@@ -86,7 +86,7 @@ var svgElementToPdf = (function () {
 
   // computes the transform directly applied at the node (such as viewbox scaling and the "transform" atrribute)
   // x,y,cx,cy,r,... are omitted
-  var computeNodeTransformfunction = function(node) {
+  var computeNodeTransform = function(node) {
     var height, width, viewBoxHeight, viewBoxWidth, bounds, viewBox, y, x;
     var nodeTransform = _pdf.unitMatrix;
     if (node.is("svg,g")) {
