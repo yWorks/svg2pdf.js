@@ -184,7 +184,7 @@ var svgElementToPdf = (function () {
         width = parseFloat(node.get(0).getAttribute("markerWidth")) || viewBoxWidth;
         height = parseFloat(node.get(0).getAttribute("markerHeight")) || viewBoxHeight;
 
-        var s = new _pdf.Matrix(width / viewBoxWidth, 0, 0, height / viewBoxHeight, 0, 0)
+        var s = new _pdf.Matrix(width / viewBoxWidth, 0, 0, height / viewBoxHeight, 0, 0);
         var t = new _pdf.Matrix(1, 0, 0, 1, x - bounds[0], y - bounds[1]);
         nodeTransform = _pdf.matrixMult(t, s);
       } else {
@@ -197,7 +197,7 @@ var svgElementToPdf = (function () {
       return nodeTransform;
     else
       return _pdf.matrixMult(nodeTransform, parseTransform(transformString));
-  }
+  };
 
   // parses the "points" string used by polygons and returns an array of points
   var parsePointsString = function (string) {
@@ -663,7 +663,7 @@ var svgElementToPdf = (function () {
       }
 
       return {lines: lines, markers: markers};
-    }
+    };
     var lines = getLinesFromPath(list, tfMatrix);
 
     var markerEnd = n.attr("marker-end");
@@ -813,7 +813,7 @@ var svgElementToPdf = (function () {
           break;
       }
       return xOffset;
-    }
+    };
 
     // creates an svg element and append the text node to properly measure the text size
     var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -837,14 +837,13 @@ var svgElementToPdf = (function () {
     y = (parseFloat(n.attr("dy")) || 0) * pdfFontSize;
     _pdf.setFontSize(pdfFontSize);
 
-    var undef;
     // when there are no tspans draw the text directly
     if (node.childElementCount === 0) {
       _pdf.text(
           (x - xOffset),
           y,
           removeNewlinesAndTrim(n.text()),
-          undef,
+          void 0,
           m
       );
     } else {
@@ -858,7 +857,7 @@ var svgElementToPdf = (function () {
             x - xOffset,
             y,
             removeNewlinesAndTrim(s.text()),
-            undef,
+            void 0,
             m
         );
       });
@@ -946,7 +945,6 @@ var svgElementToPdf = (function () {
     var tfMatrix,
         hasFillColor = false,
         fillRGB = null,
-        hasStrokeColor = false,
         colorMode = null,
         gradient = null,
         gradientMatrix = null,
@@ -960,7 +958,6 @@ var svgElementToPdf = (function () {
     // of the top-level page
     var targetIsFormObject = withinDefs && "lineargradient,radialgradient".indexOf(node.tagName.toLowerCase()) < 0;
     if (targetIsFormObject) {
-      tfMatrix = _pdf.unitMatrix;
 
       // the transformations directly at the node are written to the pdf form object transformation matrix
       tfMatrix = computeNodeTransform(n);
@@ -1050,7 +1047,6 @@ var svgElementToPdf = (function () {
         }
         var strokeRGB = new RGBColor(strokeColor);
         if (strokeRGB.ok) {
-          hasStrokeColor = true;
           _pdf.setDrawColor(strokeRGB.r, strokeRGB.g, strokeRGB.b);
           colorMode = (colorMode || "") + "D";
         }
@@ -1147,7 +1143,7 @@ var svgElementToPdf = (function () {
     } else {
       _pdf.restoreGraphicsState();
     }
-  }
+  };
 
   // the actual svgToPdf function (see above)
   return function (element, pdf, options) {
