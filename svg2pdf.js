@@ -14,6 +14,73 @@ var svgElementToPdf = (function () {
 
   var cToQ = 2 / 3; // ratio to convert quadratic bezier curves to cubic ones
 
+  // pathSegList is marked deprecated in chrome, so parse the d attribute manually if necessary
+  var getPathSegList = function (node) {
+    var pathSegList = node.pathSegList;
+    if (pathSegList) {
+      return pathSegList;
+    }
+
+    pathSegList = [];
+
+    var d = node.getAttribute("d");
+
+    var regex = /([a-zA-Z])([^a-zA-Z]*)/g,
+        match;
+    while (match = regex.exec(d)) {
+      var coords = parseFloats(match[2]).reverse();
+      var pathSeg = {};
+      var type = pathSeg.pathSegTypeAsLetter = match[1];
+      switch (type) {
+        case "h":
+        case "H":
+          pathSeg.x = coords[0];
+          break;
+
+        case "v":
+        case "V":
+          pathSeg.y = coords[0];
+          break;
+
+        case "c":
+        case "C":
+          pathSeg.x1 = coords[5];
+          pathSeg.y1 = coords[4];
+        case "s":
+        case "S":
+          pathSeg.x2 = coords[3];
+          pathSeg.y2 = coords[2];
+        case "t":
+        case "T":
+        case "l":
+        case "L":
+        case "m":
+        case "M":
+          pathSeg.x = coords[1];
+          pathSeg.y = coords[0];
+          break;
+
+        case "q":
+        case "Q":
+          pathSeg.x1 = coords[3];
+          pathSeg.y1 = coords[2];
+          pathSeg.x = coords[1];
+          pathSeg.y = coords[0];
+          break;
+        // TODO: a,A
+      }
+
+      pathSegList.push(pathSeg);
+    }
+
+    pathSegList.getItem = function (i) {
+      return this[i]
+    };
+    pathSegList.numberOfItems = pathSegList.length;
+
+    return pathSegList;
+  };
+
   // returns an attribute of a node, either from the node directly or from css
   var getAttribute = function (node, propertyNode, propertyCss) {
     propertyCss = propertyCss || propertyNode;
@@ -86,7 +153,7 @@ var svgElementToPdf = (function () {
 
   // computes the transform directly applied at the node (such as viewbox scaling and the "transform" atrribute)
   // x,y,cx,cy,r,... are omitted
-  var computeNodeTransform = function(node) {
+  var computeNodeTransform = function (node) {
     var height, width, viewBoxHeight, viewBoxWidth, bounds, viewBox, y, x;
     var nodeTransform = _pdf.unitMatrix;
     if (node.is("svg,g")) {
@@ -209,7 +276,7 @@ var svgElementToPdf = (function () {
 
   // parses a comma and/or whitespace separated string of floats and returns the single floats in an array
   var parseFloats = function (str) {
-    return str.trim().split(/\s*\s|,\s*/).map(parseFloat);
+    return str.replace(/[^eE]-/g, " -").trim().split(/\s*\s|,\s*/).map(parseFloat);
   };
 
   // multiplies a vector with a matrix: vec' = vec * matrix
@@ -249,7 +316,7 @@ var svgElementToPdf = (function () {
     }
 
     if (node.is("path")) {
-      var list = node.get(0).pathSegList;
+      var list = getPathSegList(node.get(0));
       minX = Number.POSITIVE_INFINITY;
       minY = Number.POSITIVE_INFINITY;
       maxX = Number.NEGATIVE_INFINITY;
@@ -451,7 +518,7 @@ var svgElementToPdf = (function () {
 
   // draws a path
   var path = function (n, node, tfMatrix, svgIdPrefix, colorMode, gradient, gradientMatrix) {
-    var list = node.pathSegList;
+    var list = getPathSegList(node);
 
     var getLinesFromPath = function (pathSegList, tfMatrix) {
       var x = 0, y = 0;
