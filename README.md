@@ -14,7 +14,7 @@ run
 npm install
 ```
 
-to install all dependecies.
+to install all dependencies.
 
 If you're only interested in the complete package, run
 
