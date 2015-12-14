@@ -1,6 +1,27 @@
 # svg2pdf.js
 A javascript-only SVG to PDF conversion utility that runs in the browser leveraging jsPDF.
 
+## Installation
+If you have cloned this repository via
+
+```bash
+git clone https://github.com/yWorks/svg2pdf.js.git
+```
+
+run 
+
+```bash
+npm install
+```
+
+to install all dependecies.
+
+If you're only interested in the complete package, run
+
+```bash
+npm install svg2pdf.js
+```
+
 ## Usage
 ```javascript
 var svgElement = document.getElementById('svg');
