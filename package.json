@@ -22,7 +22,6 @@
   },
   "homepage": "https://github.com/yWorks/svg2pdf.js#readme",
   "dependencies": {
-	"jspdf": "git+https://github.com/yWorks/jsPDF.git#1.1.345",
-	"jquery": ">=2.1.4"
+	"jspdf": "git+https://github.com/yWorks/jsPDF.git#1.1.345"
   }
 }

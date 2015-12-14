@@ -43,8 +43,6 @@ var uri = pdf.output('datauristring');
 
 ## Dependencies
  * [jsPDF](https://github.com/yWorks/jsPDF) (yWorks fork version!)
- * [jQuery](https://jquery.org/)
-
 
 ## License
 

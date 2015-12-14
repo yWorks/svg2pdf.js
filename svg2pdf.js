@@ -111,6 +111,21 @@ var svgElementToPdf = (function (global) {
     return node.getAttribute(propertyNode) || node.style[propertyCss];
   };
 
+  var nodeIs = function (node, tagsString) {
+    return tagsString.indexOf(node.tagName.toLowerCase()) >= 0;
+  };
+
+  var forEachChild = function (node, fn) {
+    // copy list of children, as the original might be modified
+    var children = [];
+    for (var i = 0; i < node.children.length; i++) {
+      children.push(node.children[i]);
+    }
+    for (i = 0; i < children.length; i++) {
+      fn(i, children[i]);
+    }
+  };
+
   // mirrors p1 at p2
   var mirrorPoint = function (p1, p2) {
     var dx = p2[0] - p1[0];
@@ -180,33 +195,33 @@ var svgElementToPdf = (function (global) {
   var computeNodeTransform = function (node) {
     var height, width, viewBoxHeight, viewBoxWidth, bounds, viewBox, y, x;
     var nodeTransform = _pdf.unitMatrix;
-    if (node.is("svg,g")) {
-      x = parseFloat(node.attr("x")) || 0;
-      y = parseFloat(node.attr("y")) || 0;
+    if (nodeIs(node, "svg,g")) {
+      x = parseFloat(node.getAttribute("x")) || 0;
+      y = parseFloat(node.getAttribute("y")) || 0;
 
       // jquery doesn't like camelCase notation...
-      viewBox = node.get(0).getAttribute("viewBox");
+      viewBox = node.getAttribute("viewBox");
       if (viewBox) {
         bounds = parseFloats(viewBox);
         viewBoxWidth = bounds[2] - bounds[0];
         viewBoxHeight = bounds[3] - bounds[1];
-        width = parseFloat(node.attr("width")) || viewBoxWidth;
-        height = parseFloat(node.attr("height")) || viewBoxHeight;
+        width = parseFloat(node.getAttribute("width")) || viewBoxWidth;
+        height = parseFloat(node.getAttribute("height")) || viewBoxHeight;
         nodeTransform = new _pdf.Matrix(width / viewBoxWidth, 0, 0, height / viewBoxHeight, x - bounds[0], y - bounds[1]);
       } else {
         nodeTransform = new _pdf.Matrix(1, 0, 0, 1, x, y);
       }
-    } else if (node.is("marker")) {
-      x = -parseFloat(node.get(0).getAttribute("refX")) || 0;
-      y = -parseFloat(node.get(0).getAttribute("refY")) || 0;
+    } else if (nodeIs(node, "marker")) {
+      x = -parseFloat(node.getAttribute("refX")) || 0;
+      y = -parseFloat(node.getAttribute("refY")) || 0;
 
-      viewBox = node.get(0).getAttribute("viewBox");
+      viewBox = node.getAttribute("viewBox");
       if (viewBox) {
         bounds = parseFloats(viewBox);
         viewBoxWidth = bounds[2] - bounds[0];
         viewBoxHeight = bounds[3] - bounds[1];
-        width = parseFloat(node.get(0).getAttribute("markerWidth")) || viewBoxWidth;
-        height = parseFloat(node.get(0).getAttribute("markerHeight")) || viewBoxHeight;
+        width = parseFloat(node.getAttribute("markerWidth")) || viewBoxWidth;
+        height = parseFloat(node.getAttribute("markerHeight")) || viewBoxHeight;
 
         var s = new _pdf.Matrix(width / viewBoxWidth, 0, 0, height / viewBoxHeight, 0, 0);
         var t = new _pdf.Matrix(1, 0, 0, 1, x - bounds[0], y - bounds[1]);
@@ -216,7 +231,7 @@ var svgElementToPdf = (function (global) {
       }
     }
 
-    var transformString = node.attr("transform");
+    var transformString = node.getAttribute("transform");
     if (!transformString)
       return nodeTransform;
     else
@@ -318,8 +333,8 @@ var svgElementToPdf = (function (global) {
   var getUntransformedBBox = function (node) {
     var i, minX, minY, maxX, maxY, viewBox, vb;
 
-    if (node.is("polygon")) {
-      var points = parsePointsString(node.attr("points"));
+    if (nodeIs(node, "polygon")) {
+      var points = parsePointsString(node.getAttribute("points"));
       minX = Number.POSITIVE_INFINITY;
       minY = Number.POSITIVE_INFINITY;
       maxX = Number.NEGATIVE_INFINITY;
@@ -339,8 +354,8 @@ var svgElementToPdf = (function (global) {
       ];
     }
 
-    if (node.is("path")) {
-      var list = getPathSegList(node.get(0));
+    if (nodeIs(node, "path")) {
+      var list = getPathSegList(node);
       minX = Number.POSITIVE_INFINITY;
       minY = Number.POSITIVE_INFINITY;
       maxX = Number.NEGATIVE_INFINITY;
@@ -442,36 +457,36 @@ var svgElementToPdf = (function (global) {
     }
 
     var pf = parseFloat;
-    if (node.is("svg")) {
-      viewBox = node.get(0).getAttribute("viewBox");
+    if (nodeIs(node, "svg")) {
+      viewBox = node.getAttribute("viewBox");
       if (viewBox) {
         vb = parseFloats(viewBox);
       }
       return [
-        pf(node.attr("x")) || (vb && vb[0]) || 0,
-        pf(node.attr("y")) || (vb && vb[1]) || 0,
-        pf(node.attr("width")) || (vb && vb[2]) || 0,
-        pf(node.attr("height")) || (vb && vb[3]) || 0
+        pf(node.getAttribute("x")) || (vb && vb[0]) || 0,
+        pf(node.getAttribute("y")) || (vb && vb[1]) || 0,
+        pf(node.getAttribute("width")) || (vb && vb[2]) || 0,
+        pf(node.getAttribute("height")) || (vb && vb[3]) || 0
       ];
     }
-    if (node.is("marker")) {
-      viewBox = node.get(0).getAttribute("viewBox");
+    if (nodeIs(node, "marker")) {
+      viewBox = node.getAttribute("viewBox");
       if (viewBox) {
         vb = parseFloats(viewBox);
       }
       return [
         (vb && vb[0]) || 0,
         (vb && vb[1]) || 0,
-        (vb && vb[2]) || pf(node.attr("marker-width")) || 0,
-        (vb && vb[3]) || pf(node.attr("marker-height")) || 0
+        (vb && vb[2]) || pf(node.getAttribute("marker-width")) || 0,
+        (vb && vb[3]) || pf(node.getAttribute("marker-height")) || 0
       ];
     }
 
     // TODO: check if there are other possible coordinate attributes
-    var x1 = pf(node.attr("x1")) || pf(node.attr("x")) || pf((node.attr("cx")) - pf(node.attr("r"))) || 0;
-    var x2 = pf(node.attr("x2")) || (x1 + pf(node.attr("width"))) || (pf(node.attr("cx")) + pf(node.attr("r"))) || 0;
-    var y1 = pf(node.attr("y1")) || pf(node.attr("y")) || (pf(node.attr("cy")) - pf(node.attr("r"))) || 0;
-    var y2 = pf(node.attr("y2")) || (y1 + pf(node.attr("height"))) || (pf(node.attr("cy")) + pf(node.attr("r"))) || 0;
+    var x1 = pf(node.getAttribute("x1")) || pf(node.getAttribute("x")) || pf((node.getAttribute("cx")) - pf(node.getAttribute("r"))) || 0;
+    var x2 = pf(node.getAttribute("x2")) || (x1 + pf(node.getAttribute("width"))) || (pf(node.getAttribute("cx")) + pf(node.getAttribute("r"))) || 0;
+    var y1 = pf(node.getAttribute("y1")) || pf(node.getAttribute("y")) || (pf(node.getAttribute("cy")) - pf(node.getAttribute("r"))) || 0;
+    var y2 = pf(node.getAttribute("y2")) || (y1 + pf(node.getAttribute("height"))) || (pf(node.getAttribute("cy")) + pf(node.getAttribute("r"))) || 0;
     return [
       Math.min(x1, x2),
       Math.min(y1, y2),
@@ -501,8 +516,8 @@ var svgElementToPdf = (function (global) {
   };
 
   // draws a polygon
-  var polygon = function (n, tfMatrix, colorMode, gradient, gradientMatrix) {
-    var points = parsePointsString(n.attr("points"));
+  var polygon = function (node, tfMatrix, colorMode, gradient, gradientMatrix) {
+    var points = parsePointsString(node.getAttribute("points"));
     var lines = [{op: "m", c: multVecMatrix(points[0], tfMatrix)}];
     for (var i = 1; i < points.length; i++) {
       var p = points[i];
@@ -514,15 +529,15 @@ var svgElementToPdf = (function (global) {
   };
 
   // draws an image (converts it to jpeg first, as jsPDF doesn't support png or other formats)
-  var image = function (n) {
+  var image = function (node) {
     // convert image to jpeg
-    var imageUrl = n.attr("xlink:href") || n.attr("href");
+    var imageUrl = node.getAttribute("xlink:href") || node.getAttribute("href");
     var image = new Image();
     image.src = imageUrl;
 
     var canvas = document.createElement("canvas");
-    var width = parseFloat(n.attr("width")),
-        height = parseFloat(n.attr("height"));
+    var width = parseFloat(node.getAttribute("width")),
+        height = parseFloat(node.getAttribute("height"));
     canvas.width = width;
     canvas.height = height;
     var context = canvas.getContext("2d");
@@ -541,7 +556,7 @@ var svgElementToPdf = (function (global) {
   };
 
   // draws a path
-  var path = function (n, node, tfMatrix, svgIdPrefix, colorMode, gradient, gradientMatrix) {
+  var path = function (node, tfMatrix, svgIdPrefix, colorMode, gradient, gradientMatrix) {
     var list = getPathSegList(node);
 
     var getLinesFromPath = function (pathSegList, tfMatrix) {
@@ -690,7 +705,7 @@ var svgElementToPdf = (function (global) {
     };
     var lines = getLinesFromPath(list, tfMatrix);
 
-    var markerEnd = n.attr("marker-end");
+    var markerEnd = node.getAttribute("marker-end");
     if (markerEnd) {
       for (var i = 0; i < lines.markers.length; i++) {
         var marker = lines.markers[i];
@@ -710,8 +725,8 @@ var svgElementToPdf = (function (global) {
 
   // draws the element referenced by a use node, makes use of pdf's XObjects/FormObjects so nodes are only written once
   // to the pdf document. This highly reduces the file size and computation time.
-  var use = function (n, tfMatrix, svgIdPrefix) {
-    var url = (n.attr("href") || n.attr("xlink:href"));
+  var use = function (node, tfMatrix, svgIdPrefix) {
+    var url = (node.getAttribute("href") || node.getAttribute("xlink:href"));
     // just in case someone has the idea to use empty use-tags, wtf???
     if (!url)
       return;
@@ -720,10 +735,10 @@ var svgElementToPdf = (function (global) {
     var formObject = _pdf.getFormObject(svgIdPrefix.get() + url.substring(1));
 
     // scale and position it right
-    var x = n.attr("x") || 0;
-    var y = n.attr("y") || 0;
-    var width = n.attr("width") || formObject.width;
-    var height = n.attr("height") || formObject.height;
+    var x = node.getAttribute("x") || 0;
+    var y = node.getAttribute("y") || 0;
+    var width = node.getAttribute("width") || formObject.width;
+    var height = node.getAttribute("height") || formObject.height;
     var t = _pdf.unitMatrix;
     if (width > 0 && height > 0) {
       t = new _pdf.Matrix(width / formObject.width, 0, 0, height / formObject.height, x, y);
@@ -733,21 +748,21 @@ var svgElementToPdf = (function (global) {
   };
 
   // draws a line
-  var line = function (n, tfMatrix) {
-    var p1 = multVecMatrix([parseFloat(n.attr('x1')), parseFloat(n.attr('y1'))], tfMatrix);
-    var p2 = multVecMatrix([parseFloat(n.attr('x2')), parseFloat(n.attr('y2'))], tfMatrix);
+  var line = function (node, tfMatrix) {
+    var p1 = multVecMatrix([parseFloat(node.getAttribute('x1')), parseFloat(node.getAttribute('y1'))], tfMatrix);
+    var p2 = multVecMatrix([parseFloat(node.getAttribute('x2')), parseFloat(node.getAttribute('y2'))], tfMatrix);
     _pdf.line(p1[0], p1[1], p2[0], p2[1]);
   };
 
   // draws a rect
-  var rect = function (n, colorMode, gradient, gradientMatrix) {
+  var rect = function (node, colorMode, gradient, gradientMatrix) {
     _pdf.roundedRect(
-        parseFloat(n.attr('x')) || 0,
-        parseFloat(n.attr('y')) || 0,
-        parseFloat(n.attr('width')),
-        parseFloat(n.attr('height')),
-        parseFloat(n.attr('rx')) || 0,
-        parseFloat(n.attr('ry')) || 0,
+        parseFloat(node.getAttribute('x')) || 0,
+        parseFloat(node.getAttribute('y')) || 0,
+        parseFloat(node.getAttribute('width')),
+        parseFloat(node.getAttribute('height')),
+        parseFloat(node.getAttribute('rx')) || 0,
+        parseFloat(node.getAttribute('ry')) || 0,
         colorMode,
         gradient,
         gradientMatrix
@@ -755,12 +770,12 @@ var svgElementToPdf = (function (global) {
   };
 
   // draws an ellipse
-  var ellipse = function (n, colorMode, gradient, gradientMatrix) {
+  var ellipse = function (node, colorMode, gradient, gradientMatrix) {
     _pdf.ellipse(
-        parseFloat(n.attr('cx')) || 0,
-        parseFloat(n.attr('cy')) || 0,
-        parseFloat(n.attr('rx')),
-        parseFloat(n.attr('ry')),
+        parseFloat(node.getAttribute('cx')) || 0,
+        parseFloat(node.getAttribute('cy')) || 0,
+        parseFloat(node.getAttribute('rx')),
+        parseFloat(node.getAttribute('ry')),
         colorMode,
         gradient,
         gradientMatrix
@@ -768,11 +783,11 @@ var svgElementToPdf = (function (global) {
   };
 
   // draws a circle
-  var circle = function (n, colorMode, gradient, gradientMatrix) {
-    var radius = parseFloat(n.attr('r')) || 0;
+  var circle = function (node, colorMode, gradient, gradientMatrix) {
+    var radius = parseFloat(node.getAttribute('r')) || 0;
     _pdf.ellipse(
-        parseFloat(n.attr('cx')) || 0,
-        parseFloat(n.attr('cy')) || 0,
+        parseFloat(node.getAttribute('cx')) || 0,
+        parseFloat(node.getAttribute('cy')) || 0,
         radius,
         radius,
         colorMode,
@@ -782,7 +797,7 @@ var svgElementToPdf = (function (global) {
   };
 
   // draws a text element and its tspan children
-  var text = function (n, node, tfMatrix, hasFillColor, fillRGB) {
+  var text = function (node, tfMatrix, hasFillColor, fillRGB) {
     var fontFamily = getAttribute(node, "font-family");
     if (fontFamily) {
       switch (fontFamily.toLowerCase()) {
@@ -854,11 +869,11 @@ var svgElementToPdf = (function (global) {
     // Only supported measuring unit is "em"!
     var m = new _pdf.Matrix(
         tfMatrix.a, tfMatrix.b, tfMatrix.c, tfMatrix.d,
-        tfMatrix.e + (parseFloat(n.attr('x')) || 0),
-        tfMatrix.f + (parseFloat(n.attr('y')) || 0)
+        tfMatrix.e + (parseFloat(node.getAttribute('x')) || 0),
+        tfMatrix.f + (parseFloat(node.getAttribute('y')) || 0)
     );
-    x = (parseFloat(n.attr("dx")) || 0) * pdfFontSize;
-    y = (parseFloat(n.attr("dy")) || 0) * pdfFontSize;
+    x = (parseFloat(node.getAttribute("dx")) || 0) * pdfFontSize;
+    y = (parseFloat(node.getAttribute("dy")) || 0) * pdfFontSize;
     _pdf.setFontSize(pdfFontSize);
 
     // when there are no tspans draw the text directly
@@ -866,21 +881,19 @@ var svgElementToPdf = (function (global) {
       _pdf.text(
           (x - xOffset),
           y,
-          removeNewlinesAndTrim(n.text()),
+          removeNewlinesAndTrim(node.textContent),
           void 0,
           m
       );
     } else {
       // otherwise loop over tspans and position each relative to the previous one
-      n.children().each(function (i, tSpan) {
+      forEachChild(node, function (i, tSpan) {
         var xOffset = getTextOffset(textAnchor, tSpan.getComputedTextLength());
-        var s = $(tSpan);
-        x += (parseFloat(s.attr("dx")) || 0) * pdfFontSize;
-        y += (parseFloat(s.attr("dy")) || 0) * pdfFontSize;
+        y += (parseFloat(tSpan.getAttribute("dy")) || 0) * pdfFontSize;
         _pdf.text(
             x - xOffset,
             y,
-            removeNewlinesAndTrim(s.text()),
+            removeNewlinesAndTrim(tSpan.textContent),
             void 0,
             m
         );
@@ -891,8 +904,8 @@ var svgElementToPdf = (function (global) {
   };
 
   // As defs elements are allowed to appear after they are referenced, we search for them at first
-  var findAndRenderDefs = function (n, tfMatrix, defs, svgIdPrefix, withinDefs) {
-    n.children().each(function (i, child) {
+  var findAndRenderDefs = function (node, tfMatrix, defs, svgIdPrefix, withinDefs) {
+    forEachChild(node, function (i, child) {
       if (child.tagName.toLowerCase() === "defs") {
         renderNode(child, tfMatrix, defs, svgIdPrefix, withinDefs);
         // prevent defs from being evaluated twice // TODO: make this better
@@ -902,17 +915,17 @@ var svgElementToPdf = (function (global) {
   };
 
   // processes a svg node
-  var svg = function (n, tfMatrix, defs, svgIdPrefix, withinDefs) {
+  var svg = function (node, tfMatrix, defs, svgIdPrefix, withinDefs) {
     // create a new prefix and clone the defs, as defs within the svg should not be visible outside
     var newSvgIdPrefix = svgIdPrefix.nextChild();
     var newDefs = cloneDefs(defs);
-    findAndRenderDefs(n, tfMatrix, newDefs, newSvgIdPrefix, withinDefs);
-    renderChildren(n, tfMatrix, newDefs, newSvgIdPrefix, withinDefs);
+    findAndRenderDefs(node, tfMatrix, newDefs, newSvgIdPrefix, withinDefs);
+    renderChildren(node, tfMatrix, newDefs, newSvgIdPrefix, withinDefs);
   };
 
   // renders all children of a node
-  var renderChildren = function (n, tfMatrix, defs, svgIdPrefix, withinDefs) {
-    n.children().each(function (i, node) {
+  var renderChildren = function (node, tfMatrix, defs, svgIdPrefix, withinDefs) {
+    forEachChild(node, function (i, node) {
       renderNode(node, tfMatrix, defs, svgIdPrefix, withinDefs);
     });
   };
@@ -920,18 +933,17 @@ var svgElementToPdf = (function (global) {
   // adds a gradient to defs and the pdf document for later use, type is either "axial" or "radial"
   // opacity is only supported rudimentary by avaraging over all stops
   // transforms are applied on use
-  var putGradient = function (n, node, type, coords, defs, svgIdPrefix) {
+  var putGradient = function (node, type, coords, defs, svgIdPrefix) {
     var colors = [];
     var opacitySum = 0;
     var hasOpacity = false;
     var gState;
-    n.children().each(function (i, element) {
+    forEachChild(node, function (i, element) {
       // since opacity gradients are hard to realize, avarage the opacity over the control points
       if (element.tagName.toLowerCase() === "stop") {
-        var e = $(element);
         var color = new RGBColor(getAttribute(element, "stop-color"));
         colors.push({
-          offset: parseFloat(e.attr("offset")),
+          offset: parseFloat(element.getAttribute("offset")),
           color: [color.r, color.g, color.b]
         });
         var opacity = getAttribute(element, "stop-opacity");
@@ -947,7 +959,7 @@ var svgElementToPdf = (function (global) {
     }
 
     var pattern = new _pdf.Pattern(type, coords, colors, gState);
-    var id = svgIdPrefix.get() + n.attr("id");
+    var id = svgIdPrefix.get() + node.getAttribute("id");
     _pdf.addPattern(id, pattern);
     defs[id] = node;
   };
@@ -962,10 +974,6 @@ var svgElementToPdf = (function (global) {
    * @param withinDefs True iff we are top-level within a defs node, so the target can be switched to an pdf form object
    */
   var renderNode = function (node, contextTransform, defs, svgIdPrefix, withinDefs) {
-
-    var n = $(node); // jquery node for comfort
-
-
     var tfMatrix,
         hasFillColor = false,
         fillRGB = null,
@@ -980,12 +988,12 @@ var svgElementToPdf = (function (global) {
 
     // if we are within a defs node, start a new pdf form object and draw this node and all children on that instead
     // of the top-level page
-    var targetIsFormObject = withinDefs && "lineargradient,radialgradient".indexOf(node.tagName.toLowerCase()) < 0;
+    var targetIsFormObject = withinDefs && !nodeIs(node, "lineargradient,radialgradient");
     if (targetIsFormObject) {
 
       // the transformations directly at the node are written to the pdf form object transformation matrix
-      tfMatrix = computeNodeTransform(n);
-      bBox = getUntransformedBBox(n);
+      tfMatrix = computeNodeTransform(node);
+      bBox = getUntransformedBBox(node);
 
       _pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], tfMatrix);
 
@@ -994,7 +1002,7 @@ var svgElementToPdf = (function (global) {
       withinDefs = false;
 
     } else {
-      tfMatrix = _pdf.matrixMult(computeNodeTransform(n), contextTransform);
+      tfMatrix = _pdf.matrixMult(computeNodeTransform(node), contextTransform);
       _pdf.saveGraphicsState();
     }
 
@@ -1003,15 +1011,15 @@ var svgElementToPdf = (function (global) {
     //
 
     // fill mode
-    if (n.is('g,path,rect,text,ellipse,line,circle,polygon')) {
-      var fillColor = n.attr('fill');
+    if (nodeIs(node, "g,path,rect,text,ellipse,line,circle,polygon")) {
+      var fillColor = node.getAttribute("fill");
       if (fillColor) {
         var url = /url\(#(\w+)\)/.exec(fillColor);
         if (url) {
           // probably a gradient (or something unsupported)
           gradient = svgIdPrefix.get() + url[1];
           var fill = getFromDefs(gradient, defs);
-          if ("lineargradient,radialgradient".indexOf(fill.tagName.toLowerCase()) >= 0) {
+          if (nodeIs(fill, "lineargradient,radialgradient")) {
 
             // matrix to convert between gradient space and user space
             // for "userSpaceOnUse" this is the current transformation: tfMatrix
@@ -1019,10 +1027,10 @@ var svgElementToPdf = (function (global) {
             var gradientUnitsMatrix = tfMatrix;
             if (!fill.hasAttribute("gradientUnits")
                 || fill.getAttribute("gradientUnits").toLowerCase() === "objectboundingbox") {
-              bBox = getUntransformedBBox(n);
+              bBox = getUntransformedBBox(node);
               gradientUnitsMatrix = new _pdf.Matrix(bBox[2], 0, 0, bBox[3], bBox[0], bBox[1]);
 
-              var nodeTransform = computeNodeTransform(n);
+              var nodeTransform = computeNodeTransform(node);
               gradientUnitsMatrix = _pdf.matrixMult(gradientUnitsMatrix, nodeTransform);
             }
 
@@ -1049,7 +1057,7 @@ var svgElementToPdf = (function (global) {
       }
 
       // opacity is realized via a pdf graphics state
-      var opacity = n.attr("opacity") || n.attr("fill-opacity");
+      var opacity = node.getAttribute("opacity") || node.getAttribute("fill-opacity");
       if (opacity) {
         _pdf.setGState(new _pdf.GState({opacity: parseFloat(opacity)}));
       } else {
@@ -1057,17 +1065,17 @@ var svgElementToPdf = (function (global) {
       }
     }
 
-    if (n.is('g,path,rect,ellipse,line,circle,polygon')) {
+    if (nodeIs(node, "g,path,rect,ellipse,line,circle,polygon")) {
       // text has no fill color, so apply it not until here
       if (hasFillColor) {
         _pdf.setFillColor(fillRGB.r, fillRGB.g, fillRGB.b);
       }
 
       // stroke mode
-      var strokeColor = n.attr('stroke');
+      var strokeColor = node.getAttribute('stroke');
       if (strokeColor) {
         if (node.hasAttribute("stroke-width")) {
-          _pdf.setLineWidth(Math.abs(parseFloat(n.attr('stroke-width'))));
+          _pdf.setLineWidth(Math.abs(parseFloat(node.getAttribute('stroke-width'))));
         }
         var strokeRGB = new RGBColor(strokeColor);
         if (strokeRGB.ok) {
@@ -1075,15 +1083,15 @@ var svgElementToPdf = (function (global) {
           colorMode = (colorMode || "") + "D";
         }
         if (node.hasAttribute("stroke-linecap")) {
-          _pdf.setLineCap(n.attr("stroke-linecap"));
+          _pdf.setLineCap(node.getAttribute("stroke-linecap"));
         }
         if (node.hasAttribute("stroke-linejoin")) {
-          _pdf.setLineJoin(n.attr("stroke-linejoin"));
+          _pdf.setLineJoin(node.getAttribute("stroke-linejoin"));
         }
         if (node.hasAttribute("stroke-dasharray")) {
           _pdf.setLineDashPattern(
-              parseFloats(n.attr("stroke-dasharray")),
-              parseInt(n.attr("stroke-dashoffset")) || 0
+              parseFloats(node.getAttribute("stroke-dasharray")),
+              parseInt(node.getAttribute("stroke-dashoffset")) || 0
           );
         }
       }
@@ -1092,78 +1100,82 @@ var svgElementToPdf = (function (global) {
     // do the actual drawing
     switch (node.tagName.toLowerCase()) {
       case 'svg':
-        svg(n, tfMatrix, defs, svgIdPrefix, withinDefs);
+        svg(node, tfMatrix, defs, svgIdPrefix, withinDefs);
         break;
       case 'g':
-        findAndRenderDefs(n, tfMatrix, defs, svgIdPrefix, withinDefs);
+        findAndRenderDefs(node, tfMatrix, defs, svgIdPrefix, withinDefs);
       case 'a':
       case "marker":
-        renderChildren(n, tfMatrix, defs, svgIdPrefix, withinDefs);
+        renderChildren(node, tfMatrix, defs, svgIdPrefix, withinDefs);
         break;
 
       case 'defs':
-        renderChildren(n, tfMatrix, defs, svgIdPrefix, true);
+        renderChildren(node, tfMatrix, defs, svgIdPrefix, true);
         break;
 
       case 'use':
-        use(n, tfMatrix, svgIdPrefix);
+        use(node, tfMatrix, svgIdPrefix);
         break;
 
       case 'line':
-        line(n, tfMatrix);
+        line(node, tfMatrix);
         break;
 
       case 'rect':
         _pdf.setCurrentTransformationMatrix(tfMatrix);
-        rect(n, colorMode, gradient, gradientMatrix);
+        rect(node, colorMode, gradient, gradientMatrix);
         break;
 
       case 'ellipse':
         _pdf.setCurrentTransformationMatrix(tfMatrix);
-        ellipse(n, colorMode, gradient, gradientMatrix);
+        ellipse(node, colorMode, gradient, gradientMatrix);
         break;
 
       case 'circle':
         _pdf.setCurrentTransformationMatrix(tfMatrix);
-        circle(n, colorMode, gradient, gradientMatrix);
+        circle(node, colorMode, gradient, gradientMatrix);
         break;
       case 'text':
-        text(n, node, tfMatrix, hasFillColor, fillRGB);
+        text(node, tfMatrix, hasFillColor, fillRGB);
         break;
 
       case 'path':
-        path(n, node, tfMatrix, svgIdPrefix, colorMode, gradient, gradientMatrix);
+        path(node, tfMatrix, svgIdPrefix, colorMode, gradient, gradientMatrix);
         break;
 
       case 'polygon':
-        polygon(n, tfMatrix, colorMode, gradient, gradientMatrix);
+        polygon(node, tfMatrix, colorMode, gradient, gradientMatrix);
         break;
 
       case 'image':
         _pdf.setCurrentTransformationMatrix(tfMatrix);
-        image(n);
+        image(node);
         break;
 
       case "lineargradient":
-        putGradient(n, node, "axial", [n.attr("x1"), n.attr("y1"), n.attr("x2"), n.attr("y2")], defs, svgIdPrefix);
+        putGradient(node, "axial", [
+          node.getAttribute("x1"),
+          node.getAttribute("y1"),
+          node.getAttribute("x2"),
+          node.getAttribute("y2")
+        ], defs, svgIdPrefix);
         break;
 
       case "radialgradient":
-        var coords = [
-          n.attr("fx") || n.attr("cx"),
-          n.attr("fy") || n.attr("cy"),
+        putGradient(node, "radial", [
+          node.getAttribute("fx") || node.getAttribute("cx"),
+          node.getAttribute("fy") || node.getAttribute("cy"),
           0,
-          n.attr("cx") || 0,
-          n.attr("cy") || 0,
-          n.attr("r") || 0
-        ];
-        putGradient(n, node, "radial", coords, defs, svgIdPrefix);
+          node.getAttribute("cx") || 0,
+          node.getAttribute("cy") || 0,
+          node.getAttribute("r") || 0
+        ], defs, svgIdPrefix);
         break;
     }
 
     // close either the formObject or the graphics context
     if (targetIsFormObject) {
-      _pdf.endFormObject(svgIdPrefix.get() + n.attr("id"));
+      _pdf.endFormObject(svgIdPrefix.get() + node.getAttribute("id"));
     } else {
       _pdf.restoreGraphicsState();
     }
