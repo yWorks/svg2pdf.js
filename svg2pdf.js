@@ -224,7 +224,7 @@ var svgElementToPdf = (function (global) {
         height = parseFloat(node.getAttribute("markerHeight")) || viewBoxHeight;
 
         var s = new _pdf.Matrix(width / viewBoxWidth, 0, 0, height / viewBoxHeight, 0, 0);
-        var t = new _pdf.Matrix(1, 0, 0, 1, x - bounds[0], y - bounds[1]);
+        var t = new _pdf.Matrix(1, 0, 0, 1, x, y);
         nodeTransform = _pdf.matrixMult(t, s);
       } else {
         nodeTransform = new _pdf.Matrix(1, 0, 0, 1, x, y);
@@ -699,7 +699,9 @@ var svgElementToPdf = (function (global) {
         if (i === list.numberOfItems - 1
             || ("mM".indexOf(cmd) < 0 && "mM".indexOf(list.getItem(i + 1).pathSegTypeAsLetter) >= 0)) {
           var a = Math.atan2(to[1] - from[1], to[0] - from[0]);
-          var tf = new _pdf.Matrix(Math.cos(a), Math.sin(a), -Math.sin(a), Math.cos(a), to[0], to[1]);
+          var cos = Math.cos(a);
+          var sin = Math.sin(a);
+          var tf = new _pdf.Matrix(cos, sin, -sin, cos, to[0], to[1]);
           markers.push({type: "end", tf: _pdf.matrixMult(tf, tfMatrix)});
         }
 
