@@ -995,7 +995,9 @@ var svgElementToPdf = (function (global) {
       tfMatrix = computeNodeTransform(node);
       bBox = getUntransformedBBox(node);
 
-      _pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], tfMatrix);
+      // set a small margin as line width is not respected in the bounding box // TODO: set to actual line width
+      var margin = 5;
+      _pdf.beginFormObject(bBox[0] - margin, bBox[1] - margin, bBox[2] + 2 * margin, bBox[3] + 2 * margin, tfMatrix);
 
       // continue without transformation and set withinDefs to false to prevent child nodes from starting new form objects
       tfMatrix = _pdf.unitMatrix;
