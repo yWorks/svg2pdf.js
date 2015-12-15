@@ -1096,6 +1096,9 @@ var svgElementToPdf = (function (global) {
               parseInt(node.getAttribute("stroke-dashoffset")) || 0
           );
         }
+        if (node.hasAttribute("stroke-miterlimit")) {
+          _pdf.setLineMiterLimit(parseFloat(node.getAttribute("stroke-miterlimit")));
+        }
       }
     }
 
