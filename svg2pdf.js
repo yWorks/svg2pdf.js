@@ -439,7 +439,7 @@ var svgElementToPdf = (function (global) {
         } else if ("mlcsqt".indexOf(cmd) >= 0) {
           x = seg.x + x;
           y = seg.y + y;
-        } else {
+        } else if ("zZ".indexOf(cmd) < 0) {
           x = newX;
           y = newY;
         }
@@ -711,7 +711,7 @@ var svgElementToPdf = (function (global) {
         } else if ("mlcsqt".indexOf(cmd) >= 0) {
           x = seg.x + x;
           y = seg.y + y;
-        } else {
+        } else if ("zZ".indexOf(cmd) < 0) {
           x = newX;
           y = newY;
         }
