@@ -126,6 +126,10 @@ var svgElementToPdf = (function (global) {
     }
   };
 
+  var getAngle = function (from, to) {
+    return Math.atan2(to[1] - from[1], to[0] - from[0]);
+  };
+
   // mirrors p1 at p2
   var mirrorPoint = function (p1, p2) {
     var dx = p2[0] - p1[0];
@@ -565,15 +569,27 @@ var svgElementToPdf = (function (global) {
   // draws a path
   var path = function (node, tfMatrix, svgIdPrefix, colorMode, gradient, gradientMatrix) {
     var list = getPathSegList(node);
+    var markerEnd = node.getAttribute("marker-end"),
+        markerStart = node.getAttribute("marker-start"),
+        markerMid = node.getAttribute("marker-mid");
 
     var getLinesFromPath = function (pathSegList, tfMatrix) {
       var x = 0, y = 0;
       var x0 = x, y0 = y;
       var prevX, prevY, newX, newY;
-      var from, to, p, p2, p3;
+      var to, p, p2, p3;
       var lines = [];
       var markers = [];
       var op;
+      var prevAngle = 0, curAngle;
+
+      var addMarker = function (angle, anchor, type) {
+        var cos = Math.cos(angle);
+        var sin = Math.sin(angle);
+        var tf;
+        tf = new _pdf.Matrix(cos, sin, -sin, cos, anchor[0], anchor[1]);
+        markers.push({type: type, tf: _pdf.matrixMult(tf, tfMatrix)});
+      };
 
       for (var i = 0; i < list.numberOfItems; i++) {
         var seg = list.getItem(i);
@@ -676,8 +692,28 @@ var svgElementToPdf = (function (global) {
             break;
         }
 
+        var hasStartMarker = markerStart
+            && (i === 1
+            || ("mM".indexOf(cmd) < 0 && "mM".indexOf(list.getItem(i - 1).pathSegTypeAsLetter) >= 0));
+        var hasEndMarker = markerEnd
+            && (i === list.numberOfItems - 1
+            || ("mM".indexOf(cmd) < 0 && "mM".indexOf(list.getItem(i + 1).pathSegTypeAsLetter) >= 0));
+        var hasMidMarker = markerMid
+            && i > 0
+            && !(i === 1 && "mM".indexOf(list.getItem(i - 1).pathSegTypeAsLetter) >= 0);
+
         if ("sScCqQtT".indexOf(cmd) >= 0) {
-          from = p3;
+          hasStartMarker && addMarker(getAngle([x, y], p2), [x, y], "start");
+          hasEndMarker && addMarker(getAngle(p3, to), to, "end");
+          if (hasMidMarker) {
+            curAngle = getAngle([x, y], p2);
+            curAngle = "mM".indexOf(list.getItem(i - 1).pathSegTypeAsLetter) >= 0 ?
+                curAngle : .5 * (prevAngle + curAngle);
+            addMarker(curAngle, [x, y], "mid");
+          }
+
+          prevAngle = getAngle(p3, to);
+
           prevX = x;
           prevY = y;
           p2 = multVecMatrix(p2, tfMatrix);
@@ -691,18 +727,19 @@ var svgElementToPdf = (function (global) {
             ]
           });
         } else if ("lLhHvVmM".indexOf(cmd) >= 0) {
-          from = [x, y];
+          curAngle = getAngle([x, y], to);
+          hasStartMarker && addMarker(curAngle, [x, y], "start");
+          hasEndMarker && addMarker(curAngle, to, "end");
+          if (hasMidMarker) {
+            var angle = "mM".indexOf(cmd) >= 0 ?
+                prevAngle : "mM".indexOf(list.getItem(i - 1).pathSegTypeAsLetter) >= 0 ?
+                curAngle : .5 * (prevAngle + curAngle);
+            addMarker(angle, [x, y], "mid");
+          }
+          prevAngle = curAngle;
+
           p = multVecMatrix(to, tfMatrix);
           lines.push({op: op, c: p});
-        }
-
-        if (i === list.numberOfItems - 1
-            || ("mM".indexOf(cmd) < 0 && "mM".indexOf(list.getItem(i + 1).pathSegTypeAsLetter) >= 0)) {
-          var a = Math.atan2(to[1] - from[1], to[0] - from[0]);
-          var cos = Math.cos(a);
-          var sin = Math.sin(a);
-          var tf = new _pdf.Matrix(cos, sin, -sin, cos, to[0], to[1]);
-          markers.push({type: "end", tf: _pdf.matrixMult(tf, tfMatrix)});
         }
 
         if ("MLCSQT".indexOf(cmd) >= 0) {
@@ -721,14 +758,20 @@ var svgElementToPdf = (function (global) {
     };
     var lines = getLinesFromPath(list, tfMatrix);
 
-    var markerEnd = node.getAttribute("marker-end");
-    if (markerEnd) {
+    if (markerEnd || markerStart || markerMid) {
       for (var i = 0; i < lines.markers.length; i++) {
         var marker = lines.markers[i];
         var markerElement;
         switch (marker.type) {
+          case "start":
+            markerElement = svgIdPrefix.get() + /url\(#(\w+)\)/.exec(markerStart)[1];
+            break;
           case "end":
             markerElement = svgIdPrefix.get() + /url\(#(\w+)\)/.exec(markerEnd)[1];
+            break;
+          case "mid":
+            markerElement = svgIdPrefix.get() + /url\(#(\w+)\)/.exec(markerMid)[1];
+            break;
         }
         _pdf.doFormObject(markerElement, marker.tf);
       }
