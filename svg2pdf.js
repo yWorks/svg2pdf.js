@@ -361,23 +361,27 @@ var svgElementToPdf = (function (global) {
       maxX = Number.NEGATIVE_INFINITY;
       maxY = Number.NEGATIVE_INFINITY;
       var x = 0, y = 0;
-      var prevX, prevY;
+      var prevX, prevY, newX, newY;
       var p2, p3, to;
       for (i = 0; i < list.numberOfItems; i++) {
         var seg = list.getItem(i);
         var cmd = seg.pathSegTypeAsLetter;
         switch (cmd) {
           case "H":
-            x = seg.x;
+            newX = seg.x;
+            newY = y;
             break;
           case "h":
-            x = seg.x + x;
+            newX = seg.x + x;
+            newY = y;
             break;
           case "V":
-            y = seg.y;
+            newX = x;
+            newY = seg.y;
             break;
           case "v":
-            y = seg.y + y;
+            newX = x;
+            newY = seg.y + y;
             break;
           case "C":
             p2 = [seg.x1, seg.y1];
@@ -435,6 +439,9 @@ var svgElementToPdf = (function (global) {
         } else if ("mlcsqt".indexOf(cmd) >= 0) {
           x = seg.x + x;
           y = seg.y + y;
+        } else {
+          x = newX;
+          y = newY;
         }
         if ("CSQTcsqt".indexOf(cmd) >= 0) {
           minX = Math.min(minX, x, p2[0], p3[0], to[0]);
@@ -562,8 +569,8 @@ var svgElementToPdf = (function (global) {
     var getLinesFromPath = function (pathSegList, tfMatrix) {
       var x = 0, y = 0;
       var x0 = x, y0 = y;
-      var prevX, prevY;
-      var from, to, p2, p3;
+      var prevX, prevY, newX, newY;
+      var from, to, p, p2, p3;
       var lines = [];
       var markers = [];
       var op;
@@ -595,22 +602,26 @@ var svgElementToPdf = (function (global) {
           case "H":
             to = [seg.x, y];
             op = "l";
-            x = seg.x;
+            newX = seg.x;
+            newY = y;
             break;
           case "h":
             to = [seg.x + x, y];
             op = "l";
-            x = seg.x + x;
+            newX = seg.x + x;
+            newY = y;
             break;
           case "V":
             to = [x, seg.y];
             op = "l";
-            y = seg.y;
+            newX = x;
+            newY = seg.y;
             break;
           case "v":
             to = [x, seg.y + y];
             op = "l";
-            y = seg.y + y;
+            newX = x;
+            newY = seg.y + y;
             break;
           case "C":
             p2 = [seg.x1, seg.y1];
@@ -698,6 +709,9 @@ var svgElementToPdf = (function (global) {
         } else if ("mlcsqt".indexOf(cmd) >= 0) {
           x = seg.x + x;
           y = seg.y + y;
+        } else {
+          x = newX;
+          y = newY;
         }
       }
 
