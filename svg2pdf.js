@@ -800,17 +800,7 @@ var svgElementToPdf = (function (global) {
   var text = function (node, tfMatrix, hasFillColor, fillRGB) {
     var fontFamily = getAttribute(node, "font-family");
     if (fontFamily) {
-      switch (fontFamily.toLowerCase()) {
-        case 'serif':
-          _pdf.setFont('times');
-          break;
-        case 'monospace':
-          _pdf.setFont('courier');
-          break;
-        default:
-          _pdf.setFont('helvetica');
-          break;
-      }
+      _pdf.setFont(fontFamily);
     }
 
     if (hasFillColor) {
