@@ -1261,7 +1261,7 @@ var svgElementToPdf = (function (global) {
   };
 
   if (typeof define === 'function' && define.amd) {
-    define(function () {
+    define("svg2pdf", function () {
       return svg2pdf;
     });
   } else if (typeof module !== 'undefined' && module.exports) {
