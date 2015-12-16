@@ -11,12 +11,24 @@ git clone https://github.com/yWorks/svg2pdf.js.git
 run 
 
 ```bash
+bower install
+```
+
+or 
+
+```bash
 npm install
 ```
 
 to install all dependencies.
 
 If you're only interested in the complete package, run
+
+```bash
+bower install svg2pdf.js
+```
+
+or 
 
 ```bash
 npm install svg2pdf.js
