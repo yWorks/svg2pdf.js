@@ -335,7 +335,8 @@ var svgElementToPdf = (function (global) {
   // returns the untransformated bounding box of an svg element (quite expensive for path and polygon objects, as
   // the whole points/d-string has to be processed)
   var getUntransformedBBox = function (node) {
-    var i, minX, minY, maxX, maxY, viewBox, vb;
+    var i, minX, minY, maxX, maxY, viewBox, vb, boundingBox;
+    var pf = parseFloat;
 
     if (nodeIs(node, "polygon")) {
       var points = parsePointsString(node.getAttribute("points"));
@@ -350,15 +351,13 @@ var svgElementToPdf = (function (global) {
         minY = Math.min(minY, point[1]);
         maxY = Math.max(maxY, point[1]);
       }
-      return [
+      boundingBox = [
         minX,
         minY,
         maxX - minX,
         maxY - minY
       ];
-    }
-
-    if (nodeIs(node, "path")) {
+    } else if (nodeIs(node, "path")) {
       var list = getPathSegList(node);
       minX = Number.POSITIVE_INFINITY;
       minY = Number.POSITIVE_INFINITY;
@@ -459,16 +458,13 @@ var svgElementToPdf = (function (global) {
           maxY = Math.max(maxY, y);
         }
       }
-      return [
+      boundingBox = [
         minX,
         minY,
         maxX - minX,
         maxY - minY
       ];
-    }
-
-    var pf = parseFloat;
-    if (nodeIs(node, "svg")) {
+    } else if (nodeIs(node, "svg")) {
       viewBox = node.getAttribute("viewBox");
       if (viewBox) {
         vb = parseFloats(viewBox);
@@ -479,8 +475,7 @@ var svgElementToPdf = (function (global) {
         pf(node.getAttribute("width")) || (vb && vb[2]) || 0,
         pf(node.getAttribute("height")) || (vb && vb[3]) || 0
       ];
-    }
-    if (nodeIs(node, "marker")) {
+    } else if (nodeIs(node, "marker")) {
       viewBox = node.getAttribute("viewBox");
       if (viewBox) {
         vb = parseFloats(viewBox);
@@ -491,19 +486,35 @@ var svgElementToPdf = (function (global) {
         (vb && vb[2]) || pf(node.getAttribute("marker-width")) || 0,
         (vb && vb[3]) || pf(node.getAttribute("marker-height")) || 0
       ];
+    } else {
+      // TODO: check if there are other possible coordinate attributes
+      var x1 = pf(node.getAttribute("x1")) || pf(node.getAttribute("x")) || pf((node.getAttribute("cx")) - pf(node.getAttribute("r"))) || 0;
+      var x2 = pf(node.getAttribute("x2")) || (x1 + pf(node.getAttribute("width"))) || (pf(node.getAttribute("cx")) + pf(node.getAttribute("r"))) || 0;
+      var y1 = pf(node.getAttribute("y1")) || pf(node.getAttribute("y")) || (pf(node.getAttribute("cy")) - pf(node.getAttribute("r"))) || 0;
+      var y2 = pf(node.getAttribute("y2")) || (y1 + pf(node.getAttribute("height"))) || (pf(node.getAttribute("cy")) + pf(node.getAttribute("r"))) || 0;
+      boundingBox = [
+        Math.min(x1, x2),
+        Math.min(y1, y2),
+        Math.max(x1, x2) - Math.min(x1, x2),
+        Math.max(y1, y2) - Math.min(y1, y2)
+      ];
     }
 
-    // TODO: check if there are other possible coordinate attributes
-    var x1 = pf(node.getAttribute("x1")) || pf(node.getAttribute("x")) || pf((node.getAttribute("cx")) - pf(node.getAttribute("r"))) || 0;
-    var x2 = pf(node.getAttribute("x2")) || (x1 + pf(node.getAttribute("width"))) || (pf(node.getAttribute("cx")) + pf(node.getAttribute("r"))) || 0;
-    var y1 = pf(node.getAttribute("y1")) || pf(node.getAttribute("y")) || (pf(node.getAttribute("cy")) - pf(node.getAttribute("r"))) || 0;
-    var y2 = pf(node.getAttribute("y2")) || (y1 + pf(node.getAttribute("height"))) || (pf(node.getAttribute("cy")) + pf(node.getAttribute("r"))) || 0;
-    return [
-      Math.min(x1, x2),
-      Math.min(y1, y2),
-      Math.max(x1, x2) - Math.min(x1, x2),
-      Math.max(y1, y2) - Math.min(y1, y2)
-    ];
+    if (!nodeIs(node, "marker,svg,g")) {
+      // add line-width
+      var lineWidth = getAttribute(node, "stroke-width") || 1;
+      var miterLimit = getAttribute(node, "stroke-miterlimit");
+      // miterLength / lineWidth = 1 / sin(phi / 2)
+      miterLimit && (lineWidth *= 0.5 / (Math.sin(Math.PI / 12)));
+      return [
+          boundingBox[0] - lineWidth,
+          boundingBox[1] - lineWidth,
+          boundingBox[2] + 2 * lineWidth,
+          boundingBox[3] + 2 * lineWidth
+      ];
+    }
+
+    return boundingBox;
   };
 
   // transforms a bounding box and returns a new rect that contains it
@@ -790,7 +801,7 @@ var svgElementToPdf = (function (global) {
     if (!url)
       return;
 
-    // get the size of the referenced form object (to apply the correct saling)
+    // get the size of the referenced form object (to apply the correct scaling)
     var formObject = _pdf.getFormObject(svgIdPrefix.get() + url.substring(1));
 
     // scale and position it right
@@ -798,10 +809,7 @@ var svgElementToPdf = (function (global) {
     var y = node.getAttribute("y") || 0;
     var width = node.getAttribute("width") || formObject.width;
     var height = node.getAttribute("height") || formObject.height;
-    var t = _pdf.unitMatrix;
-    if (width > 0 && height > 0) {
-      t = new _pdf.Matrix(width / formObject.width, 0, 0, height / formObject.height, x, y);
-    }
+    var t = new _pdf.Matrix(width / formObject.width || 0, 0, 0, height / formObject.height || 0, x, y);
     t = _pdf.matrixMult(t, tfMatrix);
     _pdf.doFormObject(svgIdPrefix.get() + url.substring(1), t);
   };
@@ -1044,9 +1052,7 @@ var svgElementToPdf = (function (global) {
       tfMatrix = computeNodeTransform(node);
       bBox = getUntransformedBBox(node);
 
-      // set a small margin as line width is not respected in the bounding box // TODO: set to actual line width
-      var margin = 5;
-      _pdf.beginFormObject(bBox[0] - margin, bBox[1] - margin, bBox[2] + 2 * margin, bBox[3] + 2 * margin, tfMatrix);
+      _pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], tfMatrix);
 
       // continue without transformation and set withinDefs to false to prevent child nodes from starting new form objects
       tfMatrix = _pdf.unitMatrix;
