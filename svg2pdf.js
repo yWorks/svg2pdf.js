@@ -118,8 +118,10 @@ var svgElementToPdf = (function (global) {
   var forEachChild = function (node, fn) {
     // copy list of children, as the original might be modified
     var children = [];
-    for (var i = 0; i < node.children.length; i++) {
-      children.push(node.children[i]);
+    for (var i = 0; i < node.childNodes.length; i++) {
+      var childNode = node.childNodes[i];
+      if (childNode.nodeName.charAt(0) !== "#")
+        children.push(childNode);
     }
     for (i = 0; i < children.length; i++) {
       fn(i, children[i]);
