@@ -25,6 +25,6 @@
     "tests"
   ],
   "dependencies": {
-    "jspdf-yworks": "jspdf-yworks#~1.1.350"
+    "jspdf-yworks": "jspdf-yworks#~1.2.21"
   }
 }
