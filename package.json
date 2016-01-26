@@ -22,6 +22,6 @@
   },
   "homepage": "https://github.com/yWorks/svg2pdf.js#readme",
   "dependencies": {
-	"jspdf": "git+https://github.com/yWorks/jsPDF.git#1.1.350"
+	"jspdf": "git://github.com/yWorks/jsPDF.git#v1.2.21"
   }
 }
