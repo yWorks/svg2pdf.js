@@ -319,9 +319,14 @@ var svgElementToPdf = (function (global) {
     return resultMatrix;
   };
 
-  // parses a comma and/or whitespace separated string of floats and returns the single floats in an array
+  // parses a comma, sign and/or whitespace separated string of floats and returns the single floats in an array
   var parseFloats = function (str) {
-    return str.replace(/[^eE]-/g, " -").trim().split(/\s*\s|,\s*/).map(parseFloat);
+    var floats = [], match,
+        regex = /[+-]?(?:(?:\d+\.?\d*)|(?:\d*\.?\d+))(?:[eE][+-]?\d+)?/g;
+    while(match = regex.exec(str)) {
+      floats.push(parseFloat(match[0]));
+    }
+    return floats;
   };
 
   // multiplies a vector with a matrix: vec' = vec * matrix
