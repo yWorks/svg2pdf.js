@@ -1,6 +1,7 @@
 {
   "name": "svg2pdf.js",
   "description": "A javascript-only SVG to PDF conversion utility that runs in the browser leveraging jsPDF",
+  "version": "0.10.4",
   "main": "svg2pdf.js",
   "authors": [
     "Lukas Hollaender <lukas.hollaender@yworks.com>"
@@ -25,6 +26,6 @@
     "tests"
   ],
   "dependencies": {
-    "jspdf-yworks": "jspdf-yworks#~1.2.21"
+    "jspdf-yworks": "jspdf-yworks#~1.2.64"
   }
 }
