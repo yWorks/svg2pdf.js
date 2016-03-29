@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<head>
+  <!--<script src="http://live.yworks.com/yfiles-for-html/resources/scripts/rgbcolor.js"></script>-->
+  <!--<script src="http://live.yworks.com/yfiles-for-html/resources/scripts/rgbcolor.js"></script>-->
+  <script src="../../jsPDF/dist/jspdf.debug.js"></script>
+  <script src="../rgbcolor.js"></script>
+  <script src="../svg2pdf.js"></script>
+</head>
+<body>
+<svg id="svgElement" xmlns="http://www.w3.org/2000/svg" width="500px" height="160px" viewBox="0 0 500 160"
+     style="overflow: hidden; display: block; width: 500px; height: 160px;">
+  <!--<g transform="translate(20 0)">-->
+  <!--defs>
+    <linearGradient gradientUnits="objectBoundingBox" id="gr1" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0.0" style="stop-color: #00ff00"></stop>
+      <stop offset="0.7" style="stop-color: #0000ff"></stop>
+      <stop offset="1.0" style="stop-color: #ff0000"></stop>
+    </linearGradient>
+    <radialGradient id="gr2" gradientUnits="userSpaceOnUse" cx="100" cy="100" r="50" fx="80" fy="80">
+      <stop offset="0.0" style="stop-color: #00ff00"></stop>
+      <stop offset="0.7" style="stop-color: #0000ff"></stop>
+      <stop offset="1.0" style="stop-color: #ff0000"></stop>
+    </radialGradient>
+    <circle id="c" r="50" cy="50" cx="50" fill="#aabbcc"></circle>
+    <!--<rect id="c" width="100" height="100" fill="#aabbcc" transform="rotate(45)"></rect>-->
+    <!--<g transform="translate(20, 20)">-->
+      <!--<path id="c" d="M 0 0 h 100 v 100 h -100 Z" fill="#aabbcc" transform="rotate(45)"></path>>
+    <!--</g>>
+  </defs-->
+  <!--<path d="M 30 30 h 100 v 100 h -100 Z" fill="url(#gr2)" stroke="#000000"></path>-->
+  <!--path d="M 0 0 h 100 v 100 h -100 Z" fill="url(#gr1)" stroke="#000000" transform="rotate(45)"></path-->
+  <path d="M 0 0 h 100 v 100 h -100 Z" fill="#000000" stroke="#000000"></path>
+  <!--<rect width="100" height="100" fill="url(#gr2)"></rect>-->
+  <!--<use xlink:href="#c" xmlns:xlink="http://www.w3.org/1999/xlink" transform="translate(100 0)" width="100"-->
+       <!--height="100"></use>-->
+
+  <!--</g>-->
+</svg>
+
+<button onclick="save();">Convert</button>
+<br>
+
+<iframe id="pdf"></iframe>
+
+<script>
+  function svgToPdf(svgElement, margin) {
+    var width = svgElement.width.baseVal.value + 2 * margin;
+    var height = svgElement.height.baseVal.value + 2 * margin;
+    var pdf = new jsPDF('l', 'pt', [width, height]);
+    svgElementToPdf(svgElement, pdf, {removeInvalid: true});
+
+    return pdf.output('datauristring');
+  }
+
+  function saveToFile(/**string*/ fileContentUrl, /**string*/ fileName, /**function(Object, yfiles.canvas.FileEventArgs)*/ handler) {
+    var aElement = document.createElement("a");
+    aElement.setAttribute("href", fileContentUrl);
+    aElement.setAttribute("download", fileName);
+    aElement.style.setProperty("display", "none", "");
+    document.body.appendChild(aElement);
+    aElement.click();
+    document.body.removeChild(aElement);
+
+    handler();
+  }
+
+  function save() {
+//    saveToFile(svgToPdf(document.getElementById("svgElement"), 0), "svg.pdf", function () {
+//    });
+    document.getElementById("pdf").src = svgToPdf(document.getElementById("svgElement"), 0);
+  }
+</script>
+</body>
