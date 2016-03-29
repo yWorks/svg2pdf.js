@@ -339,7 +339,7 @@ var svgElementToPdf = (function (global) {
     ];
   };
 
-  // returns the untransformated bounding box of an svg element (quite expensive for path and polygon objects, as
+  // returns the untransformed bounding box of an svg element (quite expensive for path and polygon objects, as
   // the whole points/d-string has to be processed)
   var getUntransformedBBox = function (node) {
     var i, minX, minY, maxX, maxY, viewBox, vb, boundingBox;
@@ -550,7 +550,7 @@ var svgElementToPdf = (function (global) {
     var lines = [{op: "m", c: multVecMatrix(points[0], tfMatrix)}];
     for (var i = 1; i < points.length; i++) {
       var p = points[i];
-      to = multVecMatrix(p, tfMatrix);
+      var to = multVecMatrix(p, tfMatrix);
       lines.push({op: "l", c: to});
     }
     lines.push({op: "h"});
@@ -967,7 +967,7 @@ var svgElementToPdf = (function (global) {
     document.body.removeChild(svg);
   };
 
-  // As defs elements are allowed to appear after they are referenced, we search for them at first
+  // As defs elements are allowed to appear after they are referenced, we search for them first
   var findAndRenderDefs = function (node, tfMatrix, defs, svgIdPrefix, withinDefs) {
     forEachChild(node, function (i, child) {
       if (child.tagName.toLowerCase() === "defs") {
@@ -995,7 +995,7 @@ var svgElementToPdf = (function (global) {
   };
 
   // adds a gradient to defs and the pdf document for later use, type is either "axial" or "radial"
-  // opacity is only supported rudimentary by avaraging over all stops
+  // opacity is only supported rudimentary by averaging over all stops
   // transforms are applied on use
   var putGradient = function (node, type, coords, defs, svgIdPrefix) {
     var colors = [];
@@ -1003,7 +1003,7 @@ var svgElementToPdf = (function (global) {
     var hasOpacity = false;
     var gState;
     forEachChild(node, function (i, element) {
-      // since opacity gradients are hard to realize, avarage the opacity over the control points
+      // since opacity gradients are hard to realize, average the opacity over the control points
       if (element.tagName.toLowerCase() === "stop") {
         var color = new RGBColor(getAttribute(element, "stop-color"));
         colors.push({
@@ -1130,7 +1130,7 @@ var svgElementToPdf = (function (global) {
     }
 
     if (nodeIs(node, "g,path,rect,ellipse,line,circle,polygon")) {
-      // text has no fill color, so apply it not until here
+      // text has no fill color, so don't apply it until here
       if (hasFillColor) {
         _pdf.setFillColor(fillRGB.r, fillRGB.g, fillRGB.b);
       }
