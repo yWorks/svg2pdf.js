@@ -15,7 +15,11 @@
     "pdf",
 	"javascript"
   ],
-  "author": "Lukas Hollaender <lukas.hollaender@yworks.com>",
+  "author": {
+    "name": "yFiles for HTML Support Team",
+    "email": "yfileshtml@yworks.com",
+    "url": "https://www.yworks.com/yfileshtml"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/yWorks/svg2pdf.js/issues"
