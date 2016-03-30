@@ -43,7 +43,7 @@ var width = 300, height = 200;
 var pdf = new jsPDF('l', 'pt', [width, height]);
 
 // render the svg element
-svgElementToPdf(svgElement, pdf, {
+svg2pdf(svgElement, pdf, {
 	xOffset: 0,
 	yOffset: 0,
 	scale: 1
