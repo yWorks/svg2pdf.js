@@ -32,7 +32,8 @@ SOFTWARE.
  *                         xOffset, yOffset: Offsets that are added to every coordinate AFTER scaling (They are not
  *                            influenced by the scale attribute).
  */
-var svgElementToPdf = (function (global) {
+(function (global) {
+  var RGBColor;
 
   var _pdf; // jsPDF pdf-document
 
@@ -1267,14 +1268,19 @@ var svgElementToPdf = (function (global) {
     return _pdf;
   };
 
-  if (typeof define === 'function' && define.amd) {
-    define("svg2pdf", function () {
+  if (typeof define === "function" && define.amd) {
+    define(["rgbcolor"], function (rgbcolor) {
+      RGBColor = rgbcolor;
       return svg2pdf;
     });
-  } else if (typeof module !== 'undefined' && module.exports) {
+  } else if (typeof module !== "undefined" && module.exports) {
+    RGBColor = require("./rgbcolor.js");
     module.exports = svg2pdf;
   } else {
+    RGBColor = global.RGBColor;
     global.svg2pdf = svg2pdf;
+    // for compatibility reasons
+    global.svgElementToPdf = svg2pdf;
   }
   return svg2pdf;
 }(typeof self !== "undefined" && self || typeof window !== "undefined" && window || this));

@@ -4,6 +4,7 @@
  * @link   http://www.phpied.com/rgb-color-parser-in-javascript/
  * @license Use it if you like it
  */
+(function (global) {
 function RGBColor(color_string)
 {
   this.ok = false;
@@ -285,3 +286,14 @@ function RGBColor(color_string)
   }
 
 }
+if (typeof define === "function" && define.amd) {
+  define(function () {
+    return RGBColor;
+  });
+} else if (typeof module !== "undefined" && module.exports) {
+  module.exports = RGBColor;
+} else {
+  global.RGBColor = RGBColor;
+}
+return RGBColor;
+})(typeof self !== "undefined" && self || typeof window !== "undefined" && window || this);
