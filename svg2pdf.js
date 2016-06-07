@@ -568,6 +568,8 @@ SOFTWARE.
     var canvas = document.createElement("canvas");
     var width = parseFloat(node.getAttribute("width")),
         height = parseFloat(node.getAttribute("height"));
+        x = parseFloat(node.getAttribute("x"));
+        y = parseFloat(node.getAttribute("y"));
     canvas.width = width;
     canvas.height = height;
     var context = canvas.getContext("2d");
@@ -578,8 +580,8 @@ SOFTWARE.
 
     _pdf.addImage(jpegUrl,
         "jpeg",
-        0,
-        0,
+        x,
+        y,
         width,
         height
     );
