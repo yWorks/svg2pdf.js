@@ -483,6 +483,17 @@ SOFTWARE.
         pf(node.getAttribute("width")) || (vb && vb[2]) || 0,
         pf(node.getAttribute("height")) || (vb && vb[3]) || 0
       ];
+    } else if (nodeIs(node, "g")) {
+      boundingBox = [0, 0, 0, 0];
+      forEachChild(node, function (i, node) {
+        var nodeBox = getUntransformedBBox(node);
+        boundingBox = [
+            Math.min(boundingBox[0], nodeBox[0]),
+            Math.min(boundingBox[1], nodeBox[1]),
+            Math.max(boundingBox[0] + boundingBox[2], nodeBox[0] + nodeBox[2]) - Math.min(boundingBox[0], nodeBox[0]),
+            Math.max(boundingBox[1] + boundingBox[3], nodeBox[1] + nodeBox[3]) - Math.min(boundingBox[1], nodeBox[1])
+        ];
+      });
     } else if (nodeIs(node, "marker")) {
       viewBox = node.getAttribute("viewBox");
       if (viewBox) {
