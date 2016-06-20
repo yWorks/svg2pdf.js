@@ -1177,13 +1177,19 @@ SOFTWARE.
       // stroke mode
       var strokeColor = node.getAttribute('stroke');
       if (strokeColor) {
+        var strokeWidth;
         if (node.hasAttribute("stroke-width")) {
-          _pdf.setLineWidth(Math.abs(parseFloat(node.getAttribute('stroke-width'))));
+          strokeWidth = Math.abs(parseFloat(node.getAttribute('stroke-width')));
+          _pdf.setLineWidth(strokeWidth);
         }
         var strokeRGB = new RGBColor(strokeColor);
         if (strokeRGB.ok) {
           _pdf.setDrawColor(strokeRGB.r, strokeRGB.g, strokeRGB.b);
-          colorMode = (colorMode || "") + "D";
+          if (strokeWidth !== 0) {
+            // pdf spec states: "A line width of 0 denotes the thinnest line that can be rendered at device resolution:
+            // 1 device pixel wide". SVG, however, does not draw zero width lines.
+            colorMode = (colorMode || "") + "D";
+          }
         }
         if (node.hasAttribute("stroke-linecap")) {
           _pdf.setLineCap(node.getAttribute("stroke-linecap"));
