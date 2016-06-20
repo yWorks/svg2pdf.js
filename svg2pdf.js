@@ -113,7 +113,7 @@ SOFTWARE.
   };
 
   var nodeIs = function (node, tagsString) {
-    return tagsString.indexOf(node.tagName.toLowerCase()) >= 0;
+    return tagsString.split(",").indexOf(node.tagName.toLowerCase()) >= 0;
   };
 
   var forEachChild = function (node, fn) {
