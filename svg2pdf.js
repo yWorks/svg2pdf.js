@@ -884,38 +884,21 @@ SOFTWARE.
     );
   };
 
+  // applies text transformations to a text node
+  var transformText = function (node, text) {
+    var textTransform = getAttribute(node, "text-transform");
+    switch (textTransform) {
+      case "uppercase": return text.toUpperCase();
+      case "lowercase": return text.toLowerCase();
+      default: return text;
+      // TODO: capitalize, full-width
+    }
+  };
+
   // draws a text element and its tspan children
   var text = function (node, tfMatrix, hasFillColor, fillRGB) {
-    var fontFamily = getAttribute(node, "font-family");
-    if (fontFamily) {
-      _pdf.setFont(fontFamily);
-    }
-
-    if (hasFillColor) {
-      _pdf.setTextColor(fillRGB.r, fillRGB.g, fillRGB.b);
-    }
-
-    var fontType;
-    var fontWeight = getAttribute(node, "font-weight");
-    if (fontWeight) {
-      if (fontWeight === "bold") {
-        fontType = "bold";
-      }
-    }
-
-    var fontStyle = getAttribute(node, "font-style");
-    if (fontStyle) {
-      if (fontStyle === "italic") {
-        fontType += "italic";
-      }
-    }
-    _pdf.setFontType(fontType);
-
-    var pdfFontSize = 16;
-    var fontSize = getAttribute(node, "font-size");
-    if (fontSize) {
-      pdfFontSize = parseFloat(fontSize);
-    }
+    _pdf.saveGraphicsState();
+    setTextProperties(node, fillRGB);
 
     var getTextOffset = function (textAnchor, width) {
       var xOffset = 0;
@@ -950,35 +933,43 @@ SOFTWARE.
         tfMatrix.e + (parseFloat(node.getAttribute('x')) || 0),
         tfMatrix.f + (parseFloat(node.getAttribute('y')) || 0)
     );
+    var pdfFontSize = _pdf.getFontSize();
     x = (parseFloat(node.getAttribute("dx")) || 0) * pdfFontSize;
     y = (parseFloat(node.getAttribute("dy")) || 0) * pdfFontSize;
-    _pdf.setFontSize(pdfFontSize);
 
     // when there are no tspans draw the text directly
     if (node.childElementCount === 0) {
       _pdf.text(
           (x - xOffset),
           y,
-          removeNewlinesAndTrim(node.textContent),
+          transformText(node, removeNewlinesAndTrim(node.textContent)),
           void 0,
           m
       );
     } else {
       // otherwise loop over tspans and position each relative to the previous one
       forEachChild(node, function (i, tSpan) {
+        _pdf.saveGraphicsState();
+        var tSpanColor = getAttribute(tSpan, "fill");
+        setTextProperties(tSpan, tSpanColor && new RGBColor(tSpanColor));
+
         var xOffset = getTextOffset(textAnchor, tSpan.getComputedTextLength());
         y += (parseFloat(tSpan.getAttribute("dy")) || 0) * pdfFontSize;
         _pdf.text(
             x - xOffset,
             y,
-            removeNewlinesAndTrim(tSpan.textContent),
+            transformText(node, removeNewlinesAndTrim(tSpan.textContent)),
             void 0,
             m
         );
+
+        _pdf.restoreGraphicsState();
       });
     }
 
     document.body.removeChild(svg);
+
+    _pdf.restoreGraphicsState();
   };
 
   // As defs elements are allowed to appear after they are referenced, we search for them first
@@ -1042,6 +1033,40 @@ SOFTWARE.
     defs[id] = node;
   };
 
+  function setTextProperties(node, fillRGB) {
+    var fontFamily = getAttribute(node, "font-family");
+    if (fontFamily) {
+      _pdf.setFont(fontFamily);
+    }
+
+    if (fillRGB && fillRGB.ok) {
+      _pdf.setTextColor(fillRGB.r, fillRGB.g, fillRGB.b);
+    }
+
+    var fontType;
+    var fontWeight = getAttribute(node, "font-weight");
+    if (fontWeight) {
+      if (fontWeight === "bold") {
+        fontType = "bold";
+      }
+    }
+
+    var fontStyle = getAttribute(node, "font-style");
+    if (fontStyle) {
+      if (fontStyle === "italic") {
+        fontType += "italic";
+      }
+    }
+    _pdf.setFontType(fontType);
+
+    var pdfFontSize = 16;
+    var fontSize = getAttribute(node, "font-size");
+    if (fontSize) {
+      pdfFontSize = parseFloat(fontSize);
+      _pdf.setFontSize(pdfFontSize);
+    }
+  }
+
 
   /**
    * Renders a svg node.
@@ -1090,7 +1115,7 @@ SOFTWARE.
 
     // fill mode
     if (nodeIs(node, "g,path,rect,text,ellipse,line,circle,polygon")) {
-      var fillColor = node.getAttribute("fill");
+      var fillColor = getAttribute(node, "fill");
       if (fillColor) {
         var url = /url\(#(\w+)\)/.exec(fillColor);
         if (url) {
@@ -1177,6 +1202,8 @@ SOFTWARE.
         }
       }
     }
+
+    setTextProperties(node, fillRGB);
 
     // do the actual drawing
     switch (node.tagName.toLowerCase()) {
