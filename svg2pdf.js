@@ -567,8 +567,8 @@ SOFTWARE.
 
     var canvas = document.createElement("canvas");
     var width = parseFloat(node.getAttribute("width")),
-        height = parseFloat(node.getAttribute("height"));
-        x = parseFloat(node.getAttribute("x") || 0);
+        height = parseFloat(node.getAttribute("height")),
+        x = parseFloat(node.getAttribute("x") || 0),
         y = parseFloat(node.getAttribute("y") || 0);
     canvas.width = width;
     canvas.height = height;
