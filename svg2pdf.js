@@ -330,6 +330,19 @@ SOFTWARE.
     return floats;
   };
 
+  // extends RGBColor by rgba colors as RGBColor is not capable of it
+  var parseColor = function (colorString) {
+    var match = /\s*rgba\(((?:[^,\)]*,){3}[^,\)]*)\)\s*/.exec(colorString);
+    if (match) {
+      var floats = parseFloats(match[1]);
+      var color = new RGBColor("rgb(" + floats.slice(0,3).join(",") + ")");
+      color.a = floats[3];
+      return color;
+    } else {
+      return new RGBColor(colorString);
+    }
+  };
+
   // multiplies a vector with a matrix: vec' = vec * matrix
   var multVecMatrix = function (vec, matrix) {
     var x = vec[0];
@@ -1144,7 +1157,7 @@ SOFTWARE.
           }
         } else {
           // plain color
-          fillRGB = new RGBColor(fillColor);
+          fillRGB = parseColor(fillColor);
           if (fillRGB.ok) {
             hasFillColor = true;
             colorMode = 'F';
@@ -1160,12 +1173,15 @@ SOFTWARE.
       }
 
       // opacity is realized via a pdf graphics state
-      var opacity = node.getAttribute("opacity") || node.getAttribute("fill-opacity");
-      if (opacity) {
-        _pdf.setGState(new _pdf.GState({opacity: parseFloat(opacity)}));
-      } else {
-        _pdf.setGState(new _pdf.GState({opacity: 1.0}));
+      var opacity = 1.0;
+      var nodeOpacity = node.getAttribute("opacity") || node.getAttribute("fill-opacity");
+      if (nodeOpacity) {
+        opacity *= parseFloat(nodeOpacity);
       }
+      if (fillRGB && typeof fillRGB.a === "number") {
+        opacity *= fillRGB.a;
+      }
+      _pdf.setGState(new _pdf.GState({opacity: opacity}));
     }
 
     if (nodeIs(node, "g,path,rect,ellipse,line,circle,polygon")) {
