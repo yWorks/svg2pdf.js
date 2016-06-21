@@ -26,6 +26,6 @@
   },
   "homepage": "https://github.com/yWorks/svg2pdf.js#readme",
   "dependencies": {
-	"jspdf-yworks": "^1.2.65"
+	"jspdf-yworks": "^1.2.66"
   }
 }

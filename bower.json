@@ -28,6 +28,6 @@
     "tests"
   ],
   "dependencies": {
-    "jspdf-yworks": "jspdf-yworks#~1.2.65"
+    "jspdf-yworks": "jspdf-yworks#~1.2.66"
   }
 }
