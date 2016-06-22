@@ -1128,6 +1128,12 @@ SOFTWARE.
 
     // fill mode
     if (nodeIs(node, "g,path,rect,text,ellipse,line,circle,polygon")) {
+      function setDefaultColor() {
+        fillRGB = new RGBColor("rgb(0, 0, 0)");
+        hasFillColor = true;
+        colorMode = "F";
+      }
+
       var fillColor = getAttribute(node, "fill");
       if (fillColor) {
         var url = /url\(#(\w+)\)/.exec(fillColor);
@@ -1135,7 +1141,7 @@ SOFTWARE.
           // probably a gradient (or something unsupported)
           gradient = svgIdPrefix.get() + url[1];
           var fill = getFromDefs(gradient, defs);
-          if (nodeIs(fill, "lineargradient,radialgradient")) {
+          if (fill && nodeIs(fill, "lineargradient,radialgradient")) {
 
             // matrix to convert between gradient space and user space
             // for "userSpaceOnUse" this is the current transformation: tfMatrix
@@ -1154,6 +1160,10 @@ SOFTWARE.
             var gradientTransform = parseTransform(fill.getAttribute("gradientTransform"));
 
             gradientMatrix = _pdf.matrixMult(gradientTransform, gradientUnitsMatrix);
+          } else {
+            // unsupported fill argument (e.g. patterns) -> fill black
+            gradient = fill = null;
+            setDefaultColor();
           }
         } else {
           // plain color
@@ -1167,9 +1177,7 @@ SOFTWARE.
         }
       } else {
         // if no fill attribute is provided the default fill color is black
-        fillRGB = new RGBColor("rgb(0, 0, 0)");
-        hasFillColor = true;
-        colorMode = "F";
+        setDefaultColor();
       }
 
       // opacity is realized via a pdf graphics state
