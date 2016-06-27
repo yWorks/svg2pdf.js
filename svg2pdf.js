@@ -50,7 +50,7 @@ SOFTWARE.
 
     var d = node.getAttribute("d");
 
-    var regex = /([a-zA-Z])([^a-zA-Z]*)/g,
+    var regex = /([a-df-zA-DF-Z])([^a-df-zA-DF-Z]*)/g,
         match;
     while (match = regex.exec(d)) {
       var coords = parseFloats(match[2]).reverse();
