@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<head>
+  <!--<script src="http://live.yworks.com/yfiles-for-html/resources/scripts/rgbcolor.js"></script>-->
+  <!--<script src="http://live.yworks.com/yfiles-for-html/resources/scripts/rgbcolor.js"></script>-->
+  <script src="../../jsPDF/dist/jspdf.debug.js"></script>
+  <script src="../rgbcolor.js"></script>
+  <script src="../svg2pdf.js"></script>
+</head>
+<body>
+<svg id="svgElement" xmlns="http://www.w3.org/2000/svg" width="305" height="230">
+    <defs>
+      <linearGradient id="gradient" x1="0" y1="0" x2="1" y2="1" gradientUnits="objectBoundingBox">
+        <stop offset="0" stop-color="blue"></stop>
+        <stop offset="1" stop-color="green"></stop>
+      </linearGradient>
+      <!--<pattern id="secondPattern" width="80" height="80" patternUnits="userSpaceOnUse" patternContentUnits="userSpaceOnUse">-->
+        <!--<rect x="0" y="0" width="10" height="10" fill= "#876fc1" />-->
+        <!--<rect x="70" y="70" width="10" height="10" fill= "red" />-->
+        <!--<rect x="0" y="0" width="80" height="80" fill= "none" stroke="black"/>-->
+      <!--</pattern>-->
+      <!--<pattern id="secondPattern" width="0.4" height="0.4" patternUnits="objectBoundingBox" patternContentUnits="userSpaceOnUse">-->
+        <!--<rect x="0" y="0" width="80" height="80" fill= "url(#gradient)" stroke="black"/>-->
+        <!--<rect x="0" y="0" width="10" height="10" fill= "#876fc1" />-->
+        <!--<rect x="70" y="70" width="10" height="10" fill= "red" />-->
+      <!--</pattern>-->
+      <!--<pattern id="secondPattern" width="80" height="80" patternUnits="userSpaceOnUse" patternContentUnits="objectBoundingBox">-->
+        <!--<rect x="0" y="0" width="0.05" height="0.05" fill= "#876fc1" />-->
+        <!--<rect x="0.35" y="0.35" width="0.05" height="0.05" fill= "red" />-->
+        <!--<rect x="0" y="0" width="0.4" height="0.4" fill= "none" stroke="black" stroke-width="0.005"/>-->
+      <!--</pattern>-->
+      <pattern id="secondPattern" width="0.4" height="0.4" patternUnits="objectBoundingBox" patternContentUnits="objectBoundingBox">
+        <rect x="0" y="0" width="0.4" height="0.4" fill= "url(#gradient)" stroke="black" stroke-width="0.005"/>
+        <rect x="0" y="0" width="0.05" height="0.05" fill= "#876fc1" />
+        <rect x="0.35" y="0.35" width="0.05" height="0.05" fill= "red" />
+      </pattern>
+    </defs>
+    <rect transform="translate(130 5) rotate(45) scale(0.5)" x="20" y="0" width="200" height="200" stroke= "#333333" stroke-width="2" fill="url(#secondPattern)" />
+    <rect x="98" y="98" width="150" height="150" stroke= "#333333" stroke-width="2" fill="url(#secondPattern)" />
+</svg>
+
+<br>
+<button onclick="save();">Convert</button>
+<br>
+
+<iframe id="pdf"></iframe>
+
+<script>
+  function svgToPdf(svgElement, margin) {
+    var width = svgElement.width.baseVal.value + 2 * margin;
+    var height = svgElement.height.baseVal.value + 2 * margin;
+    var pdf = new jsPDF('l', 'pt', [width, height]);
+    svgElementToPdf(svgElement, pdf, {removeInvalid: true});
+
+    return pdf.output('datauristring');
+  }
+
+  function saveToFile(/**string*/ fileContentUrl, /**string*/ fileName, /**function(Object, yfiles.canvas.FileEventArgs)*/ handler) {
+    var aElement = document.createElement("a");
+    aElement.setAttribute("href", fileContentUrl);
+    aElement.setAttribute("download", fileName);
+    aElement.style.setProperty("display", "none", "");
+    document.body.appendChild(aElement);
+    aElement.click();
+    document.body.removeChild(aElement);
+
+    handler();
+  }
+
+  function save() {
+//    saveToFile(svgToPdf(document.getElementById("svgElement"), 0), "svg.pdf", function () {
+//    });
+    document.getElementById("pdf").src = svgToPdf(document.getElementById("svgElement"), 0);
+  }
+</script>
+</body>

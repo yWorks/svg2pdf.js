@@ -10,7 +10,7 @@
 <svg id="svgElement" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <g>
     <pattern id="redPattern" width="10" height="10" patternUnits="userSpaceOnUse">
-      <path d="M 0 0 L 12 0 12 12 0 12 z" stroke="black" stroke-width="1" fill="red"></path>
+      <path d="M 0 0 L 12 0 L 12 12 L 0 12 z" stroke="black" stroke-width="1" fill="red"></path>
     </pattern>
     <pattern id="greenPattern" width="10" height="10" patternUnits="userSpaceOnUse">
       <path d="M 0 0 L 12 0 12 12 0 12 z" stroke="black" stroke-width="1" fill="green"></path>
@@ -29,8 +29,7 @@
     <text transform="translate(135 75)" style="font-size:15px; font-family:Arial; fill:red">[S]</text>
     <rect transform="translate(8 10)" fill="white" stroke="green" stroke-width="3" rx="6" ry="6" width="145"
           height="40"/>
-    <rect transform="translate(15 15)" ng-show={{item.colorWidth[0].redWidth}}
-          fill="url(#redPattern)" width=15 height="30"/>
+    <rect transform="translate(15 15)" fill="url(#redPattern)" width="15" height="30"/>
     <!--<rect transform="translate({{item.colorWidth[0].greenTranslate}} 15)" ng-show={{item.colorWidth[0].greenWidth}}-->
           <!--fill="url(#greenPattern)" width={{item.colorWidth[0].greenWidth}} height="30"/>-->
     <!--<rect transform="translate({{item.colorWidth[0].yellowTranslate}} 15)" ng-show={{item.colorWidth[0].yellowWidth}}-->

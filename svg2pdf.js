@@ -353,7 +353,7 @@ SOFTWARE.
     ];
   };
 
-  // returns the untransformed bounding box of an svg element (quite expensive for path and polygon objects, as
+  // returns the untransformed bounding box [x, y, width, height] of an svg element (quite expensive for path and polygon objects, as
   // the whole points/d-string has to be processed)
   var getUntransformedBBox = function (node) {
     var i, minX, minY, maxX, maxY, viewBox, vb, boundingBox;
@@ -518,6 +518,13 @@ SOFTWARE.
         (vb && vb[2]) || pf(node.getAttribute("marker-width")) || 0,
         (vb && vb[3]) || pf(node.getAttribute("marker-height")) || 0
       ];
+    } else if (nodeIs(node, "pattern")) {
+      return [
+          pf(node.getAttribute("x")) || 0,
+          pf(node.getAttribute("y")) || 0,
+          pf(node.getAttribute("width")) || 0,
+          pf(node.getAttribute("height")) || 0
+      ]
     } else {
       // TODO: check if there are other possible coordinate attributes
       var x1 = pf(node.getAttribute("x1")) || pf(node.getAttribute("x")) || pf((node.getAttribute("cx")) - pf(node.getAttribute("r"))) || 0;
@@ -1040,10 +1047,25 @@ SOFTWARE.
       gState = new _pdf.GState({opacity: opacitySum / coords.length});
     }
 
-    var pattern = new _pdf.Pattern(type, coords, colors, gState);
+    var pattern = new _pdf.ShadingPattern(type, coords, colors, gState);
     var id = svgIdPrefix.get() + node.getAttribute("id");
-    _pdf.addPattern(id, pattern);
+    _pdf.addShadingPattern(id, pattern);
     defs[id] = node;
+  };
+
+  var pattern = function (node, defs, svgIdPrefix) {
+    var id = svgIdPrefix.get() + node.getAttribute("id");
+    defs[id] = node;
+
+    // the transformations directly at the node are written to the pattern transformation matrix
+    var bBox = getUntransformedBBox(node);
+    var pattern = new _pdf.TilingPattern([bBox[0], bBox[1], bBox[0] + bBox[2], bBox[1] + bBox[3]], bBox[2], bBox[3],
+        null, computeNodeTransform(node));
+
+    _pdf.beginTilingPattern(pattern);
+    // continue without transformation
+    renderChildren(node, _pdf.unitMatrix, defs, svgIdPrefix, false);
+    _pdf.endTilingPattern(id, pattern);
   };
 
   function setTextProperties(node, fillRGB) {
@@ -1094,8 +1116,8 @@ SOFTWARE.
         hasFillColor = false,
         fillRGB = null,
         colorMode = null,
-        gradient = null,
-        gradientMatrix = null,
+        fillUrl = null,
+        fillData = null,
         bBox;
 
     //
@@ -1104,7 +1126,7 @@ SOFTWARE.
 
     // if we are within a defs node, start a new pdf form object and draw this node and all children on that instead
     // of the top-level page
-    var targetIsFormObject = withinDefs && !nodeIs(node, "lineargradient,radialgradient");
+    var targetIsFormObject = withinDefs && !nodeIs(node, "lineargradient,radialgradient,pattern");
     if (targetIsFormObject) {
 
       // the transformations directly at the node are written to the pdf form object transformation matrix
@@ -1139,8 +1161,8 @@ SOFTWARE.
         var url = /url\(#(\w+)\)/.exec(fillColor);
         if (url) {
           // probably a gradient (or something unsupported)
-          gradient = svgIdPrefix.get() + url[1];
-          var fill = getFromDefs(gradient, defs);
+          fillUrl = svgIdPrefix.get() + url[1];
+          var fill = getFromDefs(fillUrl, defs);
           if (fill && nodeIs(fill, "lineargradient,radialgradient")) {
 
             // matrix to convert between gradient space and user space
@@ -1149,7 +1171,7 @@ SOFTWARE.
             var gradientUnitsMatrix = tfMatrix;
             if (!fill.hasAttribute("gradientUnits")
                 || fill.getAttribute("gradientUnits").toLowerCase() === "objectboundingbox") {
-              bBox = getUntransformedBBox(node);
+              bBox || (bBox = getUntransformedBBox(node));
               gradientUnitsMatrix = new _pdf.Matrix(bBox[2], 0, 0, bBox[3], bBox[0], bBox[1]);
 
               var nodeTransform = computeNodeTransform(node);
@@ -1159,10 +1181,51 @@ SOFTWARE.
             // matrix that is applied to the gradient before any other transformations
             var gradientTransform = parseTransform(fill.getAttribute("gradientTransform"));
 
-            gradientMatrix = _pdf.matrixMult(gradientTransform, gradientUnitsMatrix);
+            fillData = _pdf.matrixMult(gradientTransform, gradientUnitsMatrix);
+          } else if (fill && nodeIs(fill, "pattern")) {
+            var fillBBox, y, width, height, x;
+            fillData = {};
+
+            var patternUnitsMatrix = _pdf.unitMatrix;
+            if (!fill.hasAttribute("patternUnits")
+                || fill.getAttribute("patternUnits").toLowerCase() === "objectboundingbox") {
+              bBox || (bBox = getUntransformedBBox(node));
+              patternUnitsMatrix = new _pdf.Matrix(1, 0, 0, 1, bBox[0], bBox[1]);
+
+              // TODO: slightly inaccurate (rounding errors? line width bBoxes?)
+              fillBBox = getUntransformedBBox(fill);
+              x = fillBBox[0] * bBox[0];
+              y = fillBBox[1] * bBox[1];
+              width = fillBBox[2] * bBox[2];
+              height = fillBBox[3] * bBox[3];
+              fillData.boundingBox = [x, y, x + width, y + height];
+              fillData.xStep = width;
+              fillData.yStep = height;
+            }
+
+            var patternContentUnitsMatrix = _pdf.unitMatrix;
+            if (fill.hasAttribute("patternContentUnits")
+                && fill.getAttribute("patternContentUnits").toLowerCase() === "objectboundingbox") {
+              bBox || (bBox = getUntransformedBBox(node));
+              patternContentUnitsMatrix = new _pdf.Matrix(bBox[2], 0, 0, bBox[3], 0, 0);
+
+              fillBBox = fillData.boundingBox || getUntransformedBBox(fill);
+              x = fillBBox[0] / bBox[0];
+              y = fillBBox[1] / bBox[1];
+              width = fillBBox[2] / bBox[2];
+              height = fillBBox[3] / bBox[3];
+              fillData.boundingBox = [x, y, x + width, y + height];
+              fillData.xStep = width;
+              fillData.yStep = height;
+            }
+
+            fillData.matrix = _pdf.matrixMult(
+                _pdf.matrixMult(patternContentUnitsMatrix, patternUnitsMatrix), tfMatrix);
+
+            colorMode = "F";
           } else {
             // unsupported fill argument (e.g. patterns) -> fill black
-            gradient = fill = null;
+            fillUrl = fill = null;
             setDefaultColor();
           }
         } else {
@@ -1261,28 +1324,28 @@ SOFTWARE.
 
       case 'rect':
         _pdf.setCurrentTransformationMatrix(tfMatrix);
-        rect(node, colorMode, gradient, gradientMatrix);
+        rect(node, colorMode, fillUrl, fillData);
         break;
 
       case 'ellipse':
         _pdf.setCurrentTransformationMatrix(tfMatrix);
-        ellipse(node, colorMode, gradient, gradientMatrix);
+        ellipse(node, colorMode, fillUrl, fillData);
         break;
 
       case 'circle':
         _pdf.setCurrentTransformationMatrix(tfMatrix);
-        circle(node, colorMode, gradient, gradientMatrix);
+        circle(node, colorMode, fillUrl, fillData);
         break;
       case 'text':
         text(node, tfMatrix, hasFillColor, fillRGB);
         break;
 
       case 'path':
-        path(node, tfMatrix, svgIdPrefix, colorMode, gradient, gradientMatrix);
+        path(node, tfMatrix, svgIdPrefix, colorMode, fillUrl, fillData);
         break;
 
       case 'polygon':
-        polygon(node, tfMatrix, colorMode, gradient, gradientMatrix);
+        polygon(node, tfMatrix, colorMode, fillUrl, fillData);
         break;
 
       case 'image':
@@ -1308,6 +1371,10 @@ SOFTWARE.
           node.getAttribute("cy") || 0,
           node.getAttribute("r") || 0
         ], defs, svgIdPrefix);
+        break;
+
+      case "pattern":
+        pattern(node, defs, svgIdPrefix);
         break;
     }
 
