@@ -53,49 +53,60 @@ SOFTWARE.
     var regex = /([a-df-zA-DF-Z])([^a-df-zA-DF-Z]*)/g,
         match;
     while (match = regex.exec(d)) {
-      var coords = parseFloats(match[2]).reverse();
-      var pathSeg = {};
-      var type = pathSeg.pathSegTypeAsLetter = match[1];
-      switch (type) {
-        case "h":
-        case "H":
-          pathSeg.x = coords[0];
-          break;
+      var coords = parseFloats(match[2]);
 
-        case "v":
-        case "V":
-          pathSeg.y = coords[0];
-          break;
+      var type = match[1];
+      var length = "zZ".indexOf(type) >= 0 ? 0 :
+          "hHvV".indexOf(type) >= 0  ? 1 :
+          "mMlLtT".indexOf(type) >= 0  ? 2 :
+          "sSqQ".indexOf(type) >= 0  ? 4 :
+          "cC".indexOf(type) >= 0  ? 6 : -1;
 
-        case "c":
-        case "C":
-          pathSeg.x1 = coords[5];
-          pathSeg.y1 = coords[4];
-        case "s":
-        case "S":
-          pathSeg.x2 = coords[3];
-          pathSeg.y2 = coords[2];
-        case "t":
-        case "T":
-        case "l":
-        case "L":
-        case "m":
-        case "M":
-          pathSeg.x = coords[1];
-          pathSeg.y = coords[0];
-          break;
+      var i = 0;
+      do {
+        var pathSeg = {pathSegTypeAsLetter: type};
+        switch (type) {
+          case "h":
+          case "H":
+            pathSeg.x = coords[i];
+            break;
 
-        case "q":
-        case "Q":
-          pathSeg.x1 = coords[3];
-          pathSeg.y1 = coords[2];
-          pathSeg.x = coords[1];
-          pathSeg.y = coords[0];
-          break;
-        // TODO: a,A
-      }
+          case "v":
+          case "V":
+            pathSeg.y = coords[i];
+            break;
 
-      pathSegList.push(pathSeg);
+          case "c":
+          case "C":
+            pathSeg.x1 = coords[i + length - 6];
+            pathSeg.y1 = coords[i + length - 5];
+          case "s":
+          case "S":
+            pathSeg.x2 = coords[i + length - 4];
+            pathSeg.y2 = coords[i + length - 3];
+          case "t":
+          case "T":
+          case "l":
+          case "L":
+          case "m":
+          case "M":
+            pathSeg.x = coords[i + length - 2];
+            pathSeg.y = coords[i + length - 1];
+            break;
+
+          case "q":
+          case "Q":
+            pathSeg.x1 = coords[i];
+            pathSeg.y1 = coords[i + 1];
+            pathSeg.x = coords[i + 2];
+            pathSeg.y = coords[i + 3];
+            break;
+            // TODO: a,A
+        }
+
+        pathSegList.push(pathSeg);
+        i += length;
+      } while(i < coords.length);
     }
 
     pathSegList.getItem = function (i) {
