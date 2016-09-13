@@ -946,25 +946,25 @@ SOFTWARE.
       return xOffset;
     };
 
-        /**
+    /**
      * Convert em, px and bare number attributes to pixel values
      */
     var toPixels = function (value, pdfFontSize) {
       var match;
 
       // em
-      match = value && value.toString().match(/^([0-9\.]+)em$/)
+      match = value && value.toString().match(/^([\-0-9\.]+)em$/)
       if (match) {
         return parseFloat(match[1]) * pdfFontSize;
       }
 
       // pixels
-      match = value && value.toString().match(/^([0-9\.]+)(px|)$/)
+      match = value && value.toString().match(/^([\-0-9\.]+)(px|)$/)
       if (match) {
         return parseFloat(match[1]);
       }
       return 0;
-    }
+    };
 
     // creates an svg element and append the text node to properly measure the text size
     var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -980,10 +980,12 @@ SOFTWARE.
     }
     // Only supported measuring unit is "em"!
     var pdfFontSize = _pdf.getFontSize();
+    var textX = toPixels(node.getAttribute('x'), pdfFontSize);
+    var textY = toPixels(node.getAttribute('y'), pdfFontSize);
     var m = new _pdf.Matrix(
         tfMatrix.a, tfMatrix.b, tfMatrix.c, tfMatrix.d,
-        tfMatrix.e + toPixels(node.getAttribute('x'), pdfFontSize),
-        tfMatrix.f + toPixels(node.getAttribute('y'), pdfFontSize)
+        tfMatrix.e + textX,
+        tfMatrix.f + textY
     );
 
     x = toPixels(node.getAttribute("dx"), pdfFontSize);
@@ -998,17 +1000,16 @@ SOFTWARE.
           void 0,
           m
       );
-    } else if (node.childElementCount === 1) {
+    } else {
       // otherwise loop over tspans and position each relative to the previous one
       forEachChild(node, function (i, tSpan) {
         _pdf.saveGraphicsState();
         var tSpanColor = getAttribute(tSpan, "fill");
         setTextProperties(tSpan, tSpanColor && new RGBColor(tSpanColor));
-        var xOffset = getTextOffset(textAnchor, tSpan.getComputedTextLength());
-        y += toPixels(tSpan.getAttribute("dy"), pdfFontSize);
+        var extent = tSpan.getExtentOfChar(0);
         _pdf.text(
-            x - xOffset,
-            y,
+            extent.x - textX,//x - xOffset,
+            extent.y + extent.height * 0.7 - textY, // 0.7 roughly mimicks the text baseline
             transformText(node, removeNewlinesAndTrim(tSpan.textContent)),
             void 0,
             m
@@ -1017,7 +1018,7 @@ SOFTWARE.
         _pdf.restoreGraphicsState();
       });
 
-    } else { // 2 or more children
+    } /*else { // 2 or more children
       var tSpanStarts = [0];
       var lineMap = []; // which line does each tSpan (i) belong to
       var lineNo = 0;
@@ -1055,7 +1056,7 @@ SOFTWARE.
         );
         _pdf.restoreGraphicsState();
       });
-    }
+    }*/
     document.body.removeChild(svg);
     _pdf.restoreGraphicsState();
   };
