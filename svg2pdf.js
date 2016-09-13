@@ -1174,8 +1174,8 @@ SOFTWARE.
           // probably a gradient (or something unsupported)
           fillUrl = svgIdPrefix.get() + url[1];
           var fill = getFromDefs(fillUrl, defs);
-          if (fill && nodeIs(fill, "lineargradient,radialgradient")) {
 
+          if (fill && nodeIs(fill, "lineargradient,radialgradient")) {
             // matrix to convert between gradient space and user space
             // for "userSpaceOnUse" this is the current transformation: tfMatrix
             // for "objectBoundingBox" or default, the gradient gets scaled and transformed to the bounding box
@@ -1190,9 +1190,21 @@ SOFTWARE.
             }
 
             // matrix that is applied to the gradient before any other transformations
-            var gradientTransform = parseTransform(fill.getAttribute("gradientTransform"));
-
+            var gradientTransformAttr = fill.getAttribute("gradientTransform");
+            var gradientTransform = parseTransform(gradientTransformAttr);
             fillData = _pdf.matrixMult(gradientTransform, gradientUnitsMatrix);
+            // If no fill had no gradientTransform attribute, fill with solid color
+            if (!gradientTransformAttr) {
+              var stopColor = fill.firstElementChild.getAttribute("stop-color");
+              if (stopColor) {
+                fillRGB = parseColor(stopColor);
+              } else {
+                fillRGB = parseColor('');
+              }
+              colorMode = 'F';
+              hasFillColor = true;
+            }
+
           } else if (fill && nodeIs(fill, "pattern")) {
             var fillBBox, y, width, height, x;
             fillData = {};
