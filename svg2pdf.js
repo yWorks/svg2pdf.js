@@ -1169,7 +1169,7 @@ SOFTWARE.
 
       var fillColor = getAttribute(node, "fill");
       if (fillColor) {
-        var url = /url\(#(\w+)\)/.exec(fillColor);
+        var url = /url\(#([\w-]+)\)/.exec(fillColor);
         if (url) {
           // probably a gradient (or something unsupported)
           fillUrl = svgIdPrefix.get() + url[1];
