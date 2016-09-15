@@ -953,13 +953,13 @@ SOFTWARE.
       var match;
 
       // em
-      match = value && value.toString().match(/^([\-0-9\.]+)em$/)
+      match = value && value.toString().match(/^([\-0-9.]+)em$/);
       if (match) {
         return parseFloat(match[1]) * pdfFontSize;
       }
 
       // pixels
-      match = value && value.toString().match(/^([\-0-9\.]+)(px|)$/)
+      match = value && value.toString().match(/^([\-0-9.]+)(px|)$/);
       if (match) {
         return parseFloat(match[1]);
       }
@@ -978,7 +978,7 @@ SOFTWARE.
     if (textAnchor) {
       xOffset = getTextOffset(textAnchor, box.width);
     }
-    // Only supported measuring unit is "em"!
+
     var pdfFontSize = _pdf.getFontSize();
     var textX = toPixels(node.getAttribute('x'), pdfFontSize);
     var textY = toPixels(node.getAttribute('y'), pdfFontSize);
@@ -1018,45 +1018,8 @@ SOFTWARE.
         _pdf.restoreGraphicsState();
       });
 
-    } /*else { // 2 or more children
-      var tSpanStarts = [0];
-      var lineMap = []; // which line does each tSpan (i) belong to
-      var lineNo = 0;
-      var lineLength = [0];
-      forEachChild(node, function (i, tSpan) {
-        var length = tSpan.getComputedTextLength(),
-          x = toPixels(tSpan.getAttribute("x"), pdfFontSize);
-        if (x) { // x attribute starts new line
-          x -= toPixels(node.getAttribute("x"), pdfFontSize);
-          tSpanStarts[i] = x;
-          lineNo++;
-          lineLength[lineNo] = 0;
-        } else {
-          tSpanStarts.push(tSpanStarts[i] + length);
-        }
-        lineMap[i] = lineNo;
-        lineLength[lineNo] += length;
-      });
+    }
 
-      // otherwise loop over tspans and position each relative to the previous on
-      var ithOffset = 0;
-      forEachChild(node, function (i, tSpan) {
-        _pdf.saveGraphicsState();
-        var tSpanColor = getAttribute(tSpan, "fill");
-        setTextProperties(tSpan, tSpanColor && new RGBColor(tSpanColor));
-
-        y += toPixels(tSpan.getAttribute("dy"), pdfFontSize);
-
-        _pdf.text(
-            x - (lineLength[lineMap[i]] / 2) + tSpanStarts[i],
-            y,
-            transformText(node, removeNewlinesAndTrim(tSpan.textContent)),
-            void 0,
-            m
-        );
-        _pdf.restoreGraphicsState();
-      });
-    }*/
     document.body.removeChild(svg);
     _pdf.restoreGraphicsState();
   };
