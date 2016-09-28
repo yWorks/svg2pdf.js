@@ -982,11 +982,7 @@ SOFTWARE.
     var pdfFontSize = _pdf.getFontSize();
     var textX = toPixels(node.getAttribute('x'), pdfFontSize);
     var textY = toPixels(node.getAttribute('y'), pdfFontSize);
-    var m = new _pdf.Matrix(
-        tfMatrix.a, tfMatrix.b, tfMatrix.c, tfMatrix.d,
-        tfMatrix.e + textX,
-        tfMatrix.f + textY
-    );
+    var m = _pdf.matrixMult(new _pdf.Matrix(1, 0, 0, 1, textX, textY), tfMatrix);
 
     x = toPixels(node.getAttribute("dx"), pdfFontSize);
     y = toPixels(node.getAttribute("dy"), pdfFontSize);
