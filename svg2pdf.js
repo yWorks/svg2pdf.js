@@ -827,13 +827,13 @@ SOFTWARE.
         var markerElement;
         switch (marker.type) {
           case "start":
-            markerElement = svgIdPrefix.get() + /url\(#(\w+)\)/.exec(markerStart)[1];
+            markerElement = svgIdPrefix.get() + /url\(#([\w\-]+)\)/.exec(markerStart)[1];
             break;
           case "end":
-            markerElement = svgIdPrefix.get() + /url\(#(\w+)\)/.exec(markerEnd)[1];
+            markerElement = svgIdPrefix.get() + /url\(#([\w\-]+)\)/.exec(markerEnd)[1];
             break;
           case "mid":
-            markerElement = svgIdPrefix.get() + /url\(#(\w+)\)/.exec(markerMid)[1];
+            markerElement = svgIdPrefix.get() + /url\(#([\w\-]+)\)/.exec(markerMid)[1];
             break;
         }
         _pdf.doFormObject(markerElement, marker.tf);
