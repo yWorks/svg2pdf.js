@@ -3,9 +3,10 @@
   <!--<script src="http://live.yworks.com/yfiles-for-html/resources/scripts/rgbcolor.js"></script>-->
   <!--<script src="http://live.yworks.com/yfiles-for-html/resources/scripts/rgbcolor.js"></script>-->
   <!--<script src="../../jsPDF/dist/jspdf.debug.js"></script>-->
-  <!--<script src="../rgbcolor.js"></script>-->
-  <!--<script src="../svg2pdf.js"></script>-->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.22/require.min.js"></script>
+  <!--<script src="../src/rgbcolor.js"></script>-->
+  <!--<script src="../src/svg2pdf.js"></script>-->
+  <script src="https://rawgit.com/yWorks/jsPDF/master/dist/jspdf.debug.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.2/require.js"></script>
 </head>
 <body>
 
@@ -536,13 +537,11 @@
 //  var jsPDF = require("jsPDF");
 
   require.config({
-    baseUrl: "../"
+    baseUrl: "../src"
   });
   require([
-    "../jsPDF/dist/jspdf.debug",
-//    "../jsPDF/jspdf.js",
-    "svg2pdf"
-  ], function (jsPDF, svgElementToPdf) {
+    "svg2pdf",
+  ], function (svgElementToPdf) {
 
 
     function svgToPdf(svgElement, margin) {

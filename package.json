@@ -1,9 +1,19 @@
 {
   "name": "svg2pdf.js",
-  "version": "0.11.4",
+  "version": "1.0.0",
   "description": "A javascript-only SVG to PDF conversion utility that runs in the browser leveraging jsPDF",
-  "main": "svg2pdf.js",
+  "main": "src/svg2pdf.js",
+  "files": [
+    "src/svg2pdf.js",
+    "dist/svg2pdf.js",
+    "dist/svg2pdf.min.js",
+    "README.md"
+  ],
   "scripts": {
+    "browserify:svgpath": "browserify node_modules/svgpath/index.js -s SvgPath -o src/SvgPath.js",
+    "browserify": "browserify src/svg2pdf.js -s svg2pdf -o dist/svg2pdf.js",
+    "uglify:dist": "uglifyjs -m -c -o dist/svg2pdf.min.js dist/svg2pdf.js",
+    "build": "npm run browserify && npm run uglify:dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -13,7 +23,7 @@
   "keywords": [
     "svg",
     "pdf",
-	"javascript"
+    "javascript"
   ],
   "author": {
     "name": "yFiles for HTML Support Team",
@@ -26,6 +36,13 @@
   },
   "homepage": "https://github.com/yWorks/svg2pdf.js#readme",
   "dependencies": {
-	"jspdf-yworks": "^1.2.68"
+    "jspdf-yworks": "^1.2.68"
+  },
+  "devDependencies": {
+    "browserify": "^13.1.1",
+    "jspdf-yworks": "^1.2.68",
+    "requirejs": "^2.3.2",
+    "svgpath": "^2.2.0",
+    "uglify-js": "^2.7.5"
   }
 }
