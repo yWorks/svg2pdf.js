@@ -40,6 +40,9 @@ SOFTWARE.
 
   var cToQ = 2 / 3; // ratio to convert quadratic bezier curves to cubic ones
 
+  var iriReference = /url\(#([^)]+)\)/;
+
+
   // pathSegList is marked deprecated in chrome, so parse the d attribute manually if necessary
   var getPathSegList = function (node) {
     var pathSegList = node.pathSegList;
@@ -833,13 +836,13 @@ SOFTWARE.
         var markerElement;
         switch (marker.type) {
           case "start":
-            markerElement = svgIdPrefix.get() + /url\(#(\w+)\)/.exec(markerStart)[1];
+            markerElement = svgIdPrefix.get() + iriReference.exec(markerStart)[1];
             break;
           case "end":
-            markerElement = svgIdPrefix.get() + /url\(#(\w+)\)/.exec(markerEnd)[1];
+            markerElement = svgIdPrefix.get() + iriReference.exec(markerEnd)[1];
             break;
           case "mid":
-            markerElement = svgIdPrefix.get() + /url\(#(\w+)\)/.exec(markerMid)[1];
+            markerElement = svgIdPrefix.get() + iriReference.exec(markerMid)[1];
             break;
         }
         _pdf.doFormObject(markerElement, marker.tf);
@@ -1192,7 +1195,7 @@ SOFTWARE.
 
       var fillColor = getAttribute(node, "fill");
       if (fillColor) {
-        var url = /url\(#(\w+)\)/.exec(fillColor);
+        var url = iriReference.exec(fillColor);
         if (url) {
           // probably a gradient (or something unsupported)
           fillUrl = svgIdPrefix.get() + url[1];

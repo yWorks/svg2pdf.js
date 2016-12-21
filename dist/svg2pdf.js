@@ -1735,7 +1735,7 @@ function RGBColor(color_string)
 
 }
 if (typeof define === "function" && define.amd) {
-  define([],function () {
+  define(function () {
     return RGBColor;
   });
 } else if (typeof module !== "undefined" && module.exports) {
