@@ -1443,7 +1443,7 @@ SOFTWARE.
   };
 
   if (typeof define === "function" && define.amd) {
-    define(["./rgbcolor", "./SvgPath"], function (rgbcolor, svgpath) {
+    define(["./rgbcolor", "SvgPath"], function (rgbcolor, svgpath) {
       RGBColor = rgbcolor;
       SvgPath = svgpath;
       return svg2pdf;
