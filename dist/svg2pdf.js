@@ -6,7 +6,7 @@
  *   license: MIT (http://opensource.org/licenses/MIT)
  *   author: yFiles for HTML Support Team <yfileshtml@yworks.com>
  *   homepage: https://github.com/yWorks/svg2pdf.js#readme
- *   version: 1.0.2
+ *   version: 1.0.4
  *
  * svgpath:
  *   license: MIT (http://opensource.org/licenses/MIT)
@@ -2777,6 +2777,9 @@ SOFTWARE.
     } else {
       // otherwise loop over tspans and position each relative to the previous one
       forEachChild(node, function (i, tSpan) {
+        if (!tSpan.textContent) {
+          return;
+        }
         _pdf.saveGraphicsState();
         var tSpanColor = getAttribute(tSpan, "fill");
         setTextProperties(tSpan, tSpanColor && new RGBColor(tSpanColor));
@@ -3212,7 +3215,7 @@ SOFTWARE.
   };
 
   if (typeof define === "function" && define.amd) {
-    define(["./rgbcolor", "./SvgPath"], function (rgbcolor, svgpath) {
+    define(["./rgbcolor", "SvgPath"], function (rgbcolor, svgpath) {
       RGBColor = rgbcolor;
       SvgPath = svgpath;
       return svg2pdf;

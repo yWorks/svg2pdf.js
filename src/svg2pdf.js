@@ -1008,6 +1008,9 @@ SOFTWARE.
     } else {
       // otherwise loop over tspans and position each relative to the previous one
       forEachChild(node, function (i, tSpan) {
+        if (!tSpan.textContent) {
+          return;
+        }
         _pdf.saveGraphicsState();
         var tSpanColor = getAttribute(tSpan, "fill");
         setTextProperties(tSpan, tSpanColor && new RGBColor(tSpanColor));
