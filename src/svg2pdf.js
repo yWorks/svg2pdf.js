@@ -1008,7 +1008,7 @@ SOFTWARE.
     } else {
       // otherwise loop over tspans and position each relative to the previous one
       forEachChild(node, function (i, tSpan) {
-        if (!tSpan.textContent) {
+        if (!tSpan.textContent || nodeIs(tSpan, 'title,desc,metadata')) {
           return;
         }
         _pdf.saveGraphicsState();
