@@ -6,7 +6,7 @@
  *   license: MIT (http://opensource.org/licenses/MIT)
  *   author: yFiles for HTML Support Team <yfileshtml@yworks.com>
  *   homepage: https://github.com/yWorks/svg2pdf.js#readme
- *   version: 1.0.5
+ *   version: 1.0.6
  *
  * svgpath:
  *   license: MIT (http://opensource.org/licenses/MIT)
@@ -1814,16 +1814,21 @@ SOFTWARE.
 
   // pathSegList is marked deprecated in chrome, so parse the d attribute manually if necessary
   var getPathSegList = function (node) {
+    var d = node.getAttribute("d");
+
+    // Replace arcs before path segment list is handled
+    if (SvgPath) {
+      d = SvgPath(d).unshort().unarc().abs().toString();
+      node.setAttribute('d', d);
+    }
+
     var pathSegList = node.pathSegList;
+    
     if (pathSegList) {
       return pathSegList;
     }
 
     pathSegList = [];
-
-    var d = node.getAttribute("d");
-
-    SvgPath && (d = SvgPath(d).unshort().unarc().abs().toString());
 
     var regex = /([a-df-zA-DF-Z])([^a-df-zA-DF-Z]*)/g,
         match;

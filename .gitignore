@@ -1,3 +1,5 @@
 node_modules/
 bower_components/
 .idea/
+dist/svg2pdf.js.map
+dist/svg2pdf.min.js.map
