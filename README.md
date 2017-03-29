@@ -53,6 +53,14 @@ svg2pdf(svgElement, pdf, {
 var uri = pdf.output('datauristring');
 ```
 
+## Building
+
+If you want to play with the sources or build the minified js file yourself, check out the repository and use the npm scripts defined in `package.json`:
+
+```bash
+npm run build
+```
+
 ## Dependencies
  * [jsPDF](https://github.com/yWorks/jsPDF) (yWorks fork version!)
  * [fontello/svgpath](https://github.com/fontello/svgpath)
