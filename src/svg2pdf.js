@@ -45,11 +45,10 @@ SOFTWARE.
 
   // pathSegList is marked deprecated in chrome, so parse the d attribute manually if necessary
   var getPathSegList = function (node) {
-    var d;
+    var d = node.getAttribute("d");
 
     // Replace arcs before path segment list is handled
     if (SvgPath) {
-      var d = node.getAttribute("d");
       d = SvgPath(d).unshort().unarc().abs().toString();
       node.setAttribute('d', d);
     }
