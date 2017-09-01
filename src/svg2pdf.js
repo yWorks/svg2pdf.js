@@ -684,7 +684,7 @@ SOFTWARE.
   };
 
   // draws a path
-  var path = function (node, tfMatrix, svgIdPrefix, colorMode, gradient, gradientMatrix) {
+  var path = function (node, tfMatrix, svgIdPrefix, colorMode, gradient, gradientMatrix, attributeState) {
     var list = getPathSegList(node);
     var markerEnd = node.getAttribute("marker-end"),
         markerStart = node.getAttribute("marker-start"),
@@ -704,7 +704,10 @@ SOFTWARE.
         var cos = Math.cos(angle);
         var sin = Math.sin(angle);
         var tf;
+        // position and rotate at anchor
         tf = new _pdf.Matrix(cos, sin, -sin, cos, anchor[0], anchor[1]);
+        // scale with stroke-width
+        tf = _pdf.matrixMult(new _pdf.Matrix(attributeState.strokeWidth, 0, 0, attributeState.strokeWidth, 0, 0), tf);
         markers.push({type: type, tf: _pdf.matrixMult(tf, tfMatrix)});
       };
 
@@ -1439,7 +1442,7 @@ SOFTWARE.
         break;
 
       case 'path':
-        path(node, tfMatrix, svgIdPrefix, colorMode, fillUrl, fillData);
+        path(node, tfMatrix, svgIdPrefix, colorMode, fillUrl, fillData, attributeState);
         break;
 
       case 'polygon':
