@@ -197,6 +197,41 @@ SOFTWARE.
     }
   };
 
+  var AttributeState = function () {
+    this.fillMode = "F";
+    this.strokeMode = "";
+
+    this.color = new RGBColor("rgb(0, 0, 0)");
+    this.fill = new RGBColor("rgb(0, 0, 0)");
+    this.fillOpacity = 1.0;
+    // this.fillRule = "nonzero";
+    // this.fontFamily = "";
+    // this.fontSize = "medium";
+    // this.fontStyle = "normal";
+    // this.fontVariant = "normal";
+    // this.fontWeight = "normal";
+    this.opacity = 1.0;
+    this.stroke = null;
+    this.strokeDasharray = null;
+    this.strokeDashoffset = null;
+    this.strokeLinecap = "butt";
+    this.strokeLinejoin = "miter";
+    this.strokeMiterlimit = 4.0;
+    this.strokeOpacity = 1.0;
+    this.strokeWidth = 1.0;
+    // this.textAlign = "start";
+    this.textAnchor = "start";
+    this.visibility = "visible";
+  };
+
+  AttributeState.prototype.clone = function () {
+    var clone = new AttributeState();
+    Object.getOwnPropertyNames(this).forEach(function (name) {
+      clone[name] = this[name];
+    }, this);
+    return clone;
+  };
+
   // returns the node for the specified id or incrementally removes prefixes to search "higher" levels
   var getFromDefs = function (id, defs) {
     var regExp = /_\d+_/;
@@ -1043,10 +1078,10 @@ SOFTWARE.
   };
 
   // As defs elements are allowed to appear after they are referenced, we search for them first
-  var findAndRenderDefs = function (node, tfMatrix, defs, svgIdPrefix, withinDefs) {
+  var findAndRenderDefs = function (node, tfMatrix, defs, svgIdPrefix, withinDefs, attributeState) {
     forEachChild(node, function (i, child) {
       if (child.tagName.toLowerCase() === "defs") {
-        renderNode(child, tfMatrix, defs, svgIdPrefix, withinDefs);
+        renderNode(child, tfMatrix, defs, svgIdPrefix, withinDefs, attributeState);
         // prevent defs from being evaluated twice // TODO: make this better
         child.parentNode.removeChild(child);
       }
@@ -1054,18 +1089,18 @@ SOFTWARE.
   };
 
   // processes a svg node
-  var svg = function (node, tfMatrix, defs, svgIdPrefix, withinDefs) {
+  var svg = function (node, tfMatrix, defs, svgIdPrefix, withinDefs, attributeState) {
     // create a new prefix and clone the defs, as defs within the svg should not be visible outside
     var newSvgIdPrefix = svgIdPrefix.nextChild();
     var newDefs = cloneDefs(defs);
-    findAndRenderDefs(node, tfMatrix, newDefs, newSvgIdPrefix, withinDefs);
-    renderChildren(node, tfMatrix, newDefs, newSvgIdPrefix, withinDefs);
+    findAndRenderDefs(node, tfMatrix, newDefs, newSvgIdPrefix, withinDefs, attributeState);
+    renderChildren(node, tfMatrix, newDefs, newSvgIdPrefix, withinDefs, attributeState);
   };
 
   // renders all children of a node
-  var renderChildren = function (node, tfMatrix, defs, svgIdPrefix, withinDefs) {
+  var renderChildren = function (node, tfMatrix, defs, svgIdPrefix, withinDefs, attributeState) {
     forEachChild(node, function (i, node) {
-      renderNode(node, tfMatrix, defs, svgIdPrefix, withinDefs);
+      renderNode(node, tfMatrix, defs, svgIdPrefix, withinDefs, attributeState);
     });
   };
 
@@ -1114,7 +1149,7 @@ SOFTWARE.
 
     _pdf.beginTilingPattern(pattern);
     // continue without transformation
-    renderChildren(node, _pdf.unitMatrix, defs, svgIdPrefix, false);
+    renderChildren(node, _pdf.unitMatrix, defs, svgIdPrefix, false, attributeState);
     _pdf.endTilingPattern(id, pattern);
   };
 
@@ -1160,15 +1195,19 @@ SOFTWARE.
    * @param defs The defs map holding all svg nodes that can be referenced
    * @param svgIdPrefix The current id prefix
    * @param withinDefs True iff we are top-level within a defs node, so the target can be switched to an pdf form object
+   * @param {AttributeState} attributeState Keeps track of parent attributes that are inherited automatically
    */
-  var renderNode = function (node, contextTransform, defs, svgIdPrefix, withinDefs) {
+  var renderNode = function (node, contextTransform, defs, svgIdPrefix, withinDefs, attributeState) {
     var tfMatrix,
         hasFillColor = false,
         fillRGB = null,
-        colorMode = null,
+        fillMode = "inherit",
+        strokeMode = "inherit",
         fillUrl = null,
         fillData = null,
         bBox;
+
+    attributeState = attributeState.clone();
 
     //
     // Decide about the render target and set the correct transformation
@@ -1203,7 +1242,7 @@ SOFTWARE.
       function setDefaultColor() {
         fillRGB = new RGBColor("rgb(0, 0, 0)");
         hasFillColor = true;
-        colorMode = "F";
+        fillMode = "F";
       }
 
       var fillColor = getAttribute(node, "fill");
@@ -1272,9 +1311,9 @@ SOFTWARE.
             fillData.matrix = _pdf.matrixMult(
                 _pdf.matrixMult(patternContentUnitsMatrix, patternUnitsMatrix), tfMatrix);
 
-            colorMode = "F";
+            fillMode = "F";
           } else {
-            // unsupported fill argument (e.g. patterns) -> fill black
+            // unsupported fill argument -> fill black
             fillUrl = fill = null;
             setDefaultColor();
           }
@@ -1283,14 +1322,11 @@ SOFTWARE.
           fillRGB = parseColor(fillColor);
           if (fillRGB.ok) {
             hasFillColor = true;
-            colorMode = 'F';
+            fillMode = "F";
           } else {
-            colorMode = null;
+            fillMode = "";
           }
         }
-      } else {
-        // if no fill attribute is provided the default fill color is black
-        setDefaultColor();
       }
 
       // opacity is realized via a pdf graphics state
@@ -1308,6 +1344,7 @@ SOFTWARE.
     if (nodeIs(node, "g,path,rect,ellipse,line,circle,polygon")) {
       // text has no fill color, so don't apply it until here
       if (hasFillColor) {
+        attributeState.fill = fillRGB;
         _pdf.setFillColor(fillRGB.r, fillRGB.g, fillRGB.b);
       }
 
@@ -1317,51 +1354,62 @@ SOFTWARE.
         var strokeWidth;
         if (node.hasAttribute("stroke-width")) {
           strokeWidth = Math.abs(parseFloat(node.getAttribute('stroke-width')));
+          attributeState.strokeWidth = strokeWidth;
           _pdf.setLineWidth(strokeWidth);
         }
         var strokeRGB = new RGBColor(strokeColor);
         if (strokeRGB.ok) {
+          attributeState.color = strokeRGB;
           _pdf.setDrawColor(strokeRGB.r, strokeRGB.g, strokeRGB.b);
           if (strokeWidth !== 0) {
             // pdf spec states: "A line width of 0 denotes the thinnest line that can be rendered at device resolution:
             // 1 device pixel wide". SVG, however, does not draw zero width lines.
-            colorMode = (colorMode || "") + "D";
+            strokeMode = "D";
+          } else {
+            strokeMode = "";
           }
         }
         if (node.hasAttribute("stroke-linecap")) {
-          _pdf.setLineCap(node.getAttribute("stroke-linecap"));
+          _pdf.setLineCap(attributeState.strokeLinecap = node.getAttribute("stroke-linecap"));
         }
         if (node.hasAttribute("stroke-linejoin")) {
-          _pdf.setLineJoin(node.getAttribute("stroke-linejoin"));
+          _pdf.setLineJoin(attributeState.strokeLinejoin = node.getAttribute("stroke-linejoin"));
         }
         if (node.hasAttribute("stroke-dasharray")) {
-          _pdf.setLineDashPattern(
-              parseFloats(node.getAttribute("stroke-dasharray")),
-              parseInt(node.getAttribute("stroke-dashoffset")) || 0
-          );
+          var dashArray = parseFloats(node.getAttribute("stroke-dasharray"));
+          var dashOffset = parseInt(node.getAttribute("stroke-dashoffset")) || 0;
+          attributeState.strokeDasharray = dashArray;
+          attributeState.strokeDashoffset = dashOffset;
+          _pdf.setLineDashPattern(dashArray, dashOffset);
         }
         if (node.hasAttribute("stroke-miterlimit")) {
-          _pdf.setLineMiterLimit(parseFloat(node.getAttribute("stroke-miterlimit")));
+          _pdf.setLineMiterLimit(attributeState.strokeMiterlimit = parseFloat(node.getAttribute("stroke-miterlimit")));
         }
       }
     }
+
+    // inherit fill and stroke mode if not specified at this node
+    fillMode = attributeState.fillMode = fillMode === "inherit" ? attributeState.fillMode : fillMode;
+    strokeMode = attributeState.strokeMode = strokeMode === "inherit" ? attributeState.strokeMode : strokeMode;
+
+    var colorMode = fillMode + strokeMode;
 
     setTextProperties(node, fillRGB);
 
     // do the actual drawing
     switch (node.tagName.toLowerCase()) {
       case 'svg':
-        svg(node, tfMatrix, defs, svgIdPrefix, withinDefs);
+        svg(node, tfMatrix, defs, svgIdPrefix, withinDefs, attributeState);
         break;
       case 'g':
-        findAndRenderDefs(node, tfMatrix, defs, svgIdPrefix, withinDefs);
+        findAndRenderDefs(node, tfMatrix, defs, svgIdPrefix, withinDefs, attributeState);
       case 'a':
       case "marker":
-        renderChildren(node, tfMatrix, defs, svgIdPrefix, withinDefs);
+        renderChildren(node, tfMatrix, defs, svgIdPrefix, withinDefs, attributeState);
         break;
 
       case 'defs':
-        renderChildren(node, tfMatrix, defs, svgIdPrefix, true);
+        renderChildren(node, tfMatrix, defs, svgIdPrefix, true, attributeState);
         break;
 
       case 'use':
@@ -1448,7 +1496,7 @@ SOFTWARE.
     _pdf.saveGraphicsState();
     _pdf.setCurrentTransformationMatrix(new _pdf.Matrix(k, 0, 0, k, xOffset, yOffset));
 
-    renderNode(element.cloneNode(true), _pdf.unitMatrix, {}, new SvgPrefix(""), false);
+    renderNode(element.cloneNode(true), _pdf.unitMatrix, {}, new SvgPrefix(""), false, new AttributeState());
 
     _pdf.restoreGraphicsState();
 
