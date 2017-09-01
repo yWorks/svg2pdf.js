@@ -632,15 +632,20 @@ SOFTWARE.
     context.fillStyle = "#fff";
     context.fillRect(0, 0, width, height);
     context.drawImage(image, 0, 0, width, height);
-    var jpegUrl = canvas.toDataURL("image/jpeg");
 
-    _pdf.addImage(jpegUrl,
-        "jpeg",
-        x,
-        y,
-        width,
-        height
-    );
+    try {
+      var jpegUrl = canvas.toDataURL("image/jpeg");
+
+      _pdf.addImage(jpegUrl,
+          "jpeg",
+          x,
+          y,
+          width,
+          height
+      );
+    } catch (e) {
+      console.warn('svg2pdfjs: Images with external resource link are not supported! ("' + imageUrl + '")');
+    }
   };
 
   // draws a path
