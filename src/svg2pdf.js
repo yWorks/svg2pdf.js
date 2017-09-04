@@ -880,7 +880,12 @@ SOFTWARE.
             markerElement = svgIdPrefix.get() + iriReference.exec(markerMid)[1];
             break;
         }
+
+        // as the marker is already scaled by the current line width we must not apply the line width twice!
+        _pdf.saveGraphicsState();
+        _pdf.setLineWidth(1.0);
         _pdf.doFormObject(markerElement, marker.tf);
+        _pdf.restoreGraphicsState();
       }
     }
 
