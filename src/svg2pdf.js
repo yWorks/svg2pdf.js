@@ -1511,7 +1511,8 @@ SOFTWARE.
     // set default values that differ from pdf defaults
     var attributeState = new AttributeState();
     _pdf.setLineWidth(attributeState.strokeWidth);
-    _pdf.setFillColor(attributeState.fill);
+    var fill = attributeState.fill;
+    _pdf.setFillColor(fill.r, fill.g, fill.b);
 
     // start rendering
     renderNode(element.cloneNode(true), _pdf.unitMatrix, {}, new SvgPrefix(""), false, attributeState);
