@@ -282,20 +282,7 @@ SOFTWARE.
       x = -parseFloat(node.getAttribute("refX")) || 0;
       y = -parseFloat(node.getAttribute("refY")) || 0;
 
-      viewBox = node.getAttribute("viewBox");
-      if (viewBox) {
-        bounds = parseFloats(viewBox);
-        viewBoxWidth = bounds[2] - bounds[0];
-        viewBoxHeight = bounds[3] - bounds[1];
-        width = parseFloat(node.getAttribute("markerWidth")) || viewBoxWidth;
-        height = parseFloat(node.getAttribute("markerHeight")) || viewBoxHeight;
-
-        var s = new _pdf.Matrix(width / viewBoxWidth, 0, 0, height / viewBoxHeight, 0, 0);
-        var t = new _pdf.Matrix(1, 0, 0, 1, x, y);
-        nodeTransform = _pdf.matrixMult(t, s);
-      } else {
-        nodeTransform = new _pdf.Matrix(1, 0, 0, 1, x, y);
-      }
+      nodeTransform = new _pdf.Matrix(1, 0, 0, 1, x, y);
     }
 
     var transformString = node.getAttribute("transform");
@@ -1499,7 +1486,13 @@ SOFTWARE.
     _pdf.saveGraphicsState();
     _pdf.setCurrentTransformationMatrix(new _pdf.Matrix(k, 0, 0, k, xOffset, yOffset));
 
-    renderNode(element.cloneNode(true), _pdf.unitMatrix, {}, new SvgPrefix(""), false, new AttributeState());
+    // set default values that differ from pdf defaults
+    var attributeState = new AttributeState();
+    _pdf.setLineWidth(attributeState.strokeWidth);
+    _pdf.setFillColor(attributeState.fill);
+
+    // start rendering
+    renderNode(element.cloneNode(true), _pdf.unitMatrix, {}, new SvgPrefix(""), false, attributeState);
 
     _pdf.restoreGraphicsState();
 
