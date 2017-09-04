@@ -1326,7 +1326,7 @@ SOFTWARE.
 
       // opacity is realized via a pdf graphics state
       var opacity = 1.0;
-      var nodeOpacity = node.getAttribute("opacity") || node.getAttribute("fill-opacity");
+      var nodeOpacity = getAttribute(node, "opacity") || getAttribute(node, "fill-opacity");
       if (nodeOpacity) {
         opacity *= parseFloat(nodeOpacity);
       }
@@ -1344,11 +1344,11 @@ SOFTWARE.
       }
 
       // stroke mode
-      var strokeColor = node.getAttribute('stroke');
+      var strokeColor = getAttribute(node, "stroke");
       if (strokeColor) {
-        var strokeWidth;
-        if (node.hasAttribute("stroke-width")) {
-          strokeWidth = Math.abs(parseFloat(node.getAttribute('stroke-width')));
+        var strokeWidth = getAttribute(node, "stroke-width");
+        if (strokeWidth !== void 0 && strokeWidth !== "") {
+          strokeWidth = Math.abs(parseFloat(strokeWidth));
           attributeState.strokeWidth = strokeWidth;
           _pdf.setLineWidth(strokeWidth);
         }
@@ -1364,21 +1364,25 @@ SOFTWARE.
             strokeMode = "";
           }
         }
-        if (node.hasAttribute("stroke-linecap")) {
-          _pdf.setLineCap(attributeState.strokeLinecap = node.getAttribute("stroke-linecap"));
+        var lineCap = getAttribute(node, "stroke-linecap");
+        if (lineCap) {
+          _pdf.setLineCap(attributeState.strokeLinecap = lineCap);
         }
-        if (node.hasAttribute("stroke-linejoin")) {
-          _pdf.setLineJoin(attributeState.strokeLinejoin = node.getAttribute("stroke-linejoin"));
+        var lineJoin = getAttribute(node, "stroke-linejoin");
+        if (lineJoin) {
+          _pdf.setLineJoin(attributeState.strokeLinejoin = lineJoin);
         }
-        if (node.hasAttribute("stroke-dasharray")) {
-          var dashArray = parseFloats(node.getAttribute("stroke-dasharray"));
-          var dashOffset = parseInt(node.getAttribute("stroke-dashoffset")) || 0;
+        var dashArray = getAttribute(node, "stroke-dasharray");
+        if (dashArray) {
+          dashArray = parseFloats(dashArray);
+          var dashOffset = parseInt(getAttribute(node, "stroke-dashoffset")) || 0;
           attributeState.strokeDasharray = dashArray;
           attributeState.strokeDashoffset = dashOffset;
           _pdf.setLineDashPattern(dashArray, dashOffset);
         }
-        if (node.hasAttribute("stroke-miterlimit")) {
-          _pdf.setLineMiterLimit(attributeState.strokeMiterlimit = parseFloat(node.getAttribute("stroke-miterlimit")));
+        var miterLimit = getAttribute(node, "stroke-miterlimit");
+        if (miterLimit !== void 0 && miterLimit !== "") {
+          _pdf.setLineMiterLimit(attributeState.strokeMiterlimit = parseFloat(miterLimit));
         }
       }
     }
