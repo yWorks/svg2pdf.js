@@ -1142,7 +1142,7 @@ SOFTWARE.
     defs[id] = node;
   };
 
-  var pattern = function (node, defs, svgIdPrefix) {
+  var pattern = function (node, defs, svgIdPrefix, attributeState) {
     var id = svgIdPrefix.get() + node.getAttribute("id");
     defs[id] = node;
 
@@ -1484,7 +1484,7 @@ SOFTWARE.
         break;
 
       case "pattern":
-        pattern(node, defs, svgIdPrefix);
+        pattern(node, defs, svgIdPrefix, attributeState);
         break;
     }
 
