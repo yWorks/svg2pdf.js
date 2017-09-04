@@ -679,7 +679,9 @@ SOFTWARE.
           height
       );
     } catch (e) {
-      console.warn('svg2pdfjs: Images with external resource link are not supported! ("' + imageUrl + '")');
+      (typeof console === "object"
+          && console.warn
+          && console.warn('svg2pdfjs: Images with external resource link are not supported! ("' + imageUrl + '")'));
     }
   };
 
