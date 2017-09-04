@@ -865,6 +865,10 @@ SOFTWARE.
     };
     var lines = getLinesFromPath(list, tfMatrix);
 
+    if (lines.lines.length > 0) {
+      _pdf.path(lines.lines, colorMode, gradient, gradientMatrix);
+    }
+
     if (markerEnd || markerStart || markerMid) {
       for (var i = 0; i < lines.markers.length; i++) {
         var marker = lines.markers[i];
@@ -887,10 +891,6 @@ SOFTWARE.
         _pdf.doFormObject(markerElement, marker.tf);
         _pdf.restoreGraphicsState();
       }
-    }
-
-    if (lines.lines.length > 0) {
-      _pdf.path(lines.lines, colorMode, gradient, gradientMatrix);
     }
   };
 
