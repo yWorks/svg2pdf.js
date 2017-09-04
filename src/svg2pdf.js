@@ -119,6 +119,15 @@ SOFTWARE.
         }
 
         pathSegList.push(pathSeg);
+
+        // "If a moveto is followed by multiple pairs of coordinates, the subsequent pairs are treated as implicit
+        // lineto commands"
+        if (type === "m") {
+          type = "l";
+        } else if (type === "M") {
+          type = "L";
+        }
+
         i += length;
       } while(i < coords.length);
     }
