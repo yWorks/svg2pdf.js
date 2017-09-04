@@ -1275,6 +1275,8 @@ SOFTWARE.
             var gradientTransform = parseTransform(fill.getAttribute("gradientTransform"));
 
             fillData = _pdf.matrixMult(gradientTransform, gradientUnitsMatrix);
+
+            fillMode = "";
           } else if (fill && nodeIs(fill, "pattern")) {
             var fillBBox, y, width, height, x;
             fillData = {};
