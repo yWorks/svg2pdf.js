@@ -1335,7 +1335,11 @@ SOFTWARE.
 
       // opacity is realized via a pdf graphics state
       var opacity = 1.0;
-      var nodeOpacity = getAttribute(node, "opacity") || getAttribute(node, "fill-opacity");
+      var nodeOpacity = getAttribute(node, "opacity")
+          || getAttribute(node, "fill-opacity")
+          // this is a quickfix: pdf can't handle different opacity values for stroke and fill
+          // we could split the primitive into two parts, however
+          || getAttribute(node, "stroke-opacity");
       if (nodeOpacity) {
         opacity *= parseFloat(nodeOpacity);
       }
