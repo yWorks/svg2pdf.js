@@ -214,8 +214,8 @@ SOFTWARE.
     this.fill = new RGBColor("rgb(0, 0, 0)");
     this.fillOpacity = 1.0;
     // this.fillRule = "nonzero";
-    // this.fontFamily = "";
-    // this.fontSize = "medium";
+    this.fontFamily = "times";
+    this.fontSize = 16;
     // this.fontStyle = "normal";
     // this.fontVariant = "normal";
     // this.fontWeight = "normal";
@@ -1537,6 +1537,8 @@ SOFTWARE.
     _pdf.setLineWidth(attributeState.strokeWidth);
     var fill = attributeState.fill;
     _pdf.setFillColor(fill.r, fill.g, fill.b);
+    _pdf.setFont(attributeState.fontFamily);
+    _pdf.setFontSize(attributeState.fontSize);
 
     // start rendering
     renderNode(element.cloneNode(true), _pdf.unitMatrix, {}, new SvgPrefix(""), false, attributeState);
