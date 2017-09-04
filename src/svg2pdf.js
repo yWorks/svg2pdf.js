@@ -412,6 +412,10 @@ SOFTWARE.
   // returns the untransformed bounding box [x, y, width, height] of an svg element (quite expensive for path and polygon objects, as
   // the whole points/d-string has to be processed)
   var getUntransformedBBox = function (node) {
+    if (getAttribute("display") === "none") {
+      return [0, 0, 0, 0];
+    }
+
     var i, minX, minY, maxX, maxY, viewBox, vb, boundingBox;
     var pf = parseFloat;
 
@@ -985,7 +989,7 @@ SOFTWARE.
   };
 
   // draws a text element and its tspan children
-  var text = function (node, tfMatrix, hasFillColor, fillRGB) {
+  var text = function (node, tfMatrix, hasFillColor, fillRGB, attributeState) {
     _pdf.saveGraphicsState();
     setTextProperties(node, fillRGB);
 
@@ -1045,15 +1049,18 @@ SOFTWARE.
     x = toPixels(node.getAttribute("dx"), pdfFontSize);
     y = toPixels(node.getAttribute("dy"), pdfFontSize);
 
+    var visibility = getAttribute(node, "visibility");
     // when there are no tspans draw the text directly
     if (node.childElementCount === 0) {
-      _pdf.text(
-          (x - xOffset),
-          y,
-          transformText(node, removeNewlinesAndTrim(node.textContent)),
-          void 0,
-          m
-      );
+      if ((visibility !== "hidden" && (attributeState.visibility !== "hidden" || visibility === "visible"))) {
+        _pdf.text(
+            (x - xOffset),
+            y,
+            transformText(node, removeNewlinesAndTrim(node.textContent)),
+            void 0,
+            m
+        );
+      }
     } else {
       // otherwise loop over tspans and position each relative to the previous one
       forEachChild(node, function (i, tSpan) {
@@ -1064,13 +1071,16 @@ SOFTWARE.
         var tSpanColor = getAttribute(tSpan, "fill");
         setTextProperties(tSpan, tSpanColor && new RGBColor(tSpanColor));
         var extent = tSpan.getExtentOfChar(0);
-        _pdf.text(
-            extent.x - textX,//x - xOffset,
-            extent.y + extent.height * 0.7 - textY, // 0.7 roughly mimicks the text baseline
-            transformText(node, removeNewlinesAndTrim(tSpan.textContent)),
-            void 0,
-            m
-        );
+        var tSpanVisibility = getAttribute(tSpan, "visibility");
+        if ((tSpanVisibility !== "hidden" && (visibility !== "hidden" || tSpanVisibility === "visible"))) {
+          _pdf.text(
+              extent.x - textX,//x - xOffset,
+              extent.y + extent.height * 0.7 - textY, // 0.7 roughly mimicks the text baseline
+              transformText(node, removeNewlinesAndTrim(tSpan.textContent)),
+              void 0,
+              m
+          );
+        }
 
         _pdf.restoreGraphicsState();
       });
@@ -1202,6 +1212,20 @@ SOFTWARE.
    * @param {AttributeState} attributeState Keeps track of parent attributes that are inherited automatically
    */
   var renderNode = function (node, contextTransform, defs, svgIdPrefix, withinDefs, attributeState) {
+    attributeState = attributeState.clone();
+
+    if (getAttribute(node, "display") === "none") {
+      return;
+    }
+
+    var visibility = getAttribute(node, "visibility");
+    if ((visibility === "hidden" || (attributeState.visibility === "hidden" && visibility !== "visible"))
+        && !nodeIs(node, "svg,g,marker,a,pattern,defs,text")) {
+      return;
+    }
+
+    visibility && (attributeState.visibility = visibility);
+
     var tfMatrix,
         hasFillColor = false,
         fillRGB = null,
@@ -1210,8 +1234,6 @@ SOFTWARE.
         fillUrl = null,
         fillData = null,
         bBox;
-
-    attributeState = attributeState.clone();
 
     //
     // Decide about the render target and set the correct transformation
@@ -1449,7 +1471,7 @@ SOFTWARE.
         circle(node, colorMode, fillUrl, fillData);
         break;
       case 'text':
-        text(node, tfMatrix, hasFillColor, fillRGB);
+        text(node, tfMatrix, hasFillColor, fillRGB, attributeState);
         break;
 
       case 'path':
