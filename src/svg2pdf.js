@@ -412,7 +412,7 @@ SOFTWARE.
   // returns the untransformed bounding box [x, y, width, height] of an svg element (quite expensive for path and polygon objects, as
   // the whole points/d-string has to be processed)
   var getUntransformedBBox = function (node) {
-    if (getAttribute("display") === "none") {
+    if (getAttribute(node, "display") === "none") {
       return [0, 0, 0, 0];
     }
 
