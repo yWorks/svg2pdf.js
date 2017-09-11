@@ -241,6 +241,57 @@ SOFTWARE.
     return clone;
   };
 
+  /**
+   * @constructor
+   * @property {Marker[]} markers
+   */
+  function MarkerList() {
+    this.markers = [];
+  }
+
+  /**
+   * @param {Marker} marker
+   */
+  MarkerList.prototype.addMarker = function addMarker(marker) {
+    this.markers.push(marker);
+  };
+
+  MarkerList.prototype.draw = function (tfMatrix, attributeState) {
+    for (var i = 0; i < this.markers.length; i++) {
+      var marker = this.markers[i];
+
+      var tf;
+      var angle = marker.angle, anchor = marker.anchor;
+      var cos = Math.cos(angle);
+      var sin = Math.sin(angle);
+      // position at and rotate around anchor
+      tf = new _pdf.Matrix(cos, sin, -sin, cos, anchor[0], anchor[1]);
+      // scale with stroke-width
+      tf = _pdf.matrixMult(new _pdf.Matrix(attributeState.strokeWidth, 0, 0, attributeState.strokeWidth, 0, 0), tf);
+
+      tf = _pdf.matrixMult(tf, tfMatrix);
+
+      // as the marker is already scaled by the current line width we must not apply the line width twice!
+      _pdf.saveGraphicsState();
+      _pdf.setLineWidth(1.0);
+      _pdf.doFormObject(marker.id, tf);
+      _pdf.restoreGraphicsState();
+    }
+  };
+
+  /**
+   * @param {string} id
+   * @param {"start"|"mid"|"end"} type
+   * @param {[number,number]} anchor
+   * @param {number} angle
+   */
+  function Marker(id, type, anchor, angle) {
+    this.id = id;
+    this.type = type;
+    this.anchor = anchor;
+    this.angle = angle;
+  }
+
   // returns the node for the specified id or incrementally removes prefixes to search "higher" levels
   var getFromDefs = function (id, defs) {
     var regExp = /_\d+_/;
@@ -692,26 +743,19 @@ SOFTWARE.
         markerStart = node.getAttribute("marker-start"),
         markerMid = node.getAttribute("marker-mid");
 
+    markerEnd && (markerEnd = svgIdPrefix.get() + iriReference.exec(markerEnd)[1]);
+    markerStart && (markerStart = svgIdPrefix.get() + iriReference.exec(markerStart)[1]);
+    markerMid && (markerMid = svgIdPrefix.get() + iriReference.exec(markerMid)[1]);
+
     var getLinesFromPath = function (pathSegList, tfMatrix) {
       var x = 0, y = 0;
       var x0 = x, y0 = y;
       var prevX, prevY, newX, newY;
       var to, p, p2, p3;
       var lines = [];
-      var markers = [];
+      var markers = new MarkerList();
       var op;
       var prevAngle = 0, curAngle;
-
-      var addMarker = function (angle, anchor, type) {
-        var cos = Math.cos(angle);
-        var sin = Math.sin(angle);
-        var tf;
-        // position and rotate at anchor
-        tf = new _pdf.Matrix(cos, sin, -sin, cos, anchor[0], anchor[1]);
-        // scale with stroke-width
-        tf = _pdf.matrixMult(new _pdf.Matrix(attributeState.strokeWidth, 0, 0, attributeState.strokeWidth, 0, 0), tf);
-        markers.push({type: type, tf: _pdf.matrixMult(tf, tfMatrix)});
-      };
 
       for (var i = 0; i < list.numberOfItems; i++) {
         var seg = list.getItem(i);
@@ -825,13 +869,13 @@ SOFTWARE.
             && !(i === 1 && "mM".indexOf(list.getItem(i - 1).pathSegTypeAsLetter) >= 0);
 
         if ("sScCqQtT".indexOf(cmd) >= 0) {
-          hasStartMarker && addMarker(getAngle([x, y], p2), [x, y], "start");
-          hasEndMarker && addMarker(getAngle(p3, to), to, "end");
+          hasStartMarker && markers.addMarker(new Marker(markerStart, "start", [x, y], getAngle([x, y], p2)));
+          hasEndMarker && markers.addMarker(new Marker(markerEnd, "end", to, getAngle(p3, to)));
           if (hasMidMarker) {
             curAngle = getAngle([x, y], p2);
             curAngle = "mM".indexOf(list.getItem(i - 1).pathSegTypeAsLetter) >= 0 ?
                 curAngle : .5 * (prevAngle + curAngle);
-            addMarker(curAngle, [x, y], "mid");
+            markers.addMarker(new Marker(markerMid, "mid", [x, y], curAngle));
           }
 
           prevAngle = getAngle(p3, to);
@@ -850,13 +894,13 @@ SOFTWARE.
           });
         } else if ("lLhHvVmM".indexOf(cmd) >= 0) {
           curAngle = getAngle([x, y], to);
-          hasStartMarker && addMarker(curAngle, [x, y], "start");
-          hasEndMarker && addMarker(curAngle, to, "end");
+          hasStartMarker && markers.addMarker(new Marker(markerStart, "start", [x, y], curAngle));
+          hasEndMarker && markers.addMarker(new Marker(markerEnd, "end", to, curAngle));
           if (hasMidMarker) {
             var angle = "mM".indexOf(cmd) >= 0 ?
                 prevAngle : "mM".indexOf(list.getItem(i - 1).pathSegTypeAsLetter) >= 0 ?
                 curAngle : .5 * (prevAngle + curAngle);
-            addMarker(angle, [x, y], "mid");
+            markers.addMarker(new Marker(markerMid, "mid", [x, y], angle));
           }
           prevAngle = curAngle;
 
@@ -885,27 +929,7 @@ SOFTWARE.
     }
 
     if (markerEnd || markerStart || markerMid) {
-      for (var i = 0; i < lines.markers.length; i++) {
-        var marker = lines.markers[i];
-        var markerElement;
-        switch (marker.type) {
-          case "start":
-            markerElement = svgIdPrefix.get() + iriReference.exec(markerStart)[1];
-            break;
-          case "end":
-            markerElement = svgIdPrefix.get() + iriReference.exec(markerEnd)[1];
-            break;
-          case "mid":
-            markerElement = svgIdPrefix.get() + iriReference.exec(markerMid)[1];
-            break;
-        }
-
-        // as the marker is already scaled by the current line width we must not apply the line width twice!
-        _pdf.saveGraphicsState();
-        _pdf.setLineWidth(1.0);
-        _pdf.doFormObject(markerElement, marker.tf);
-        _pdf.restoreGraphicsState();
-      }
+      lines.markers.draw(tfMatrix, attributeState);
     }
   };
 
