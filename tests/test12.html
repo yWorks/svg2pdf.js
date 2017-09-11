@@ -9,7 +9,7 @@
 <body>
 <div style="float: left">
   <h4>SVG:</h4>
-  <svg id="svgElement" xmlns="http://www.w3.org/2000/svg" width="500px" height="300px" viewBox="0 0 500 300">
+  <svg id="svgElement" xmlns="http://www.w3.org/2000/svg" width="500px" height="400px" viewBox="0 0 500 400">
     <defs>
       <marker id="mid" markerWidth="20" markerHeight="20" refX="0" refY="0" orient="auto" viewBox="-11 -11 22 22">
         <circle fill="none" r="10" stroke="#000000"></circle>
@@ -25,6 +25,9 @@
           marker-start="url(#mid)" marker-end="url(#mid)" marker-mid="url(#mid)" transform="translate(20 60)"></path>
     <path d="M 0 0 l 50 20 l 50 -20 M 0 50 h 100" fill="none" stroke="#000000" marker-mid="url(#mid)"
           stroke-width="0.5" transform="translate(20 140)"></path>
+
+    <line x1="0" y1="0" x2="50" y2="40" marker-start="url(#mid)" marker-end="url(#mid)"
+          transform="translate(20 220)" stroke="#000000"></line>
   </svg>
 </div>
 

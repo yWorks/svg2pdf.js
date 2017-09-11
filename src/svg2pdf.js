@@ -281,13 +281,11 @@ SOFTWARE.
 
   /**
    * @param {string} id
-   * @param {"start"|"mid"|"end"} type
    * @param {[number,number]} anchor
    * @param {number} angle
    */
-  function Marker(id, type, anchor, angle) {
+  function Marker(id, anchor, angle) {
     this.id = id;
-    this.type = type;
     this.anchor = anchor;
     this.angle = angle;
   }
@@ -869,13 +867,13 @@ SOFTWARE.
             && !(i === 1 && "mM".indexOf(list.getItem(i - 1).pathSegTypeAsLetter) >= 0);
 
         if ("sScCqQtT".indexOf(cmd) >= 0) {
-          hasStartMarker && markers.addMarker(new Marker(markerStart, "start", [x, y], getAngle([x, y], p2)));
-          hasEndMarker && markers.addMarker(new Marker(markerEnd, "end", to, getAngle(p3, to)));
+          hasStartMarker && markers.addMarker(new Marker(markerStart, [x, y], getAngle([x, y], p2)));
+          hasEndMarker && markers.addMarker(new Marker(markerEnd, to, getAngle(p3, to)));
           if (hasMidMarker) {
             curAngle = getAngle([x, y], p2);
             curAngle = "mM".indexOf(list.getItem(i - 1).pathSegTypeAsLetter) >= 0 ?
                 curAngle : .5 * (prevAngle + curAngle);
-            markers.addMarker(new Marker(markerMid, "mid", [x, y], curAngle));
+            markers.addMarker(new Marker(markerMid, [x, y], curAngle));
           }
 
           prevAngle = getAngle(p3, to);
@@ -894,13 +892,13 @@ SOFTWARE.
           });
         } else if ("lLhHvVmM".indexOf(cmd) >= 0) {
           curAngle = getAngle([x, y], to);
-          hasStartMarker && markers.addMarker(new Marker(markerStart, "start", [x, y], curAngle));
-          hasEndMarker && markers.addMarker(new Marker(markerEnd, "end", to, curAngle));
+          hasStartMarker && markers.addMarker(new Marker(markerStart, [x, y], curAngle));
+          hasEndMarker && markers.addMarker(new Marker(markerEnd, to, curAngle));
           if (hasMidMarker) {
             var angle = "mM".indexOf(cmd) >= 0 ?
                 prevAngle : "mM".indexOf(list.getItem(i - 1).pathSegTypeAsLetter) >= 0 ?
                 curAngle : .5 * (prevAngle + curAngle);
-            markers.addMarker(new Marker(markerMid, "mid", [x, y], angle));
+            markers.addMarker(new Marker(markerMid, [x, y], angle));
           }
           prevAngle = curAngle;
 
@@ -955,10 +953,25 @@ SOFTWARE.
   };
 
   // draws a line
-  var line = function (node, tfMatrix) {
+  var line = function (node, tfMatrix, svgIdPrefix, attributeState) {
     var p1 = multVecMatrix([parseFloat(node.getAttribute('x1')), parseFloat(node.getAttribute('y1'))], tfMatrix);
     var p2 = multVecMatrix([parseFloat(node.getAttribute('x2')), parseFloat(node.getAttribute('y2'))], tfMatrix);
     _pdf.line(p1[0], p1[1], p2[0], p2[1]);
+
+    var markerStart = node.getAttribute("marker-start"),
+        markerEnd = node.getAttribute("marker-end");
+
+    if (markerStart || markerEnd) {
+      var markers = new MarkerList();
+      var angle = getAngle(p1, p2);
+      if (markerStart) {
+        markers.addMarker(new Marker(svgIdPrefix.get() + iriReference.exec(markerStart)[1], p1, angle));
+      }
+      if (markerEnd) {
+        markers.addMarker(new Marker(svgIdPrefix.get() + iriReference.exec(markerEnd)[1], p2, angle));
+      }
+      markers.draw(_pdf.unitMatrix, attributeState);
+    }
   };
 
   // draws a rect
@@ -1479,7 +1492,7 @@ SOFTWARE.
         break;
 
       case 'line':
-        line(node, tfMatrix);
+        line(node, tfMatrix, svgIdPrefix, attributeState);
         break;
 
       case 'rect':
