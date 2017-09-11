@@ -1008,7 +1008,10 @@ SOFTWARE.
   var line = function (node, tfMatrix, svgIdPrefix, attributeState) {
     var p1 = multVecMatrix([parseFloat(node.getAttribute('x1')), parseFloat(node.getAttribute('y1'))], tfMatrix);
     var p2 = multVecMatrix([parseFloat(node.getAttribute('x2')), parseFloat(node.getAttribute('y2'))], tfMatrix);
-    _pdf.line(p1[0], p1[1], p2[0], p2[1]);
+
+    if (attributeState.strokeMode === "D"){
+      _pdf.line(p1[0], p1[1], p2[0], p2[1]);
+    }
 
     var markerStart = node.getAttribute("marker-start"),
         markerEnd = node.getAttribute("marker-end");
