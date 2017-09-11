@@ -167,6 +167,20 @@ SOFTWARE.
     return Math.atan2(to[1] - from[1], to[0] - from[0]);
   };
 
+  function normalize(v) {
+    var length = Math.sqrt(v[0] * v[0] + v[1] * v[1]);
+    return [v[0] / length, v[1] / length];
+  }
+
+  function getDirectionVector(from, to) {
+    var v = [to[0] - from[0], to[1] - from[1]];
+    return normalize(v);
+  }
+
+  function addVectors(v1, v2) {
+    return [v1[0] + v2[0], v1[1] + v2[1]];
+  }
+
   // mirrors p1 at p2
   var mirrorPoint = function (p1, p2) {
     var dx = p2[0] - p1[0];
@@ -686,16 +700,54 @@ SOFTWARE.
   };
 
   // draws a polygon
-  var polygon = function (node, tfMatrix, colorMode, gradient, gradientMatrix) {
+  var polygon = function (node, tfMatrix, colorMode, gradient, gradientMatrix, svgIdPrefix, attributeState) {
     var points = parsePointsString(node.getAttribute("points"));
     var lines = [{op: "m", c: multVecMatrix(points[0], tfMatrix)}];
-    for (var i = 1; i < points.length; i++) {
+    var i, angle;
+    for (i = 1; i < points.length; i++) {
       var p = points[i];
       var to = multVecMatrix(p, tfMatrix);
       lines.push({op: "l", c: to});
     }
     lines.push({op: "h"});
     _pdf.path(lines, colorMode, gradient, gradientMatrix);
+
+    var markerEnd = node.getAttribute("marker-end"),
+        markerStart = node.getAttribute("marker-start"),
+        markerMid = node.getAttribute("marker-mid");
+
+    if (markerStart || markerMid || markerEnd) {
+      var length = lines.length;
+      var markers = new MarkerList();
+      if (markerStart) {
+        markerStart = svgIdPrefix.get() + iriReference.exec(markerStart)[1];
+        angle = addVectors(getDirectionVector(lines[0].c, lines[1].c), getDirectionVector(lines[length - 2].c, lines[0].c));
+        markers.addMarker(new Marker(markerStart, lines[0].c, Math.atan2(angle[1], angle[0])));
+      }
+
+      if (markerMid) {
+        markerMid = svgIdPrefix.get() + iriReference.exec(markerMid)[1];
+        var prevAngle = getDirectionVector(lines[0].c, lines[1].c), curAngle;
+        for (i = 1; i < lines.length - 2; i++) {
+          curAngle = getDirectionVector(lines[i].c, lines[i + 1].c);
+          angle = addVectors(prevAngle, curAngle);
+          markers.addMarker(new Marker(markerMid, lines[i].c, Math.atan2(angle[1], angle[0])));
+          prevAngle = curAngle;
+        }
+
+        curAngle = getDirectionVector(lines[length - 2].c, lines[0].c);
+        angle = addVectors(prevAngle, curAngle);
+        markers.addMarker(new Marker(markerMid, lines[length - 2].c, Math.atan2(angle[1], angle[0])));
+      }
+
+      if (markerEnd) {
+        markerEnd = svgIdPrefix.get() + iriReference.exec(markerEnd)[1];
+        angle = addVectors(getDirectionVector(lines[0].c, lines[1].c), getDirectionVector(lines[length - 2].c, lines[0].c));
+        markers.addMarker(new Marker(markerEnd, lines[0].c, Math.atan2(angle[1], angle[0])));
+      }
+
+      markers.draw(_pdf.unitMatrix, attributeState);
+    }
   };
 
   // draws an image (converts it to jpeg first, as jsPDF doesn't support png or other formats)
@@ -753,7 +805,7 @@ SOFTWARE.
       var lines = [];
       var markers = new MarkerList();
       var op;
-      var prevAngle = 0, curAngle;
+      var prevAngle = [0, 0], curAngle;
 
       for (var i = 0; i < list.numberOfItems; i++) {
         var seg = list.getItem(i);
@@ -870,13 +922,13 @@ SOFTWARE.
           hasStartMarker && markers.addMarker(new Marker(markerStart, [x, y], getAngle([x, y], p2)));
           hasEndMarker && markers.addMarker(new Marker(markerEnd, to, getAngle(p3, to)));
           if (hasMidMarker) {
-            curAngle = getAngle([x, y], p2);
+            curAngle = getDirectionVector([x, y], p2);
             curAngle = "mM".indexOf(list.getItem(i - 1).pathSegTypeAsLetter) >= 0 ?
-                curAngle : .5 * (prevAngle + curAngle);
-            markers.addMarker(new Marker(markerMid, [x, y], curAngle));
+                curAngle : normalize(addVectors(prevAngle, curAngle));
+            markers.addMarker(new Marker(markerMid, [x, y], Math.atan2(curAngle[1], curAngle[0])));
           }
 
-          prevAngle = getAngle(p3, to);
+          prevAngle = getDirectionVector(p3, to);
 
           prevX = x;
           prevY = y;
@@ -891,14 +943,14 @@ SOFTWARE.
             ]
           });
         } else if ("lLhHvVmM".indexOf(cmd) >= 0) {
-          curAngle = getAngle([x, y], to);
-          hasStartMarker && markers.addMarker(new Marker(markerStart, [x, y], curAngle));
-          hasEndMarker && markers.addMarker(new Marker(markerEnd, to, curAngle));
+          curAngle = getDirectionVector([x, y], to);
+          hasStartMarker && markers.addMarker(new Marker(markerStart, [x, y], Math.atan2(curAngle[1], curAngle[0])));
+          hasEndMarker && markers.addMarker(new Marker(markerEnd, to, Math.atan2(curAngle[1], curAngle[0])));
           if (hasMidMarker) {
             var angle = "mM".indexOf(cmd) >= 0 ?
                 prevAngle : "mM".indexOf(list.getItem(i - 1).pathSegTypeAsLetter) >= 0 ?
-                curAngle : .5 * (prevAngle + curAngle);
-            markers.addMarker(new Marker(markerMid, [x, y], angle));
+                curAngle : normalize(addVectors(prevAngle, curAngle));
+            markers.addMarker(new Marker(markerMid, [x, y], Math.atan2(angle[1], angle[0])));
           }
           prevAngle = curAngle;
 
@@ -1518,7 +1570,7 @@ SOFTWARE.
         break;
 
       case 'polygon':
-        polygon(node, tfMatrix, colorMode, fillUrl, fillData);
+        polygon(node, tfMatrix, colorMode, fillUrl, fillData, svgIdPrefix, attributeState);
         break;
 
       case 'image':
