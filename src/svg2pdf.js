@@ -329,32 +329,87 @@ SOFTWARE.
     return clone;
   };
 
+  function computeViewBoxTransform(node, bounds, eX, eY, eWidth, eHeight) {
+    var vbX = bounds[0];
+    var vbY = bounds[1];
+    var vbWidth = bounds[2];
+    var vbHeight = bounds[3];
+
+    var scaleX = eWidth / vbWidth;
+    var scaleY = eHeight / vbHeight;
+
+    var align, meetOrSlice;
+    var preserveAspectRatio = node.getAttribute("preserveAspectRatio");
+    if (preserveAspectRatio) {
+      var alignAndMeetOrSlice = preserveAspectRatio.split(" ");
+      align = alignAndMeetOrSlice[0];
+      meetOrSlice = alignAndMeetOrSlice[1] || "meet";
+    } else {
+      align = "xMidYMid";
+      meetOrSlice = "meet"
+    }
+
+    if (align !== "none") {
+      if (meetOrSlice === "meet") {
+        // uniform scaling with min scale
+        scaleX = scaleY = Math.min(scaleX, scaleY);
+      } else if (meetOrSlice === "slice") {
+        // uniform scaling with max scale
+        scaleX = scaleY = Math.max(scaleX, scaleY);
+      }
+    }
+
+    var translateX = eX - (vbX * scaleX);
+    var translateY = eY - (vbY * scaleY);
+
+    if (align.indexOf("xMid") >= 0) {
+      translateX += (eWidth - vbWidth * scaleX) / 2;
+    } else if (align.indexOf("xMax") >= 0) {
+      translateX += eWidth - vbWidth * scaleX;
+    }
+
+    if (align.indexOf("yMid") >= 0) {
+      translateY += (eHeight - vbHeight * scaleY) / 2;
+    } else if (align.indexOf("yMax") >= 0) {
+      translateY += (eHeight - vbHeight * scaleY);
+    }
+
+    var translate = new _pdf.Matrix(1, 0, 0, 1, translateX, translateY);
+    var scale = new _pdf.Matrix(scaleX, 0, 0, scaleY, 0, 0);
+
+    return _pdf.matrixMult(scale, translate);
+  }
+
   // computes the transform directly applied at the node (such as viewbox scaling and the "transform" atrribute)
   // x,y,cx,cy,r,... are omitted
   var computeNodeTransform = function (node) {
-    var height, width, viewBoxHeight, viewBoxWidth, bounds, viewBox, y, x;
+    var viewBox, x, y;
     var nodeTransform = _pdf.unitMatrix;
     if (nodeIs(node, "svg,g")) {
       x = parseFloat(node.getAttribute("x")) || 0;
       y = parseFloat(node.getAttribute("y")) || 0;
 
-      // jquery doesn't like camelCase notation...
       viewBox = node.getAttribute("viewBox");
       if (viewBox) {
-        bounds = parseFloats(viewBox);
-        viewBoxWidth = bounds[2] - bounds[0];
-        viewBoxHeight = bounds[3] - bounds[1];
-        width = parseFloat(node.getAttribute("width")) || viewBoxWidth;
-        height = parseFloat(node.getAttribute("height")) || viewBoxHeight;
-        nodeTransform = new _pdf.Matrix(width / viewBoxWidth, 0, 0, height / viewBoxHeight, x - bounds[0], y - bounds[1]);
+        var width = parseFloat(node.getAttribute("width"));
+        var height = parseFloat(node.getAttribute("height"));
+        nodeTransform = computeViewBoxTransform(node, parseFloats(viewBox), x, y, width, height)
       } else {
         nodeTransform = new _pdf.Matrix(1, 0, 0, 1, x, y);
       }
     } else if (nodeIs(node, "marker")) {
-      x = -parseFloat(node.getAttribute("refX")) || 0;
-      y = -parseFloat(node.getAttribute("refY")) || 0;
+      x = parseFloat(node.getAttribute("refX")) || 0;
+      y = parseFloat(node.getAttribute("refY")) || 0;
 
-      nodeTransform = new _pdf.Matrix(1, 0, 0, 1, x, y);
+      viewBox = node.getAttribute("viewBox");
+      if (viewBox) {
+        var bounds = parseFloats(viewBox);
+        bounds[0] = bounds[1] = 0; // for some reason vbX anc vbY seem to be ignored for markers
+        nodeTransform = computeViewBoxTransform(node, bounds, 0, 0, node.getAttribute("markerWidth"), node.getAttribute("markerHeight"));
+        nodeTransform = _pdf.matrixMult(new _pdf.Matrix(1, 0, 0, 1, -x, -y), nodeTransform);
+      } else {
+        nodeTransform = new _pdf.Matrix(1, 0, 0, 1, -x, -y);
+      }
     }
 
     var transformString = node.getAttribute("transform");
