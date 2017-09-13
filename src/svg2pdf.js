@@ -1198,10 +1198,10 @@ SOFTWARE.
     x = toPixels(node.getAttribute("dx"), pdfFontSize);
     y = toPixels(node.getAttribute("dy"), pdfFontSize);
 
-    var visibility = getAttribute(node, "visibility");
+    var visibility = getAttribute(node, "visibility") || attributeState.visibility;
     // when there are no tspans draw the text directly
     if (node.childElementCount === 0) {
-      if ((visibility !== "hidden" && (attributeState.visibility !== "hidden" || visibility === "visible"))) {
+      if (visibility === "visible") {
         _pdf.text(
             (x - xOffset),
             y,
@@ -1220,8 +1220,8 @@ SOFTWARE.
         var tSpanColor = getAttribute(tSpan, "fill");
         setTextProperties(tSpan, tSpanColor && new RGBColor(tSpanColor));
         var extent = tSpan.getExtentOfChar(0);
-        var tSpanVisibility = getAttribute(tSpan, "visibility");
-        if ((tSpanVisibility !== "hidden" && (visibility !== "hidden" || tSpanVisibility === "visible"))) {
+        var tSpanVisibility = getAttribute(tSpan, "visibility") || visibility;
+        if (tSpanVisibility === "visible") {
           _pdf.text(
               extent.x - textX,//x - xOffset,
               extent.y + extent.height * 0.7 - textY, // 0.7 roughly mimicks the text baseline
@@ -1367,13 +1367,10 @@ SOFTWARE.
       return;
     }
 
-    var visibility = getAttribute(node, "visibility");
-    if ((visibility === "hidden" || (attributeState.visibility === "hidden" && visibility !== "visible"))
-        && !nodeIs(node, "svg,g,marker,a,pattern,defs,text")) {
+    var visibility = attributeState.visibility = getAttribute(node, "visibility") || attributeState.visibility;
+    if (visibility === "hidden" && !nodeIs(node, "svg,g,marker,a,pattern,defs,text")) {
       return;
     }
-
-    visibility && (attributeState.visibility = visibility);
 
     var tfMatrix,
         hasFillColor = false,
