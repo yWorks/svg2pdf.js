@@ -1,7 +1,7 @@
 {
   "name": "svg2pdf.js",
   "description": "A javascript-only SVG to PDF conversion utility that runs in the browser leveraging jsPDF",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "main": "dist/svg2pdf.min.js",
   "authors": [{
     "name": "yFiles for HTML Support Team",
