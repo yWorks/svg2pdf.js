@@ -1635,21 +1635,21 @@ SOFTWARE.
 
       case "lineargradient":
         putGradient(node, "axial", [
-          node.getAttribute("x1"),
-          node.getAttribute("y1"),
-          node.getAttribute("x2"),
-          node.getAttribute("y2")
+          node.getAttribute("x1") || 0,
+          node.getAttribute("y1") || 0,
+          node.getAttribute("x2") || 1,
+          node.getAttribute("y2") || 0
         ], defs, svgIdPrefix);
         break;
 
       case "radialgradient":
         putGradient(node, "radial", [
-          node.getAttribute("fx") || node.getAttribute("cx"),
-          node.getAttribute("fy") || node.getAttribute("cy"),
+          node.getAttribute("fx") || node.getAttribute("cx") || 0.5,
+          node.getAttribute("fy") || node.getAttribute("cy") || 0.5,
           0,
-          node.getAttribute("cx") || 0,
-          node.getAttribute("cy") || 0,
-          node.getAttribute("r") || 0
+          node.getAttribute("cx") || 0.5,
+          node.getAttribute("cy") || 0.5,
+          node.getAttribute("r") || 0.5
         ], defs, svgIdPrefix);
         break;
 
