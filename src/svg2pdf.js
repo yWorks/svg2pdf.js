@@ -1292,7 +1292,7 @@ SOFTWARE.
     });
 
     if (hasOpacity) {
-      gState = new _pdf.GState({opacity: opacitySum / coords.length});
+      gState = new _pdf.GState({opacity: opacitySum / colors.length});
     }
 
     var pattern = new _pdf.ShadingPattern(type, coords, colors, gState);
