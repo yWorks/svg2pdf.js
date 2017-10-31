@@ -2,45 +2,40 @@
 A javascript-only SVG to PDF conversion utility that runs in the browser leveraging jsPDF.
 
 ## Installation
-If you have cloned this repository via
+You can get svg2pf.js via npm:
 
-```bash
-git clone https://github.com/yWorks/svg2pdf.js.git
+```
+$ npm install svg2pdf.js --save
+```
+or bower:
+```
+$ bower install svg2pdf.js --save
 ```
 
-run 
-
-```bash
-bower install
+Then import via [requirejs](http://requirejs.org/):
+```javascript
+  require.config({
+    baseUrl: './node_modules' // or './bower_components'
+  });
+  require([
+    'svg2pdf.js/dist/svg2pdf.min',
+    'jspdf-yworks/dist/jspdf.min'
+  ], function (svg2pdf, jsPDF) {...});
 ```
 
-or 
-
-```bash
-npm install
-```
-
-to install all dependencies.
-
-If you're only interested in the complete package, run
-
-```bash
-bower install svg2pdf.js
-```
-
-or 
-
-```bash
-npm install svg2pdf.js
+or script-tag:
+```html
+<script src="[node_modules|bower_components]/jspdf-yworks/dist/jspdf.min.js"></script>
+<script src="[node_modules|bower_components]/svg2pdf.js/dist/svg2pdf.min.js"></script>
 ```
 
 ## Usage
 ```javascript
-var svgElement = document.getElementById('svg');
-var width = 300, height = 200;
+const svgElement = document.getElementById('svg');
+const width = 300, height = 200;
 
 // create a new jsPDF instance
-var pdf = new jsPDF('l', 'pt', [width, height]);
+const pdf = new jsPDF('l', 'pt', [width, height]);
 
 // render the svg element
 svg2pdf(svgElement, pdf, {
@@ -50,7 +45,10 @@ svg2pdf(svgElement, pdf, {
 });
 
 // get the data URI
-var uri = pdf.output('datauristring');
+const uri = pdf.output('datauristring');
+
+// or simply safe the created pdf
+pdf.save("myPDF.pdf");
 ```
 
 ## Building
