@@ -14,13 +14,13 @@ $ bower install svg2pdf.js --save
 
 Then import via [requirejs](http://requirejs.org/):
 ```javascript
-  require.config({
-    baseUrl: './node_modules' // or './bower_components'
-  });
-  require([
-    'svg2pdf.js/dist/svg2pdf.min',
-    'jspdf-yworks/dist/jspdf.min'
-  ], function (svg2pdf, jsPDF) {...});
+require.config({
+  baseUrl: './node_modules' // or './bower_components'
+});
+require([
+  'svg2pdf.js/dist/svg2pdf.min',
+  'jspdf-yworks/dist/jspdf.min'
+], function (svg2pdf, jsPDF) {...});
 ```
 
 or script-tag:
