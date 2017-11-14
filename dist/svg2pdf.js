@@ -1769,7 +1769,7 @@ return RGBColor;
 /*
 The MIT License (MIT)
 
-Copyright (c) 2015-2016 yWorks GmbH
+Copyright (c) 2015-2017 yWorks GmbH
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -2829,8 +2829,8 @@ SOFTWARE.
 
   // draws a line
   var line = function (node, tfMatrix, svgIdPrefix, attributeState) {
-    var p1 = multVecMatrix([parseFloat(node.getAttribute('x1')), parseFloat(node.getAttribute('y1'))], tfMatrix);
-    var p2 = multVecMatrix([parseFloat(node.getAttribute('x2')), parseFloat(node.getAttribute('y2'))], tfMatrix);
+    var p1 = multVecMatrix([parseFloat(node.getAttribute('x1') || 0), parseFloat(node.getAttribute('y1') || 0)], tfMatrix);
+    var p2 = multVecMatrix([parseFloat(node.getAttribute('x2') || 0), parseFloat(node.getAttribute('y2') || 0)], tfMatrix);
 
     if (attributeState.strokeMode === "D"){
       _pdf.line(p1[0], p1[1], p2[0], p2[1]);
@@ -3060,7 +3060,7 @@ SOFTWARE.
     });
 
     if (hasOpacity) {
-      gState = new _pdf.GState({opacity: opacitySum / coords.length});
+      gState = new _pdf.GState({opacity: opacitySum / colors.length});
     }
 
     var pattern = new _pdf.ShadingPattern(type, coords, colors, gState);
@@ -3403,21 +3403,21 @@ SOFTWARE.
 
       case "lineargradient":
         putGradient(node, "axial", [
-          node.getAttribute("x1"),
-          node.getAttribute("y1"),
-          node.getAttribute("x2"),
-          node.getAttribute("y2")
+          node.getAttribute("x1") || 0,
+          node.getAttribute("y1") || 0,
+          node.getAttribute("x2") || 1,
+          node.getAttribute("y2") || 0
         ], defs, svgIdPrefix);
         break;
 
       case "radialgradient":
         putGradient(node, "radial", [
-          node.getAttribute("fx") || node.getAttribute("cx"),
-          node.getAttribute("fy") || node.getAttribute("cy"),
+          node.getAttribute("fx") || node.getAttribute("cx") || 0.5,
+          node.getAttribute("fy") || node.getAttribute("cy") || 0.5,
           0,
-          node.getAttribute("cx") || 0,
-          node.getAttribute("cy") || 0,
-          node.getAttribute("r") || 0
+          node.getAttribute("cx") || 0.5,
+          node.getAttribute("cy") || 0.5,
+          node.getAttribute("r") || 0.5
         ], defs, svgIdPrefix);
         break;
 
