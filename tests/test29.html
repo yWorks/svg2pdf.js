@@ -31,7 +31,7 @@
   function svgToPdf(svgElement, margin) {
     var width = svgElement.width.baseVal.value + 2 * margin;
     var height = svgElement.height.baseVal.value + 2 * margin;
-    var pdf = new jsPDF('l', 'pt', [width, height]);
+    var pdf = new jsPDF('p', 'pt', [width, height]);
 
     pdf.addFont('Batang.ttf', 'Batang', 'normal');
 
