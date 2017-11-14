@@ -1061,8 +1061,8 @@ SOFTWARE.
 
   // draws a line
   var line = function (node, tfMatrix, svgIdPrefix, attributeState) {
-    var p1 = multVecMatrix([parseFloat(node.getAttribute('x1')), parseFloat(node.getAttribute('y1'))], tfMatrix);
-    var p2 = multVecMatrix([parseFloat(node.getAttribute('x2')), parseFloat(node.getAttribute('y2'))], tfMatrix);
+    var p1 = multVecMatrix([parseFloat(node.getAttribute('x1') || 0), parseFloat(node.getAttribute('y1') || 0)], tfMatrix);
+    var p2 = multVecMatrix([parseFloat(node.getAttribute('x2') || 0), parseFloat(node.getAttribute('y2') || 0)], tfMatrix);
 
     if (attributeState.strokeMode === "D"){
       _pdf.line(p1[0], p1[1], p2[0], p2[1]);
