@@ -221,37 +221,91 @@ SOFTWARE.
   };
 
   var AttributeState = function () {
-    this.fillMode = "F";
-    this.strokeMode = "";
+    this.fillMode = null;
+    this.strokeMode = null;
 
-    this.color = new RGBColor("rgb(0, 0, 0)");
-    this.fill = new RGBColor("rgb(0, 0, 0)");
+    this.color = null;
+    this.fill = null;
     this.fillOpacity = 1.0;
-    // this.fillRule = "nonzero";
-    this.fontFamily = "times";
+    // this.fillRule = null;
+    this.fontFamily = null;
     this.fontSize = 16;
-    // this.fontStyle = "normal";
-    // this.fontVariant = "normal";
-    // this.fontWeight = "normal";
+    // this.fontStyle = null;
+    // this.fontVariant = null;
+    // this.fontWeight = null;
     this.opacity = 1.0;
     this.stroke = null;
     this.strokeDasharray = null;
     this.strokeDashoffset = null;
-    this.strokeLinecap = "butt";
-    this.strokeLinejoin = "miter";
+    this.strokeLinecap = null;
+    this.strokeLinejoin = null;
     this.strokeMiterlimit = 4.0;
     this.strokeOpacity = 1.0;
     this.strokeWidth = 1.0;
-    // this.textAlign = "start";
-    this.textAnchor = "start";
-    this.visibility = "visible";
+    // this.textAlign = null;
+    this.textAnchor = null;
+    this.visibility = null;
+  };
+
+  AttributeState.default = function () {
+    var attributeState = new AttributeState();
+
+    attributeState.fillMode = "F";
+    attributeState.strokeMode = "";
+
+    attributeState.color = new RGBColor("rgb(0, 0, 0)");
+    attributeState.fill = new RGBColor("rgb(0, 0, 0)");
+    attributeState.fillOpacity = 1.0;
+    // attributeState.fillRule = "nonzero";
+    attributeState.fontFamily = "times";
+    attributeState.fontSize = 16;
+    // attributeState.fontStyle = "normal";
+    // attributeState.fontVariant = "normal";
+    // attributeState.fontWeight = "normal";
+    attributeState.opacity = 1.0;
+    attributeState.stroke = null;
+    attributeState.strokeDasharray = null;
+    attributeState.strokeDashoffset = null;
+    attributeState.strokeLinecap = "butt";
+    attributeState.strokeLinejoin = "miter";
+    attributeState.strokeMiterlimit = 4.0;
+    attributeState.strokeOpacity = 1.0;
+    attributeState.strokeWidth = 1.0;
+    // attributeState.textAlign = "start";
+    attributeState.textAnchor = "start";
+    attributeState.visibility = "visible";
+
+    return attributeState;
   };
 
   AttributeState.prototype.clone = function () {
     var clone = new AttributeState();
-    Object.getOwnPropertyNames(this).forEach(function (name) {
-      clone[name] = this[name];
-    }, this);
+
+    clone.fillMode = this.fillMode;
+    clone.strokeMode = this.strokeMode;
+
+    clone.color = this.color;
+    clone.fill = this.fill;
+    clone.fillOpacity = this.fillOpacity;
+    // clone.fillRule = this.fillRule;
+    clone.fontFamily = this.fontFamily;
+    clone.fontSize = this.fontSize;
+    // clone.fontStyle = this.fontStyle;
+    // clone.fontVariant = this.fontVariant;
+    // clone.fontWeight = this.fontWeight;
+    clone.opacity = this.opacity;
+    clone.stroke = this.stroke;
+    clone.strokeDasharray = this.strokeDasharray;
+    clone.strokeDashoffset = this.strokeDashoffset;
+    clone.strokeLinecap = this.strokeLinecap;
+    clone.strokeLinejoin = this.strokeLinejoin;
+    clone.strokeMiterlimit = this.strokeMiterlimit;
+    clone.strokeOpacity = this.strokeOpacity;
+    clone.strokeWidth = this.strokeWidth;
+    // clone.textAlign = this.textAlign;
+    clone.textAnchor = this.textAnchor;
+    clone.visibility = this.visibility;
+
     return clone;
   };
 
@@ -1679,7 +1733,7 @@ SOFTWARE.
     _pdf.setCurrentTransformationMatrix(new _pdf.Matrix(k, 0, 0, k, xOffset, yOffset));
 
     // set default values that differ from pdf defaults
-    var attributeState = new AttributeState();
+    var attributeState = AttributeState.default();
     _pdf.setLineWidth(attributeState.strokeWidth);
     var fill = attributeState.fill;
     _pdf.setFillColor(fill.r, fill.g, fill.b);
