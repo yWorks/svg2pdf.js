@@ -1196,7 +1196,13 @@ SOFTWARE.
     _pdf.saveGraphicsState();
     setTextProperties(node, fillRGB);
 
-    var getTextOffset = function (textAnchor, width) {
+    var getTextOffset = function (textAnchor, node) {
+      if (textAnchor === "start") {
+        return 0;
+      }
+
+      var width = node.getBBox().width;
+
       var xOffset = 0;
       switch (textAnchor) {
         case 'end':
@@ -1204,8 +1210,6 @@ SOFTWARE.
           break;
         case 'middle':
           xOffset = width / 2;
-          break;
-        case 'start':
           break;
       }
       return xOffset;
@@ -1237,11 +1241,10 @@ SOFTWARE.
     svg.setAttribute("visibility", "hidden");
     document.body.appendChild(svg);
 
-    var box = node.getBBox();
     var x, y, xOffset = 0;
     var textAnchor = getAttribute(node, "text-anchor");
     if (textAnchor) {
-      xOffset = getTextOffset(textAnchor, box.width);
+      xOffset = getTextOffset(textAnchor, node);
     }
 
     var pdfFontSize = _pdf.getFontSize();
@@ -1266,6 +1269,8 @@ SOFTWARE.
       }
     } else {
       // otherwise loop over tspans and position each relative to the previous one
+      var currentTextX = textX, currentTextY = textY;
+
       forEachChild(node, function (i, tSpan) {
         if (!tSpan.textContent || nodeIs(tSpan, 'title,desc,metadata')) {
           return;
@@ -1273,17 +1278,40 @@ SOFTWARE.
         _pdf.saveGraphicsState();
         var tSpanColor = getAttribute(tSpan, "fill");
         setTextProperties(tSpan, tSpanColor && new RGBColor(tSpanColor));
-        var extent = tSpan.getExtentOfChar(0);
+
+        var x, y;
+
+        var tSpanAbsX = tSpan.getAttribute("x");
+        var tSpanTextAnchor = tSpan.getAttribute("text-anchor") || textAnchor || "start";
+        if (tSpanAbsX === null || tSpanTextAnchor !== "start") {
+          // getExtentOfChar is expensive so only call it only when necessary
+          var extent = tSpan.getExtentOfChar(0);
+          x = extent.x;
+          y = extent.y + extent.height * 0.7; // 0.7 roughly mimicks the text baseline
+        } else {
+          x = toPixels(tSpanAbsX, pdfFontSize);
+
+          var tSpanAbsY = tSpan.getAttribute("y");
+          if (tSpanAbsY !== null) {
+            y = toPixels(tSpanAbsY, pdfFontSize);
+          } else {
+            y = currentTextY + toPixels(tSpan.getAttribute("dy") || 0, pdfFontSize);
+          }
+        }
+
         var tSpanVisibility = getAttribute(tSpan, "visibility") || visibility;
         if (tSpanVisibility === "visible") {
           _pdf.text(
-              extent.x - textX,//x - xOffset,
-              extent.y + extent.height * 0.7 - textY, // 0.7 roughly mimicks the text baseline
+              x - textX,
+              y - textY,
               transformText(node, removeNewlinesAndTrim(tSpan.textContent)),
               void 0,
               m
           );
         }
+
+        currentTextX = x;
+        currentTextY = y;
 
         _pdf.restoreGraphicsState();
       });
