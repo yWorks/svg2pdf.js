@@ -48,8 +48,15 @@ svg2pdf(svgElement, pdf, {
 const uri = pdf.output('datauristring');
 
 // or simply safe the created pdf
-pdf.save("myPDF.pdf");
+pdf.save('myPDF.pdf');
 ```
+
+## Concerning custom fonts
+If you want to use other than really basic fonts you will have to add them first before calling ```svg2pdf```:
+```js
+pdf.addFont('myFont.ttf', 'myFont', 'normal');
+```
+Please refer to the [jsPDF readme](https://github.com/yWorks/jsPDF).
 
 ## Building
 
