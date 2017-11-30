@@ -9,7 +9,7 @@
 <body>
 <div style="float: left">
   <h4>SVG:</h4>
-  <svg id="svgElement" xmlns="http://www.w3.org/2000/svg" width="500" height="500" font-family="Arial"
+  <svg id="svgElement" xmlns="http://www.w3.org/2000/svg" width="500" height="650" font-family="Arial"
       font-size="15px" style="border: 1px dotted gray">
       
       <path d="M 200 10 L 200 490 M 10 20 L 490 20 z" stroke="blue" stroke-width="1" />
@@ -74,6 +74,14 @@
           <tspan>text-anchor="end", </tspan>
           <tspan y="440">absolute y</tspan>
       </text>
+
+      <text fill="red" x="200" y="460" transform="rotate(45 200 460)">
+          <tspan>rotated text</tspan>
+          <tspan dx="40">dx="40"</tspan>
+          <tspan dy="1em">dy="1em"</tspan>
+          <tspan x="200">x="200"</tspan>
+          <tspan y="500">y="500"</tspan>
+      </text>
   </svg>
 </div>
 <!--
@@ -89,7 +97,7 @@
   function svgToPdf(svgElement, margin) {
     var width = svgElement.width.baseVal.value + 2 * margin;
     var height = svgElement.height.baseVal.value + 2 * margin;
-    var pdf = new jsPDF('l', 'pt', [width, height]);
+    var pdf = new jsPDF('p', 'pt', [width, height]);
     svgElementToPdf(svgElement, pdf, {removeInvalid: true});
 
     return pdf.output('datauristring');
