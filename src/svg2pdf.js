@@ -1605,8 +1605,9 @@ SOFTWARE.
 
       var nodeOpacity = getAttribute(node, "opacity");
       if (nodeOpacity) {
-        strokeOpacity *= parseFloat(nodeOpacity);
-        fillOpacity *= parseFloat(nodeFillOpacity);
+        var opacity = parseFloat(nodeOpacity);
+        strokeOpacity *= opacity;
+        fillOpacity *= opacity;
       }
 
       var hasFillOpacity = fillOpacity < 1.0;
