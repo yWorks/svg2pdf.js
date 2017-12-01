@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<head>
+  <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
+
+  <script src="../../jsPDF/dist/jspdf.debug.js"></script>
+  <script src="../src/rgbcolor.js" charset="utf-8"></script>
+  <script src="../src/svg2pdf.js" charset="utf-8"></script>
+</head>
+
+<body>
+<div style="float: left">
+  <h4>SVG:</h4>
+  <svg id="svgElement" width="320" height="500" xmlns="http://www.w3.org/2000/svg">
+    <rect x="20" y="0" width="100" height="100" fill="black" stroke="black" fill-opacity="0.3" stroke-opacity="0.9" stroke-width="10"></rect>
+    <rect x="20" y="120" width="100" height="100" fill="black" stroke="black" fill-opacity="0.9" stroke-opacity="0.2" stroke-width="10"></rect>
+    <rect x="20" y="240" width="100" height="100" fill="black" stroke="black" fill-opacity="0.9" stroke-width="10"></rect>
+    <rect x="20" y="360" width="100" height="100" fill="black" stroke="black" stroke-opacity="0.2" stroke-width="10"></rect>
+  </svg>
+</div>
+<div style="float: left">
+  <h4>PDF:</h4>
+  <iframe id="pdf" style="width: 550px; height: 600px"></iframe>
+</div>
+<script>
+
+  function svgToPdf(svgElement, margin) {
+    var width = svgElement.width.baseVal.value + 2 * margin;
+    var height = svgElement.height.baseVal.value + 2 * margin;
+    var pdf = new jsPDF('p', 'pt', [width, height]);
+
+    svg2pdf(svgElement, pdf, {});
+
+    return pdf.output('datauristring');
+  }
+
+  function save() {
+    document.getElementById("pdf").src = svgToPdf(document.getElementById("svgElement"), 0);
+  }
+
+  save();
+</script>
+</body>

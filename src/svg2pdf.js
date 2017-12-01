@@ -1586,19 +1586,38 @@ SOFTWARE.
       }
 
       // opacity is realized via a pdf graphics state
-      var opacity = 1.0;
-      var nodeOpacity = getAttribute(node, "opacity")
-          || getAttribute(node, "fill-opacity")
-          // this is a quickfix: pdf can't handle different opacity values for stroke and fill
-          // we could split the primitive into two parts, however
-          || getAttribute(node, "stroke-opacity");
-      if (nodeOpacity) {
-        opacity *= parseFloat(nodeOpacity);
+      var fillOpacity = 1.0, strokeOpacity = 1.0;
+      var nodeFillOpacity = getAttribute(node, "fill-opacity");
+      if (nodeFillOpacity) {
+        fillOpacity *= parseFloat(nodeFillOpacity);
       }
       if (fillRGB && typeof fillRGB.a === "number") {
-        opacity *= fillRGB.a;
+        fillOpacity *= fillRGB.a;
       }
-      _pdf.setGState(new _pdf.GState({opacity: opacity}));
+
+      var nodeStrokeOpacity = getAttribute(node, "stroke-opacity");
+      if (nodeStrokeOpacity) {
+        strokeOpacity *= parseFloat(nodeStrokeOpacity);
+      }
+      if (strokeRGB && typeof strokeRGB.a === "number") {
+        strokeOpacity *= strokeRGB.a;
+      }
+
+      var nodeOpacity = getAttribute(node, "opacity");
+      if (nodeOpacity) {
+        strokeOpacity *= parseFloat(nodeOpacity);
+        fillOpacity *= parseFloat(nodeFillOpacity);
+      }
+
+      var hasFillOpacity = fillOpacity < 1.0;
+      var hasStrokeOpacity = strokeOpacity < 1.0;
+      if (hasFillOpacity || hasStrokeOpacity) {
+        var gState = {};
+        hasFillOpacity && (gState["opacity"] = fillOpacity);
+        hasStrokeOpacity && (gState["stroke-opacity"] = strokeOpacity);
+        _pdf.setGState(new _pdf.GState(gState));
+      }
+
     }
 
     if (nodeIs(node, "g,path,rect,ellipse,line,circle,polygon")) {
