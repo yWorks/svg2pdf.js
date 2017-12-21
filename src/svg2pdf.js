@@ -1194,7 +1194,6 @@ SOFTWARE.
   // draws a text element and its tspan children
   var text = function (node, tfMatrix, hasFillColor, fillRGB, attributeState) {
     _pdf.saveGraphicsState();
-    setTextProperties(node, fillRGB);
 
     var getTextOffset = function (textAnchor, node) {
       if (textAnchor === "start") {
@@ -1242,7 +1241,7 @@ SOFTWARE.
     document.body.appendChild(svg);
 
     var x, y, xOffset = 0;
-    var textAnchor = getAttribute(node, "text-anchor");
+    var textAnchor = attributeState.textAnchor;
     if (textAnchor) {
       xOffset = getTextOffset(textAnchor, node);
     }
@@ -1282,7 +1281,7 @@ SOFTWARE.
         var x, y;
 
         var tSpanAbsX = tSpan.getAttribute("x");
-        var tSpanTextAnchor = tSpan.getAttribute("text-anchor") || textAnchor || "start";
+        var tSpanTextAnchor = attributeState.textAnchor;
         if (tSpanAbsX === null || tSpanTextAnchor !== "start") {
           // getExtentOfChar is expensive so only call it only when necessary
           var extent = tSpan.getExtentOfChar(0);
@@ -1398,7 +1397,7 @@ SOFTWARE.
     _pdf.endTilingPattern(id, pattern);
   };
 
-  function setTextProperties(node, fillRGB) {
+  function setTextProperties(node, fillRGB, attributeState) {
     var fontFamily = getAttribute(node, "font-family");
     if (fontFamily) {
       _pdf.setFont(fontFamily);
@@ -1429,6 +1428,11 @@ SOFTWARE.
     if (fontSize) {
       pdfFontSize = parseFloat(fontSize);
       _pdf.setFontSize(pdfFontSize);
+    }
+
+    var textAnchor = getAttribute(node, "text-anchor");
+    if (textAnchor) {
+      attributeState.textAnchor = textAnchor;
     }
   }
 
@@ -1678,7 +1682,7 @@ SOFTWARE.
 
     var colorMode = fillMode + strokeMode;
 
-    setTextProperties(node, fillRGB);
+    setTextProperties(node, fillRGB, attributeState);
 
     // do the actual drawing
     switch (node.tagName.toLowerCase()) {
