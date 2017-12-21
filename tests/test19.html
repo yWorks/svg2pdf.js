@@ -9,10 +9,10 @@
 <body>
 <div style="float: left">
   <h4>SVG:</h4>
-  <svg id="svgElement" xmlns="http://www.w3.org/2000/svg" width="500" height="650" font-family="Arial"
+  <svg id="svgElement" xmlns="http://www.w3.org/2000/svg" width="500" height="800" font-family="Arial"
       font-size="15px" style="border: 1px dotted gray">
       
-      <path d="M 200 10 L 200 650 M 10 20 L 490 20 z" stroke="blue" stroke-width="1" />
+      <path d="M 200 10 L 200 800 M 10 20 L 490 20 z" stroke="blue" stroke-width="1" />
       <text fill="blue" x="200" y="20">
           <tspan>text-anchor auto</tspan>
       </text>
@@ -75,7 +75,7 @@
           <tspan y="440">absolute y</tspan>
       </text>
 
-      <text fill="red" x="200" y="460" transform="rotate(45 200 460)">
+      <text fill="red" x="200" y="460" transform="translate(100 0) rotate(45 200 460)">
           <tspan>rotated text</tspan>
           <tspan dx="40">dx="40"</tspan>
           <tspan dy="1em">dy="1em"</tspan>
@@ -86,6 +86,29 @@
       <g transform="translate(200 520)" text-anchor="middle">
           <text fill="blue">Inherited text-anchor (middle)</text>
       </g>
+
+      <text fill="green" x="200" y="560">
+          <tspan x="210" dx="-30">x and dx</tspan>
+          <tspan y="570" dy="1em">y and dy</tspan>
+      </text>
+
+      <text fill="blue" x="200" y="600">
+          <tspan>text-anchor auto, </tspan>
+          <tspan x="200" y="620">absolute x</tspan>
+      </text>
+      <text fill="blue" x="200" y="640" text-anchor="middle">
+          <tspan>text-anchor="middle", </tspan>
+          <tspan x="200" y="660">absolute x</tspan>
+          <tspan>another span</tspan>
+      </text>
+      <text fill="blue" x="200" y="680" text-anchor="end">
+          <tspan>text-anchor="end", </tspan>
+          <tspan x="200" y="700">absolute x</tspan>
+      </text>
+      <text fill="blue" x="200" y="740" text-anchor="start">
+          <tspan>text-anchor="start", </tspan>
+          <tspan x="200" y="740" text-anchor="end">absolute x, anchor="end"</tspan>
+      </text>
   </svg>
 </div>
 <!--
