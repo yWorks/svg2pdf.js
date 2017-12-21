@@ -40,7 +40,7 @@ SOFTWARE.
 
   var cToQ = 2 / 3; // ratio to convert quadratic bezier curves to cubic ones
 
-  var iriReference = /url\(#([^)]+)\)/;
+  var iriReference = /url\((\")?#([^\")]+)(\")?\)/;
 
 
   // pathSegList is marked deprecated in chrome, so parse the d attribute manually if necessary
@@ -829,13 +829,13 @@ SOFTWARE.
       var length = lines.length;
       var markers = new MarkerList();
       if (markerStart) {
-        markerStart = svgIdPrefix.get() + iriReference.exec(markerStart)[1];
+        markerStart = svgIdPrefix.get() + iriReference.exec(markerStart)[2];
         angle = addVectors(getDirectionVector(lines[0].c, lines[1].c), getDirectionVector(lines[length - 2].c, lines[0].c));
         markers.addMarker(new Marker(markerStart, lines[0].c, Math.atan2(angle[1], angle[0])));
       }
 
       if (markerMid) {
-        markerMid = svgIdPrefix.get() + iriReference.exec(markerMid)[1];
+        markerMid = svgIdPrefix.get() + iriReference.exec(markerMid)[2];
         var prevAngle = getDirectionVector(lines[0].c, lines[1].c), curAngle;
         for (i = 1; i < lines.length - 2; i++) {
           curAngle = getDirectionVector(lines[i].c, lines[i + 1].c);
@@ -850,7 +850,7 @@ SOFTWARE.
       }
 
       if (markerEnd) {
-        markerEnd = svgIdPrefix.get() + iriReference.exec(markerEnd)[1];
+        markerEnd = svgIdPrefix.get() + iriReference.exec(markerEnd)[2];
         angle = addVectors(getDirectionVector(lines[0].c, lines[1].c), getDirectionVector(lines[length - 2].c, lines[0].c));
         markers.addMarker(new Marker(markerEnd, lines[0].c, Math.atan2(angle[1], angle[0])));
       }
@@ -902,9 +902,9 @@ SOFTWARE.
         markerStart = node.getAttribute("marker-start"),
         markerMid = node.getAttribute("marker-mid");
 
-    markerEnd && (markerEnd = svgIdPrefix.get() + iriReference.exec(markerEnd)[1]);
-    markerStart && (markerStart = svgIdPrefix.get() + iriReference.exec(markerStart)[1]);
-    markerMid && (markerMid = svgIdPrefix.get() + iriReference.exec(markerMid)[1]);
+    markerEnd && (markerEnd = svgIdPrefix.get() + iriReference.exec(markerEnd)[2]);
+    markerStart && (markerStart = svgIdPrefix.get() + iriReference.exec(markerStart)[2]);
+    markerMid && (markerMid = svgIdPrefix.get() + iriReference.exec(markerMid)[2]);
 
     var getLinesFromPath = function (pathSegList, tfMatrix) {
       var x = 0, y = 0;
@@ -1129,10 +1129,10 @@ SOFTWARE.
       var markers = new MarkerList();
       var angle = getAngle(p1, p2);
       if (markerStart) {
-        markers.addMarker(new Marker(svgIdPrefix.get() + iriReference.exec(markerStart)[1], p1, angle));
+        markers.addMarker(new Marker(svgIdPrefix.get() + iriReference.exec(markerStart)[2], p1, angle));
       }
       if (markerEnd) {
-        markers.addMarker(new Marker(svgIdPrefix.get() + iriReference.exec(markerEnd)[1], p2, angle));
+        markers.addMarker(new Marker(svgIdPrefix.get() + iriReference.exec(markerEnd)[2], p2, angle));
       }
       markers.draw(_pdf.unitMatrix, attributeState);
     }
