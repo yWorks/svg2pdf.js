@@ -1285,6 +1285,11 @@ SOFTWARE.
     return measure(text, attributeState.fontFamily, attributeState.fontSize + "px", attributeState.fontStyle, attributeState.fontWeight);
   }
 
+  /**
+   * @param {string} text
+   * @param {AttributeState} attributeState
+   * @returns {number}
+   */
   function getTextOffset(text, attributeState) {
     var textAnchor = attributeState.textAnchor;
     if (textAnchor === "start") {
@@ -1306,6 +1311,12 @@ SOFTWARE.
     return xOffset;
   }
 
+  /**
+   * @param {string} textAnchor
+   * @param {number} originX
+   * @param {number} originY
+   * @constructor
+   */
   function TextChunk(textAnchor, originX, originY) {
     this.texts = [];
     this.tSpans = [];
@@ -1313,10 +1324,21 @@ SOFTWARE.
     this.originX = originX;
     this.originY = originY;
   }
+
+  /**
+   * @param {SVGElement} tSpan
+   * @param {string} text
+   */
   TextChunk.prototype.add = function(tSpan, text) {
     this.texts.push(text);
     this.tSpans.push(tSpan);
   };
+  /**
+   * Outputs the chunk to pdf.
+   * @param {jsPDF.Matrix} transform
+   * @param {AttributeState} attributeState
+   * @returns {[number, number]} The last current text position.
+   */
   TextChunk.prototype.put = function (transform, attributeState) {
     var i, tSpan;
 
@@ -1380,6 +1402,8 @@ SOFTWARE.
 
   /**
    * Convert em, px and bare number attributes to pixel values
+   * @param {string} value
+   * @param {number} pdfFontSize
    */
   function toPixels(value, pdfFontSize) {
     var match;
@@ -1399,7 +1423,14 @@ SOFTWARE.
   }
 
 
-  // draws a text element and its tspan children
+  /**
+   * Draws a text element and its tspan children.
+   * @param {SVGElement} node
+   * @param {jsPDF.Matrix} tfMatrix
+   * @param {boolean} hasFillColor
+   * @param {RGBColor} fillRGB
+   * @param {AttributeState} attributeState
+   */
   var text = function (node, tfMatrix, hasFillColor, fillRGB, attributeState) {
     _pdf.saveGraphicsState();
 
@@ -1456,7 +1487,7 @@ SOFTWARE.
         }
 
         transformedText = transformText(node, removeNewlines(tSpan.textContent));
-        currentTextSegment.add(tSpan, transformedText, x, y, attributeState);
+        currentTextSegment.add(tSpan, transformedText);
       });
 
       currentTextSegment.put(tfMatrix, attributeState);
