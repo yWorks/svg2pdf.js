@@ -369,10 +369,6 @@ SOFTWARE.
     return defs[id];
   };
 
-  function removeNewlines(str) {
-    return str.replace(/[\n\r]/, "");
-  }
-
   // replace any newline characters by space and trim
   var removeNewlinesAndTrim = function (str) {
     return str.replace(/[\n\s\r]+/, " ").trim();
@@ -1367,7 +1363,9 @@ SOFTWARE.
       xs[i] = x;
       ys[i] = y;
 
-      currentTextX = x + measureTextWidth(this.texts[i], tSpanAttributeState);
+      // add an additional "." (which has approximately the same size as a space character) in order to put
+      // some space between the tSpans (I can't find this in the spec but all browsers do it)
+      currentTextX = x + measureTextWidth(this.texts[i], tSpanAttributeState) + measureTextWidth(".", tSpanAttributeState);
       currentTextY = y;
 
       minX = Math.min(minX, x);
@@ -1486,7 +1484,7 @@ SOFTWARE.
           currentTextSegment = new TextChunk(tSpan.getAttribute("text-anchor") || attributeState.textAnchor, lastPositions[0], y);
         }
 
-        transformedText = transformText(node, removeNewlines(tSpan.textContent));
+        transformedText = transformText(node, removeNewlinesAndTrim(tSpan.textContent));
         currentTextSegment.add(tSpan, transformedText);
       });
 
