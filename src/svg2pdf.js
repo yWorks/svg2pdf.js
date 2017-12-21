@@ -1306,18 +1306,18 @@ SOFTWARE.
     return xOffset;
   }
 
-  function TextSegment(textAnchor, originX, originY) {
+  function TextChunk(textAnchor, originX, originY) {
     this.texts = [];
     this.tSpans = [];
     this.textAnchor = textAnchor;
     this.originX = originX;
     this.originY = originY;
   }
-  TextSegment.prototype.add = function(tSpan, text) {
+  TextChunk.prototype.add = function(tSpan, text) {
     this.texts.push(text);
     this.tSpans.push(tSpan);
   };
-  TextSegment.prototype.put = function (transform, attributeState) {
+  TextChunk.prototype.put = function (transform, attributeState) {
     var i, tSpan;
 
     var xs = [], ys = [], attributeStates = [];
@@ -1429,7 +1429,7 @@ SOFTWARE.
       }
     } else {
       // otherwise loop over tspans and position each relative to the previous one
-      var currentTextSegment = new TextSegment(attributeState.textAnchor, textX + dx, textY + dy);
+      var currentTextSegment = new TextChunk(attributeState.textAnchor, textX + dx, textY + dy);
 
       forEachChild(node, function (i, tSpan) {
         if (!tSpan.textContent || nodeIs(tSpan, 'title,desc,metadata')) {
@@ -1444,7 +1444,7 @@ SOFTWARE.
           var x = toPixels(tSpanAbsX, pdfFontSize);
 
           lastPositions = currentTextSegment.put(tfMatrix, attributeState);
-          currentTextSegment = new TextSegment(tSpan.getAttribute("text-anchor") || attributeState.textAnchor, x, lastPositions[1]);
+          currentTextSegment = new TextChunk(tSpan.getAttribute("text-anchor") || attributeState.textAnchor, x, lastPositions[1]);
         }
 
         var tSpanAbsY = tSpan.getAttribute("y");
@@ -1452,7 +1452,7 @@ SOFTWARE.
           var y = toPixels(tSpanAbsY, pdfFontSize);
 
           lastPositions = currentTextSegment.put(tfMatrix, attributeState);
-          currentTextSegment = new TextSegment(tSpan.getAttribute("text-anchor") || attributeState.textAnchor, lastPositions[0], y);
+          currentTextSegment = new TextChunk(tSpan.getAttribute("text-anchor") || attributeState.textAnchor, lastPositions[0], y);
         }
 
         transformedText = transformText(node, removeNewlines(tSpan.textContent));
