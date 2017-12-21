@@ -40,7 +40,7 @@ SOFTWARE.
 
   var cToQ = 2 / 3; // ratio to convert quadratic bezier curves to cubic ones
 
-  var iriReference = /url\((\")?#([^)]+)(\")?\)/;
+  var iriReference = /url\(\"?#([^)]+)\"?\)/;
 
 
   // pathSegList is marked deprecated in chrome, so parse the d attribute manually if necessary
