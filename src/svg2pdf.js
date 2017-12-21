@@ -1320,29 +1320,32 @@ SOFTWARE.
   TextSegment.prototype.put = function (transform, attributeState) {
     var i, tSpan;
 
-    var xs = [], ys = [];
+    var xs = [], ys = [], attributeStates = [];
     var currentTextX = this.originX, currentTextY = this.originY;
     var minX = currentTextX, maxX = currentTextX;
     for (i = 0; i < this.tSpans.length; i++) {
       tSpan = this.tSpans[i];
+      var tSpanAttributeState = attributeStates[i] = attributeState.clone();
+      var tSpanColor = getAttribute(tSpan, "fill");
+      setTextProperties(tSpan, tSpanColor && new RGBColor(tSpanColor), tSpanAttributeState);
 
       var x = currentTextX;
       var y = currentTextY;
 
       var tSpanDx = tSpan.getAttribute("dx");
       if (tSpanDx !== null) {
-        x += toPixels(tSpanDx, attributeState.fontSize);// TODO: attributeState of tSpan
+        x += toPixels(tSpanDx, tSpanAttributeState.fontSize);
       }
 
       var tSpanDy = tSpan.getAttribute("dy");
       if (tSpanDy !== null) {
-        y += toPixels(tSpanDy, attributeState.fontSize);// TODO: attributeState of tSpan
+        y += toPixels(tSpanDy, tSpanAttributeState.fontSize);
       }
 
       xs[i] = x;
       ys[i] = y;
 
-      currentTextX = x + measureTextWidth(this.texts[i], attributeState); // TODO: attributeState of tSpan
+      currentTextX = x + measureTextWidth(this.texts[i], tSpanAttributeState);
       currentTextY = y;
 
       minX = Math.min(minX, x);
@@ -1365,9 +1368,7 @@ SOFTWARE.
       }
 
       _pdf.saveGraphicsState();
-      var tSpanColor = getAttribute(tSpan, "fill");
-      attributeState = attributeState.clone();
-      setTextProperties(tSpan, tSpanColor && new RGBColor(tSpanColor), attributeState);
+      putTextProperties(attributeStates[i], attributeState);
 
       _pdf.text(xs[i] - textOffset, ys[i], this.texts[i], void 0, transform);
 
@@ -1541,47 +1542,63 @@ SOFTWARE.
   };
 
   function setTextProperties(node, fillRGB, attributeState) {
-    // TODO: separate attributeState and actual serialization
     var fontFamily = getAttribute(node, "font-family");
     if (fontFamily) {
-      _pdf.setFont(fontFamily);
       attributeState.fontFamily = fontFamily;
     }
 
     if (fillRGB && fillRGB.ok) {
-      _pdf.setTextColor(fillRGB.r, fillRGB.g, fillRGB.b);
       attributeState.fill = fillRGB;
     }
 
-    var fontType;
     var fontWeight = getAttribute(node, "font-weight");
     if (fontWeight) {
-      if (fontWeight === "bold") {
-        fontType = "bold";
-      }
       attributeState.fontWeight = fontWeight;
     }
 
     var fontStyle = getAttribute(node, "font-style");
     if (fontStyle) {
-      if (fontStyle === "italic") {
-        fontType += "italic";
-      }
       attributeState.fontStyle = fontStyle;
     }
-    _pdf.setFontType(fontType);
 
-    var pdfFontSize = 16;
     var fontSize = getAttribute(node, "font-size");
     if (fontSize) {
-      pdfFontSize = parseFloat(fontSize);
-      _pdf.setFontSize(pdfFontSize);
-      attributeState.fontSize = pdfFontSize;
+      attributeState.fontSize = parseFloat(fontSize);
     }
 
     var textAnchor = getAttribute(node, "text-anchor");
     if (textAnchor) {
       attributeState.textAnchor = textAnchor;
+    }
+  }
+
+  /**
+   * @param {AttributeState} attributeState
+   * @param {AttributeState} parentAttributeState
+   */
+  function putTextProperties(attributeState, parentAttributeState) {
+    if (attributeState.fontFamily !== parentAttributeState.fontFamily) {
+      _pdf.setFont(attributeState.fontFamily);
+    }
+
+    if (attributeState.fill !== parentAttributeState.fill && attributeState.fill.ok) {
+      var fillRGB = attributeState.fill;
+      _pdf.setTextColor(fillRGB.r, fillRGB.g, fillRGB.b);
+    }
+
+    var fontType = "";
+    if (attributeState.fontWeight !== parentAttributeState.fontWeight && attributeState.fontWeight === "bold") {
+      fontType = "bold";
+    }
+    if (attributeState.fontStyle !== parentAttributeState.fontStyle && attributeState.fontStyle === "italic") {
+      fontType += "italic";
+    }
+    if (fontType !== "") {
+      _pdf.setFontType(fontType);
+    }
+
+    if (attributeState.fontSize !== parentAttributeState.fontSize) {
+      _pdf.setFontSize(attributeState.fontSize);
     }
   }
 
@@ -1596,6 +1613,7 @@ SOFTWARE.
    * @param {AttributeState} attributeState Keeps track of parent attributes that are inherited automatically
    */
   var renderNode = function (node, contextTransform, defs, svgIdPrefix, withinDefs, attributeState) {
+    var parentAttributeState = attributeState;
     attributeState = attributeState.clone();
 
     if (getAttribute(node, "display") === "none") {
@@ -1832,6 +1850,7 @@ SOFTWARE.
     var colorMode = fillMode + strokeMode;
 
     setTextProperties(node, fillRGB, attributeState);
+    putTextProperties(attributeState, parentAttributeState);
 
     // do the actual drawing
     switch (node.tagName.toLowerCase()) {
