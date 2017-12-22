@@ -861,29 +861,17 @@ SOFTWARE.
     }
   };
 
-  // draws an image (converts it to jpeg first, as jsPDF doesn't support png or other formats)
+  // draws an image
   var image = function (node) {
-    // convert image to jpeg
     var imageUrl = node.getAttribute("xlink:href") || node.getAttribute("href");
-    var image = new Image();
-    image.src = imageUrl;
 
-    var canvas = document.createElement("canvas");
     var width = parseFloat(node.getAttribute("width")),
         height = parseFloat(node.getAttribute("height")),
         x = parseFloat(node.getAttribute("x") || 0),
         y = parseFloat(node.getAttribute("y") || 0);
-    canvas.width = width;
-    canvas.height = height;
-    var context = canvas.getContext("2d");
-    context.fillStyle = "#fff";
-    context.fillRect(0, 0, width, height);
-    context.drawImage(image, 0, 0, width, height);
 
     try {
-      var jpegUrl = canvas.toDataURL("image/jpeg");
-
-      _pdf.addImage(jpegUrl,
+      _pdf.addImage(imageUrl,
           "jpeg",
           x,
           y,
