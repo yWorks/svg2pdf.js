@@ -40,7 +40,7 @@ SOFTWARE.
 
   var cToQ = 2 / 3; // ratio to convert quadratic bezier curves to cubic ones
 
-  var iriReference = /url\(#([^)]+)\)/;
+  var iriReference = /url\(["']?#([^"']+)["']?\)/;
 
   var svgNamespaceURI = "http://www.w3.org/2000/svg";
 
