@@ -862,8 +862,17 @@ SOFTWARE.
   };
 
   // draws an image
-  var image = function (node) {
+  var image = function (node, svgIdPrefix) {
     var imageUrl = node.getAttribute("xlink:href") || node.getAttribute("href");
+
+    var svgDataUrlHeader = "data:image/svg+xml;base64,";
+    if (imageUrl.indexOf(svgDataUrlHeader) === 0) {
+      var svgText = atob(imageUrl.substr(svgDataUrlHeader.length));
+      var parser = new DOMParser();
+      var svgElement = parser.parseFromString(svgText, "image/svg+xml").firstElementChild;
+      renderNode(svgElement, _pdf.unitMatrix, {}, svgIdPrefix, false, AttributeState.default());
+      return;
+    }
 
     var width = parseFloat(node.getAttribute("width")),
         height = parseFloat(node.getAttribute("height")),
@@ -1921,7 +1930,7 @@ SOFTWARE.
 
       case 'image':
         _pdf.setCurrentTransformationMatrix(tfMatrix);
-        image(node);
+        image(node, svgIdPrefix);
         break;
 
       case "lineargradient":
