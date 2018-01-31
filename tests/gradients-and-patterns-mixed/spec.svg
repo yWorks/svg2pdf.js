@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="305" height="230">
+    <defs>
+        <linearGradient id="gradient" x1="0" y1="0" x2="1" y2="1" gradientUnits="objectBoundingBox">
+            <stop offset="0" stop-color="blue"></stop>
+            <stop offset="1" stop-color="green"></stop>
+        </linearGradient>
+        <pattern id="secondPattern-awesome/23~34" width="0.4" height="0.4" patternUnits="objectBoundingBox" patternContentUnits="objectBoundingBox">
+            <rect x="0" y="0" width="0.4" height="0.4" fill= "url(#gradient)" stroke="black" stroke-width="0.005"/>
+            <rect x="0" y="0" width="0.05" height="0.05" fill= "#876fc1" />
+            <rect x="0.35" y="0.35" width="0.05" height="0.05" fill= "red" />
+        </pattern>
+    </defs>
+    <rect transform="translate(130 5) rotate(45) scale(0.5)" x="20" y="0" width="200" height="200" stroke= "#333333" stroke-width="2" fill="url(#secondPattern-awesome/23~34)" />
+    <rect x="98" y="98" width="150" height="150" stroke= "#333333" stroke-width="2" fill="url(#secondPattern-awesome/23~34)" />
+</svg>
