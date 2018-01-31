@@ -1,6 +1,13 @@
 // Karma configuration
 'use strict'
 module.exports = (config) => {
+  const testCoverage = process.argv.indexOf('--coverage') >= 0
+  const preprocessors = {
+    'tests/tests.js': 'babel'
+  };
+  if (testCoverage) {
+    preprocessors['dist/svg2pdf.js'] = 'coverage'
+  }
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -35,15 +42,12 @@ module.exports = (config) => {
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-    preprocessors: {
-      'dist/svg2pdf.js': 'coverage',
-      'tests/tests.js': 'babel'
-    },
+    preprocessors: preprocessors,
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['mocha', 'coverage'],
+    reporters: ['mocha'].concat(testCoverage ? ['coverage'] : []),
 
     // web server port
     port: 9876,

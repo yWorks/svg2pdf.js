@@ -15,7 +15,8 @@
     "exorcist:svg2pdf": "browserify src/svg2pdf.js --debug -p licensify -s svg2pdf | exorcist dist/svg2pdf.js.map > dist/svg2pdf.js",
     "uglify:dist": "uglifyjs -m -c --source-map dist/svg2pdf.min.js.map --in-source-map dist/svg2pdf.js.map --source-map-url svg2pdf.min.js.map --comments /@license/ -o dist/svg2pdf.min.js dist/svg2pdf.js",
     "build": "npm run browserify && npm run exorcist:svg2pdf && npm run uglify:dist",
-    "test": "npm run build && karma start",
+    "test": "npm run browserify && karma start",
+    "test:coverage": "npm run browserify && karma start --coverage",
     "createreferences": "node tests/utils/reference-server.js"
   },
   "repository": {
