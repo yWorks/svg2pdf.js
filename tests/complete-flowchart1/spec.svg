@@ -1,0 +1,287 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600px" height="542px" viewBox="0 0 600 542"
+     style="overflow: hidden; display: block; width: 600px; height: 542px;">
+    <defs>
+        <path fill="rgb(0,0,0)" stroke="rgb(0,0,0)" d="M 0,0 L 10,-5 L 5,0 L 10,5 Z" fill-opacity="1"
+              stroke-opacity="1"
+              stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" id="ygc11_0"/>
+        <linearGradient x1="0" y1="0" x2="1" y2="1" spreadMethod="pad" id="ygc11_1">
+            <stop stop-color="rgb(236,245,255)" stop-opacity="1" offset="0"/>
+            <stop stop-color="rgb(196,215,237)" stop-opacity="1" offset="1"/>
+        </linearGradient>
+    </defs>
+    <g style="pointer-events:visiblePainted" transform="translate(-104.05992499999951 -128)" image-rendering="auto"
+       shape-rendering="auto">
+        <g transform="translate(104.05992499999951 128)">
+            <rect fill="rgb(236,245,255)" stroke="rgb(0,0,0)" stroke-opacity="1" stroke-width="1"
+                  stroke-linecap="butt"
+                  stroke-linejoin="miter" stroke-miterlimit="10" fill-opacity="1" x="0" y="0" height="542.361"
+                  width="600"/>
+            <g transform="translate(0 0)">
+                <g>
+                    <rect fill="rgb(171,200,226)" stroke="rgb(0,0,0)" stroke-opacity="1" stroke-width="1"
+                          stroke-linecap="butt"
+                          stroke-linejoin="miter" stroke-miterlimit="10" fill-opacity="1" x="0" y="30"
+                          height="512.361"
+                          width="150"/>
+                    <g transform="translate(0 30)">
+                        <text font-family="Arial" font-size="12px" font-style="normal" font-weight="normal"
+                              text-anchor="middle"
+                              fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(75 8)">Student
+                        </text>
+                    </g>
+                </g>
+                <g>
+                    <rect fill="rgb(171,200,226)" stroke="rgb(0,0,0)" stroke-opacity="1" stroke-width="1"
+                          stroke-linecap="butt"
+                          stroke-linejoin="miter" stroke-miterlimit="10" fill-opacity="1" x="150" y="30"
+                          height="512.361"
+                          width="150"/>
+                    <g transform="translate(150 30)">
+                        <text font-family="Arial" font-size="12px" font-style="normal" font-weight="normal"
+                              text-anchor="middle"
+                              fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(75 8)">Administration
+                        </text>
+                    </g>
+                </g>
+                <g>
+                    <rect fill="rgb(171,200,226)" stroke="rgb(0,0,0)" stroke-opacity="1" stroke-width="1"
+                          stroke-linecap="butt"
+                          stroke-linejoin="miter" stroke-miterlimit="10" fill-opacity="1" x="300" y="30"
+                          height="512.361"
+                          width="150"/>
+                    <g transform="translate(300 30)">
+                        <text font-family="Arial" font-size="12px" font-style="normal" font-weight="normal"
+                              text-anchor="middle"
+                              fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(75 8)">Registrar
+                        </text>
+                    </g>
+                </g>
+                <g>
+                    <rect fill="rgb(171,200,226)" stroke="rgb(0,0,0)" stroke-opacity="1" stroke-width="1"
+                          stroke-linecap="butt"
+                          stroke-linejoin="miter" stroke-miterlimit="10" fill-opacity="1" x="450" y="30"
+                          height="512.361"
+                          width="150"/>
+                    <g transform="translate(450 30)">
+                        <text font-family="Arial" font-size="12px" font-style="normal" font-weight="normal"
+                              text-anchor="middle"
+                              fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(75 8)">Faculting
+                            Advisor
+                        </text>
+                    </g>
+                </g>
+                <g>
+                    <rect fill="rgb(255,255,255)" stroke="rgb(0,0,0)" stroke-opacity="1" stroke-width="1"
+                          stroke-linecap="butt"
+                          stroke-linejoin="miter" stroke-miterlimit="10" fill-opacity="0" x="0" y="60"
+                          height="482.361"
+                          width="600"/>
+                </g>
+            </g>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)"
+                  d="M 279.05992499999957,327.7610666666663 L 175.5599249999995,327.7610666666663 L 175.5599249999995,287.76106666666635"
+                  stroke-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"
+                  stroke-miterlimit="10"/>
+            <use transform="matrix(0 1 -1 0 175.56 282.761)" style="pointer-events: none;"
+                 xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ygc11_0"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)"
+                  d="M 228.0599249999995,250.76106666666635 L 331.55992499999957,250.76106666666635 L 331.5599249999996,290.76106666666635"
+                  stroke-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"
+                  stroke-miterlimit="10"/>
+            <use transform="matrix(-1.42109e-15 -1 1 -1.42109e-15 331.56 295.761)" style="pointer-events: none;"
+                 xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ygc11_0"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)"
+                  d="M 331.5599249999996,359.76106666666624 L 331.55992499999957,399.76106666666635 L 425.0599249999996,399.76106666666635"
+                  stroke-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"
+                  stroke-miterlimit="10"/>
+            <use transform="matrix(-1 0 0 -1 430.06 399.761)" style="pointer-events: none;"
+                 xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ygc11_0"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)"
+                  d="M 535.0599249999996,399.76106666666635 L 633.5599249999996,399.76106666666635 L 633.5599249999996,472.76106666666635"
+                  stroke-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"
+                  stroke-miterlimit="10"/>
+            <use transform="matrix(0 -1 1 0 633.56 477.761)" style="pointer-events: none;"
+                 xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ygc11_0"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)"
+                  d="M 633.5599249999995,541.7610666666662 L 633.5599249999993,575.3610666666664" stroke-opacity="1"
+                  stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
+            <use transform="matrix(3.38354e-15 -1 1 3.38354e-15 633.56 580.361)" style="pointer-events: none;"
+                 xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ygc11_0"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)"
+                  d="M 581.0599249999992,612.3610666666664 L 233.05992499999957,612.3610666666663"
+                  stroke-opacity="1"
+                  stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
+            <use transform="matrix(1 3.26686e-16 -3.26686e-16 1 228.06 612.361)" style="pointer-events: none;"
+                 xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ygc11_0"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)"
+                  d="M 331.5599249999996,524.7610666666664 L 331.5599249999996,595.4000000000002 L 233.05992499999957,595.4000000000002"
+                  stroke-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"
+                  stroke-miterlimit="10"/>
+            <use transform="translate(228.06 595.4)" style="pointer-events: none;"
+                 xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ygc11_0"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)"
+                  d="M 482.5599249999996,431.76106666666635 L 482.5599249999996,474.76106666666635 L 389.0599249999996,474.76106666666635"
+                  stroke-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"
+                  stroke-miterlimit="10"/>
+            <use transform="translate(384.06 474.761)" style="pointer-events: none;"
+                 xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ygc11_0"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)"
+                  d="M 581.0599249999996,509.76106666666635 L 389.0599249999996,509.76106666666635"
+                  stroke-opacity="1"
+                  stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
+            <use transform="translate(384.06 509.761)" style="pointer-events: none;"
+                 xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ygc11_0"/>
+        </g>
+        <rect fill="url(#ygc11_1)" stroke="rgb(0,0,0)" stroke-opacity="1" stroke-width="1" stroke-linecap="butt"
+              stroke-linejoin="miter" stroke-miterlimit="10" x="123.06" y="218.761" height="64" width="105"/>
+        <path fill="url(#ygc11_1)" stroke="rgb(0,0,0)"
+              d="M 52.5,0 L 105,31.999999999999996 L 52.500000000000014,64 L 0,32.00000000000001 Z"
+              stroke-opacity="1"
+              stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"
+              transform="translate(279.05992499999957 295.7610666666663)"/>
+        <rect fill="url(#ygc11_1)" stroke="rgb(0,0,0)" stroke-opacity="1" stroke-width="1" stroke-linecap="butt"
+              stroke-linejoin="miter" stroke-miterlimit="10" x="279.06" y="460.761" height="64" width="105"/>
+        <path fill="url(#ygc11_1)" stroke="rgb(0,0,0)"
+              d="M 0,0 L 105,0 L 105,64 C 91.875,54.4 65.625,54.4 52.5,64 C 39.375,73.6 13.125,73.6 0,64 Z"
+              stroke-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"
+              stroke-miterlimit="10"
+              transform="translate(123.05992499999957 580.3610666666663)"/>
+        <path fill="url(#ygc11_1)" stroke="rgb(0,0,0)"
+              d="M 52.5,0 L 105,31.999999999999996 L 52.500000000000014,64 L 0,32.00000000000001 Z"
+              stroke-opacity="1"
+              stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"
+              transform="translate(430.0599249999996 367.76106666666635)"/>
+        <path fill="url(#ygc11_1)" stroke="rgb(0,0,0)"
+              d="M 52.5,0 L 105,31.999999999999996 L 52.500000000000014,64 L 0,32.00000000000001 Z"
+              stroke-opacity="1"
+              stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"
+              transform="translate(581.0599249999996 477.76106666666635)"/>
+        <rect fill="url(#ygc11_1)" stroke="rgb(0,0,0)" stroke-opacity="1" stroke-width="1" stroke-linecap="butt"
+              stroke-linejoin="miter" stroke-miterlimit="10" x="581.06" y="580.361" height="64" width="105"/>
+        <g transform="translate(218.30992499999954 337.7610666666663)">
+            <rect fill="rgb(255,255,255)" stroke="rgb(255,255,255)" fill-opacity="1" stroke-opacity="1"
+                  stroke-width="1"
+                  stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" x="0" y="0" height="14"
+                  width="18"/>
+            <text font-family="Arial" font-size="12px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(255,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">NO
+            </text>
+        </g>
+        <g transform="translate(366.30992499999957 409.76106666666635)">
+            <rect fill="rgb(255,255,255)" stroke="rgb(255,255,255)" fill-opacity="1" stroke-opacity="1"
+                  stroke-width="1"
+                  stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" x="0" y="0" height="14"
+                  width="24"/>
+            <text font-family="Arial" font-size="12px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(0,128,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">YES
+            </text>
+        </g>
+        <g transform="translate(594.6599249999995 409.76106666666635)">
+            <rect fill="rgb(255,255,255)" stroke="rgb(255,255,255)" fill-opacity="1" stroke-opacity="1"
+                  stroke-width="1"
+                  stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" x="0" y="0" height="14"
+                  width="24"/>
+            <text font-family="Arial" font-size="12px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(0,128,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">YES
+            </text>
+        </g>
+        <g transform="translate(643.5599249999993 551.5610666666663)">
+            <rect fill="rgb(255,255,255)" stroke="rgb(255,255,255)" fill-opacity="1" stroke-opacity="1"
+                  stroke-width="1"
+                  stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" x="0" y="0" height="14"
+                  width="24"/>
+            <text font-family="Arial" font-size="12px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(0,128,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">YES
+            </text>
+        </g>
+        <g transform="translate(426.8099249999996 484.76106666666635)">
+            <rect fill="rgb(255,255,255)" stroke="rgb(255,255,255)" fill-opacity="1" stroke-opacity="1"
+                  stroke-width="1"
+                  stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" x="0" y="0" height="14"
+                  width="18"/>
+            <text font-family="Arial" font-size="12px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(255,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">NO
+            </text>
+        </g>
+        <g transform="translate(476.05992499999957 519.7610666666664)">
+            <rect fill="rgb(255,255,255)" stroke="rgb(255,255,255)" fill-opacity="1" stroke-opacity="1"
+                  stroke-width="1"
+                  stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" x="0" y="0" height="14"
+                  width="18"/>
+            <text font-family="Arial" font-size="12px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(255,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">NO
+            </text>
+        </g>
+        <g transform="translate(331.5716437499995 128)">
+            <text font-family="Arial" font-size="16px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">Student Registration
+            </text>
+        </g>
+        <g transform="translate(123.05992499999951 218.76106666666635)">
+            <text font-family="Arial" font-size="12px" font-style="normal" font-weight="normal" text-anchor="middle"
+                  fill="rgb(0,0,0)" fill-opacity="1" transform="translate(52.5 16)">
+                <tspan dy="1em" x="0">Submit</tspan>
+                <tspan dy="1.5em" x="0">Registration</tspan>
+            </text>
+        </g>
+        <g transform="translate(279.05992499999957 295.7610666666663)">
+            <text font-family="Arial" font-size="12px" font-style="normal" font-weight="normal" text-anchor="middle"
+                  fill="rgb(0,0,0)" fill-opacity="1" transform="translate(52.5 16)">
+                <tspan dy="1em" x="0">Application</tspan>
+                <tspan dy="1.5em" x="0">Complete?</tspan>
+            </text>
+        </g>
+        <g transform="translate(279.0599249999996 460.76106666666635)">
+            <text font-family="Arial" font-size="12px" font-style="normal" font-weight="normal" text-anchor="middle"
+                  fill="rgb(0,0,0)" fill-opacity="1" transform="translate(52.5 16)">
+                <tspan dy="1em" x="0">Write Rejection</tspan>
+                <tspan dy="1.5em" x="0">Letter</tspan>
+            </text>
+        </g>
+        <g transform="translate(123.05992499999957 580.3610666666663)">
+            <text font-family="Arial" font-size="12px" font-style="normal" font-weight="normal" text-anchor="middle"
+                  fill="rgb(0,0,0)" fill-opacity="1" transform="translate(52.5 25)">
+                <tspan dy="1em" x="0">Letter</tspan>
+            </text>
+        </g>
+        <g transform="translate(430.0599249999996 367.76106666666635)">
+            <text font-family="Arial" font-size="12px" font-style="normal" font-weight="normal" text-anchor="middle"
+                  fill="rgb(0,0,0)" fill-opacity="1" transform="translate(52.5 16)">
+                <tspan dy="1em" x="0">Minimum Standard</tspan>
+                <tspan dy="1.5em" x="0">Met</tspan>
+            </text>
+        </g>
+        <g transform="translate(581.0599249999996 477.76106666666635)">
+            <text font-family="Arial" font-size="12px" font-style="normal" font-weight="normal" text-anchor="middle"
+                  fill="rgb(0,0,0)" fill-opacity="1" transform="translate(52.5 16)">
+                <tspan dy="1em" x="0">Suitable for</tspan>
+                <tspan dy="1.5em" x="0">Program?</tspan>
+            </text>
+        </g>
+        <g transform="translate(581.0599249999992 580.3610666666664)">
+            <text font-family="Arial" font-size="12px" font-style="normal" font-weight="normal" text-anchor="middle"
+                  fill="rgb(0,0,0)" fill-opacity="1" transform="translate(52.5 16)">
+                <tspan dy="1em" x="0">Write Acceptance</tspan>
+                <tspan dy="1.5em" x="0">Letter</tspan>
+            </text>
+        </g>
+    </g>
+</svg>

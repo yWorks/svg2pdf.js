@@ -1,4 +1,16 @@
 const tests = [
+    "complete-bpmn",
+    "complete-computer-network",
+    "complete-dependency-diagram",
+    "complete-diagram1",
+    "complete-diagram2",
+    "complete-dropshadows",
+    "complete-flowchart1",
+    "complete-flowchart2",
+    "complete-social-network",
+    "complete-movies",
+    "complete-organization-chart",
+    "complete-organization-chart-new",
     "display-none-and-visibility-inheritance",
     "fill-and-stroke-inheritance",
     "fill-and-stroke-opacity",
@@ -7,10 +19,13 @@ const tests = [
     "line-default-coordinates",
     "markers",
     "opacity-and-rgba",
-    "path-arg-support",
+    "path-arc-support",
+    "patterns",
+    "remote-images",
     "strokes-and-bounding-boxes",
     "text-placement",
     "transparent-pngs",
+    "url-references-with-quotes",
     "zero-width-strokes"
 ];
 

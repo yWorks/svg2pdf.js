@@ -1,22 +1,7 @@
-<!DOCTYPE html>
-<head>
-  <!--<script src="http://live.yworks.com/yfiles-for-html/resources/scripts/rgbcolor.js"></script>-->
-  <!--<script src="http://live.yworks.com/yfiles-for-html/resources/scripts/rgbcolor.js"></script>-->
-  <script src="../../jsPDF/dist/jspdf.debug.js"></script>
-  <script src="../src/rgbcolor.js"></script>
-  <script src="../src/svg2pdf.js"></script>
-</head>
-<body>
-
-<!--<textarea id="input" cols="200" rows="20"></textarea><br>
-<button onclick="showSvg();">Show</button>
-<br>-->
-
-<div id="svgContent">
-  <svg id="svgElement" xmlns="http://www.w3.org/2000/svg" width="898px" height="567px" viewBox="0 0 898 567"
-       style="overflow: hidden; display: block; width: 898px; height: 567px;">
+<svg xmlns="http://www.w3.org/2000/svg" width="898px" height="567px" viewBox="0 0 898 567"
+     style="overflow: hidden; display: block; width: 898px; height: 567px;">
     <defs>
-      <svg id="ygc3_1" version="1.1" x="0px" y="0px" viewBox="-0.811 -0.063 65 53" enable-background="new -0.811 -0.063 65 53" xml:space="preserve" data-referencesafe="true">
+        <svg id="ygc3_1" version="1.1" x="0px" y="0px" viewBox="-0.811 -0.063 65 53" enable-background="new -0.811 -0.063 65 53" xml:space="preserve" data-referencesafe="true">
 			<defs>
 				<linearGradient id="ygc2_0" gradientUnits="userSpaceOnUse" x1="220.9624" y1="824.415" x2="220.9624" y2="801.0922" gradientTransform="matrix(1 0 0 1 -195.2002 -770.8008)">
 					<stop offset="0.0319" style="stop-color:#808080"/>
@@ -375,266 +360,228 @@
 		</svg>
     </defs>
     <g style="pointer-events:visiblePainted" transform="translate(0 11)" image-rendering="auto" shape-rendering="auto">
-      <g>
-        <path fill="none" stroke="rgb(0,0,0)"
-              d="M 295.760289295285,336.1891118271988 L 157.9236229354389,384.3660232034388" stroke-opacity="1"
-              stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
-      </g>
-      <g>
-        <path fill="none" stroke="rgb(0,0,0)"
-              d="M 295.760289295285,309.9355586048184 L 157.9236229354389,250.09150710721624" stroke-opacity="1"
-              stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
-      </g>
-      <g>
-        <path fill="none" stroke="rgb(0,0,0)"
-              d="M 344.77784648642137,290.480133558016 L 412.355759695364,142.4124305811281" stroke-opacity="1"
-              stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
-      </g>
-      <g>
-        <path fill="none" stroke="rgb(0,0,0)"
-              d="M 311.2128841732292,358.480133558016 L 243.85951279386447,485.368991618822" stroke-opacity="1"
-              stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
-      </g>
-      <g>
-        <path fill="none" stroke="rgb(0,0,0)"
-              d="M 310.1385268787771,290.480133558016 L 231.32168906257027,150.3375866849531" stroke-opacity="1"
-              stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
-      </g>
-      <g>
-        <path fill="none" stroke="rgb(0,0,0)" d="M 92.9236229354389,405.8948518944899 L 57,417.1354885409755"
-              stroke-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
-      </g>
-      <g>
-        <path fill="none" stroke="rgb(0,0,0)"
-              d="M 456.950326329632,101.2329385808693 L 475.021025302329,93.07082531906035" stroke-opacity="1"
-              stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
-      </g>
-      <g>
-        <path fill="none" stroke="rgb(0,0,0)" d="M 414.77638946360906,89.4124305811281 L 396.7381730923421,40"
-              stroke-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
-      </g>
-      <g>
-        <path fill="none" stroke="rgb(0,0,0)"
-              d="M 692.8813823347859,376.723285496665 L 657.5893935590636,416.888851892642" stroke-opacity="1"
-              stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
-      </g>
-      <g>
-        <path fill="none" stroke="rgb(0,0,0)"
-              d="M 695.2547777281795,356.723285496665 L 676.7097051839796,327.806397763051" stroke-opacity="1"
-              stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
-      </g>
-      <g>
-        <path fill="none" stroke="rgb(0,0,0)"
-              d="M 707.9473056243113,376.723285496665 L 740.0823007605775,427.899402125502" stroke-opacity="1"
-              stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
-      </g>
-      <g>
-        <path fill="none" stroke="rgb(0,0,0)"
-              d="M 724.6877092657048,356.723285496665 L 745.860482407589,347.5256095641993" stroke-opacity="1"
-              stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
-      </g>
-      <g>
-        <path fill="none" stroke="rgb(0,0,0)"
-              d="M 810.860482407589,308.36643852875574 L 819.95478996064,301.3593925603195" stroke-opacity="1"
-              stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
-      </g>
-      <g>
-        <path fill="none" stroke="rgb(0,0,0)"
-              d="M 665.1925600025717,274.806397763051 L 674.1312636066626,231.564510362038" stroke-opacity="1"
-              stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
-      </g>
-      <g>
-        <path fill="none" stroke="rgb(0,0,0)"
-              d="M 627.214638946266,288.67879011103764 L 602.061722092516,278.90583117771865" stroke-opacity="1"
-              stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
-      </g>
-      <g>
-        <path fill="none" stroke="rgb(0,0,0)"
-              d="M 362.760289295285,328.2801234890468 L 666.168010270713,362.69643049512496" stroke-opacity="1"
-              stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
-      </g>
-      <g>
-        <path fill="none" stroke="rgb(0,0,0)"
-              d="M 601.804829528857,467.998410249095 L 584.04721306259,481.44478251672916" stroke-opacity="1"
-              stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
-      </g>
-      <g>
-        <path fill="none" stroke="rgb(0,0,0)"
-              d="M 338.4721490432341,358.480133558016 L 377.72289521637794,503.350486168846" stroke-opacity="1"
-              stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
-      </g>
-      <use width="65" height="53" transform="translate(92.9236 369.225)" xmlns:xlink="http://www.w3.org/1999/xlink"
-           xlink:href="#ygc3_1"/>
-      <use width="70" height="40" transform="translate(354.437 0)" xmlns:xlink="http://www.w3.org/1999/xlink"
-           xlink:href="#ygc3_3"/>
-      <use width="67" height="68" transform="translate(295.76 290.48)" xmlns:xlink="http://www.w3.org/1999/xlink"
-           xlink:href="#ygc3_5"/>
-      <use width="36" height="57" transform="translate(197.293 93.3376)" xmlns:xlink="http://www.w3.org/1999/xlink"
-           xlink:href="#ygc3_7"/>
-      <use width="65" height="53" transform="translate(197.293 485.369)" xmlns:xlink="http://www.w3.org/1999/xlink"
-           xlink:href="#ygc3_1"/>
-      <use width="65" height="53" transform="translate(391.95 89.4124)" xmlns:xlink="http://www.w3.org/1999/xlink"
-           xlink:href="#ygc3_1"/>
-      <use width="65" height="53" transform="translate(92.9236 209.481)" xmlns:xlink="http://www.w3.org/1999/xlink"
-           xlink:href="#ygc3_1"/>
-      <use width="57" height="47" transform="translate(475.021 56.698)" xmlns:xlink="http://www.w3.org/1999/xlink"
-           xlink:href="#ygc3_9"/>
-      <use width="57" height="47" transform="translate(0 402.553)" xmlns:xlink="http://www.w3.org/1999/xlink"
-           xlink:href="#ygc3_9"/>
-      <use width="57" height="47" transform="translate(819.955 255.901)" xmlns:xlink="http://www.w3.org/1999/xlink"
-           xlink:href="#ygc3_9"/>
-      <use width="70" height="40" transform="translate(532.062 245.307)" xmlns:xlink="http://www.w3.org/1999/xlink"
-           xlink:href="#ygc3_3"/>
-      <use width="71" height="20" transform="translate(666.168 356.723)" xmlns:xlink="http://www.w3.org/1999/xlink"
-           xlink:href="#ygc3_11"/>
-      <use width="65" height="53" transform="translate(745.86 306.907)" xmlns:xlink="http://www.w3.org/1999/xlink"
-           xlink:href="#ygc3_1"/>
-      <use width="65" height="53" transform="translate(724.222 427.899)" xmlns:xlink="http://www.w3.org/1999/xlink"
-           xlink:href="#ygc3_1"/>
-      <use width="65" height="53" transform="translate(627.215 274.806)" xmlns:xlink="http://www.w3.org/1999/xlink"
-           xlink:href="#ygc3_1"/>
-      <use width="65" height="53" transform="translate(601.805 416.889)" xmlns:xlink="http://www.w3.org/1999/xlink"
-           xlink:href="#ygc3_1"/>
-      <use width="57" height="47" transform="translate(650.489 184.565)" xmlns:xlink="http://www.w3.org/1999/xlink"
-           xlink:href="#ygc3_9"/>
-      <use width="57" height="47" transform="translate(527.047 479.525)" xmlns:xlink="http://www.w3.org/1999/xlink"
-           xlink:href="#ygc3_9"/>
-      <use width="65" height="53" transform="translate(352.403 503.35)" xmlns:xlink="http://www.w3.org/1999/xlink"
-           xlink:href="#ygc3_1"/>
-      <g transform="translate(157.9236229354389 390.225479733243)">
-        <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
-              fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">oschi
-        </text>
-      </g>
-      <g transform="translate(370.937088665155 -11)">
-        <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
-              fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">scanner
-        </text>
-      </g>
-      <g transform="translate(268.760289295285 318.980133558016)">
-        <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
-              fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">router
-        </text>
-      </g>
-      <g transform="translate(176.293152919321 116.3375866849531)">
-        <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
-              fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">klotz
-        </text>
-      </g>
-      <g transform="translate(157.293152919321 506.36899161882206)">
-        <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
-              fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">brummer
-        </text>
-      </g>
-      <g transform="translate(351.950326329632 110.4124305811281)">
-        <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
-              fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">schnucki
-        </text>
-      </g>
-      <g transform="translate(111.4236229354389 262.481098570532)">
-        <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
-              fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">power
-        </text>
-      </g>
-      <g transform="translate(532.021025302329 74.6980400265257)">
-        <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
-              fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">color
-        </text>
-      </g>
-      <g transform="translate(12 449.553245666992)">
-        <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
-              fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">deskjet
-        </text>
-      </g>
-      <g transform="translate(876.95478996064 273.900512355808)">
-        <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
-              fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">laser
-        </text>
-      </g>
-      <g transform="translate(548.561722092516 285.30686909093504)">
-        <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
-              fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">scanner
-        </text>
-      </g>
-      <g transform="translate(737.168010270713 361.223285496665)">
-        <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
-              fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">switch
-        </text>
-      </g>
-      <g transform="translate(810.860482407589 327.907266832146)">
-        <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
-              fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">trumm
-        </text>
-      </g>
-      <g transform="translate(743.222433447613 480.899402125502)">
-        <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
-              fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">garelli
-        </text>
-      </g>
-      <g transform="translate(692.214638946266 295.806397763051)">
-        <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
-              fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">brocken
-        </text>
-      </g>
-      <g transform="translate(666.804829528857 437.888851892642)">
-        <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
-              fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">kreidler
-        </text>
-      </g>
-      <g transform="translate(662.989042656594 173.564510362038)">
-        <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
-              fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">phaser
-        </text>
-      </g>
-      <g transform="translate(539.54721306259 468.525472152388)">
-        <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
-              fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">phaser
-        </text>
-      </g>
-      <g transform="translate(329.40272707875 524.3504861688459)">
-        <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
-              fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">protz
-        </text>
-      </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)"
+                  d="M 295.760289295285,336.1891118271988 L 157.9236229354389,384.3660232034388" stroke-opacity="1"
+                  stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)"
+                  d="M 295.760289295285,309.9355586048184 L 157.9236229354389,250.09150710721624" stroke-opacity="1"
+                  stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)"
+                  d="M 344.77784648642137,290.480133558016 L 412.355759695364,142.4124305811281" stroke-opacity="1"
+                  stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)"
+                  d="M 311.2128841732292,358.480133558016 L 243.85951279386447,485.368991618822" stroke-opacity="1"
+                  stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)"
+                  d="M 310.1385268787771,290.480133558016 L 231.32168906257027,150.3375866849531" stroke-opacity="1"
+                  stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)" d="M 92.9236229354389,405.8948518944899 L 57,417.1354885409755"
+                  stroke-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"
+                  stroke-miterlimit="10"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)"
+                  d="M 456.950326329632,101.2329385808693 L 475.021025302329,93.07082531906035" stroke-opacity="1"
+                  stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)" d="M 414.77638946360906,89.4124305811281 L 396.7381730923421,40"
+                  stroke-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"
+                  stroke-miterlimit="10"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)"
+                  d="M 692.8813823347859,376.723285496665 L 657.5893935590636,416.888851892642" stroke-opacity="1"
+                  stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)"
+                  d="M 695.2547777281795,356.723285496665 L 676.7097051839796,327.806397763051" stroke-opacity="1"
+                  stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)"
+                  d="M 707.9473056243113,376.723285496665 L 740.0823007605775,427.899402125502" stroke-opacity="1"
+                  stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)"
+                  d="M 724.6877092657048,356.723285496665 L 745.860482407589,347.5256095641993" stroke-opacity="1"
+                  stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)"
+                  d="M 810.860482407589,308.36643852875574 L 819.95478996064,301.3593925603195" stroke-opacity="1"
+                  stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)"
+                  d="M 665.1925600025717,274.806397763051 L 674.1312636066626,231.564510362038" stroke-opacity="1"
+                  stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)"
+                  d="M 627.214638946266,288.67879011103764 L 602.061722092516,278.90583117771865" stroke-opacity="1"
+                  stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)"
+                  d="M 362.760289295285,328.2801234890468 L 666.168010270713,362.69643049512496" stroke-opacity="1"
+                  stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)"
+                  d="M 601.804829528857,467.998410249095 L 584.04721306259,481.44478251672916" stroke-opacity="1"
+                  stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(0,0,0)"
+                  d="M 338.4721490432341,358.480133558016 L 377.72289521637794,503.350486168846" stroke-opacity="1"
+                  stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"/>
+        </g>
+        <use width="65" height="53" transform="translate(92.9236 369.225)" xmlns:xlink="http://www.w3.org/1999/xlink"
+             xlink:href="#ygc3_1"/>
+        <use width="70" height="40" transform="translate(354.437 0)" xmlns:xlink="http://www.w3.org/1999/xlink"
+             xlink:href="#ygc3_3"/>
+        <use width="67" height="68" transform="translate(295.76 290.48)" xmlns:xlink="http://www.w3.org/1999/xlink"
+             xlink:href="#ygc3_5"/>
+        <use width="36" height="57" transform="translate(197.293 93.3376)" xmlns:xlink="http://www.w3.org/1999/xlink"
+             xlink:href="#ygc3_7"/>
+        <use width="65" height="53" transform="translate(197.293 485.369)" xmlns:xlink="http://www.w3.org/1999/xlink"
+             xlink:href="#ygc3_1"/>
+        <use width="65" height="53" transform="translate(391.95 89.4124)" xmlns:xlink="http://www.w3.org/1999/xlink"
+             xlink:href="#ygc3_1"/>
+        <use width="65" height="53" transform="translate(92.9236 209.481)" xmlns:xlink="http://www.w3.org/1999/xlink"
+             xlink:href="#ygc3_1"/>
+        <use width="57" height="47" transform="translate(475.021 56.698)" xmlns:xlink="http://www.w3.org/1999/xlink"
+             xlink:href="#ygc3_9"/>
+        <use width="57" height="47" transform="translate(0 402.553)" xmlns:xlink="http://www.w3.org/1999/xlink"
+             xlink:href="#ygc3_9"/>
+        <use width="57" height="47" transform="translate(819.955 255.901)" xmlns:xlink="http://www.w3.org/1999/xlink"
+             xlink:href="#ygc3_9"/>
+        <use width="70" height="40" transform="translate(532.062 245.307)" xmlns:xlink="http://www.w3.org/1999/xlink"
+             xlink:href="#ygc3_3"/>
+        <use width="71" height="20" transform="translate(666.168 356.723)" xmlns:xlink="http://www.w3.org/1999/xlink"
+             xlink:href="#ygc3_11"/>
+        <use width="65" height="53" transform="translate(745.86 306.907)" xmlns:xlink="http://www.w3.org/1999/xlink"
+             xlink:href="#ygc3_1"/>
+        <use width="65" height="53" transform="translate(724.222 427.899)" xmlns:xlink="http://www.w3.org/1999/xlink"
+             xlink:href="#ygc3_1"/>
+        <use width="65" height="53" transform="translate(627.215 274.806)" xmlns:xlink="http://www.w3.org/1999/xlink"
+             xlink:href="#ygc3_1"/>
+        <use width="65" height="53" transform="translate(601.805 416.889)" xmlns:xlink="http://www.w3.org/1999/xlink"
+             xlink:href="#ygc3_1"/>
+        <use width="57" height="47" transform="translate(650.489 184.565)" xmlns:xlink="http://www.w3.org/1999/xlink"
+             xlink:href="#ygc3_9"/>
+        <use width="57" height="47" transform="translate(527.047 479.525)" xmlns:xlink="http://www.w3.org/1999/xlink"
+             xlink:href="#ygc3_9"/>
+        <use width="65" height="53" transform="translate(352.403 503.35)" xmlns:xlink="http://www.w3.org/1999/xlink"
+             xlink:href="#ygc3_1"/>
+        <g transform="translate(157.9236229354389 390.225479733243)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">oschi
+            </text>
+        </g>
+        <g transform="translate(370.937088665155 -11)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">scanner
+            </text>
+        </g>
+        <g transform="translate(268.760289295285 318.980133558016)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">router
+            </text>
+        </g>
+        <g transform="translate(176.293152919321 116.3375866849531)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">klotz
+            </text>
+        </g>
+        <g transform="translate(157.293152919321 506.36899161882206)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">brummer
+            </text>
+        </g>
+        <g transform="translate(351.950326329632 110.4124305811281)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">schnucki
+            </text>
+        </g>
+        <g transform="translate(111.4236229354389 262.481098570532)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">power
+            </text>
+        </g>
+        <g transform="translate(532.021025302329 74.6980400265257)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">color
+            </text>
+        </g>
+        <g transform="translate(12 449.553245666992)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">deskjet
+            </text>
+        </g>
+        <g transform="translate(876.95478996064 273.900512355808)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">laser
+            </text>
+        </g>
+        <g transform="translate(548.561722092516 285.30686909093504)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">scanner
+            </text>
+        </g>
+        <g transform="translate(737.168010270713 361.223285496665)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">switch
+            </text>
+        </g>
+        <g transform="translate(810.860482407589 327.907266832146)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">trumm
+            </text>
+        </g>
+        <g transform="translate(743.222433447613 480.899402125502)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">garelli
+            </text>
+        </g>
+        <g transform="translate(692.214638946266 295.806397763051)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">brocken
+            </text>
+        </g>
+        <g transform="translate(666.804829528857 437.888851892642)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">kreidler
+            </text>
+        </g>
+        <g transform="translate(662.989042656594 173.564510362038)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">phaser
+            </text>
+        </g>
+        <g transform="translate(539.54721306259 468.525472152388)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">phaser
+            </text>
+        </g>
+        <g transform="translate(329.40272707875 524.3504861688459)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(0,0,0)" fill-opacity="1" dy="1em" transform="translate(0 0)">protz
+            </text>
+        </g>
     </g>
-  </svg>
-</div>
-
-<button onclick="save();">Convert</button>
-<br>
-
-<iframe id="pdf" width="800px" height="400px"></iframe>
-
-<script>
-  function svgToPdf(svgElement, margin) {
-    var width = svgElement.width.baseVal.value + 2 * margin;
-    var height = svgElement.height.baseVal.value + 2 * margin;
-    var pdf = new jsPDF('l', 'pt', [width, height]);
-    svgElementToPdf(svgElement, pdf, {removeInvalid: true});
-
-    return pdf.output('datauristring');
-  }
-
-  function saveToFile(/**string*/ fileContentUrl, /**string*/ fileName, /**function(Object, yfiles.canvas.FileEventArgs)*/ handler) {
-    var aElement = document.createElement("a");
-    aElement.setAttribute("href", fileContentUrl);
-    aElement.setAttribute("download", fileName);
-    aElement.style.setProperty("display", "none", "");
-    document.body.appendChild(aElement);
-    aElement.click();
-    document.body.removeChild(aElement);
-
-    handler();
-  }
-
-  function save() {
-//    saveToFile(svgToPdf(document.getElementById("svgElement"), 0), "svg.pdf", function () {
-//    });
-    document.getElementById("pdf").src = svgToPdf(document.getElementById("svgElement"), 0);
-  }
-
-  function showSvg() {
-    document.getElementById("svgContent").innerHTML = document.getElementById("input").value;
-  }
-</script>
-</body>
+</svg>

@@ -1,17 +1,8 @@
-<!DOCTYPE html>
-<head>
-  <!--<script src="http://live.yworks.com/yfiles-for-html/resources/scripts/rgbcolor.js"></script>-->
-  <!--<script src="http://live.yworks.com/yfiles-for-html/resources/scripts/rgbcolor.js"></script>-->
-  <script src="../../jsPDF/dist/jspdf.debug.js"></script>
-  <script src="../src/rgbcolor.js"></script>
-  <script src="../src/svg2pdf.js"></script>
-</head>
-<body>
-<svg id="svgElement" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" width="255px"
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" width="255px"
      height="105px" viewBox="0 0 255 105" style="overflow: hidden; display: block; width: 255px; height: 105px;">
-  <defs>
-    <defs id="ygc74_0">
-      <svg version="1.1" id="usericon_female1" x="0px" y="0px" width="75px" height="75px" viewBox="0 0 75 75" xml:space="preserve">
+    <defs>
+        <defs id="ygc74_0">
+            <svg version="1.1" id="usericon_female1" x="0px" y="0px" width="75px" height="75px" viewBox="0 0 75 75" xml:space="preserve">
     <path fill="#FFFFFF" d="M41.39,25.38c0,0.13-0.05,0.25-0.14,0.34l-3.64,3.64l-0.68,0.68c-0.09,0.09-0.21,0.14-0.34,0.14       s-0.25-0.05-0.34-0.14l-0.68-0.68l-1.82-1.82c-0.09-0.09-0.14-0.21-0.14-0.34s0.05-0.25,0.14-0.34l0.68-0.68       c0.09-0.09,0.21-0.14,0.34-0.14s0.25,0.05,0.34,0.14l1.48,1.48l3.29-3.3c0.09-0.09,0.21-0.14,0.34-0.14s0.25,0.05,0.34,0.14       l0.68,0.68C41.35,25.13,41.39,25.25,41.39,25.38z"/>
     <circle fill="#F4E6DC" stroke="#EADCD3" stroke-miterlimit="10" cx="37.5" cy="37.5" r="37"/>
     <rect x="18.37" y="29.42" fill="#B7B7B7" width="37.66" height="25.01"/>
@@ -151,57 +142,24 @@
     <path fill="#D68627" d="M51.41,52.67h-0.97c0.01,0.07,0.06,0.14,0.03,0.21C48.32,56.95,39.36,75,40.5,74.9       c9.76-0.91,18.41-5.6,24.48-12.6C63,56.71,57.66,52.67,51.41,52.67z"/>
     <path fill="#E89E34" d="M22.52,52.75h0.97c-0.01,0.07-0.06,0.14-0.03,0.21c2.15,4.07,11.11,22.13,9.97,22.02       c-9.76-0.91-18.41-5.6-24.48-12.6C10.93,56.79,16.27,52.75,22.52,52.75z"/>
   </svg>
+        </defs>
     </defs>
-  </defs>
-  <g style="pointer-events:visiblePainted" transform="translate(-3145 0)" image-rendering="auto" shape-rendering="auto">
-    <g transform="translate(3145 0)">
-      <rect fill="rgba(0,0,0,0.25)" width="250" height="100" transform="translate(2 2)"/>
-      <rect fill="#FFFFFF" width="250" height="100"/>
-      <use xlink:href="#usericon_male1" transform="scale(0.85) translate(15 10)"/>
-      <g style="font-size:10px; font-family:Roboto; font-weight: 300; fill: #444">
-        <text transform="translate(100 25)" style="font-size:16px; fill:#336699">Eric Joplin</text>
-        <text transform="translate(100 45)" style="text-transform: uppercase; font-weight: 400">Chief Executive</text>
-        <text transform="translate(100 57)" style="text-transform: uppercase; font-weight: 400"> Officer</text>
-        <text transform="translate(100 72)">ejoplin@yoyodyne.com</text>
-        <text transform="translate(100 88)">555-0100</text>
-        <text transform="translate(170 88)">555-0101</text>
-      </g>
+    <g style="pointer-events:visiblePainted" transform="translate(-3145 0)" image-rendering="auto"
+       shape-rendering="auto">
+        <g transform="translate(3145 0)">
+            <rect fill="rgba(0,0,0,0.25)" width="250" height="100" transform="translate(2 2)"/>
+            <rect fill="#FFFFFF" width="250" height="100"/>
+            <use xlink:href="#usericon_male1" transform="scale(0.85) translate(15 10)"/>
+            <g style="font-size:10px; font-family:Roboto; font-weight: 300; fill: #444">
+                <text transform="translate(100 25)" style="font-size:16px; fill:#336699">Eric Joplin</text>
+                <text transform="translate(100 45)" style="text-transform: uppercase; font-weight: 400">Chief
+                    Executive
+                </text>
+                <text transform="translate(100 57)" style="text-transform: uppercase; font-weight: 400">Officer</text>
+                <text transform="translate(100 72)">ejoplin@yoyodyne.com</text>
+                <text transform="translate(100 88)">555-0100</text>
+                <text transform="translate(170 88)">555-0101</text>
+            </g>
+        </g>
     </g>
-  </g>
 </svg>
-
-<br>
-<button onclick="save();">Convert</button>
-<br>
-
-<iframe id="pdf"></iframe>
-
-<script>
-  function svgToPdf(svgElement, margin) {
-    var width = svgElement.width.baseVal.value + 2 * margin;
-    var height = svgElement.height.baseVal.value + 2 * margin;
-    var pdf = new jsPDF('l', 'pt', [width, height]);
-    svgElementToPdf(svgElement, pdf, {removeInvalid: true});
-
-    return pdf.output('datauristring');
-  }
-
-  function saveToFile(/**string*/ fileContentUrl, /**string*/ fileName, /**function(Object, yfiles.canvas.FileEventArgs)*/ handler) {
-    var aElement = document.createElement("a");
-    aElement.setAttribute("href", fileContentUrl);
-    aElement.setAttribute("download", fileName);
-    aElement.style.setProperty("display", "none", "");
-    document.body.appendChild(aElement);
-    aElement.click();
-    document.body.removeChild(aElement);
-
-    handler();
-  }
-
-  function save() {
-//    saveToFile(svgToPdf(document.getElementById("svgElement"), 0), "svg.pdf", function () {
-//    });
-    document.getElementById("pdf").src = svgToPdf(document.getElementById("svgElement"), 0);
-  }
-</script>
-</body>
