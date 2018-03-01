@@ -15,7 +15,7 @@
     "exorcist:svg2pdf": "browserify src/svg2pdf.js --debug -p licensify -s svg2pdf | exorcist dist/svg2pdf.js.map > dist/svg2pdf.js",
     "uglify:dist": "uglifyjs -m -c --source-map dist/svg2pdf.min.js.map --in-source-map dist/svg2pdf.js.map --source-map-url svg2pdf.min.js.map --comments /@license/ -o dist/svg2pdf.min.js dist/svg2pdf.js",
     "build": "npm run browserify && npm run exorcist:svg2pdf && npm run uglify:dist",
-    "test": "npm run browserify && karma start",
+    "test": "karma start",
     "test:coverage": "npm run browserify && karma start --coverage",
     "createreferences": "node tests/utils/reference-server.js"
   },
@@ -50,6 +50,7 @@
     "jasmine": "2.8.0",
     "karma": "^2.0.0",
     "karma-babel-preprocessor": "^6.0.1",
+    "karma-browserify": "^5.2.0",
     "karma-chrome-launcher": "2.2.0",
     "karma-coverage": "^1.1.1",
     "karma-firefox-launcher": "1.0.1",
@@ -57,6 +58,7 @@
     "karma-mocha-reporter": "^2.2.0",
     "requirejs": "^2.3.2",
     "svgpath": "^2.2.0",
-    "uglify-js": "^2.7.5"
+    "uglify-js": "^2.7.5",
+    "watchify": "^3.10.0"
   }
 }

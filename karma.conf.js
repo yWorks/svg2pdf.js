@@ -5,9 +5,15 @@ module.exports = (config) => {
   const preprocessors = {
     'tests/tests.js': 'babel'
   };
+
+  // currently it is not possible to have both coverage and browserify, so a coverage run needs to have the files
+  // pre-bundled in dist/ (as the npm script does)
   if (testCoverage) {
     preprocessors['dist/svg2pdf.js'] = 'coverage'
+  } else {
+    preprocessors['src/*.js'] = 'browserify'
   }
+
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -15,12 +21,11 @@ module.exports = (config) => {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['jasmine'],
+    frameworks: ['jasmine'].concat(testCoverage ? [] : ['browserify']),
 
     // list of files / patterns to load in the browser
     files: [
         'node_modules/jspdf-yworks/dist/jspdf.min.js',
-        'dist/svg2pdf.js',
 
         'tests/utils/compare.js',
         'tests/runTests.js',
@@ -35,7 +40,7 @@ module.exports = (config) => {
           watched: false,
           served: true
         }
-    ],
+    ].concat(testCoverage ? 'dist/svg2pdf.js' : 'src/*.js'),
 
     // list of files to exclude
     exclude: [],
@@ -64,11 +69,11 @@ module.exports = (config) => {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome', 'Firefox'],
+    browsers: ['Chrome'],
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false,
+    singleRun: testCoverage,
 
     // Concurrency level
     // how many browser should be started simultaneous
@@ -90,6 +95,12 @@ module.exports = (config) => {
         presets: ['es2015'],
         sourceMap: 'inline'
       }
+    },
+
+    browserify: {
+      debug: true,
+      extensions: ['.js'],
+      standalone: "svg2pdf"
     }
 
   })
