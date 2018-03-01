@@ -1,3 +1,5 @@
+const debug = true;
+
 const tests = [
     "complete-bpmn",
     "complete-computer-network",
@@ -43,7 +45,7 @@ for (let name of tests) {
 
       svg2pdf(svgElement, pdf, {});
 
-      comparePdf(pdf.output(), `/tests/${name}/reference.pdf`);
+      comparePdf(pdf.output(), `/tests/${name}/reference.pdf`, debug);
     })
   });
 }

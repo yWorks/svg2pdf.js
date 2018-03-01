@@ -69,22 +69,22 @@ const resetCreationDate = input =>
  * Find a better way to set this
  * @type {Boolean}
  */
-window.comparePdf = (actual, expectedFile, suite, unicodeCleanUp) => {
-  let pdf;
-  unicodeCleanUp = unicodeCleanUp || true;
-  let url;
-  if (suite) {
-    url = `/tests/${suite}/reference/${expectedFile}`;
+window.comparePdf = (actual, expectedFile, alwaysCreateReferences = false) => {
+  let reference
+
+  if (alwaysCreateReferences) {
+    sendReference(expectedFile, resetCreationDate(actual))
+    reference = actual
   } else {
-    url = expectedFile;
+    try {
+      reference = loadBinaryResource("/base" + expectedFile, true)
+    } catch (error) {
+      sendReference(expectedFile, resetCreationDate(actual))
+      reference = actual
+    }
   }
-  try {
-    pdf = loadBinaryResource("/base" + url, unicodeCleanUp)
-  } catch (error) {
-    sendReference(url, resetCreationDate(actual))
-    pdf = actual
-  }
-  const expected = resetCreationDate(pdf).trim()
+
+  const expected = resetCreationDate(reference).trim()
   actual = resetCreationDate(actual.trim())
 
   expect(actual).toEqual(expected)
