@@ -77,7 +77,7 @@ window.comparePdf = (actual, expectedFile, alwaysCreateReferences = false) => {
     reference = actual
   } else {
     try {
-      reference = loadBinaryResource("/base" + expectedFile, true)
+      reference = loadBinaryResource("/base" + expectedFile, false)
     } catch (error) {
       sendReference(expectedFile, resetCreationDate(actual))
       reference = actual
