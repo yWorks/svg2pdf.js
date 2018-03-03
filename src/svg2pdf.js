@@ -1553,7 +1553,7 @@ SOFTWARE.
     // the transformations directly at the node are written to the pattern transformation matrix
     var bBox = getUntransformedBBox(node);
     var pattern = new _pdf.TilingPattern([bBox[0], bBox[1], bBox[0] + bBox[2], bBox[1] + bBox[3]], bBox[2], bBox[3],
-        null, computeNodeTransform(node));
+        null, _pdf.unitMatrix /* this parameter is ignored !*/);
 
     _pdf.beginTilingPattern(pattern);
     // continue without transformation
@@ -1754,8 +1754,17 @@ SOFTWARE.
               fillData.yStep = height;
             }
 
-            fillData.matrix = _pdf.matrixMult(
-                _pdf.matrixMult(patternContentUnitsMatrix, patternUnitsMatrix), tfMatrix);
+            var patternTransformMatrix = _pdf.unitMatrix;
+            if (fill.hasAttribute("patternTransform")) {
+              patternTransformMatrix = parseTransform(fill.getAttribute("patternTransform"));
+            }
+
+            var matrix = patternContentUnitsMatrix;
+            matrix = _pdf.matrixMult(matrix, patternUnitsMatrix);
+            matrix = _pdf.matrixMult(matrix, patternTransformMatrix);
+            matrix = _pdf.matrixMult(matrix, tfMatrix);
+
+            fillData.matrix = matrix;
 
             fillMode = "F";
           } else {
