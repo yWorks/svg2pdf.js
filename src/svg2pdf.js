@@ -385,11 +385,11 @@ SOFTWARE.
     return clone;
   };
 
-  function computeViewBoxTransform(node, bounds, eX, eY, eWidth, eHeight) {
-    var vbX = bounds[0];
-    var vbY = bounds[1];
-    var vbWidth = bounds[2];
-    var vbHeight = bounds[3];
+  function computeViewBoxTransform(node, viewBox, eX, eY, eWidth, eHeight) {
+    var vbX = viewBox[0];
+    var vbY = viewBox[1];
+    var vbWidth = viewBox[2];
+    var vbHeight = viewBox[3];
 
     var scaleX = eWidth / vbWidth;
     var scaleY = eHeight / vbHeight;
@@ -447,9 +447,10 @@ SOFTWARE.
 
       viewBox = node.getAttribute("viewBox");
       if (viewBox) {
-        var width = parseFloat(node.getAttribute("width"));
-        var height = parseFloat(node.getAttribute("height"));
-        nodeTransform = computeViewBoxTransform(node, parseFloats(viewBox), x, y, width, height)
+        var box = parseFloats(viewBox);
+        var width = parseFloat(node.getAttribute("width")) || box[2];
+        var height = parseFloat(node.getAttribute("height")) || box[3];
+        nodeTransform = computeViewBoxTransform(node, box, x, y, width, height)
       } else {
         nodeTransform = new _pdf.Matrix(1, 0, 0, 1, x, y);
       }
@@ -461,7 +462,13 @@ SOFTWARE.
       if (viewBox) {
         var bounds = parseFloats(viewBox);
         bounds[0] = bounds[1] = 0; // for some reason vbX anc vbY seem to be ignored for markers
-        nodeTransform = computeViewBoxTransform(node, bounds, 0, 0, node.getAttribute("markerWidth"), node.getAttribute("markerHeight"));
+        nodeTransform = computeViewBoxTransform(node,
+            bounds,
+            0,
+            0,
+            parseFloat(node.getAttribute("markerWidth")) || 3,
+            parseFloat(node.getAttribute("markerHeight")) || 3
+        );
         nodeTransform = _pdf.matrixMult(new _pdf.Matrix(1, 0, 0, 1, -x, -y), nodeTransform);
       } else {
         nodeTransform = new _pdf.Matrix(1, 0, 0, 1, -x, -y);
