@@ -17,6 +17,7 @@ const tests = [
     "fill-and-stroke-inheritance",
     "fill-and-stroke-opacity",
     "gradient-default-coordinates",
+    "gradient-units",
     "gradients-and-patterns-mixed",
     "line-default-coordinates",
     "markers",

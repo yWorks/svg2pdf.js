@@ -811,14 +811,12 @@ SOFTWARE.
   };
 
   // draws a polygon
-  var polygon = function (node, tfMatrix, colorMode, gradient, gradientMatrix, svgIdPrefix, attributeState) {
+  var polygon = function (node, colorMode, gradient, gradientMatrix, svgIdPrefix, attributeState) {
     var points = parsePointsString(node.getAttribute("points"));
-    var lines = [{op: "m", c: multVecMatrix(points[0], tfMatrix)}];
+    var lines = [{op: "m", c: points[0]}];
     var i, angle;
     for (i = 1; i < points.length; i++) {
-      var p = points[i];
-      var to = multVecMatrix(p, tfMatrix);
-      lines.push({op: "l", c: to});
+      lines.push({op: "l", c: points[i]});
     }
     lines.push({op: "h"});
     _pdf.path(lines, colorMode, gradient, gradientMatrix);
@@ -895,7 +893,7 @@ SOFTWARE.
   };
 
   // draws a path
-  var path = function (node, tfMatrix, svgIdPrefix, colorMode, gradient, gradientMatrix, attributeState) {
+  var path = function (node, svgIdPrefix, colorMode, gradient, gradientMatrix, attributeState) {
     var list = getPathSegList(node);
     var markerEnd = node.getAttribute("marker-end"),
         markerStart = node.getAttribute("marker-start"),
@@ -905,7 +903,7 @@ SOFTWARE.
     markerStart && (markerStart = svgIdPrefix.get() + iriReference.exec(markerStart)[1]);
     markerMid && (markerMid = svgIdPrefix.get() + iriReference.exec(markerMid)[1]);
 
-    var getLinesFromPath = function (pathSegList, tfMatrix) {
+    var getLinesFromPath = function () {
       var x = 0, y = 0;
       var x0 = x, y0 = y;
       var prevX, prevY, newX, newY;
@@ -996,7 +994,7 @@ SOFTWARE.
             to = [seg.x + x, seg.y + y];
             break;
           case "T":
-            p2 = getControlPointFromPrevious(i, [x, y], list, prevX, prevY);
+            p = getControlPointFromPrevious(i, [x, y], list, prevX, prevY);
             p2 = toCubic([x, y], p);
             p3 = toCubic([seg.x, seg.y], p);
             to = [seg.x, seg.y];
@@ -1040,14 +1038,11 @@ SOFTWARE.
 
           prevX = x;
           prevY = y;
-          p2 = multVecMatrix(p2, tfMatrix);
-          p3 = multVecMatrix(p3, tfMatrix);
-          p = multVecMatrix(to, tfMatrix);
           lines.push({
             op: "c", c: [
               p2[0], p2[1],
               p3[0], p3[1],
-              p[0], p[1]
+              to[0], to[1]
             ]
           });
         } else if ("lLhHvVmM".indexOf(cmd) >= 0) {
@@ -1062,8 +1057,7 @@ SOFTWARE.
           }
           prevAngle = curAngle;
 
-          p = multVecMatrix(to, tfMatrix);
-          lines.push({op: op, c: p});
+          lines.push({op: op, c: to});
         }
 
         if ("MLCSQT".indexOf(cmd) >= 0) {
@@ -1080,14 +1074,14 @@ SOFTWARE.
 
       return {lines: lines, markers: markers};
     };
-    var lines = getLinesFromPath(list, tfMatrix);
+    var lines = getLinesFromPath();
 
     if (lines.lines.length > 0) {
       _pdf.path(lines.lines, colorMode, gradient, gradientMatrix);
     }
 
     if (markerEnd || markerStart || markerMid) {
-      lines.markers.draw(tfMatrix, attributeState);
+      lines.markers.draw(_pdf.unitMatrix, attributeState);
     }
   };
 
@@ -1113,9 +1107,9 @@ SOFTWARE.
   };
 
   // draws a line
-  var line = function (node, tfMatrix, svgIdPrefix, attributeState) {
-    var p1 = multVecMatrix([parseFloat(node.getAttribute('x1') || 0), parseFloat(node.getAttribute('y1') || 0)], tfMatrix);
-    var p2 = multVecMatrix([parseFloat(node.getAttribute('x2') || 0), parseFloat(node.getAttribute('y2') || 0)], tfMatrix);
+  var line = function (node, svgIdPrefix, attributeState) {
+    var p1 = [parseFloat(node.getAttribute('x1') || 0), parseFloat(node.getAttribute('y1') || 0)];
+    var p2 = [parseFloat(node.getAttribute('x2') || 0), parseFloat(node.getAttribute('y2') || 0)];
 
     if (attributeState.strokeMode === "D"){
       _pdf.line(p1[0], p1[1], p2[0], p2[1]);
@@ -1708,14 +1702,13 @@ SOFTWARE.
             // matrix to convert between gradient space and user space
             // for "userSpaceOnUse" this is the current transformation: tfMatrix
             // for "objectBoundingBox" or default, the gradient gets scaled and transformed to the bounding box
-            var gradientUnitsMatrix = tfMatrix;
+            var gradientUnitsMatrix;
             if (!fill.hasAttribute("gradientUnits")
                 || fill.getAttribute("gradientUnits").toLowerCase() === "objectboundingbox") {
               bBox || (bBox = getUntransformedBBox(node));
               gradientUnitsMatrix = new _pdf.Matrix(bBox[2], 0, 0, bBox[3], bBox[0], bBox[1]);
-
-              var nodeTransform = computeNodeTransform(node);
-              gradientUnitsMatrix = _pdf.matrixMult(gradientUnitsMatrix, nodeTransform);
+            } else {
+              gradientUnitsMatrix = _pdf.unitMatrix;
             }
 
             // matrix that is applied to the gradient before any other transformations
@@ -1899,7 +1892,8 @@ SOFTWARE.
         break;
 
       case 'line':
-        line(node, tfMatrix, svgIdPrefix, attributeState);
+        _pdf.setCurrentTransformationMatrix(tfMatrix);
+        line(node, svgIdPrefix, attributeState);
         break;
 
       case 'rect':
@@ -1921,11 +1915,13 @@ SOFTWARE.
         break;
 
       case 'path':
-        path(node, tfMatrix, svgIdPrefix, colorMode, fillUrl, fillData, attributeState);
+        _pdf.setCurrentTransformationMatrix(tfMatrix);
+        path(node, svgIdPrefix, colorMode, fillUrl, fillData, attributeState);
         break;
 
       case 'polygon':
-        polygon(node, tfMatrix, colorMode, fillUrl, fillData, svgIdPrefix, attributeState);
+        _pdf.setCurrentTransformationMatrix(tfMatrix);
+        polygon(node, colorMode, fillUrl, fillData, svgIdPrefix, attributeState);
         break;
 
       case 'image':
