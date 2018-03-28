@@ -23,6 +23,7 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
+const pdfMimeType = 'text/plain; charset=x-user-defined'
 
 
 /* global XMLHttpRequest, expect */
@@ -31,7 +32,7 @@ function loadBinaryResource (url, unicodeCleanUp) {
   const req = new XMLHttpRequest()
   req.open('GET', url, false)
    // XHR binary charset opt by Marcus Granado 2006 [http://mgran.blogspot.com]
-  req.overrideMimeType('text\/plain; charset=x-user-defined');
+  req.overrideMimeType(pdfMimeType);
   req.send(null)
   if (req.status !== 200) {
     throw new Error('Unable to load file');
@@ -52,11 +53,19 @@ function loadBinaryResource (url, unicodeCleanUp) {
 
 function sendReference (filename, data) {
   const req = new XMLHttpRequest()
-  req.open('POST', `http://localhost:9090/${filename}`, true)
+  req.open('POST', `http://localhost:9090${filename}`, true)
+  req.setRequestHeader('Content-Type', pdfMimeType)
   req.onload = e => {
     //console.log(e)
   }
-  req.send(data)
+
+  const uint8Array = new Uint8Array(data.length)
+  for (let i = 0; i < data.length; i++) {
+    uint8Array[i] = data.charCodeAt(i)
+  }
+  const blob = new Blob([uint8Array], {type: pdfMimeType})
+
+  req.send(blob)
 }
 
 const resetCreationDate = input =>
