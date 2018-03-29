@@ -38,17 +38,18 @@ function loadBinaryResource (url, unicodeCleanUp) {
     throw new Error('Unable to load file');
   }
 
-  var responseText = req.responseText;
-  var responseTextLen = req.responseText.length;
-  var StringFromCharCode = String.fromCharCode;
-  if (unicodeCleanUp === true) {    
-    var i = 0;
-    for (i = 0; i < responseText.length; i += 1) {
-      byteArray.push(StringFromCharCode(responseText.charCodeAt(i) & 0xff))
+  const responseText = req.responseText
+  if (unicodeCleanUp) {
+    const StringFromCharCode = String.fromCharCode
+    const byteArray = new Array(req.responseText.length)
+
+    for (let i = 0; i < responseText.length; i += 1) {
+      byteArray[i] = StringFromCharCode(responseText.charCodeAt(i) & 0xff)
     }
-    return byteArray.join("");
+    return byteArray.join("")
   }
-  return req.responseText;
+
+  return req.responseText
 }
 
 function sendReference (filename, data) {
@@ -86,14 +87,14 @@ window.comparePdf = (actual, expectedFile, alwaysCreateReferences = false) => {
     reference = actual
   } else {
     try {
-      reference = loadBinaryResource("/base" + expectedFile, false)
+      reference = loadBinaryResource("/base" + expectedFile, true)
     } catch (error) {
       sendReference(expectedFile, resetCreationDate(actual))
       reference = actual
     }
   }
 
-  const expected = resetCreationDate(reference).trim()
+  const expected = resetCreationDate(reference.trim())
   actual = resetCreationDate(actual.trim())
 
   expect(actual).toEqual(expected)
