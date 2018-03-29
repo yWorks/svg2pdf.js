@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<head>
+  <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
+
+  <script src="../../jsPDF/dist/jspdf.debug.js"></script>
+  <script src="../../jsPDF/test/customFonts/defaultVFS.js"></script>
+  <script src="../src/rgbcolor.js" charset="utf-8"></script>
+  <script src="../src/svg2pdf.js" charset="utf-8"></script>
+
+  <style>
+    @font-face {
+      font-family: "Batang";
+      src: url("./batang.ttf") format("ttf");
+    }
+  </style>
+</head>
+
+<body>
+<div style="float: left">
+  <h4>SVG:</h4>
+  <svg id="svgElement" width="320" height="500" xmlns="http://www.w3.org/2000/svg">
+    <text font-family="Batang" x="15" y="15">안녕하세요 만나서 반갑습니다.</text>
+  </svg>
+</div>
+<div style="float: left">
+  <h4>PDF:</h4>
+  <iframe id="pdf" style="width: 550px; height: 600px"></iframe>
+</div>
+<script>
+
+  function svgToPdf(svgElement, margin) {
+    var width = svgElement.width.baseVal.value + 2 * margin;
+    var height = svgElement.height.baseVal.value + 2 * margin;
+    var pdf = new jsPDF('p', 'pt', [width, height]);
+
+    pdf.addFont('Batang.ttf', 'Batang', 'normal');
+
+    svg2pdf(svgElement, pdf, {removeInvalid: true});
+
+    return pdf.output('datauristring');
+  }
+
+  function save() {
+    document.getElementById("pdf").src = svgToPdf(document.getElementById("svgElement"), 0);
+  }
+
+  save();
+</script>
+</body>

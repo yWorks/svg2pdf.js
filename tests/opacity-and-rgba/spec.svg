@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300px"
+     height="150px" viewBox="0 0 300 150" style="overflow: hidden; display: block; width: 250px; height: 100px;">
+    <g image-rendering="auto" shape-rendering="auto">
+        <g>
+            <rect fill="rgba(255,0,0,0.25)" width="250" height="30" transform="translate(2 2)"/>
+            <rect fill="rgba(0,0,0,0.25)" opacity="0.5" width="250" height="30" transform="translate(2 32)"/>
+            <rect fill="rgb(0,0,0)" opacity="0.5" width="250" height="30" transform="translate(2 62)"/>
+            <rect fill="rgb(0,0,255)" width="250" height="30" transform="translate(2 92)"/>
+        </g>
+    </g>
+</svg>
