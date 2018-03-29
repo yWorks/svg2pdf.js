@@ -1,0 +1,6 @@
+<!-- NOTE: currently the second image is not displayed correctly because we cannot asynchronously load it -->
+<svg xmlns="http://www.w3.org/2000/svg" width="100px" height="220px">
+    <image href="data:image/svg+xml;charset=utf-8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDBweCIgaGVpZ2h0PSIxMDBweCI+CiAgICAgIDxyZWN0IGZpbGw9InJlZCIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiPjwvcmVjdD4KICAgIDwvc3ZnPg=="
+           width="100" height="100"/>
+    <image href="./myImage.svg" y="120" width="100" height="100"/>
+</svg>

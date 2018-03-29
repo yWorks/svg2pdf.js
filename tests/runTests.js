@@ -19,6 +19,7 @@ const tests = [
     "gradient-default-coordinates",
     "gradient-units",
     "gradients-and-patterns-mixed",
+    "image-svg-urls",
     "line-default-coordinates",
     "markers",
     "opacity-and-rgba",
