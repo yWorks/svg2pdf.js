@@ -69,11 +69,15 @@ function sendReference (filename, data) {
   req.send(blob)
 }
 
-const resetCreationDate = input =>
-  input.replace(
-    /\/CreationDate \(D:(.*?)\)/,
-    '/CreationDate (D:19871210000000+00\'00\'\)'
+function resetCreationDateAndProducer(input) {
+  return input.replace(
+      /\/CreationDate \(D:(.*?)\)/,
+      '/CreationDate (D:19871210000000+00\'00\'\)'
+  ).replace(
+      /\/Producer \((jsPDF \d+\.\d+\.\d) .*?\)/,
+      '/Producer ($1)'
   )
+}
 
 /**
  * Find a better way to set this
@@ -83,19 +87,19 @@ window.comparePdf = (actual, expectedFile, alwaysCreateReferences = false) => {
   let reference
 
   if (alwaysCreateReferences) {
-    sendReference(expectedFile, resetCreationDate(actual))
+    sendReference(expectedFile, resetCreationDateAndProducer(actual))
     reference = actual
   } else {
     try {
       reference = loadBinaryResource("/base" + expectedFile, true)
     } catch (error) {
-      sendReference(expectedFile, resetCreationDate(actual))
+      sendReference(expectedFile, resetCreationDateAndProducer(actual))
       reference = actual
     }
   }
 
-  const expected = resetCreationDate(reference.trim())
-  actual = resetCreationDate(actual.trim())
+  const expected = resetCreationDateAndProducer(reference.trim())
+  actual = resetCreationDateAndProducer(actual.trim())
 
   expect(actual).toEqual(expected)
 }
