@@ -42,6 +42,9 @@ SOFTWARE.
 
   var iriReference = /url\(["']?#([^"']+)["']?\)/;
 
+  // groups: 1: mime-type (+ charset), 2: mime-type (w/o charset), 3: charset, 4: base64?, 5: body
+  var dataUrlRegex = /^\s*data:(([^/,;]+\/[^/,;]+)(?:;([^,;=]+=[^,;=]+))?)?(?:;(base64))?,([a-z0-9!$&',()*+;=\-._~:@\/?%\s]*\s*)$/i;
+
   var svgNamespaceURI = "http://www.w3.org/2000/svg";
 
 
@@ -870,9 +873,15 @@ SOFTWARE.
   var image = function (node, svgIdPrefix) {
     var imageUrl = node.getAttribute("xlink:href") || node.getAttribute("href");
 
-    var svgDataUrlHeader = "data:image/svg+xml;base64,";
-    if (imageUrl.indexOf(svgDataUrlHeader) === 0) {
-      var svgText = atob(imageUrl.substr(svgDataUrlHeader.length));
+    var dataUrl = imageUrl.match(dataUrlRegex);
+    if (dataUrl && dataUrl[2] === "image/svg+xml") {
+      var svgText = dataUrl[5];
+      if (dataUrl[4] === "base64") {
+        svgText = atob(svgText);
+      } else {
+        svgText = decodeURI(svgText);
+      }
+
       var parser = new DOMParser();
       var svgElement = parser.parseFromString(svgText, "image/svg+xml").firstElementChild;
       renderNode(svgElement, _pdf.unitMatrix, {}, svgIdPrefix, false, AttributeState.default());
