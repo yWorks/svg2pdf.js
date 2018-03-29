@@ -66,6 +66,27 @@ If you want to play with the sources or build the minified js file yourself, che
 npm run build
 ```
 
+### Testing
+The ```tests``` folder contains a set of unit tests. Each unit test has its own folder and contains exactly two files:
+ * A ```spec.svg``` file that contains the svg to test
+ * A ```reference.pdf``` file that is generated automatically and serves as reference for regression testing
+ 
+You can run the tests using
+
+```sh
+$ npm run createreferences && npm run test
+```
+
+The tests use the [Karma](https://karma-runner.github.io/2.0/index.html) framework and thus run in a captured browser.
+Have a look at the ```karma.conf.js``` file for configuration (e.g. which browsers to use).
+
+The ```createreferences``` script starts a server that automatically saves reference PDFs if they don't already exist.
+You can omit this command if you just want to test for regression.
+
+If you're debugging and want to have visual feedback, you should switch the ```debug``` flag to ```true``` in ```tests/runTests.js```.
+This ensures that a new reference PDF will be created on every run. You might also want to disable some of the tests in
+the ```tests``` array.
+
 ## Dependencies
  * [jsPDF](https://github.com/yWorks/jsPDF) (yWorks fork version!)
  * [fontello/svgpath](https://github.com/fontello/svgpath)
