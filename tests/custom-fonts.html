@@ -40,18 +40,6 @@
     return pdf.output('datauristring');
   }
 
-  function saveToFile(/**string*/ fileContentUrl, /**string*/ fileName, /**function(Object, yfiles.canvas.FileEventArgs)*/ handler) {
-    var aElement = document.createElement("a");
-    aElement.setAttribute("href", fileContentUrl);
-    aElement.setAttribute("download", fileName);
-    aElement.style.setProperty("display", "none", "");
-    document.body.appendChild(aElement);
-    aElement.click();
-    document.body.removeChild(aElement);
-
-    handler();
-  }
-
   function save() {
     document.getElementById("pdf").src = svgToPdf(document.getElementById("svgElement"), 0);
   }
