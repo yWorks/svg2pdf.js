@@ -148,7 +148,7 @@ SOFTWARE.
   // returns an attribute of a node, either from the node directly or from css
   var getAttribute = function (node, propertyNode, propertyCss) {
     propertyCss = propertyCss || propertyNode;
-    return node.getAttribute(propertyNode) || node.style[propertyCss];
+    return node.getAttribute(propertyNode) || node.style && node.style[propertyCss];
   };
 
   var nodeIs = function (node, tagsString) {
