@@ -894,8 +894,9 @@ SOFTWARE.
         y = parseFloat(node.getAttribute("y") || 0);
 
     try {
-      _pdf.addImage(imageUrl,
-          "jpeg",
+      _pdf.addImage(
+          imageUrl,
+          null, // will be ignored anyways if imageUrl is a data url
           x,
           y,
           width,
@@ -1471,7 +1472,6 @@ SOFTWARE.
         if (!tSpan.textContent || nodeIs(tSpan, 'title,desc,metadata')) {
           return;
         }
-        // TODO: space between tspans
 
         var lastPositions;
 
