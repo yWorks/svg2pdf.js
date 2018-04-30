@@ -13,7 +13,7 @@
     "browserify:svgpath": "browserify node_modules/svgpath/index.js -s SvgPath -o src/SvgPath.js",
     "browserify": "browserify src/svg2pdf.js --debug -p licensify -s svg2pdf -o dist/svg2pdf.js",
     "exorcist:svg2pdf": "browserify src/svg2pdf.js --debug -p licensify -s svg2pdf | exorcist dist/svg2pdf.js.map > dist/svg2pdf.js",
-    "uglify:dist": "uglifyjs -m -c --source-map dist/svg2pdf.min.js.map --in-source-map dist/svg2pdf.js.map --source-map-url svg2pdf.min.js.map --comments /@license/ -o dist/svg2pdf.min.js dist/svg2pdf.js",
+    "uglify:dist": "uglifyjs -m -c --source-map \"includeSources,content='dist/svg2pdf.js.map',url='svg2pdf.min.js.map' dist/svg2pdf.min.js.map\" --comments /@license/ -o dist/svg2pdf.min.js dist/svg2pdf.js",
     "build": "npm run browserify && npm run exorcist:svg2pdf && npm run uglify:dist",
     "test": "karma start",
     "test:coverage": "npm run browserify && karma start --coverage",
@@ -39,26 +39,26 @@
   },
   "homepage": "https://github.com/yWorks/svg2pdf.js#readme",
   "dependencies": {
-    "jspdf-yworks": "^1.3.0",
-    "licensify": "^3.1.3"
+    "jspdf-yworks": "^1.3.0"
   },
   "devDependencies": {
-    "babel-preset-es2015": "6.24.1",
-    "babel-preset-es2015-rollup": "3.0.0",
-    "browserify": "^13.1.1",
-    "exorcist": "^0.4.0",
-    "jasmine": "2.8.0",
-    "karma": "^2.0.0",
-    "karma-babel-preprocessor": "^6.0.1",
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.6.1",
+    "browserify": "^16.2.0",
+    "exorcist": "^1.0.1",
+    "jasmine": "^3.1.0",
+    "karma": "^2.0.2",
+    "karma-babel-preprocessor": "^7.0.0",
     "karma-browserify": "^5.2.0",
-    "karma-chrome-launcher": "2.2.0",
+    "karma-chrome-launcher": "^2.2.0",
     "karma-coverage": "^1.1.1",
-    "karma-firefox-launcher": "1.0.1",
-    "karma-jasmine": "1.1.0",
-    "karma-mocha-reporter": "^2.2.0",
-    "requirejs": "^2.3.2",
-    "svgpath": "^2.2.0",
-    "uglify-js": "^2.7.5",
-    "watchify": "^3.10.0"
+    "karma-firefox-launcher": "^1.1.0",
+    "karma-jasmine": "^1.1.1",
+    "karma-mocha-reporter": "^2.2.5",
+    "licensify": "^3.1.3",
+    "requirejs": "^2.3.5",
+    "svgpath": "^2.2.1",
+    "uglify-js": "^3.3.23",
+    "watchify": "^3.11.0"
   }
 }
