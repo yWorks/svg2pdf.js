@@ -583,6 +583,24 @@ SOFTWARE.
     }
   };
 
+  /**
+   * @param {string} fontFamily
+   * @return {string[]}
+   */
+  function parseFontFamily(fontFamily) {
+    return fontFamily.split(",")
+        .map(function (f) {
+          f = f.replace(/[\s\n\r]+/g, " ").trim();
+
+          if (f.charAt(0) === '"' || f.charAt(0) === "'") {
+            // assume correct (balanced) quotes
+            f = f.substring(1, f.length - 1).trim();
+          }
+
+          return f;
+        })
+  }
+
   // multiplies a vector with a matrix: vec' = vec * matrix
   var multVecMatrix = function (vec, matrix) {
     var x = vec[0];
@@ -1580,7 +1598,8 @@ SOFTWARE.
   function setTextProperties(node, fillRGB, attributeState) {
     var fontFamily = getAttribute(node, "font-family");
     if (fontFamily) {
-      attributeState.fontFamily = fontFamily;
+      // for now we simply take the first font
+      attributeState.fontFamily = parseFontFamily(fontFamily)[0];
     }
 
     if (fillRGB && fillRGB.ok) {

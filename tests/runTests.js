@@ -16,6 +16,7 @@ const tests = [
     "display-none-and-visibility-inheritance",
     "fill-and-stroke-inheritance",
     "fill-and-stroke-opacity",
+    "font-family-attribute",
     "gradient-default-coordinates",
     "gradient-units",
     "gradients-and-patterns-mixed",
