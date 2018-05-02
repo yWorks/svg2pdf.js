@@ -1595,13 +1595,53 @@ SOFTWARE.
     _pdf.endTilingPattern(id, pattern);
   };
 
-  function setTextProperties(node, fillRGB, attributeState) {
-    var fontFamily = getAttribute(node, "font-family");
-    if (fontFamily) {
-      // for now we simply take the first font
-      attributeState.fontFamily = parseFontFamily(fontFamily)[0];
+  var jsPDFFontAliases = ["sans-serif", "verdana", "arial", "helvetica", "fixed", "monospace", "terminal", "courier",
+    "serif", "cursive", "fantasy", "times"];
+
+  /**
+   * @param {AttributeState} attributeState
+   * @param {string[]} fontFamilies
+   * @return {string}
+   */
+  function findFirstAvailableFontFamily(attributeState, fontFamilies) {
+    var fontType = "";
+    if (attributeState.fontWeight === "bold") {
+      fontType = "bold";
+    }
+    if (attributeState.fontStyle === "italic") {
+      fontType += "italic";
+    }
+    if (fontType === "") {
+      fontType = "normal";
     }
 
+    var availableFonts = _pdf.getFontList();
+    var firstAvailable = "";
+    var fontIsAvailable = fontFamilies.some(function (font) {
+      var availableStyles = availableFonts[font];
+      if (availableStyles && availableStyles.indexOf(fontType) >= 0) {
+        firstAvailable = font;
+        return true;
+      }
+
+      // jsPDF does not include all aliases of its standard fonts when calculating the font list
+      font = font.toLowerCase();
+      if (jsPDFFontAliases.indexOf(font) >= 0) {
+        firstAvailable = font;
+        return true;
+      }
+
+      return false;
+    });
+
+    if (!fontIsAvailable) {
+      firstAvailable = "times";
+    }
+
+    return firstAvailable;
+  }
+
+  function setTextProperties(node, fillRGB, attributeState) {
     if (fillRGB && fillRGB.ok) {
       attributeState.fill = fillRGB;
     }
@@ -1614,6 +1654,12 @@ SOFTWARE.
     var fontStyle = getAttribute(node, "font-style");
     if (fontStyle) {
       attributeState.fontStyle = fontStyle;
+    }
+
+    var fontFamily = getAttribute(node, "font-family");
+    if (fontFamily) {
+      var fontFamilies = parseFontFamily(fontFamily);
+      attributeState.fontFamily = findFirstAvailableFontFamily(attributeState, fontFamilies);
     }
 
     var fontSize = getAttribute(node, "font-size");

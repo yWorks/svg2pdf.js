@@ -8,4 +8,10 @@
     <text transform="translate(30 90)" style="font-family:   courier ,   'Rounded  Mplus 1c'" font-size="16px">
         Some text
     </text>
+    <text transform="translate(30 120)" style="font-family: 'unavailable font', courier, serif" font-size="16px">
+        Some text
+    </text>
+    <text transform="translate(30 150)" style="font-family: 'unavailable font', serif, courier" font-size="16px">
+        Some text
+    </text>
 </svg>
