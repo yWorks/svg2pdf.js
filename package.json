@@ -46,6 +46,7 @@
     "babel-preset-env": "^1.6.1",
     "browserify": "^16.2.0",
     "exorcist": "^1.0.1",
+    "font-family": "^0.2.0",
     "jasmine": "^3.1.0",
     "karma": "^2.0.2",
     "karma-babel-preprocessor": "^7.0.0",

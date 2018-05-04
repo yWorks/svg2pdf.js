@@ -35,6 +35,7 @@ SOFTWARE.
 (function (global) {
   var RGBColor;
   var SvgPath;
+  var FontFamily;
 
   var _pdf; // jsPDF pdf-document
 
@@ -582,24 +583,6 @@ SOFTWARE.
       return new RGBColor(colorString);
     }
   };
-
-  /**
-   * @param {string} fontFamily
-   * @return {string[]}
-   */
-  function parseFontFamily(fontFamily) {
-    return fontFamily.split(",")
-        .map(function (f) {
-          f = f.replace(/[\s\n\r]+/g, " ").trim();
-
-          if (f.charAt(0) === '"' || f.charAt(0) === "'") {
-            // assume correct (balanced) quotes
-            f = f.substring(1, f.length - 1).trim();
-          }
-
-          return f;
-        })
-  }
 
   // multiplies a vector with a matrix: vec' = vec * matrix
   var multVecMatrix = function (vec, matrix) {
@@ -1658,7 +1641,7 @@ SOFTWARE.
 
     var fontFamily = getAttribute(node, "font-family");
     if (fontFamily) {
-      var fontFamilies = parseFontFamily(fontFamily);
+      var fontFamilies = FontFamily.parse(fontFamily);
       attributeState.fontFamily = findFirstAvailableFontFamily(attributeState, fontFamilies);
     }
 
@@ -2087,18 +2070,21 @@ SOFTWARE.
   };
 
   if (typeof define === "function" && define.amd) {
-    define(["./rgbcolor", "SvgPath"], function (rgbcolor, svgpath) {
+    define(["./rgbcolor", "SvgPath", "font-family"], function (rgbcolor, svgpath, fontFamily) {
       RGBColor = rgbcolor;
       SvgPath = svgpath;
+      FontFamily = fontFamily;
       return svg2pdf;
     });
   } else if (typeof module !== "undefined" && module.exports) {
     RGBColor = require("./rgbcolor.js");
     SvgPath = require("SvgPath");
+    FontFamily = require("font-family");
     module.exports = svg2pdf;
   } else {
     SvgPath = global.SvgPath;
     RGBColor = global.RGBColor;
+    FontFamily = global.FontFamily;
     global.svg2pdf = svg2pdf;
     // for compatibility reasons
     global.svgElementToPdf = svg2pdf;
