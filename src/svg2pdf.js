@@ -1687,14 +1687,20 @@ SOFTWARE.
       _pdf.setTextColor(fillRGB.r, fillRGB.g, fillRGB.b);
     }
 
-    var fontType = "";
-    if (attributeState.fontWeight !== parentAttributeState.fontWeight && attributeState.fontWeight === "bold") {
-      fontType = "bold";
-    }
-    if (attributeState.fontStyle !== parentAttributeState.fontStyle && attributeState.fontStyle === "italic") {
-      fontType += "italic";
-    }
-    if (fontType !== "") {
+    if (attributeState.fontWeight !== parentAttributeState.fontWeight
+        || attributeState.fontStyle !== parentAttributeState.fontStyle) {
+      var fontType = "";
+      if (attributeState.fontWeight === "bold") {
+        fontType = "bold";
+      }
+      if (attributeState.fontStyle === "italic") {
+        fontType += "italic";
+      }
+
+      if (fontType === "") {
+        fontType = "normal";
+      }
+
       _pdf.setFontType(fontType);
     }
 
