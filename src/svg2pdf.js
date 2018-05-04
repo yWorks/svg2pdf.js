@@ -897,7 +897,7 @@ SOFTWARE.
     try {
       _pdf.addImage(
           imageUrl,
-          null, // will be ignored anyways if imageUrl is a data url
+          "", // will be ignored anyways if imageUrl is a data url
           x,
           y,
           width,
