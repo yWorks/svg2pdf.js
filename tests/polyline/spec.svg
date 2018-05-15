@@ -1,0 +1,9 @@
+<svg width="500" height="500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+    <polyline/>
+    <polyline fill="aquamarine" stroke="black" stroke-width="10" points="0,0 100,0 100,100 0,100 0,200 100, 200"
+              transform="translate(10 10)"/>
+    <polyline fill="aquamarine" stroke="black" stroke-width="10" points="0,0 100,0 100,100 0,100 0,200 100, 200"
+              transform="translate(300 10) rotate(45)"/>
+    <polyline fill="none" stroke="black" stroke-width="10" points="0,0 100,0 100,100 0,100 0,200 100, 200 0,0"
+              transform="translate(10 250)"/>
+</svg>

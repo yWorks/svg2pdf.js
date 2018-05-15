@@ -28,6 +28,7 @@ const tests = [
     "opacity-and-rgba",
     "path-arc-support",
     "patterns",
+    "polyline",
     "remote-images",
     "strokes-and-bounding-boxes",
     "text-placement",

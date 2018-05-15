@@ -604,7 +604,7 @@ SOFTWARE.
     var i, minX, minY, maxX, maxY, viewBox, vb, boundingBox;
     var pf = parseFloat;
 
-    if (nodeIs(node, "polygon")) {
+    if (nodeIs(node, "polygon,polyline")) {
       var points = parsePointsString(node.getAttribute("points"));
       minX = Number.POSITIVE_INFINITY;
       minY = Number.POSITIVE_INFINITY;
@@ -822,14 +822,22 @@ SOFTWARE.
   };
 
   // draws a polygon
-  var polygon = function (node, colorMode, gradient, gradientMatrix, svgIdPrefix, attributeState) {
+  var polygon = function (node, colorMode, gradient, gradientMatrix, svgIdPrefix, attributeState, closed) {
+    if (!node.hasAttribute("points") || node.getAttribute("points") === "") {
+      return;
+    }
+
     var points = parsePointsString(node.getAttribute("points"));
     var lines = [{op: "m", c: points[0]}];
     var i, angle;
     for (i = 1; i < points.length; i++) {
       lines.push({op: "l", c: points[i]});
     }
-    lines.push({op: "h"});
+
+    if (closed) {
+      lines.push({op: "h"});
+    }
+
     _pdf.path(lines, colorMode, gradient, gradientMatrix);
 
     var markerEnd = node.getAttribute("marker-end"),
@@ -1809,7 +1817,7 @@ SOFTWARE.
     //
 
     // fill mode
-    if (nodeIs(node, "g,path,rect,text,ellipse,line,circle,polygon")) {
+    if (nodeIs(node, "g,path,rect,text,ellipse,line,circle,polygon,polyline")) {
       function setDefaultColor() {
         fillRGB = new RGBColor("rgb(0, 0, 0)");
         hasFillColor = true;
@@ -1946,7 +1954,7 @@ SOFTWARE.
 
     }
 
-    if (nodeIs(node, "g,path,rect,ellipse,line,circle,polygon")) {
+    if (nodeIs(node, "g,path,rect,ellipse,line,circle,polygon,polyline")) {
       // text has no fill color, so don't apply it until here
       if (hasFillColor) {
         attributeState.fill = fillRGB;
@@ -2065,10 +2073,11 @@ SOFTWARE.
         break;
 
       case 'polygon':
+      case 'polyline':
         if (!withinClipPath) {
           _pdf.setCurrentTransformationMatrix(tfMatrix);
         }
-        polygon(node, colorMode, fillUrl, fillData, svgIdPrefix, attributeState);
+        polygon(node, colorMode, fillUrl, fillData, svgIdPrefix, attributeState, node.tagName.toLowerCase() === "polygon");
         break;
 
       case 'image':
