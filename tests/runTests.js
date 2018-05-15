@@ -1,6 +1,7 @@
 const debug = false;
 
 const tests = [
+    "clippath",
     "complete-bpmn",
     "complete-computer-network",
     "complete-dependency-diagram",
