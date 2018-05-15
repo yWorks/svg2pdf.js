@@ -1773,7 +1773,7 @@ SOFTWARE.
       }
     }
 
-    var hasClipPath = node.hasAttribute("clip-path");
+    var hasClipPath = node.hasAttribute("clip-path") && node.getAttribute("clip-path") !== "none";
     if (hasClipPath) {
       var clipPathId = iriReference.exec(node.getAttribute("clip-path"));
       var clipPathNode = getFromDefs(svgIdPrefix.get() + clipPathId[1], defs);
