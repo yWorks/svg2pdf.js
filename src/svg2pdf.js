@@ -375,7 +375,7 @@ SOFTWARE.
 
   // replace any newline characters by space and trim
   var removeNewlinesAndTrim = function (str) {
-    return str.replace(/[\n\s\r]+/, " ").trim();
+    return str.replace(/[\n\s\r]+/g, " ").trim();
   };
 
   // clones the defs object (or basically any object)
