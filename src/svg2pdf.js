@@ -1391,9 +1391,14 @@ SOFTWARE.
       xs[i] = x;
       ys[i] = y;
 
+      currentTextX = x + measureTextWidth(this.texts[i], tSpanAttributeState);
+
       // add an additional "." (which has approximately the same size as a space character) in order to put
       // some space between the tSpans (I can't find this in the spec but all browsers do it)
-      currentTextX = x + measureTextWidth(this.texts[i], tSpanAttributeState) + measureTextWidth(".", tSpanAttributeState);
+      if (i < this.tSpans.length - 1) {
+        currentTextX += measureTextWidth(".", tSpanAttributeState);
+      }
+
       currentTextY = y;
 
       minX = Math.min(minX, x);
