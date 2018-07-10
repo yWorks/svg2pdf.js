@@ -1612,8 +1612,19 @@ SOFTWARE.
     defs[id] = node;
   }
 
-  var jsPDFFontAliases = ["sans-serif", "verdana", "arial", "helvetica", "fixed", "monospace", "terminal", "courier",
-    "serif", "cursive", "fantasy", "times"];
+  var fontAliases = {
+    "sans-serif": "helvetica",
+    "verdana": "helvetica",
+    "arial": "helvetica",
+
+    "fixed": "courier",
+    "monospace": "courier",
+    "terminal": "courier",
+
+    "serif": "times",
+    "cursive": "times",
+    "fantasy": "times"
+  };
 
   /**
    * @param {AttributeState} attributeState
@@ -1641,9 +1652,8 @@ SOFTWARE.
         return true;
       }
 
-      // jsPDF does not include all aliases of its standard fonts when calculating the font list
       font = font.toLowerCase();
-      if (jsPDFFontAliases.indexOf(font) >= 0) {
+      if (fontAliases.hasOwnProperty(font)) {
         firstAvailable = font;
         return true;
       }
@@ -1696,7 +1706,11 @@ SOFTWARE.
    */
   function putTextProperties(attributeState, parentAttributeState) {
     if (attributeState.fontFamily !== parentAttributeState.fontFamily) {
-      _pdf.setFont(attributeState.fontFamily);
+      if (fontAliases.hasOwnProperty(attributeState.fontFamily)) {
+        _pdf.setFont(fontAliases[attributeState.fontFamily]);
+      } else {
+        _pdf.setFont(attributeState.fontFamily);
+      }
     }
 
     if (attributeState.fill !== parentAttributeState.fill && attributeState.fill.ok) {
