@@ -2139,6 +2139,12 @@ SOFTWARE.
         xOffset = options.xOffset || 0.0,
         yOffset = options.yOffset || 0.0;
 
+    var apiMode = _pdf.getApiMode();
+    var toggleApiMode = apiMode !== "transforms";
+    if (toggleApiMode) {
+      _pdf.setApiMode("transforms");
+    }
+
     // set offsets and scale everything by k
     _pdf.saveGraphicsState();
     _pdf.setCurrentTransformationMatrix(new _pdf.Matrix(k, 0, 0, k, xOffset, yOffset));
@@ -2155,6 +2161,10 @@ SOFTWARE.
     renderNode(element.cloneNode(true), _pdf.unitMatrix, {}, new SvgPrefix(""), false, false, attributeState);
 
     _pdf.restoreGraphicsState();
+
+    if (toggleApiMode) {
+      _pdf.setApiMode(apiMode);
+    }
 
     return _pdf;
   };
