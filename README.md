@@ -58,6 +58,18 @@ pdf.addFont('myFont.ttf', 'myFont', 'normal');
 ```
 Please refer to the [jsPDF readme](https://github.com/yWorks/jsPDF).
 
+## Reporting issues
+
+Svg2pdf is by no means perfect. If you find something is not working as expected we are glad to receive an
+[issue report](https://github.com/yWorks/svg2pdf.js/issues) from you. In order to be able to react efficiently we ask
+you to provide us with the following information:
+ * The versions of svg2pdf and jsPDF you are using
+ * A (preferably small) sample SVG that reproduces the issue
+ * Other code snippets if necessary
+ 
+If you are getting an exception "pt.saveGraphicsState is not a function" you are using the wrong fork of jsPDF! Use the
+[yWorks fork](https://github.com/yWorks/jsPDF)!
+
 ## Building
 
 If you want to play with the sources or build the minified js file yourself, check out the repository and use the npm scripts defined in `package.json`:
