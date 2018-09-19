@@ -888,7 +888,7 @@ SOFTWARE.
       if (dataUrl[4] === "base64") {
         svgText = atob(svgText);
       } else {
-        svgText = decodeURI(svgText);
+        svgText = decodeURIComponent(svgText);
       }
 
       var parser = new DOMParser();
