@@ -402,6 +402,10 @@ SOFTWARE.
     var preserveAspectRatio = node.getAttribute("preserveAspectRatio");
     if (preserveAspectRatio) {
       var alignAndMeetOrSlice = preserveAspectRatio.split(" ");
+      if (alignAndMeetOrSlice[0] === "defer") {
+        alignAndMeetOrSlice = alignAndMeetOrSlice.slice(1);
+      }
+
       align = alignAndMeetOrSlice[0];
       meetOrSlice = alignAndMeetOrSlice[1] || "meet";
     } else {
@@ -880,6 +884,12 @@ SOFTWARE.
 
   // draws an image
   var image = function (node, svgIdPrefix) {
+    var width = parseFloat(node.getAttribute("width")),
+        height = parseFloat(node.getAttribute("height")),
+        x = parseFloat(node.getAttribute("x") || 0),
+        y = parseFloat(node.getAttribute("y") || 0);
+
+
     var imageUrl = node.getAttribute("xlink:href") || node.getAttribute("href");
 
     var dataUrl = imageUrl.match(dataUrlRegex);
@@ -893,14 +903,23 @@ SOFTWARE.
 
       var parser = new DOMParser();
       var svgElement = parser.parseFromString(svgText, "image/svg+xml").firstElementChild;
+
+      // unless preserveAspectRatio starts with "defer", the preserveAspectRatio attribute of the svg is ignored
+      var preserveAspectRatio = node.getAttribute("preserveAspectRatio");
+      if (!preserveAspectRatio
+          || preserveAspectRatio.indexOf("defer") < 0
+          || !svgElement.getAttribute("preserveAspectRatio")) {
+        svgElement.setAttribute("preserveAspectRatio", preserveAspectRatio);
+      }
+
+      svgElement.setAttribute("x", String(x));
+      svgElement.setAttribute("y", String(y));
+      svgElement.setAttribute("width", String(width));
+      svgElement.setAttribute("height", String(height));
+
       renderNode(svgElement, _pdf.unitMatrix, {}, svgIdPrefix, false, false, AttributeState.default());
       return;
     }
-
-    var width = parseFloat(node.getAttribute("width")),
-        height = parseFloat(node.getAttribute("height")),
-        x = parseFloat(node.getAttribute("x") || 0),
-        y = parseFloat(node.getAttribute("y") || 0);
 
     try {
       _pdf.addImage(
