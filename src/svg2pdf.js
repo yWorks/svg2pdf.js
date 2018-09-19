@@ -44,7 +44,7 @@ SOFTWARE.
   var iriReference = /url\(["']?#([^"']+)["']?\)/;
 
   // groups: 1: mime-type (+ charset), 2: mime-type (w/o charset), 3: charset, 4: base64?, 5: body
-  var dataUrlRegex = /^\s*data:(([^/,;]+\/[^/,;]+)(?:;([^,;=]+=[^,;=]+))?)?(?:;(base64))?,([a-z0-9!$&',()*+;=\-._~:@\/?%\s]*\s*)$/i;
+  var dataUrlRegex = /^\s*data:(([^/,;]+\/[^/,;]+)(?:;([^,;=]+=[^,;=]+))?)?(?:;(base64))?,(.*\s*)$/i;
 
   var svgNamespaceURI = "http://www.w3.org/2000/svg";
 
