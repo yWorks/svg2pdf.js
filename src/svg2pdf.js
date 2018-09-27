@@ -227,9 +227,6 @@ SOFTWARE.
   };
 
   var AttributeState = function () {
-    this.fillMode = null;
-    this.strokeMode = null;
-
     this.color = null;
     this.fill = null;
     this.fillOpacity = 1.0;
@@ -256,10 +253,6 @@ SOFTWARE.
   AttributeState.default = function () {
     var attributeState = new AttributeState();
 
-    attributeState.fillMode = "F";
-    attributeState.strokeMode = "";
-
-    attributeState.color = new RGBColor("rgb(0, 0, 0)");
     attributeState.fill = new RGBColor("rgb(0, 0, 0)");
     attributeState.fillOpacity = 1.0;
     // attributeState.fillRule = "nonzero";
@@ -287,10 +280,6 @@ SOFTWARE.
   AttributeState.prototype.clone = function () {
     var clone = new AttributeState();
 
-    clone.fillMode = this.fillMode;
-    clone.strokeMode = this.strokeMode;
-
-    clone.color = this.color;
     clone.fill = this.fill;
     clone.fillOpacity = this.fillOpacity;
     // clone.fillRule = this.fillRule;
@@ -822,7 +811,7 @@ SOFTWARE.
   };
 
   // draws a polygon
-  var polygon = function (node, colorMode, gradient, gradientMatrix, svgIdPrefix, attributeState, closed) {
+  var polygon = function (node, svgIdPrefix, attributeState, closed) {
     if (!node.hasAttribute("points") || node.getAttribute("points") === "") {
       return;
     }
@@ -838,7 +827,7 @@ SOFTWARE.
       lines.push({op: "h"});
     }
 
-    _pdf.path(lines, colorMode, gradient, gradientMatrix);
+    _pdf.path(lines);
 
     var markerEnd = node.getAttribute("marker-end"),
         markerStart = node.getAttribute("marker-start"),
@@ -919,7 +908,7 @@ SOFTWARE.
   };
 
   // draws a path
-  var path = function (node, tfMatrix, svgIdPrefix, colorMode, gradient, gradientMatrix, withinClipPath, attributeState) {
+  var path = function (node, tfMatrix, svgIdPrefix, withinClipPath, attributeState) {
     var list = getPathSegList(node);
     var markerEnd = node.getAttribute("marker-end"),
         markerStart = node.getAttribute("marker-start"),
@@ -1114,7 +1103,7 @@ SOFTWARE.
     var lines = getLinesFromPath();
 
     if (lines.lines.length > 0) {
-      _pdf.path(lines.lines, colorMode, gradient, gradientMatrix);
+      _pdf.path(lines.lines);
     }
 
     if (markerEnd || markerStart || markerMid) {
@@ -1148,7 +1137,7 @@ SOFTWARE.
     var p1 = [parseFloat(node.getAttribute('x1') || 0), parseFloat(node.getAttribute('y1') || 0)];
     var p2 = [parseFloat(node.getAttribute('x2') || 0), parseFloat(node.getAttribute('y2') || 0)];
 
-    if (attributeState.strokeMode === "D"){
+    if (attributeState.stroke !== null){
       _pdf.line(p1[0], p1[1], p2[0], p2[1]);
     }
 
@@ -1169,44 +1158,35 @@ SOFTWARE.
   };
 
   // draws a rect
-  var rect = function (node, colorMode, gradient, gradientMatrix) {
+  var rect = function (node) {
     _pdf.roundedRect(
         parseFloat(node.getAttribute('x')) || 0,
         parseFloat(node.getAttribute('y')) || 0,
         parseFloat(node.getAttribute('width')),
         parseFloat(node.getAttribute('height')),
         parseFloat(node.getAttribute('rx')) || 0,
-        parseFloat(node.getAttribute('ry')) || 0,
-        colorMode,
-        gradient,
-        gradientMatrix
+        parseFloat(node.getAttribute('ry')) || 0
     );
   };
 
   // draws an ellipse
-  var ellipse = function (node, colorMode, gradient, gradientMatrix) {
+  var ellipse = function (node) {
     _pdf.ellipse(
         parseFloat(node.getAttribute('cx')) || 0,
         parseFloat(node.getAttribute('cy')) || 0,
         parseFloat(node.getAttribute('rx')),
-        parseFloat(node.getAttribute('ry')),
-        colorMode,
-        gradient,
-        gradientMatrix
+        parseFloat(node.getAttribute('ry'))
     );
   };
 
   // draws a circle
-  var circle = function (node, colorMode, gradient, gradientMatrix) {
+  var circle = function (node) {
     var radius = parseFloat(node.getAttribute('r')) || 0;
     _pdf.ellipse(
         parseFloat(node.getAttribute('cx')) || 0,
         parseFloat(node.getAttribute('cy')) || 0,
         radius,
-        radius,
-        colorMode,
-        gradient,
-        gradientMatrix
+        radius
     );
   };
 
@@ -1767,10 +1747,9 @@ SOFTWARE.
     var tfMatrix,
         hasFillColor = false,
         fillRGB = null,
-        fillMode = "inherit",
-        strokeMode = "inherit",
-        fillUrl = null,
-        fillData = null,
+        fill = "inherit",
+        stroke = "inherit",
+        patternOrGradient = undefined,
         bBox;
 
     //
@@ -1822,9 +1801,8 @@ SOFTWARE.
       _pdf.saveGraphicsState();
       _pdf.setCurrentTransformationMatrix(clipPathMatrix);
 
-      _pdf.beginClipPath();
       renderChildren(clipPathNode, _pdf.unitMatrix, defs, svgIdPrefix, false, true, attributeState);
-      _pdf.endClipPath();
+      _pdf.clip().discardPath();
 
       // as we cannot use restoreGraphicsState() to reset the transform (this would reset the clipping path, as well),
       // we must append the inverse instead
@@ -1840,24 +1818,24 @@ SOFTWARE.
       function setDefaultColor() {
         fillRGB = new RGBColor("rgb(0, 0, 0)");
         hasFillColor = true;
-        fillMode = "F";
+        fill = true;
       }
 
       var fillColor = getAttribute(node, "fill");
       if (fillColor) {
         var url = iriReference.exec(fillColor);
         if (url) {
-          // probably a gradient (or something unsupported)
-          fillUrl = svgIdPrefix.get() + url[1];
-          var fill = getFromDefs(fillUrl, defs);
-          if (fill && nodeIs(fill, "lineargradient,radialgradient")) {
+          // probably a gradient or pattern (or something unsupported)
+          var fillUrl = svgIdPrefix.get() + url[1];
+          var fillNode = getFromDefs(fillUrl, defs);
+          if (fillNode && nodeIs(fillNode, "lineargradient,radialgradient")) {
 
             // matrix to convert between gradient space and user space
             // for "userSpaceOnUse" this is the current transformation: tfMatrix
             // for "objectBoundingBox" or default, the gradient gets scaled and transformed to the bounding box
             var gradientUnitsMatrix;
-            if (!fill.hasAttribute("gradientUnits")
-                || fill.getAttribute("gradientUnits").toLowerCase() === "objectboundingbox") {
+            if (!fillNode.hasAttribute("gradientUnits")
+                || fillNode.getAttribute("gradientUnits").toLowerCase() === "objectboundingbox") {
               bBox || (bBox = getUntransformedBBox(node));
               gradientUnitsMatrix = new _pdf.Matrix(bBox[2], 0, 0, bBox[3], bBox[0], bBox[1]);
             } else {
@@ -1865,51 +1843,54 @@ SOFTWARE.
             }
 
             // matrix that is applied to the gradient before any other transformations
-            var gradientTransform = parseTransform(fill.getAttribute("gradientTransform"));
+            var gradientTransform = parseTransform(fillNode.getAttribute("gradientTransform"));
 
-            fillData = _pdf.matrixMult(gradientTransform, gradientUnitsMatrix);
+            patternOrGradient = {
+              key: fillUrl,
+              matrix: _pdf.matrixMult(gradientTransform, gradientUnitsMatrix)
+            };
 
-            fillMode = "";
-          } else if (fill && nodeIs(fill, "pattern")) {
+            fill = true;
+          } else if (fillNode && nodeIs(fillNode, "pattern")) {
             var fillBBox, y, width, height, x;
-            fillData = {};
+            patternOrGradient = { key: fillUrl };
 
             var patternUnitsMatrix = _pdf.unitMatrix;
-            if (!fill.hasAttribute("patternUnits")
-                || fill.getAttribute("patternUnits").toLowerCase() === "objectboundingbox") {
+            if (!fillNode.hasAttribute("patternUnits")
+                || fillNode.getAttribute("patternUnits").toLowerCase() === "objectboundingbox") {
               bBox || (bBox = getUntransformedBBox(node));
               patternUnitsMatrix = new _pdf.Matrix(1, 0, 0, 1, bBox[0], bBox[1]);
 
               // TODO: slightly inaccurate (rounding errors? line width bBoxes?)
-              fillBBox = getUntransformedBBox(fill);
+              fillBBox = getUntransformedBBox(fillNode);
               x = fillBBox[0] * bBox[0];
               y = fillBBox[1] * bBox[1];
               width = fillBBox[2] * bBox[2];
               height = fillBBox[3] * bBox[3];
-              fillData.boundingBox = [x, y, x + width, y + height];
-              fillData.xStep = width;
-              fillData.yStep = height;
+              patternOrGradient.boundingBox = [x, y, x + width, y + height];
+              patternOrGradient.xStep = width;
+              patternOrGradient.yStep = height;
             }
 
             var patternContentUnitsMatrix = _pdf.unitMatrix;
-            if (fill.hasAttribute("patternContentUnits")
-                && fill.getAttribute("patternContentUnits").toLowerCase() === "objectboundingbox") {
+            if (fillNode.hasAttribute("patternContentUnits")
+                && fillNode.getAttribute("patternContentUnits").toLowerCase() === "objectboundingbox") {
               bBox || (bBox = getUntransformedBBox(node));
               patternContentUnitsMatrix = new _pdf.Matrix(bBox[2], 0, 0, bBox[3], 0, 0);
 
-              fillBBox = fillData.boundingBox || getUntransformedBBox(fill);
+              fillBBox = patternOrGradient.boundingBox || getUntransformedBBox(fillNode);
               x = fillBBox[0] / bBox[0];
               y = fillBBox[1] / bBox[1];
               width = fillBBox[2] / bBox[2];
               height = fillBBox[3] / bBox[3];
-              fillData.boundingBox = [x, y, x + width, y + height];
-              fillData.xStep = width;
-              fillData.yStep = height;
+              patternOrGradient.boundingBox = [x, y, x + width, y + height];
+              patternOrGradient.xStep = width;
+              patternOrGradient.yStep = height;
             }
 
             var patternTransformMatrix = _pdf.unitMatrix;
-            if (fill.hasAttribute("patternTransform")) {
-              patternTransformMatrix = parseTransform(fill.getAttribute("patternTransform"));
+            if (fillNode.hasAttribute("patternTransform")) {
+              patternTransformMatrix = parseTransform(fillNode.getAttribute("patternTransform"));
             }
 
             var matrix = patternContentUnitsMatrix;
@@ -1917,12 +1898,11 @@ SOFTWARE.
             matrix = _pdf.matrixMult(matrix, patternTransformMatrix);
             matrix = _pdf.matrixMult(matrix, tfMatrix);
 
-            fillData.matrix = matrix;
+            patternOrGradient.matrix = matrix;
 
-            fillMode = "F";
+            fill = true;
           } else {
             // unsupported fill argument -> fill black
-            fillUrl = fill = null;
             setDefaultColor();
           }
         } else {
@@ -1930,9 +1910,9 @@ SOFTWARE.
           fillRGB = parseColor(fillColor);
           if (fillRGB.ok) {
             hasFillColor = true;
-            fillMode = "F";
+            fill = true;
           } else {
-            fillMode = "";
+            fill = false;
           }
         }
       }
@@ -1988,18 +1968,18 @@ SOFTWARE.
           strokeWidth = Math.abs(parseFloat(strokeWidth));
           attributeState.strokeWidth = strokeWidth;
           _pdf.setLineWidth(strokeWidth);
+        } else {
+          // needed for inherited zero width strokes
+          strokeWidth = attributeState.strokeWidth
         }
         var strokeRGB = new RGBColor(strokeColor);
         if (strokeRGB.ok) {
-          attributeState.color = strokeRGB;
+          attributeState.stroke = strokeRGB;
           _pdf.setDrawColor(strokeRGB.r, strokeRGB.g, strokeRGB.b);
-          if (strokeWidth !== 0) {
-            // pdf spec states: "A line width of 0 denotes the thinnest line that can be rendered at device resolution:
-            // 1 device pixel wide". SVG, however, does not draw zero width lines.
-            strokeMode = "D";
-          } else {
-            strokeMode = "";
-          }
+
+          // pdf spec states: "A line width of 0 denotes the thinnest line that can be rendered at device resolution:
+          // 1 device pixel wide". SVG, however, does not draw zero width lines.
+          stroke = strokeWidth !== 0;
         }
         var lineCap = getAttribute(node, "stroke-linecap");
         if (lineCap) {
@@ -2025,10 +2005,12 @@ SOFTWARE.
     }
 
     // inherit fill and stroke mode if not specified at this node
-    fillMode = attributeState.fillMode = fillMode === "inherit" ? attributeState.fillMode : fillMode;
-    strokeMode = attributeState.strokeMode = strokeMode === "inherit" ? attributeState.strokeMode : strokeMode;
-
-    var colorMode = fillMode + strokeMode;
+    if (fill === "inherit") {
+      fill = attributeState.fill !== null;
+    }
+    if (stroke === "inherit") {
+      stroke = attributeState.stroke !== null;
+    }
 
     setTextProperties(node, fillRGB, attributeState);
     putTextProperties(attributeState, parentAttributeState);
@@ -2064,21 +2046,21 @@ SOFTWARE.
         if (!withinClipPath) {
           _pdf.setCurrentTransformationMatrix(tfMatrix);
         }
-        rect(node, colorMode, fillUrl, fillData);
+        rect(node);
         break;
 
       case 'ellipse':
         if (!withinClipPath) {
           _pdf.setCurrentTransformationMatrix(tfMatrix);
         }
-        ellipse(node, colorMode, fillUrl, fillData);
+        ellipse(node);
         break;
 
       case 'circle':
         if (!withinClipPath) {
           _pdf.setCurrentTransformationMatrix(tfMatrix);
         }
-        circle(node, colorMode, fillUrl, fillData);
+        circle(node);
         break;
       case 'text':
         text(node, tfMatrix, hasFillColor, fillRGB, attributeState);
@@ -2088,7 +2070,7 @@ SOFTWARE.
         if (!withinClipPath) {
           _pdf.setCurrentTransformationMatrix(tfMatrix);
         }
-        path(node, tfMatrix, svgIdPrefix, colorMode, fillUrl, fillData, withinClipPath, attributeState);
+        path(node, tfMatrix, svgIdPrefix, withinClipPath, attributeState);
         break;
 
       case 'polygon':
@@ -2096,7 +2078,7 @@ SOFTWARE.
         if (!withinClipPath) {
           _pdf.setCurrentTransformationMatrix(tfMatrix);
         }
-        polygon(node, colorMode, fillUrl, fillData, svgIdPrefix, attributeState, node.tagName.toLowerCase() === "polygon");
+        polygon(node, svgIdPrefix, attributeState, node.tagName.toLowerCase() === "polygon");
         break;
 
       case 'image':
@@ -2131,6 +2113,16 @@ SOFTWARE.
       case "clippath":
         clipPath(node, defs, svgIdPrefix);
         break;
+    }
+
+    if (nodeIs(node, "path,rect,ellipse,circle,polygon,polyline") && !withinClipPath) {
+      if (fill && stroke) {
+        _pdf.fillStroke(patternOrGradient);
+      } else if (fill) {
+        _pdf.fill(patternOrGradient);
+      } else if (stroke) {
+        _pdf.stroke();
+      }
     }
 
     // close either the formObject or the graphics context

@@ -1,4 +1,5 @@
 %PDF-1.3
+%ºß¬à
 3 0 obj
 <</Type /Page
 /Parent 1 0 R
@@ -8,16 +9,17 @@
 >>
 endobj
 4 0 obj
-<</Length 4500>>
+<</Length 5395>>
 stream
-1. 0. 0. -1. 0. 800. cm
-/F1 16 Tf
 0.200025 w
 0 G
 q
+1. 0. 0. -1. 0. 800. cm
+/F1 16 Tf
+q
 1. 0. 0. 1. 0. 0. cm
 1.00 w
-0.00 0.00 0.00 rg
+0.00 g
 /F9 16 Tf
 /F9 16 Tf
 q
@@ -35,11 +37,12 @@ h
 B
 Q
 q
-0.000 0.000 1.000 rg
 q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.000 1.000 rg
 1. 0. 0. -1. 200. 20. Tm
 (text-anchor auto) Tj
 ET
@@ -47,11 +50,12 @@ Q
 Q
 Q
 q
-0.000 0.000 1.000 rg
 q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.000 1.000 rg
 1. 0. 0. -1. 130.68359375 40. Tm
 (text-anchor="middle") Tj
 ET
@@ -59,11 +63,12 @@ Q
 Q
 Q
 q
-0.000 0.000 1.000 rg
 q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.000 1.000 rg
 1. 0. 0. -1. 80.52734375 60. Tm
 (text-anchor="end") Tj
 ET
@@ -71,18 +76,21 @@ Q
 Q
 Q
 q
-0.000 0.502 0.000 rg
 q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.502 0.000 rg
 1. 0. 0. -1. 200. 80. Tm
 (text-anchor auto,) Tj
 ET
 Q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.502 0.000 rg
 1. 0. 0. -1. 316.7333984375 80. Tm
 (two tspans) Tj
 ET
@@ -90,18 +98,21 @@ Q
 Q
 Q
 q
-0.000 0.502 0.000 rg
 q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.502 0.000 rg
 1. 0. 0. -1. 90.6640625 100. Tm
 (text-anchor="middle",) Tj
 ET
 Q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.502 0.000 rg
 1. 0. 0. -1. 237.6318359375 100. Tm
 (two tspans) Tj
 ET
@@ -109,18 +120,21 @@ Q
 Q
 Q
 q
-0.000 0.502 0.000 rg
 q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.502 0.000 rg
 1. 0. 0. -1. 0.48828125 120. Tm
 (text-anchor="end",) Tj
 ET
 Q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.502 0.000 rg
 1. 0. 0. -1. 128.2958984375 120. Tm
 (two tspans) Tj
 ET
@@ -128,18 +142,21 @@ Q
 Q
 Q
 q
-1.000 0.000 0.000 rg
 q
 q
 BT
+/F1 15 Tf
 17.25 TL
+1.000 0.000 0.000 rg
 1. 0. 0. -1. 200. 140. Tm
 (text-anchor auto,) Tj
 ET
 Q
 q
 BT
+/F1 15 Tf
 17.25 TL
+1.000 0.000 0.000 rg
 1. 0. 0. -1. 286.7333984375 147.5 Tm
 (two tspans dx&dy) Tj
 ET
@@ -147,18 +164,21 @@ Q
 Q
 Q
 q
-1.000 0.000 0.000 rg
 q
 q
 BT
+/F1 15 Tf
 17.25 TL
+1.000 0.000 0.000 rg
 1. 0. 0. -1. 82.735595703125 160. Tm
 (text-anchor="middle",) Tj
 ET
 Q
 q
 BT
+/F1 15 Tf
 17.25 TL
+1.000 0.000 0.000 rg
 1. 0. 0. -1. 199.703369140625 167.5 Tm
 (two tspans dx&dy) Tj
 ET
@@ -166,18 +186,21 @@ Q
 Q
 Q
 q
-1.000 0.000 0.000 rg
 q
 q
 BT
+/F1 15 Tf
 17.25 TL
+1.000 0.000 0.000 rg
 1. 0. 0. -1. -15.36865234375 180. Tm
 (text-anchor="end",) Tj
 ET
 Q
 q
 BT
+/F1 15 Tf
 17.25 TL
+1.000 0.000 0.000 rg
 1. 0. 0. -1. 82.43896484375 187.5 Tm
 (two tspans dx&dy) Tj
 ET
@@ -185,18 +208,21 @@ Q
 Q
 Q
 q
-0.000 0.000 1.000 rg
 q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.000 1.000 rg
 1. 0. 0. -1. 200. 220. Tm
 (text-anchor auto,) Tj
 ET
 Q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.000 1.000 rg
 1. 0. 0. -1. 200. 235. Tm
 (multiline) Tj
 ET
@@ -204,18 +230,21 @@ Q
 Q
 Q
 q
-0.000 0.000 1.000 rg
 q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.000 1.000 rg
 1. 0. 0. -1. 128.599853515625 260. Tm
 (text-anchor="middle",) Tj
 ET
 Q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.000 1.000 rg
 1. 0. 0. -1. 172.490234375 275. Tm
 (multiline) Tj
 ET
@@ -223,18 +252,21 @@ Q
 Q
 Q
 q
-0.000 0.000 1.000 rg
 q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.000 1.000 rg
 1. 0. 0. -1. 76.35986328125 300. Tm
 (text-anchor="end",) Tj
 ET
 Q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.000 1.000 rg
 1. 0. 0. -1. 144.98046875 315. Tm
 (multiline) Tj
 ET
@@ -242,18 +274,21 @@ Q
 Q
 Q
 q
-0.000 0.502 0.000 rg
 q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.502 0.000 rg
 1. 0. 0. -1. 200. 340. Tm
 (text-anchor auto,) Tj
 ET
 Q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.502 0.000 rg
 1. 0. 0. -1. 312.56591796875 360. Tm
 (absolute y) Tj
 ET
@@ -261,18 +296,21 @@ Q
 Q
 Q
 q
-0.000 0.502 0.000 rg
 q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.502 0.000 rg
 1. 0. 0. -1. 128.599853515625 380. Tm
 (text-anchor="middle",) Tj
 ET
 Q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.502 0.000 rg
 1. 0. 0. -1. 308.61083984375 400. Tm
 (absolute y) Tj
 ET
@@ -280,18 +318,21 @@ Q
 Q
 Q
 q
-0.000 0.502 0.000 rg
 q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.502 0.000 rg
 1. 0. 0. -1. 76.35986328125 420. Tm
 (text-anchor="end",) Tj
 ET
 Q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.502 0.000 rg
 1. 0. 0. -1. 255.26123046875 440. Tm
 (absolute y) Tj
 ET
@@ -299,39 +340,48 @@ Q
 Q
 Q
 q
-1.000 0.000 0.000 rg
 q
 q
 BT
+/F1 15 Tf
 17.25 TL
+1.000 0.000 0.000 rg
 0.7071067811865476 0.7071067811865475 0.7071067811865475 -0.7071067811865476 300. 460. Tm
 (rotated text) Tj
 ET
 Q
 q
 BT
+/F1 15 Tf
 17.25 TL
+1.000 0.000 0.000 rg
 0.7071067811865476 0.7071067811865475 0.7071067811865475 -0.7071067811865476 384.2952075648387336 544.2952075648387336 Tm
 (dx="40") Tj
 ET
 Q
 q
 BT
+/F1 15 Tf
 17.25 TL
+1.000 0.000 0.000 rg
 0.7071067811865476 0.7071067811865475 0.7071067811865475 -0.7071067811865476 413.3597821938834045 594.572985629479831 Tm
 (dy="1em") Tj
 ET
 Q
 q
 BT
+/F1 15 Tf
 17.25 TL
+1.000 0.000 0.000 rg
 0.7071067811865476 0.7071067811865475 0.7071067811865475 -0.7071067811865476 289.3933982822017583 470.6066017177981848 Tm
 (x="200") Tj
 ET
 Q
 q
 BT
+/F1 15 Tf
 17.25 TL
+1.000 0.000 0.000 rg
 0.7071067811865476 0.7071067811865475 0.7071067811865475 -0.7071067811865476 308.4400513994654034 525.0085938943891506 Tm
 (y="500") Tj
 ET
@@ -340,10 +390,11 @@ Q
 Q
 q
 q
-0.000 0.000 1.000 rg
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.000 1.000 rg
 1. 0. 0. -1. 102.03857421875 520. Tm
 (Inherited text-anchor \(middle\)) Tj
 ET
@@ -351,18 +402,21 @@ Q
 Q
 Q
 q
-0.000 0.502 0.000 rg
 q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.502 0.000 rg
 1. 0. 0. -1. 180. 560. Tm
 (x and dx) Tj
 ET
 Q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.502 0.000 rg
 1. 0. 0. -1. 236.7041015625 585. Tm
 (y and dy) Tj
 ET
@@ -370,18 +424,21 @@ Q
 Q
 Q
 q
-0.000 0.000 1.000 rg
 q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.000 1.000 rg
 1. 0. 0. -1. 200. 600. Tm
 (text-anchor auto,) Tj
 ET
 Q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.000 1.000 rg
 1. 0. 0. -1. 200. 620. Tm
 (absolute x) Tj
 ET
@@ -389,25 +446,30 @@ Q
 Q
 Q
 q
-0.000 0.000 1.000 rg
 q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.000 1.000 rg
 1. 0. 0. -1. 128.599853515625 640. Tm
 (text-anchor="middle",) Tj
 ET
 Q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.000 1.000 rg
 1. 0. 0. -1. 119.942626953125 660. Tm
 (absolute x) Tj
 ET
 Q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.000 1.000 rg
 1. 0. 0. -1. 192.489013671875 660. Tm
 (another span) Tj
 ET
@@ -415,18 +477,21 @@ Q
 Q
 Q
 q
-0.000 0.000 1.000 rg
 q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.000 1.000 rg
 1. 0. 0. -1. 76.35986328125 680. Tm
 (text-anchor="end",) Tj
 ET
 Q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.000 1.000 rg
 1. 0. 0. -1. 131.62109375 700. Tm
 (absolute x) Tj
 ET
@@ -434,21 +499,25 @@ Q
 Q
 Q
 q
-0.000 0.000 1.000 rg
 q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.000 1.000 rg
 1. 0. 0. -1. 200. 740. Tm
 (text-anchor="start",) Tj
 ET
 Q
 q
 BT
+/F1 15 Tf
 17.25 TL
+0.000 0.000 1.000 rg
 1. 0. 0. -1. 32.98583984375 740. Tm
 (absolute x, anchor="end") Tj
 ET
+Q
 Q
 Q
 Q
@@ -463,69 +532,142 @@ endobj
 >>
 endobj
 5 0 obj
-<</BaseFont/Helvetica/Type/Font
-/Encoding/WinAnsiEncoding
-/Subtype/Type1>>
+<<
+/Type /Font
+/BaseFont /Helvetica
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
 endobj
 6 0 obj
-<</BaseFont/Helvetica-Bold/Type/Font
-/Encoding/WinAnsiEncoding
-/Subtype/Type1>>
+<<
+/Type /Font
+/BaseFont /Helvetica-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
 endobj
 7 0 obj
-<</BaseFont/Helvetica-Oblique/Type/Font
-/Encoding/WinAnsiEncoding
-/Subtype/Type1>>
+<<
+/Type /Font
+/BaseFont /Helvetica-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
 endobj
 8 0 obj
-<</BaseFont/Helvetica-BoldOblique/Type/Font
-/Encoding/WinAnsiEncoding
-/Subtype/Type1>>
+<<
+/Type /Font
+/BaseFont /Helvetica-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
 endobj
 9 0 obj
-<</BaseFont/Courier/Type/Font
-/Encoding/WinAnsiEncoding
-/Subtype/Type1>>
+<<
+/Type /Font
+/BaseFont /Courier
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
 endobj
 10 0 obj
-<</BaseFont/Courier-Bold/Type/Font
-/Encoding/WinAnsiEncoding
-/Subtype/Type1>>
+<<
+/Type /Font
+/BaseFont /Courier-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
 endobj
 11 0 obj
-<</BaseFont/Courier-Oblique/Type/Font
-/Encoding/WinAnsiEncoding
-/Subtype/Type1>>
+<<
+/Type /Font
+/BaseFont /Courier-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
 endobj
 12 0 obj
-<</BaseFont/Courier-BoldOblique/Type/Font
-/Encoding/WinAnsiEncoding
-/Subtype/Type1>>
+<<
+/Type /Font
+/BaseFont /Courier-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
 endobj
 13 0 obj
-<</BaseFont/Times-Roman/Type/Font
-/Encoding/WinAnsiEncoding
-/Subtype/Type1>>
+<<
+/Type /Font
+/BaseFont /Times-Roman
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
 endobj
 14 0 obj
-<</BaseFont/Times-Bold/Type/Font
-/Encoding/WinAnsiEncoding
-/Subtype/Type1>>
+<<
+/Type /Font
+/BaseFont /Times-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
 endobj
 15 0 obj
-<</BaseFont/Times-Italic/Type/Font
-/Encoding/WinAnsiEncoding
-/Subtype/Type1>>
+<<
+/Type /Font
+/BaseFont /Times-Italic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
 endobj
 16 0 obj
-<</BaseFont/Times-BoldItalic/Type/Font
-/Encoding/WinAnsiEncoding
-/Subtype/Type1>>
+<<
+/Type /Font
+/BaseFont /Times-BoldItalic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
 endobj
 17 0 obj
-<</BaseFont/ZapfDingbats/Type/Font
-/Encoding/StandardEncoding
-/Subtype/Type1>>
+<<
+/Type /Font
+/BaseFont /ZapfDingbats
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+18 0 obj
+<<
+/Type /Font
+/BaseFont /Symbol
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
 endobj
 2 0 obj
 <<
@@ -544,6 +686,7 @@ endobj
 /F11 15 0 R
 /F12 16 0 R
 /F13 17 0 R
+/F14 18 0 R
 >>
 /Shading <<
 >>
@@ -555,13 +698,13 @@ endobj
 >>
 >>
 endobj
-18 0 obj
+19 0 obj
 <<
-/Producer (jsPDF 1.3.2)
+/Producer (jsPDF 0.0.0)
 /CreationDate (D:19871210000000+00'00')
 >>
 endobj
-19 0 obj
+20 0 obj
 <<
 /Type /Catalog
 /Pages 1 0 R
@@ -570,33 +713,35 @@ endobj
 >>
 endobj
 xref
-0 20
+0 21
 0000000000 65535 f 
-0000004664 00000 n 
-0000005958 00000 n 
-0000000009 00000 n 
-0000000114 00000 n 
-0000004721 00000 n 
-0000004811 00000 n 
-0000004906 00000 n 
-0000005004 00000 n 
-0000005106 00000 n 
-0000005194 00000 n 
-0000005288 00000 n 
-0000005385 00000 n 
-0000005486 00000 n 
-0000005579 00000 n 
-0000005671 00000 n 
-0000005765 00000 n 
-0000005863 00000 n 
-0000006241 00000 n 
-0000006366 00000 n 
+0000005565 00000 n 
+0000007382 00000 n 
+0000000015 00000 n 
+0000000120 00000 n 
+0000005622 00000 n 
+0000005747 00000 n 
+0000005877 00000 n 
+0000006010 00000 n 
+0000006147 00000 n 
+0000006270 00000 n 
+0000006399 00000 n 
+0000006531 00000 n 
+0000006667 00000 n 
+0000006795 00000 n 
+0000006922 00000 n 
+0000007051 00000 n 
+0000007184 00000 n 
+0000007286 00000 n 
+0000007677 00000 n 
+0000007763 00000 n 
 trailer
 <<
-/Size 20
-/Root 19 0 R
-/Info 18 0 R
+/Size 21
+/Root 20 0 R
+/Info 19 0 R
+/ID [ <60C4D3E7F81E71C6FA95971E6414E4FB> <60C4D3E7F81E71C6FA95971E6414E4FB> ]
 >>
 startxref
-6470
+7867
 %%EOF
