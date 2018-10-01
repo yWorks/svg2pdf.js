@@ -2145,32 +2145,26 @@ SOFTWARE.
         xOffset = options.xOffset || 0.0,
         yOffset = options.yOffset || 0.0;
 
-    var apiMode = _pdf.getApiMode();
-    var toggleApiMode = apiMode !== "transforms";
-    if (toggleApiMode) {
-      _pdf.setApiMode("transforms");
-    }
+    _pdf.advancedAPI(function () {
 
-    // set offsets and scale everything by k
-    _pdf.saveGraphicsState();
-    _pdf.setCurrentTransformationMatrix(new _pdf.Matrix(k, 0, 0, k, xOffset, yOffset));
+      // set offsets and scale everything by k
+      _pdf.saveGraphicsState();
+      _pdf.setCurrentTransformationMatrix(new _pdf.Matrix(k, 0, 0, k, xOffset, yOffset));
 
-    // set default values that differ from pdf defaults
-    var attributeState = AttributeState.default();
-    _pdf.setLineWidth(attributeState.strokeWidth);
-    var fill = attributeState.fill;
-    _pdf.setFillColor(fill.r, fill.g, fill.b);
-    _pdf.setFont(attributeState.fontFamily);
-    _pdf.setFontSize(attributeState.fontSize);
+      // set default values that differ from pdf defaults
+      var attributeState = AttributeState.default();
+      _pdf.setLineWidth(attributeState.strokeWidth);
+      var fill = attributeState.fill;
+      _pdf.setFillColor(fill.r, fill.g, fill.b);
+      _pdf.setFont(attributeState.fontFamily);
+      _pdf.setFontSize(attributeState.fontSize);
 
-    // start rendering
-    renderNode(element.cloneNode(true), _pdf.unitMatrix, {}, new SvgPrefix(""), false, false, attributeState);
+      // start rendering
+      renderNode(element.cloneNode(true), _pdf.unitMatrix, {}, new SvgPrefix(""), false, false, attributeState);
 
-    _pdf.restoreGraphicsState();
+      _pdf.restoreGraphicsState();
 
-    if (toggleApiMode) {
-      _pdf.setApiMode(apiMode);
-    }
+    });
 
     return _pdf;
   };
