@@ -1,4 +1,5 @@
 %PDF-1.3
+%ºß¬à
 3 0 obj
 <</Type /Page
 /Parent 1 0 R
@@ -8,16 +9,17 @@
 >>
 endobj
 4 0 obj
-<</Length 11537>>
+<</Length 11497>>
 stream
-1. 0. 0. -1. 0. 406. cm
-/F1 16 Tf
 0.200025 w
 0 G
 q
+1. 0. 0. -1. 0. 406. cm
+/F1 16 Tf
+q
 1. 0. 0. 1. 0. 0. cm
 1.00 w
-0.00 0.00 0.00 rg
+0.00 g
 /F9 16 Tf
 /F9 16 Tf
 q
@@ -27,7 +29,7 @@ q
 q
 q
 1.00 w
-0.00 0.00 0.00 RG
+0.00 G
 0 J
 0 j
 10. M
@@ -50,7 +52,7 @@ Q
 q
 q
 1.00 w
-0.00 0.00 0.00 RG
+0.00 G
 0 J
 0 j
 10. M
@@ -69,7 +71,7 @@ Q
 q
 q
 1.00 w
-0.00 0.00 0.00 RG
+0.00 G
 0 J
 0 j
 10. M
@@ -92,7 +94,7 @@ Q
 q
 q
 1.00 w
-0.00 0.00 0.00 RG
+0.00 G
 0 J
 0 j
 10. M
@@ -111,7 +113,7 @@ Q
 q
 q
 1.00 w
-0.00 0.00 0.00 RG
+0.00 G
 0 J
 0 j
 10. M
@@ -130,7 +132,7 @@ Q
 q
 q
 1.00 w
-0.00 0.00 0.00 RG
+0.00 G
 0 J
 0 j
 10. M
@@ -149,7 +151,7 @@ Q
 q
 q
 1.00 w
-0.00 0.00 0.00 RG
+0.00 G
 0 J
 0 j
 10. M
@@ -168,7 +170,7 @@ Q
 q
 q
 1.00 w
-0.00 0.00 0.00 RG
+0.00 G
 0 J
 0 j
 10. M
@@ -195,7 +197,7 @@ Q
 q
 q
 1.00 w
-0.00 0.00 0.00 RG
+0.00 G
 0 J
 0 j
 10. M
@@ -218,7 +220,7 @@ Q
 q
 q
 1.00 w
-0.00 0.00 0.00 RG
+0.00 G
 0 J
 0 j
 10. M
@@ -237,7 +239,7 @@ Q
 q
 q
 1.00 w
-0.00 0.00 0.00 RG
+0.00 G
 0 J
 0 j
 10. M
@@ -260,7 +262,7 @@ Q
 q
 q
 1.00 w
-0.00 0.00 0.00 RG
+0.00 G
 0 J
 0 j
 10. M
@@ -279,7 +281,7 @@ Q
 q
 q
 1.00 w
-0.00 0.00 0.00 RG
+0.00 G
 0 J
 0 j
 10. M
@@ -306,7 +308,7 @@ Q
 q
 q
 1.00 w
-0.00 0.00 0.00 RG
+0.00 G
 0 J
 0 j
 10. M
@@ -325,7 +327,7 @@ Q
 q
 q
 1.00 w
-0.00 0.00 0.00 RG
+0.00 G
 0 J
 0 j
 10. M
@@ -344,7 +346,7 @@ Q
 q
 q
 1.00 w
-0.00 0.00 0.00 RG
+0.00 G
 0 J
 0 j
 10. M
@@ -367,7 +369,7 @@ Q
 q
 q
 1.00 w
-0.00 0.00 0.00 RG
+0.00 G
 0 J
 0 j
 10. M
@@ -386,7 +388,7 @@ Q
 q
 q
 1.00 w
-0.00 0.00 0.00 RG
+0.00 G
 0 J
 0 j
 10. M
@@ -499,11 +501,12 @@ Q
 q
 q
 /F1 16 Tf
-0.000 g
 /F1 10 Tf
 q
 BT
-11.5 TL
+/F1 10 Tf
+11.50 TL
+0.000 g
 1. 0. 0. -1. 0. 234.8531746031746934 Tm
 (The Prestige) Tj
 ET
@@ -513,11 +516,12 @@ Q
 q
 q
 /F1 16 Tf
-0.000 g
 /F1 10 Tf
 q
 BT
-11.5 TL
+/F1 10 Tf
+11.50 TL
+0.000 g
 1. 0. 0. -1. 118.0483134920634853 405.7797619047619833 Tm
 (The Illusionist) Tj
 ET
@@ -527,11 +531,12 @@ Q
 q
 q
 /F1 16 Tf
-0.000 g
 /F1 10 Tf
 q
 BT
-11.5 TL
+/F1 10 Tf
+11.50 TL
+0.000 g
 1. 0. 0. -1. 122.0483134920634853 234.8531746031746934 Tm
 (High Speed) Tj
 ET
@@ -541,11 +546,12 @@ Q
 q
 q
 /F1 16 Tf
-0.000 g
 /F1 10 Tf
 q
 BT
-11.5 TL
+/F1 10 Tf
+11.50 TL
+0.000 g
 1. 0. 0. -1. 102.0483134920634853 93.4265873015874035 Tm
 (Memoirs of a Geisha) Tj
 ET
@@ -555,11 +561,12 @@ Q
 q
 q
 /F1 16 Tf
-0.000 g
 /F1 10 Tf
 q
 BT
-11.5 TL
+/F1 10 Tf
+11.50 TL
+0.000 g
 1. 0. 0. -1. 233.548313492063528 93.4265873015874035 Tm
 (Starship Troopers) Tj
 ET
@@ -569,11 +576,12 @@ Q
 q
 q
 /F1 16 Tf
-0.000 g
 /F1 10 Tf
 q
 BT
-11.5 TL
+/F1 10 Tf
+11.50 TL
+0.000 g
 1. 0. 0. -1. 360.8466269841269991 107.9265873015874035 Tm
 (Serenity) Tj
 ET
@@ -583,11 +591,12 @@ Q
 q
 q
 /F1 16 Tf
-0.000 g
 /F1 10 Tf
 q
 BT
-11.5 TL
+/F1 10 Tf
+11.50 TL
+0.000 g
 1. 0. 0. -1. 453.9966269841269764 73.7132936507937302 Tm
 (Future Wars) Tj
 ET
@@ -597,11 +606,12 @@ Q
 q
 q
 /F1 16 Tf
-0.000 g
 /F1 10 Tf
 q
 BT
-11.5 TL
+/F1 10 Tf
+11.50 TL
+0.000 g
 1. 0. 0. -1. 236.048313492063528 405.7797619047619833 Tm
 (The Sixth Sense) Tj
 ET
@@ -611,11 +621,12 @@ Q
 q
 q
 /F1 16 Tf
-0.000 g
 /F1 10 Tf
 q
 BT
-11.5 TL
+/F1 10 Tf
+11.50 TL
+0.000 g
 1. 0. 0. -1. 242.548313492063528 234.8531746031746934 Tm
 (The Departed) Tj
 ET
@@ -625,11 +636,12 @@ Q
 q
 q
 /F1 16 Tf
-0.000 g
 /F1 10 Tf
 q
 BT
-11.5 TL
+/F1 10 Tf
+11.50 TL
+0.000 g
 1. 0. 0. -1. 362.3466269841269991 346.7797619047619833 Tm
 (Sin City) Tj
 ET
@@ -639,11 +651,12 @@ Q
 q
 q
 /F1 16 Tf
-0.000 g
 /F1 10 Tf
 q
 BT
-11.5 TL
+/F1 10 Tf
+11.50 TL
+0.000 g
 1. 0. 0. -1. 350.3466269841269991 234.8531746031746934 Tm
 (Carlito's Way) Tj
 ET
@@ -653,11 +666,12 @@ Q
 q
 q
 /F1 16 Tf
-0.000 g
 /F1 10 Tf
 q
 BT
-11.5 TL
+/F1 10 Tf
+11.50 TL
+0.000 g
 1. 0. 0. -1. 636.1466269841271242 234.8531746031746934 Tm
 (Cidade de Deus) Tj
 ET
@@ -667,11 +681,12 @@ Q
 q
 q
 /F1 16 Tf
-0.000 g
 /F1 10 Tf
 q
 BT
-11.5 TL
+/F1 10 Tf
+11.50 TL
+0.000 g
 1. 0. 0. -1. 450.9966269841269764 346.7797619047619833 Tm
 (Kill Bill: Vol. 1) Tj
 ET
@@ -681,11 +696,12 @@ Q
 q
 q
 /F1 16 Tf
-0.000 g
 /F1 10 Tf
 q
 BT
-11.5 TL
+/F1 10 Tf
+11.50 TL
+0.000 g
 1. 0. 0. -1. 544.4966269841270332 346.7797619047619833 Tm
 (Pulp Fiction) Tj
 ET
@@ -695,14 +711,16 @@ Q
 q
 q
 /F1 16 Tf
-0.000 g
 /F1 10 Tf
 q
 BT
-11.5 TL
+/F1 10 Tf
+11.50 TL
+0.000 g
 1. 0. 0. -1. 627.1466269841271242 391.2797619047619833 Tm
 (The Usual Suspects) Tj
 ET
+Q
 Q
 Q
 Q
@@ -718,86 +736,158 @@ endobj
 >>
 endobj
 5 0 obj
-<</BaseFont/Helvetica/Type/Font
-/Encoding/WinAnsiEncoding
-/Subtype/Type1>>
+<<
+/Type /Font
+/BaseFont /Helvetica
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
 endobj
 6 0 obj
-<</BaseFont/Helvetica-Bold/Type/Font
-/Encoding/WinAnsiEncoding
-/Subtype/Type1>>
+<<
+/Type /Font
+/BaseFont /Helvetica-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
 endobj
 7 0 obj
-<</BaseFont/Helvetica-Oblique/Type/Font
-/Encoding/WinAnsiEncoding
-/Subtype/Type1>>
+<<
+/Type /Font
+/BaseFont /Helvetica-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
 endobj
 8 0 obj
-<</BaseFont/Helvetica-BoldOblique/Type/Font
-/Encoding/WinAnsiEncoding
-/Subtype/Type1>>
+<<
+/Type /Font
+/BaseFont /Helvetica-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
 endobj
 9 0 obj
-<</BaseFont/Courier/Type/Font
-/Encoding/WinAnsiEncoding
-/Subtype/Type1>>
+<<
+/Type /Font
+/BaseFont /Courier
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
 endobj
 10 0 obj
-<</BaseFont/Courier-Bold/Type/Font
-/Encoding/WinAnsiEncoding
-/Subtype/Type1>>
+<<
+/Type /Font
+/BaseFont /Courier-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
 endobj
 11 0 obj
-<</BaseFont/Courier-Oblique/Type/Font
-/Encoding/WinAnsiEncoding
-/Subtype/Type1>>
+<<
+/Type /Font
+/BaseFont /Courier-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
 endobj
 12 0 obj
-<</BaseFont/Courier-BoldOblique/Type/Font
-/Encoding/WinAnsiEncoding
-/Subtype/Type1>>
+<<
+/Type /Font
+/BaseFont /Courier-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
 endobj
 13 0 obj
-<</BaseFont/Times-Roman/Type/Font
-/Encoding/WinAnsiEncoding
-/Subtype/Type1>>
+<<
+/Type /Font
+/BaseFont /Times-Roman
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
 endobj
 14 0 obj
-<</BaseFont/Times-Bold/Type/Font
-/Encoding/WinAnsiEncoding
-/Subtype/Type1>>
+<<
+/Type /Font
+/BaseFont /Times-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
 endobj
 15 0 obj
-<</BaseFont/Times-Italic/Type/Font
-/Encoding/WinAnsiEncoding
-/Subtype/Type1>>
+<<
+/Type /Font
+/BaseFont /Times-Italic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
 endobj
 16 0 obj
-<</BaseFont/Times-BoldItalic/Type/Font
-/Encoding/WinAnsiEncoding
-/Subtype/Type1>>
+<<
+/Type /Font
+/BaseFont /Times-BoldItalic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
 endobj
 17 0 obj
-<</BaseFont/ZapfDingbats/Type/Font
-/Encoding/StandardEncoding
-/Subtype/Type1>>
+<<
+/Type /Font
+/BaseFont /ZapfDingbats
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
 endobj
 18 0 obj
+<<
+/Type /Font
+/BaseFont /Symbol
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+19 0 obj
 <<
 /Type /XObject
 /Subtype /Form
 /BBox [-1.9318516525781368 -6.9318516525781373 11.9318516525781373 6.9318516525781373]
 /Matrix [1. 0. 0. 1. 0. 0.]
-/Length 124
+/Length 94
 >>
 stream
-0.00 0.00 0.00 rg
+0.00 g
 1.00 w
-0.00 0.00 0.00 RG
+0.00 G
 0 J
 0 j
 10. M
-0.000 g
 1. 0. 0. 1. 0. 0. cm
 0. 0. m
 10. -5. l
@@ -807,13 +897,13 @@ h
 B
 endstream
 endobj
-19 0 obj
+20 0 obj
 <<
 /Type /XObject
 /Subtype /Form
 /BBox [0. 0. 48. 48.]
 /Matrix [1. 0. 0. 1. 0. 0.]
-/Length 4881
+/Length 4811
 >>
 stream
 q
@@ -826,7 +916,7 @@ Q
 Q
 q
 0.50 w
-0.00 0.00 0.00 RG
+0.00 G
 1. 0. 0. 1. 0. 0. cm
 41.1340000000000003 41.25 m
 41.1340000000000003 42.3500000000000014 40.2349999999999994 43.25 39.1340000000000003 43.25 c
@@ -846,9 +936,9 @@ Q
 Q
 q
 0.50 w
-0.00 0.00 0.00 RG
+0.00 G
 1. 0. 0. 1. 0. 0. cm
-4.6059999999999999 18.6670000000000016 m 
+4.6059999999999999 18.6670000000000016 m
 43.2190000000000012 18.6670000000000016 l
 43.2190000000000012 18.6670000000000016 43.2190000000000012 18.6670000000000016 43.2190000000000012 18.6670000000000016 c
 43.2190000000000012 22.328000000000003 l
@@ -929,7 +1019,7 @@ f
 Q
 q
 0.50 w
-0.00 0.00 0.00 RG
+0.00 G
 1. 0. 0. 1. 0. 0. cm
 42.4799999999999969 10.9269999999999996 m
 4.6109999999999998 18.4639999999999986 l
@@ -1007,31 +1097,31 @@ f
 Q
 q
 2.50 w
-0.86 0.86 0.86 RG
+0.86 G
 1. 0. 0. 1. 0. 0. cm
-10.6370000000000005 26.5940000000000012 m 
+10.6370000000000005 26.5940000000000012 m
 22.7340000000000018 26.5940000000000012 l
 S
 Q
 q
 2.50 w
-0.86 0.86 0.86 RG
+0.86 G
 1. 0. 0. 1. 0. 0. cm
-10.6370000000000005 32.402000000000001 m 
+10.6370000000000005 32.402000000000001 m
 37.3049999999999997 32.402000000000001 l
 S
 Q
 q
 2.50 w
-0.86 0.86 0.86 RG
+0.86 G
 1. 0. 0. 1. 0. 0. cm
-10.6370000000000005 38.213000000000001 m 
+10.6370000000000005 38.213000000000001 m
 37.3629999999999995 38.213000000000001 l
 S
 Q
 endstream
 endobj
-20 0 obj
+21 0 obj
 << /FunctionType 0
 /Domain [0.0 1.0]
 /Size [21]
@@ -1045,15 +1135,15 @@ stream
 0000000808081010101818181f1f1f2727272f2f2f3737373f3f3f4747474f4f4f5656565e5e5e6666666e6e6e7676767e7e7e8585857d7d7d606060424242
 endstream
 endobj
-21 0 obj
+22 0 obj
 << /ShadingType 2
 /ColorSpace /DeviceRGB
 /Coords [225.8613 590.7772999999999683 225.8613 566.9873000000000047]
-/Function 20 0 R
+/Function 21 0 R
 /Extend [true true]
 >>
 endobj
-22 0 obj
+23 0 obj
 << /FunctionType 0
 /Domain [0.0 1.0]
 /Size [21]
@@ -1067,15 +1157,15 @@ stream
 fffffffcfcfcf9f9faf6f6f7f3f3f4f0f0f2ededefeaeaece7e7e9e4e4e7e2e2e4dfdfe1dcdcdfd9d9dcd6d6d9d3d3d7d0d0d4cdcdd1cacacec7c7ccc4c4c9
 endstream
 endobj
-23 0 obj
+24 0 obj
 << /ShadingType 2
 /ColorSpace /DeviceRGB
 /Coords [428. 1109.5507999999999811 428. 1114.626700000000028]
-/Function 22 0 R
+/Function 23 0 R
 /Extend [true true]
 >>
 endobj
-24 0 obj
+25 0 obj
 << /FunctionType 0
 /Domain [0.0 1.0]
 /Size [21]
@@ -1089,11 +1179,11 @@ stream
 fffffffefefefcfcfcfbfbfbf9f9f9f7f7f7f4f4f5f1f1f2eeeef0ebebede9e9ebe6e6e8e2e2e6dfdfe2dbdbded7d7dbd3d3d7cfcfd4ccccd0c8c8cdc4c4c9
 endstream
 endobj
-25 0 obj
+26 0 obj
 << /ShadingType 2
 /ColorSpace /DeviceRGB
 /Coords [-1767.9546000000000276 1318.5507999999999811 -1767.9546000000000276 1323.4954999999999927]
-/Function 24 0 R
+/Function 25 0 R
 /Extend [true true]
 >>
 endobj
@@ -1114,29 +1204,30 @@ endobj
 /F11 15 0 R
 /F12 16 0 R
 /F13 17 0 R
+/F14 18 0 R
 >>
 /Shading <<
-/Sh1 21 0 R
-/Sh2 23 0 R
-/Sh3 25 0 R
+/Sh1 22 0 R
+/Sh2 24 0 R
+/Sh3 26 0 R
 >>
 /Pattern <<
 >>
 /ExtGState <<
 >>
 /XObject <<
-/Xo1 18 0 R
-/Xo2 19 0 R
+/Xo1 19 0 R
+/Xo2 20 0 R
 >>
->>
-endobj
-26 0 obj
-<<
-/Producer (jsPDF 1.3.2)
-/CreationDate (D:19871210000000+00'00')
 >>
 endobj
 27 0 obj
+<<
+/Producer (jsPDF 0.0.0)
+/CreationDate (D:19871210000000+00'00')
+>>
+endobj
+28 0 obj
 <<
 /Type /Catalog
 /Pages 1 0 R
@@ -1145,41 +1236,43 @@ endobj
 >>
 endobj
 xref
-0 28
+0 29
 0000000000 65535 f 
-0000011702 00000 n 
-0000019848 00000 n 
-0000000009 00000 n 
-0000000114 00000 n 
-0000011759 00000 n 
-0000011849 00000 n 
-0000011944 00000 n 
-0000012042 00000 n 
-0000012144 00000 n 
-0000012232 00000 n 
-0000012326 00000 n 
-0000012423 00000 n 
-0000012524 00000 n 
-0000012617 00000 n 
-0000012709 00000 n 
-0000012803 00000 n 
-0000012901 00000 n 
-0000012996 00000 n 
-0000013317 00000 n 
-0000018331 00000 n 
-0000018662 00000 n 
-0000018829 00000 n 
-0000019160 00000 n 
-0000019320 00000 n 
-0000019651 00000 n 
-0000020191 00000 n 
-0000020316 00000 n 
+0000011668 00000 n 
+0000020236 00000 n 
+0000000015 00000 n 
+0000000120 00000 n 
+0000011725 00000 n 
+0000011850 00000 n 
+0000011980 00000 n 
+0000012113 00000 n 
+0000012250 00000 n 
+0000012373 00000 n 
+0000012502 00000 n 
+0000012634 00000 n 
+0000012770 00000 n 
+0000012898 00000 n 
+0000013025 00000 n 
+0000013154 00000 n 
+0000013287 00000 n 
+0000013389 00000 n 
+0000013485 00000 n 
+0000013775 00000 n 
+0000018719 00000 n 
+0000019050 00000 n 
+0000019217 00000 n 
+0000019548 00000 n 
+0000019708 00000 n 
+0000020039 00000 n 
+0000020591 00000 n 
+0000020677 00000 n 
 trailer
 <<
-/Size 28
-/Root 27 0 R
-/Info 26 0 R
+/Size 29
+/Root 28 0 R
+/Info 27 0 R
+/ID [ <00000000000000000000000000000000> <00000000000000000000000000000000> ]
 >>
 startxref
-20420
+20781
 %%EOF
