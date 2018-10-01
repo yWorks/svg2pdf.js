@@ -6,7 +6,7 @@
  *   license: MIT (http://opensource.org/licenses/MIT)
  *   author: yFiles for HTML Support Team <yfileshtml@yworks.com>
  *   homepage: https://github.com/yWorks/svg2pdf.js#readme
- *   version: 1.2.1
+ *   version: 1.3.0
  *
  * font-family:
  *   license: MIT (http://opensource.org/licenses/MIT)
@@ -2038,7 +2038,7 @@ SOFTWARE.
   var iriReference = /url\(["']?#([^"']+)["']?\)/;
 
   // groups: 1: mime-type (+ charset), 2: mime-type (w/o charset), 3: charset, 4: base64?, 5: body
-  var dataUrlRegex = /^\s*data:(([^/,;]+\/[^/,;]+)(?:;([^,;=]+=[^,;=]+))?)?(?:;(base64))?,([a-z0-9!$&',()*+;=\-._~:@\/?%\s]*\s*)$/i;
+  var dataUrlRegex = /^\s*data:(([^/,;]+\/[^/,;]+)(?:;([^,;=]+=[^,;=]+))?)?(?:;(base64))?,(.*\s*)$/i;
 
   var svgNamespaceURI = "http://www.w3.org/2000/svg";
 
@@ -2221,9 +2221,6 @@ SOFTWARE.
   };
 
   var AttributeState = function () {
-    this.fillMode = null;
-    this.strokeMode = null;
-
     this.color = null;
     this.fill = null;
     this.fillOpacity = 1.0;
@@ -2250,10 +2247,6 @@ SOFTWARE.
   AttributeState.default = function () {
     var attributeState = new AttributeState();
 
-    attributeState.fillMode = "F";
-    attributeState.strokeMode = "";
-
-    attributeState.color = new RGBColor("rgb(0, 0, 0)");
     attributeState.fill = new RGBColor("rgb(0, 0, 0)");
     attributeState.fillOpacity = 1.0;
     // attributeState.fillRule = "nonzero";
@@ -2281,10 +2274,6 @@ SOFTWARE.
   AttributeState.prototype.clone = function () {
     var clone = new AttributeState();
 
-    clone.fillMode = this.fillMode;
-    clone.strokeMode = this.strokeMode;
-
-    clone.color = this.color;
     clone.fill = this.fill;
     clone.fillOpacity = this.fillOpacity;
     // clone.fillRule = this.fillRule;
@@ -2369,7 +2358,7 @@ SOFTWARE.
 
   // replace any newline characters by space and trim
   var removeNewlinesAndTrim = function (str) {
-    return str.replace(/[\n\s\r]+/, " ").trim();
+    return str.replace(/[\n\s\r]+/g, " ").trim();
   };
 
   // clones the defs object (or basically any object)
@@ -2396,6 +2385,10 @@ SOFTWARE.
     var preserveAspectRatio = node.getAttribute("preserveAspectRatio");
     if (preserveAspectRatio) {
       var alignAndMeetOrSlice = preserveAspectRatio.split(" ");
+      if (alignAndMeetOrSlice[0] === "defer") {
+        alignAndMeetOrSlice = alignAndMeetOrSlice.slice(1);
+      }
+
       align = alignAndMeetOrSlice[0];
       meetOrSlice = alignAndMeetOrSlice[1] || "meet";
     } else {
@@ -2598,7 +2591,7 @@ SOFTWARE.
     var i, minX, minY, maxX, maxY, viewBox, vb, boundingBox;
     var pf = parseFloat;
 
-    if (nodeIs(node, "polygon")) {
+    if (nodeIs(node, "polygon,polyline")) {
       var points = parsePointsString(node.getAttribute("points"));
       minX = Number.POSITIVE_INFINITY;
       minY = Number.POSITIVE_INFINITY;
@@ -2735,7 +2728,7 @@ SOFTWARE.
         pf(node.getAttribute("width")) || (vb && vb[2]) || 0,
         pf(node.getAttribute("height")) || (vb && vb[3]) || 0
       ];
-    } else if (nodeIs(node, "g")) {
+    } else if (nodeIs(node, "g,clippath")) {
       boundingBox = [0, 0, 0, 0];
       forEachChild(node, function (i, node) {
         var nodeBox = getUntransformedBBox(node);
@@ -2816,15 +2809,23 @@ SOFTWARE.
   };
 
   // draws a polygon
-  var polygon = function (node, colorMode, gradient, gradientMatrix, svgIdPrefix, attributeState) {
+  var polygon = function (node, svgIdPrefix, attributeState, closed) {
+    if (!node.hasAttribute("points") || node.getAttribute("points") === "") {
+      return;
+    }
+
     var points = parsePointsString(node.getAttribute("points"));
     var lines = [{op: "m", c: points[0]}];
     var i, angle;
     for (i = 1; i < points.length; i++) {
       lines.push({op: "l", c: points[i]});
     }
-    lines.push({op: "h"});
-    _pdf.path(lines, colorMode, gradient, gradientMatrix);
+
+    if (closed) {
+      lines.push({op: "h"});
+    }
+
+    _pdf.path(lines);
 
     var markerEnd = node.getAttribute("marker-end"),
         markerStart = node.getAttribute("marker-start"),
@@ -2866,6 +2867,12 @@ SOFTWARE.
 
   // draws an image
   var image = function (node, svgIdPrefix) {
+    var width = parseFloat(node.getAttribute("width")),
+        height = parseFloat(node.getAttribute("height")),
+        x = parseFloat(node.getAttribute("x") || 0),
+        y = parseFloat(node.getAttribute("y") || 0);
+
+
     var imageUrl = node.getAttribute("xlink:href") || node.getAttribute("href");
 
     var dataUrl = imageUrl.match(dataUrlRegex);
@@ -2874,19 +2881,28 @@ SOFTWARE.
       if (dataUrl[4] === "base64") {
         svgText = atob(svgText);
       } else {
-        svgText = decodeURI(svgText);
+        svgText = decodeURIComponent(svgText);
       }
 
       var parser = new DOMParser();
       var svgElement = parser.parseFromString(svgText, "image/svg+xml").firstElementChild;
-      renderNode(svgElement, _pdf.unitMatrix, {}, svgIdPrefix, false, AttributeState.default());
+
+      // unless preserveAspectRatio starts with "defer", the preserveAspectRatio attribute of the svg is ignored
+      var preserveAspectRatio = node.getAttribute("preserveAspectRatio");
+      if (!preserveAspectRatio
+          || preserveAspectRatio.indexOf("defer") < 0
+          || !svgElement.getAttribute("preserveAspectRatio")) {
+        svgElement.setAttribute("preserveAspectRatio", preserveAspectRatio);
+      }
+
+      svgElement.setAttribute("x", String(x));
+      svgElement.setAttribute("y", String(y));
+      svgElement.setAttribute("width", String(width));
+      svgElement.setAttribute("height", String(height));
+
+      renderNode(svgElement, _pdf.unitMatrix, {}, svgIdPrefix, false, false, AttributeState.default());
       return;
     }
-
-    var width = parseFloat(node.getAttribute("width")),
-        height = parseFloat(node.getAttribute("height")),
-        x = parseFloat(node.getAttribute("x") || 0),
-        y = parseFloat(node.getAttribute("y") || 0);
 
     try {
       _pdf.addImage(
@@ -2905,7 +2921,7 @@ SOFTWARE.
   };
 
   // draws a path
-  var path = function (node, svgIdPrefix, colorMode, gradient, gradientMatrix, attributeState) {
+  var path = function (node, tfMatrix, svgIdPrefix, withinClipPath, attributeState) {
     var list = getPathSegList(node);
     var markerEnd = node.getAttribute("marker-end"),
         markerStart = node.getAttribute("marker-start"),
@@ -3050,6 +3066,13 @@ SOFTWARE.
 
           prevX = x;
           prevY = y;
+
+          if (withinClipPath) {
+            p2 = multVecMatrix(p2, tfMatrix);
+            p3 = multVecMatrix(p3, tfMatrix);
+            to = multVecMatrix(to, tfMatrix);
+          }
+
           lines.push({
             op: "c", c: [
               p2[0], p2[1],
@@ -3068,6 +3091,10 @@ SOFTWARE.
             markers.addMarker(new Marker(markerMid, [x, y], Math.atan2(angle[1], angle[0])));
           }
           prevAngle = curAngle;
+
+          if (withinClipPath) {
+            to = multVecMatrix(to, tfMatrix);
+          }
 
           lines.push({op: op, c: to});
         }
@@ -3089,7 +3116,7 @@ SOFTWARE.
     var lines = getLinesFromPath();
 
     if (lines.lines.length > 0) {
-      _pdf.path(lines.lines, colorMode, gradient, gradientMatrix);
+      _pdf.path(lines.lines);
     }
 
     if (markerEnd || markerStart || markerMid) {
@@ -3123,7 +3150,7 @@ SOFTWARE.
     var p1 = [parseFloat(node.getAttribute('x1') || 0), parseFloat(node.getAttribute('y1') || 0)];
     var p2 = [parseFloat(node.getAttribute('x2') || 0), parseFloat(node.getAttribute('y2') || 0)];
 
-    if (attributeState.strokeMode === "D"){
+    if (attributeState.stroke !== null){
       _pdf.line(p1[0], p1[1], p2[0], p2[1]);
     }
 
@@ -3144,44 +3171,35 @@ SOFTWARE.
   };
 
   // draws a rect
-  var rect = function (node, colorMode, gradient, gradientMatrix) {
+  var rect = function (node) {
     _pdf.roundedRect(
         parseFloat(node.getAttribute('x')) || 0,
         parseFloat(node.getAttribute('y')) || 0,
         parseFloat(node.getAttribute('width')),
         parseFloat(node.getAttribute('height')),
         parseFloat(node.getAttribute('rx')) || 0,
-        parseFloat(node.getAttribute('ry')) || 0,
-        colorMode,
-        gradient,
-        gradientMatrix
+        parseFloat(node.getAttribute('ry')) || 0
     );
   };
 
   // draws an ellipse
-  var ellipse = function (node, colorMode, gradient, gradientMatrix) {
+  var ellipse = function (node) {
     _pdf.ellipse(
         parseFloat(node.getAttribute('cx')) || 0,
         parseFloat(node.getAttribute('cy')) || 0,
         parseFloat(node.getAttribute('rx')),
-        parseFloat(node.getAttribute('ry')),
-        colorMode,
-        gradient,
-        gradientMatrix
+        parseFloat(node.getAttribute('ry'))
     );
   };
 
   // draws a circle
-  var circle = function (node, colorMode, gradient, gradientMatrix) {
+  var circle = function (node) {
     var radius = parseFloat(node.getAttribute('r')) || 0;
     _pdf.ellipse(
         parseFloat(node.getAttribute('cx')) || 0,
         parseFloat(node.getAttribute('cy')) || 0,
         radius,
-        radius,
-        colorMode,
-        gradient,
-        gradientMatrix
+        radius
     );
   };
 
@@ -3366,9 +3384,14 @@ SOFTWARE.
       xs[i] = x;
       ys[i] = y;
 
+      currentTextX = x + measureTextWidth(this.texts[i], tSpanAttributeState);
+
       // add an additional "." (which has approximately the same size as a space character) in order to put
       // some space between the tSpans (I can't find this in the spec but all browsers do it)
-      currentTextX = x + measureTextWidth(this.texts[i], tSpanAttributeState) + measureTextWidth(".", tSpanAttributeState);
+      if (i < this.tSpans.length - 1) {
+        currentTextX += measureTextWidth(".", tSpanAttributeState);
+      }
+
       currentTextY = y;
 
       minX = Math.min(minX, x);
@@ -3500,7 +3523,7 @@ SOFTWARE.
   var findAndRenderDefs = function (node, tfMatrix, defs, svgIdPrefix, withinDefs, attributeState) {
     forEachChild(node, function (i, child) {
       if (child.tagName.toLowerCase() === "defs") {
-        renderNode(child, tfMatrix, defs, svgIdPrefix, withinDefs, attributeState);
+        renderNode(child, tfMatrix, defs, svgIdPrefix, withinDefs, false, attributeState);
         // prevent defs from being evaluated twice // TODO: make this better
         child.parentNode.removeChild(child);
       }
@@ -3513,13 +3536,13 @@ SOFTWARE.
     var newSvgIdPrefix = svgIdPrefix.nextChild();
     var newDefs = cloneDefs(defs);
     findAndRenderDefs(node, tfMatrix, newDefs, newSvgIdPrefix, withinDefs, attributeState);
-    renderChildren(node, tfMatrix, newDefs, newSvgIdPrefix, withinDefs, attributeState);
+    renderChildren(node, tfMatrix, newDefs, newSvgIdPrefix, withinDefs, false, attributeState);
   };
 
   // renders all children of a node
-  var renderChildren = function (node, tfMatrix, defs, svgIdPrefix, withinDefs, attributeState) {
+  var renderChildren = function (node, tfMatrix, defs, svgIdPrefix, withinDefs, withinClipPath, attributeState) {
     forEachChild(node, function (i, node) {
-      renderNode(node, tfMatrix, defs, svgIdPrefix, withinDefs, attributeState);
+      renderNode(node, tfMatrix, defs, svgIdPrefix, withinDefs, withinClipPath, attributeState);
     });
   };
 
@@ -3568,12 +3591,33 @@ SOFTWARE.
 
     _pdf.beginTilingPattern(pattern);
     // continue without transformation
-    renderChildren(node, _pdf.unitMatrix, defs, svgIdPrefix, false, attributeState);
+    renderChildren(node, _pdf.unitMatrix, defs, svgIdPrefix, false, false, attributeState);
     _pdf.endTilingPattern(id, pattern);
   };
 
-  var jsPDFFontAliases = ["sans-serif", "verdana", "arial", "helvetica", "fixed", "monospace", "terminal", "courier",
-    "serif", "cursive", "fantasy", "times"];
+  /**
+   * @param {Element} node
+   * @param {Object.<String,Element>} defs
+   * @param {SvgPrefix} svgIdPrefix
+   */
+  function clipPath(node, defs, svgIdPrefix) {
+    var id = svgIdPrefix.get() + node.getAttribute("id");
+    defs[id] = node;
+  }
+
+  var fontAliases = {
+    "sans-serif": "helvetica",
+    "verdana": "helvetica",
+    "arial": "helvetica",
+
+    "fixed": "courier",
+    "monospace": "courier",
+    "terminal": "courier",
+
+    "serif": "times",
+    "cursive": "times",
+    "fantasy": "times"
+  };
 
   /**
    * @param {AttributeState} attributeState
@@ -3601,9 +3645,8 @@ SOFTWARE.
         return true;
       }
 
-      // jsPDF does not include all aliases of its standard fonts when calculating the font list
       font = font.toLowerCase();
-      if (jsPDFFontAliases.indexOf(font) >= 0) {
+      if (fontAliases.hasOwnProperty(font)) {
         firstAvailable = font;
         return true;
       }
@@ -3656,7 +3699,11 @@ SOFTWARE.
    */
   function putTextProperties(attributeState, parentAttributeState) {
     if (attributeState.fontFamily !== parentAttributeState.fontFamily) {
-      _pdf.setFont(attributeState.fontFamily);
+      if (fontAliases.hasOwnProperty(attributeState.fontFamily)) {
+        _pdf.setFont(fontAliases[attributeState.fontFamily]);
+      } else {
+        _pdf.setFont(attributeState.fontFamily);
+      }
     }
 
     if (attributeState.fill !== parentAttributeState.fill && attributeState.fill.ok) {
@@ -3694,9 +3741,10 @@ SOFTWARE.
    * @param defs The defs map holding all svg nodes that can be referenced
    * @param svgIdPrefix The current id prefix
    * @param withinDefs True iff we are top-level within a defs node, so the target can be switched to an pdf form object
+   * @param {boolean} withinClipPath
    * @param {AttributeState} attributeState Keeps track of parent attributes that are inherited automatically
    */
-  var renderNode = function (node, contextTransform, defs, svgIdPrefix, withinDefs, attributeState) {
+  var renderNode = function (node, contextTransform, defs, svgIdPrefix, withinDefs, withinClipPath, attributeState) {
     var parentAttributeState = attributeState;
     attributeState = attributeState.clone();
 
@@ -3712,10 +3760,9 @@ SOFTWARE.
     var tfMatrix,
         hasFillColor = false,
         fillRGB = null,
-        fillMode = "inherit",
-        strokeMode = "inherit",
-        fillUrl = null,
-        fillData = null,
+        fill = "inherit",
+        stroke = "inherit",
+        patternOrGradient = undefined,
         bBox;
 
     //
@@ -3724,7 +3771,7 @@ SOFTWARE.
 
     // if we are within a defs node, start a new pdf form object and draw this node and all children on that instead
     // of the top-level page
-    var targetIsFormObject = withinDefs && !nodeIs(node, "lineargradient,radialgradient,pattern");
+    var targetIsFormObject = withinDefs && !nodeIs(node, "lineargradient,radialgradient,pattern,clippath");
     if (targetIsFormObject) {
 
       // the transformations directly at the node are written to the pdf form object transformation matrix
@@ -3739,7 +3786,40 @@ SOFTWARE.
 
     } else {
       tfMatrix = _pdf.matrixMult(computeNodeTransform(node), contextTransform);
+
+      if (!withinClipPath) {
+        _pdf.saveGraphicsState();
+      }
+    }
+
+    var hasClipPath = node.hasAttribute("clip-path") && node.getAttribute("clip-path") !== "none";
+    if (hasClipPath) {
+      var clipPathId = iriReference.exec(node.getAttribute("clip-path"));
+      var clipPathNode = getFromDefs(svgIdPrefix.get() + clipPathId[1], defs);
+
+      var clipPathMatrix = tfMatrix;
+      if (clipPathNode.hasAttribute("clipPathUnits")
+          && clipPathNode.getAttribute("clipPathUnits").toLowerCase() === "objectboundingbox") {
+        bBox = getUntransformedBBox(node);
+        clipPathMatrix = _pdf.matrixMult(new _pdf.Matrix(bBox[2], 0, 0, bBox[3], bBox[0], bBox[1]), clipPathMatrix);
+      }
+
+      // here, browsers show different results for a "transform" attribute on the clipPath element itself:
+      // IE/Edge considers it, Chrome and Firefox ignore it. However, the specification lists "transform" as a valid
+      // attribute for clipPath elements, although not explicitly explaining its behavior. This implementation follows
+      // IE/Edge and considers the "transform" attribute as additional transformation within the coordinate system
+      // established by the "clipPathUnits" attribute.
+      clipPathMatrix = _pdf.matrixMult(computeNodeTransform(clipPathNode), clipPathMatrix);
+
       _pdf.saveGraphicsState();
+      _pdf.setCurrentTransformationMatrix(clipPathMatrix);
+
+      renderChildren(clipPathNode, _pdf.unitMatrix, defs, svgIdPrefix, false, true, attributeState);
+      _pdf.clip().discardPath();
+
+      // as we cannot use restoreGraphicsState() to reset the transform (this would reset the clipping path, as well),
+      // we must append the inverse instead
+      _pdf.setCurrentTransformationMatrix(clipPathMatrix.inversed());
     }
 
     //
@@ -3747,28 +3827,28 @@ SOFTWARE.
     //
 
     // fill mode
-    if (nodeIs(node, "g,path,rect,text,ellipse,line,circle,polygon")) {
+    if (nodeIs(node, "g,path,rect,text,ellipse,line,circle,polygon,polyline")) {
       function setDefaultColor() {
         fillRGB = new RGBColor("rgb(0, 0, 0)");
         hasFillColor = true;
-        fillMode = "F";
+        fill = true;
       }
 
       var fillColor = getAttribute(node, "fill");
       if (fillColor) {
         var url = iriReference.exec(fillColor);
         if (url) {
-          // probably a gradient (or something unsupported)
-          fillUrl = svgIdPrefix.get() + url[1];
-          var fill = getFromDefs(fillUrl, defs);
-          if (fill && nodeIs(fill, "lineargradient,radialgradient")) {
+          // probably a gradient or pattern (or something unsupported)
+          var fillUrl = svgIdPrefix.get() + url[1];
+          var fillNode = getFromDefs(fillUrl, defs);
+          if (fillNode && nodeIs(fillNode, "lineargradient,radialgradient")) {
 
             // matrix to convert between gradient space and user space
             // for "userSpaceOnUse" this is the current transformation: tfMatrix
             // for "objectBoundingBox" or default, the gradient gets scaled and transformed to the bounding box
             var gradientUnitsMatrix;
-            if (!fill.hasAttribute("gradientUnits")
-                || fill.getAttribute("gradientUnits").toLowerCase() === "objectboundingbox") {
+            if (!fillNode.hasAttribute("gradientUnits")
+                || fillNode.getAttribute("gradientUnits").toLowerCase() === "objectboundingbox") {
               bBox || (bBox = getUntransformedBBox(node));
               gradientUnitsMatrix = new _pdf.Matrix(bBox[2], 0, 0, bBox[3], bBox[0], bBox[1]);
             } else {
@@ -3776,51 +3856,54 @@ SOFTWARE.
             }
 
             // matrix that is applied to the gradient before any other transformations
-            var gradientTransform = parseTransform(fill.getAttribute("gradientTransform"));
+            var gradientTransform = parseTransform(fillNode.getAttribute("gradientTransform"));
 
-            fillData = _pdf.matrixMult(gradientTransform, gradientUnitsMatrix);
+            patternOrGradient = {
+              key: fillUrl,
+              matrix: _pdf.matrixMult(gradientTransform, gradientUnitsMatrix)
+            };
 
-            fillMode = "";
-          } else if (fill && nodeIs(fill, "pattern")) {
+            fill = true;
+          } else if (fillNode && nodeIs(fillNode, "pattern")) {
             var fillBBox, y, width, height, x;
-            fillData = {};
+            patternOrGradient = { key: fillUrl };
 
             var patternUnitsMatrix = _pdf.unitMatrix;
-            if (!fill.hasAttribute("patternUnits")
-                || fill.getAttribute("patternUnits").toLowerCase() === "objectboundingbox") {
+            if (!fillNode.hasAttribute("patternUnits")
+                || fillNode.getAttribute("patternUnits").toLowerCase() === "objectboundingbox") {
               bBox || (bBox = getUntransformedBBox(node));
               patternUnitsMatrix = new _pdf.Matrix(1, 0, 0, 1, bBox[0], bBox[1]);
 
               // TODO: slightly inaccurate (rounding errors? line width bBoxes?)
-              fillBBox = getUntransformedBBox(fill);
+              fillBBox = getUntransformedBBox(fillNode);
               x = fillBBox[0] * bBox[0];
               y = fillBBox[1] * bBox[1];
               width = fillBBox[2] * bBox[2];
               height = fillBBox[3] * bBox[3];
-              fillData.boundingBox = [x, y, x + width, y + height];
-              fillData.xStep = width;
-              fillData.yStep = height;
+              patternOrGradient.boundingBox = [x, y, x + width, y + height];
+              patternOrGradient.xStep = width;
+              patternOrGradient.yStep = height;
             }
 
             var patternContentUnitsMatrix = _pdf.unitMatrix;
-            if (fill.hasAttribute("patternContentUnits")
-                && fill.getAttribute("patternContentUnits").toLowerCase() === "objectboundingbox") {
+            if (fillNode.hasAttribute("patternContentUnits")
+                && fillNode.getAttribute("patternContentUnits").toLowerCase() === "objectboundingbox") {
               bBox || (bBox = getUntransformedBBox(node));
               patternContentUnitsMatrix = new _pdf.Matrix(bBox[2], 0, 0, bBox[3], 0, 0);
 
-              fillBBox = fillData.boundingBox || getUntransformedBBox(fill);
+              fillBBox = patternOrGradient.boundingBox || getUntransformedBBox(fillNode);
               x = fillBBox[0] / bBox[0];
               y = fillBBox[1] / bBox[1];
               width = fillBBox[2] / bBox[2];
               height = fillBBox[3] / bBox[3];
-              fillData.boundingBox = [x, y, x + width, y + height];
-              fillData.xStep = width;
-              fillData.yStep = height;
+              patternOrGradient.boundingBox = [x, y, x + width, y + height];
+              patternOrGradient.xStep = width;
+              patternOrGradient.yStep = height;
             }
 
             var patternTransformMatrix = _pdf.unitMatrix;
-            if (fill.hasAttribute("patternTransform")) {
-              patternTransformMatrix = parseTransform(fill.getAttribute("patternTransform"));
+            if (fillNode.hasAttribute("patternTransform")) {
+              patternTransformMatrix = parseTransform(fillNode.getAttribute("patternTransform"));
             }
 
             var matrix = patternContentUnitsMatrix;
@@ -3828,12 +3911,11 @@ SOFTWARE.
             matrix = _pdf.matrixMult(matrix, patternTransformMatrix);
             matrix = _pdf.matrixMult(matrix, tfMatrix);
 
-            fillData.matrix = matrix;
+            patternOrGradient.matrix = matrix;
 
-            fillMode = "F";
+            fill = true;
           } else {
             // unsupported fill argument -> fill black
-            fillUrl = fill = null;
             setDefaultColor();
           }
         } else {
@@ -3841,9 +3923,9 @@ SOFTWARE.
           fillRGB = parseColor(fillColor);
           if (fillRGB.ok) {
             hasFillColor = true;
-            fillMode = "F";
+            fill = true;
           } else {
-            fillMode = "";
+            fill = false;
           }
         }
       }
@@ -3884,7 +3966,7 @@ SOFTWARE.
 
     }
 
-    if (nodeIs(node, "g,path,rect,ellipse,line,circle,polygon")) {
+    if (nodeIs(node, "g,path,rect,ellipse,line,circle,polygon,polyline")) {
       // text has no fill color, so don't apply it until here
       if (hasFillColor) {
         attributeState.fill = fillRGB;
@@ -3899,18 +3981,18 @@ SOFTWARE.
           strokeWidth = Math.abs(parseFloat(strokeWidth));
           attributeState.strokeWidth = strokeWidth;
           _pdf.setLineWidth(strokeWidth);
+        } else {
+          // needed for inherited zero width strokes
+          strokeWidth = attributeState.strokeWidth
         }
         var strokeRGB = new RGBColor(strokeColor);
         if (strokeRGB.ok) {
-          attributeState.color = strokeRGB;
+          attributeState.stroke = strokeRGB;
           _pdf.setDrawColor(strokeRGB.r, strokeRGB.g, strokeRGB.b);
-          if (strokeWidth !== 0) {
-            // pdf spec states: "A line width of 0 denotes the thinnest line that can be rendered at device resolution:
-            // 1 device pixel wide". SVG, however, does not draw zero width lines.
-            strokeMode = "D";
-          } else {
-            strokeMode = "";
-          }
+
+          // pdf spec states: "A line width of 0 denotes the thinnest line that can be rendered at device resolution:
+          // 1 device pixel wide". SVG, however, does not draw zero width lines.
+          stroke = strokeWidth !== 0;
         }
         var lineCap = getAttribute(node, "stroke-linecap");
         if (lineCap) {
@@ -3936,10 +4018,12 @@ SOFTWARE.
     }
 
     // inherit fill and stroke mode if not specified at this node
-    fillMode = attributeState.fillMode = fillMode === "inherit" ? attributeState.fillMode : fillMode;
-    strokeMode = attributeState.strokeMode = strokeMode === "inherit" ? attributeState.strokeMode : strokeMode;
-
-    var colorMode = fillMode + strokeMode;
+    if (fill === "inherit") {
+      fill = attributeState.fill !== null;
+    }
+    if (stroke === "inherit") {
+      stroke = attributeState.stroke !== null;
+    }
 
     setTextProperties(node, fillRGB, attributeState);
     putTextProperties(attributeState, parentAttributeState);
@@ -3953,11 +4037,11 @@ SOFTWARE.
         findAndRenderDefs(node, tfMatrix, defs, svgIdPrefix, withinDefs, attributeState);
       case 'a':
       case "marker":
-        renderChildren(node, tfMatrix, defs, svgIdPrefix, withinDefs, attributeState);
+        renderChildren(node, tfMatrix, defs, svgIdPrefix, withinDefs, false, attributeState);
         break;
 
       case 'defs':
-        renderChildren(node, tfMatrix, defs, svgIdPrefix, true, attributeState);
+        renderChildren(node, tfMatrix, defs, svgIdPrefix, true, false, attributeState);
         break;
 
       case 'use':
@@ -3965,36 +4049,49 @@ SOFTWARE.
         break;
 
       case 'line':
-        _pdf.setCurrentTransformationMatrix(tfMatrix);
-        line(node, svgIdPrefix, attributeState);
+        if (!withinClipPath) {
+          _pdf.setCurrentTransformationMatrix(tfMatrix);
+          line(node, svgIdPrefix, attributeState);
+        }
         break;
 
       case 'rect':
-        _pdf.setCurrentTransformationMatrix(tfMatrix);
-        rect(node, colorMode, fillUrl, fillData);
+        if (!withinClipPath) {
+          _pdf.setCurrentTransformationMatrix(tfMatrix);
+        }
+        rect(node);
         break;
 
       case 'ellipse':
-        _pdf.setCurrentTransformationMatrix(tfMatrix);
-        ellipse(node, colorMode, fillUrl, fillData);
+        if (!withinClipPath) {
+          _pdf.setCurrentTransformationMatrix(tfMatrix);
+        }
+        ellipse(node);
         break;
 
       case 'circle':
-        _pdf.setCurrentTransformationMatrix(tfMatrix);
-        circle(node, colorMode, fillUrl, fillData);
+        if (!withinClipPath) {
+          _pdf.setCurrentTransformationMatrix(tfMatrix);
+        }
+        circle(node);
         break;
       case 'text':
         text(node, tfMatrix, hasFillColor, fillRGB, attributeState);
         break;
 
       case 'path':
-        _pdf.setCurrentTransformationMatrix(tfMatrix);
-        path(node, svgIdPrefix, colorMode, fillUrl, fillData, attributeState);
+        if (!withinClipPath) {
+          _pdf.setCurrentTransformationMatrix(tfMatrix);
+        }
+        path(node, tfMatrix, svgIdPrefix, withinClipPath, attributeState);
         break;
 
       case 'polygon':
-        _pdf.setCurrentTransformationMatrix(tfMatrix);
-        polygon(node, colorMode, fillUrl, fillData, svgIdPrefix, attributeState);
+      case 'polyline':
+        if (!withinClipPath) {
+          _pdf.setCurrentTransformationMatrix(tfMatrix);
+        }
+        polygon(node, svgIdPrefix, attributeState, node.tagName.toLowerCase() === "polygon");
         break;
 
       case 'image':
@@ -4025,12 +4122,30 @@ SOFTWARE.
       case "pattern":
         pattern(node, defs, svgIdPrefix, attributeState);
         break;
+
+      case "clippath":
+        clipPath(node, defs, svgIdPrefix);
+        break;
+    }
+
+    if (nodeIs(node, "path,rect,ellipse,circle,polygon,polyline") && !withinClipPath) {
+      if (fill && stroke) {
+        _pdf.fillStroke(patternOrGradient);
+      } else if (fill) {
+        _pdf.fill(patternOrGradient);
+      } else if (stroke) {
+        _pdf.stroke();
+      }
     }
 
     // close either the formObject or the graphics context
     if (targetIsFormObject) {
       _pdf.endFormObject(svgIdPrefix.get() + node.getAttribute("id"));
-    } else {
+    } else if (!withinClipPath) {
+      _pdf.restoreGraphicsState();
+    }
+
+    if (hasClipPath) {
       _pdf.restoreGraphicsState();
     }
   };
@@ -4043,22 +4158,26 @@ SOFTWARE.
         xOffset = options.xOffset || 0.0,
         yOffset = options.yOffset || 0.0;
 
-    // set offsets and scale everything by k
-    _pdf.saveGraphicsState();
-    _pdf.setCurrentTransformationMatrix(new _pdf.Matrix(k, 0, 0, k, xOffset, yOffset));
+    _pdf.advancedAPI(function () {
 
-    // set default values that differ from pdf defaults
-    var attributeState = AttributeState.default();
-    _pdf.setLineWidth(attributeState.strokeWidth);
-    var fill = attributeState.fill;
-    _pdf.setFillColor(fill.r, fill.g, fill.b);
-    _pdf.setFont(attributeState.fontFamily);
-    _pdf.setFontSize(attributeState.fontSize);
+      // set offsets and scale everything by k
+      _pdf.saveGraphicsState();
+      _pdf.setCurrentTransformationMatrix(new _pdf.Matrix(k, 0, 0, k, xOffset, yOffset));
 
-    // start rendering
-    renderNode(element.cloneNode(true), _pdf.unitMatrix, {}, new SvgPrefix(""), false, attributeState);
+      // set default values that differ from pdf defaults
+      var attributeState = AttributeState.default();
+      _pdf.setLineWidth(attributeState.strokeWidth);
+      var fill = attributeState.fill;
+      _pdf.setFillColor(fill.r, fill.g, fill.b);
+      _pdf.setFont(attributeState.fontFamily);
+      _pdf.setFontSize(attributeState.fontSize);
 
-    _pdf.restoreGraphicsState();
+      // start rendering
+      renderNode(element.cloneNode(true), _pdf.unitMatrix, {}, new SvgPrefix(""), false, false, attributeState);
+
+      _pdf.restoreGraphicsState();
+
+    });
 
     return _pdf;
   };
