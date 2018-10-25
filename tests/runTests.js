@@ -29,6 +29,7 @@ const tests = [
     "path-arc-support",
     "patterns",
     "polyline",
+    "references",
     "remote-images",
     "strokes-and-bounding-boxes",
     "text-placement",

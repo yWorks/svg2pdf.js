@@ -152,6 +152,11 @@ SOFTWARE.
     return node.getAttribute(propertyNode) || node.style && node.style[propertyCss];
   };
 
+  /**
+   * @param {Element} node
+   * @param {string} tagsString
+   * @return {boolean}
+   */
   var nodeIs = function (node, tagsString) {
     return tagsString.split(",").indexOf(node.tagName.toLowerCase()) >= 0;
   };
@@ -214,16 +219,61 @@ SOFTWARE.
     return p2;
   };
 
-  // an id prefix to handle duplicate ids
-  var SvgPrefix = function (prefix) {
-    this.prefix = prefix;
-    this.id = 0;
-    this.nextChild = function () {
-      return new SvgPrefix("_" + this.id++ + "_" + this.get());
-    };
-    this.get = function () {
-      return this.prefix;
+  /**
+   * @param {Element} rootSvg
+   * @constructor
+   * @property {Object.<String,Element>} renderedElements
+   * @property {Element} rootSvg
+   */
+  function ReferencesHandler(rootSvg) {
+    this.renderedElements = {};
+    this.rootSvg = rootSvg;
+  }
+
+  /**
+   * @param {string} id
+   * @return {*}
+   */
+  ReferencesHandler.prototype.getRendered = function (id) {
+    if (this.renderedElements.hasOwnProperty(id)) {
+      return this.renderedElements[id];
     }
+
+    var node = this.rootSvg.getElementById(id);
+
+    if (nodeIs(node, "lineargradient")) {
+      putGradient(node, "axial", [
+        node.getAttribute("x1") || 0,
+        node.getAttribute("y1") || 0,
+        node.getAttribute("x2") || 1,
+        node.getAttribute("y2") || 0
+      ]);
+    } else if (nodeIs(node, "radialgradient")) {
+      putGradient(node, "radial", [
+        node.getAttribute("fx") || node.getAttribute("cx") || 0.5,
+        node.getAttribute("fy") || node.getAttribute("cy") || 0.5,
+        0,
+        node.getAttribute("cx") || 0.5,
+        node.getAttribute("cy") || 0.5,
+        node.getAttribute("r") || 0.5
+      ]);
+    } else if (nodeIs(node, "pattern")) {
+      pattern(node, this, AttributeState.default())
+    } else if (nodeIs(node, "marker")) {
+      // the transformations directly at the node are written to the pdf form object transformation matrix
+      var tfMatrix = computeNodeTransform(node);
+      var bBox = getUntransformedBBox(node);
+
+      _pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], tfMatrix);
+      renderChildren(node, _pdf.unitMatrix, this, false, false, AttributeState.default());
+      _pdf.endFormObject(node.getAttribute("id"));
+    } else if (!nodeIs(node, "clippath")) {
+      // all other nodes will be rendered as PDF form object
+      renderNode(node, _pdf.unitMatrix, this, true, false, AttributeState.default());
+    }
+
+    this.renderedElements[id] = node;
+    return node;
   };
 
   var AttributeState = function () {
@@ -319,7 +369,7 @@ SOFTWARE.
     this.markers.push(marker);
   };
 
-  MarkerList.prototype.draw = function (tfMatrix, attributeState) {
+  MarkerList.prototype.draw = function (tfMatrix, refsHandler, attributeState) {
     for (var i = 0; i < this.markers.length; i++) {
       var marker = this.markers[i];
 
@@ -337,6 +387,7 @@ SOFTWARE.
       // as the marker is already scaled by the current line width we must not apply the line width twice!
       _pdf.saveGraphicsState();
       _pdf.setLineWidth(1.0);
+      refsHandler.getRendered(marker.id);
       _pdf.doFormObject(marker.id, tf);
       _pdf.restoreGraphicsState();
     }
@@ -353,29 +404,9 @@ SOFTWARE.
     this.angle = angle;
   }
 
-  // returns the node for the specified id or incrementally removes prefixes to search "higher" levels
-  var getFromDefs = function (id, defs) {
-    var regExp = /_\d+_/;
-    while (!defs[id] && regExp.exec(id)) {
-      id = id.replace(regExp, "");
-    }
-    return defs[id];
-  };
-
   // replace any newline characters by space and trim
   var removeNewlinesAndTrim = function (str) {
     return str.replace(/[\n\s\r]+/g, " ").trim();
-  };
-
-  // clones the defs object (or basically any object)
-  var cloneDefs = function (defs) {
-    var clone = {};
-    for (var key in defs) {
-      if (defs.hasOwnProperty(key)) {
-        clone[key] = defs[key];
-      }
-    }
-    return clone;
   };
 
   function computeViewBoxTransform(node, viewBox, eX, eY, eWidth, eHeight) {
@@ -815,7 +846,7 @@ SOFTWARE.
   };
 
   // draws a polygon
-  var polygon = function (node, svgIdPrefix, attributeState, closed) {
+  var polygon = function (node, refsHandler, attributeState, closed) {
     if (!node.hasAttribute("points") || node.getAttribute("points") === "") {
       return;
     }
@@ -841,13 +872,13 @@ SOFTWARE.
       var length = lines.length;
       var markers = new MarkerList();
       if (markerStart) {
-        markerStart = svgIdPrefix.get() + iriReference.exec(markerStart)[1];
+        markerStart = iriReference.exec(markerStart)[1];
         angle = addVectors(getDirectionVector(lines[0].c, lines[1].c), getDirectionVector(lines[length - 2].c, lines[0].c));
         markers.addMarker(new Marker(markerStart, lines[0].c, Math.atan2(angle[1], angle[0])));
       }
 
       if (markerMid) {
-        markerMid = svgIdPrefix.get() + iriReference.exec(markerMid)[1];
+        markerMid = iriReference.exec(markerMid)[1];
         var prevAngle = getDirectionVector(lines[0].c, lines[1].c), curAngle;
         for (i = 1; i < lines.length - 2; i++) {
           curAngle = getDirectionVector(lines[i].c, lines[i + 1].c);
@@ -862,17 +893,17 @@ SOFTWARE.
       }
 
       if (markerEnd) {
-        markerEnd = svgIdPrefix.get() + iriReference.exec(markerEnd)[1];
+        markerEnd = iriReference.exec(markerEnd)[1];
         angle = addVectors(getDirectionVector(lines[0].c, lines[1].c), getDirectionVector(lines[length - 2].c, lines[0].c));
         markers.addMarker(new Marker(markerEnd, lines[0].c, Math.atan2(angle[1], angle[0])));
       }
 
-      markers.draw(_pdf.unitMatrix, attributeState);
+      markers.draw(_pdf.unitMatrix, refsHandler, attributeState);
     }
   };
 
   // draws an image
-  var image = function (node, svgIdPrefix) {
+  var image = function (node) {
     var width = parseFloat(node.getAttribute("width")),
         height = parseFloat(node.getAttribute("height")),
         x = parseFloat(node.getAttribute("x") || 0),
@@ -906,7 +937,7 @@ SOFTWARE.
       svgElement.setAttribute("width", String(width));
       svgElement.setAttribute("height", String(height));
 
-      renderNode(svgElement, _pdf.unitMatrix, {}, svgIdPrefix, false, false, AttributeState.default());
+      renderNode(svgElement, _pdf.unitMatrix, {}, false, false, AttributeState.default());
       return;
     }
 
@@ -927,15 +958,15 @@ SOFTWARE.
   };
 
   // draws a path
-  var path = function (node, tfMatrix, svgIdPrefix, withinClipPath, attributeState) {
+  var path = function (node, tfMatrix, refsHandler, withinClipPath, attributeState) {
     var list = getPathSegList(node);
     var markerEnd = node.getAttribute("marker-end"),
         markerStart = node.getAttribute("marker-start"),
         markerMid = node.getAttribute("marker-mid");
 
-    markerEnd && (markerEnd = svgIdPrefix.get() + iriReference.exec(markerEnd)[1]);
-    markerStart && (markerStart = svgIdPrefix.get() + iriReference.exec(markerStart)[1]);
-    markerMid && (markerMid = svgIdPrefix.get() + iriReference.exec(markerMid)[1]);
+    markerEnd && (markerEnd = iriReference.exec(markerEnd)[1]);
+    markerStart && (markerStart = iriReference.exec(markerStart)[1]);
+    markerMid && (markerMid = iriReference.exec(markerMid)[1]);
 
     var getLinesFromPath = function () {
       var x = 0, y = 0;
@@ -1126,20 +1157,22 @@ SOFTWARE.
     }
 
     if (markerEnd || markerStart || markerMid) {
-      lines.markers.draw(_pdf.unitMatrix, attributeState);
+      lines.markers.draw(_pdf.unitMatrix, refsHandler, attributeState);
     }
   };
 
   // draws the element referenced by a use node, makes use of pdf's XObjects/FormObjects so nodes are only written once
   // to the pdf document. This highly reduces the file size and computation time.
-  var use = function (node, tfMatrix, svgIdPrefix) {
+  var use = function (node, tfMatrix, refsHandler) {
     var url = (node.getAttribute("href") || node.getAttribute("xlink:href"));
     // just in case someone has the idea to use empty use-tags, wtf???
     if (!url)
       return;
 
     // get the size of the referenced form object (to apply the correct scaling)
-    var formObject = _pdf.getFormObject(svgIdPrefix.get() + url.substring(1));
+    var id = url.substring(1);
+    refsHandler.getRendered(id);
+    var formObject = _pdf.getFormObject(id);
 
     // scale and position it right
     var x = node.getAttribute("x") || 0;
@@ -1148,11 +1181,11 @@ SOFTWARE.
     var height = node.getAttribute("height") || formObject.height;
     var t = new _pdf.Matrix(width / formObject.width || 0, 0, 0, height / formObject.height || 0, x, y);
     t = _pdf.matrixMult(t, tfMatrix);
-    _pdf.doFormObject(svgIdPrefix.get() + url.substring(1), t);
+    _pdf.doFormObject(id, t);
   };
 
   // draws a line
-  var line = function (node, svgIdPrefix, attributeState) {
+  var line = function (node, refsHandler, attributeState) {
     var p1 = [parseFloat(node.getAttribute('x1') || 0), parseFloat(node.getAttribute('y1') || 0)];
     var p2 = [parseFloat(node.getAttribute('x2') || 0), parseFloat(node.getAttribute('y2') || 0)];
 
@@ -1167,12 +1200,12 @@ SOFTWARE.
       var markers = new MarkerList();
       var angle = getAngle(p1, p2);
       if (markerStart) {
-        markers.addMarker(new Marker(svgIdPrefix.get() + iriReference.exec(markerStart)[1], p1, angle));
+        markers.addMarker(new Marker(iriReference.exec(markerStart)[1], p1, angle));
       }
       if (markerEnd) {
-        markers.addMarker(new Marker(svgIdPrefix.get() + iriReference.exec(markerEnd)[1], p2, angle));
+        markers.addMarker(new Marker(iriReference.exec(markerEnd)[1], p2, angle));
       }
-      markers.draw(_pdf.unitMatrix, attributeState);
+      markers.draw(_pdf.unitMatrix, refsHandler, attributeState);
     }
   };
 
@@ -1525,37 +1558,17 @@ SOFTWARE.
     _pdf.restoreGraphicsState();
   };
 
-  // As defs elements are allowed to appear after they are referenced, we search for them first
-  var findAndRenderDefs = function (node, tfMatrix, defs, svgIdPrefix, withinDefs, attributeState) {
-    forEachChild(node, function (i, child) {
-      if (child.tagName.toLowerCase() === "defs") {
-        renderNode(child, tfMatrix, defs, svgIdPrefix, withinDefs, false, attributeState);
-        // prevent defs from being evaluated twice // TODO: make this better
-        child.parentNode.removeChild(child);
-      }
-    });
-  };
-
-  // processes a svg node
-  var svg = function (node, tfMatrix, defs, svgIdPrefix, withinDefs, attributeState) {
-    // create a new prefix and clone the defs, as defs within the svg should not be visible outside
-    var newSvgIdPrefix = svgIdPrefix.nextChild();
-    var newDefs = cloneDefs(defs);
-    findAndRenderDefs(node, tfMatrix, newDefs, newSvgIdPrefix, withinDefs, attributeState);
-    renderChildren(node, tfMatrix, newDefs, newSvgIdPrefix, withinDefs, false, attributeState);
-  };
-
   // renders all children of a node
-  var renderChildren = function (node, tfMatrix, defs, svgIdPrefix, withinDefs, withinClipPath, attributeState) {
+  var renderChildren = function (node, tfMatrix, refsHandler, withinDefs, withinClipPath, attributeState) {
     forEachChild(node, function (i, node) {
-      renderNode(node, tfMatrix, defs, svgIdPrefix, withinDefs, withinClipPath, attributeState);
+      renderNode(node, tfMatrix, refsHandler, withinDefs, withinClipPath, attributeState);
     });
   };
 
   // adds a gradient to defs and the pdf document for later use, type is either "axial" or "radial"
   // opacity is only supported rudimentary by averaging over all stops
   // transforms are applied on use
-  var putGradient = function (node, type, coords, defs, svgIdPrefix) {
+  var putGradient = function (node, type, coords) {
     var colors = [];
     var opacitySum = 0;
     var hasOpacity = false;
@@ -1581,14 +1594,12 @@ SOFTWARE.
     }
 
     var pattern = new _pdf.ShadingPattern(type, coords, colors, gState);
-    var id = svgIdPrefix.get() + node.getAttribute("id");
+    var id = node.getAttribute("id");
     _pdf.addShadingPattern(id, pattern);
-    defs[id] = node;
   };
 
-  var pattern = function (node, defs, svgIdPrefix, attributeState) {
-    var id = svgIdPrefix.get() + node.getAttribute("id");
-    defs[id] = node;
+  var pattern = function (node, refsHandler, attributeState) {
+    var id = node.getAttribute("id");
 
     // the transformations directly at the node are written to the pattern transformation matrix
     var bBox = getUntransformedBBox(node);
@@ -1597,19 +1608,9 @@ SOFTWARE.
 
     _pdf.beginTilingPattern(pattern);
     // continue without transformation
-    renderChildren(node, _pdf.unitMatrix, defs, svgIdPrefix, false, false, attributeState);
+    renderChildren(node, _pdf.unitMatrix, refsHandler, false, false, attributeState);
     _pdf.endTilingPattern(id, pattern);
   };
-
-  /**
-   * @param {Element} node
-   * @param {Object.<String,Element>} defs
-   * @param {SvgPrefix} svgIdPrefix
-   */
-  function clipPath(node, defs, svgIdPrefix) {
-    var id = svgIdPrefix.get() + node.getAttribute("id");
-    defs[id] = node;
-  }
 
   var fontAliases = {
     "sans-serif": "helvetica",
@@ -1744,15 +1745,19 @@ SOFTWARE.
    * Renders a svg node.
    * @param node The svg element
    * @param contextTransform The current transformation matrix
-   * @param defs The defs map holding all svg nodes that can be referenced
-   * @param svgIdPrefix The current id prefix
+   * @param refsHandler The handler that will render references on demand
    * @param withinDefs True iff we are top-level within a defs node, so the target can be switched to an pdf form object
    * @param {boolean} withinClipPath
    * @param {AttributeState} attributeState Keeps track of parent attributes that are inherited automatically
    */
-  var renderNode = function (node, contextTransform, defs, svgIdPrefix, withinDefs, withinClipPath, attributeState) {
+  var renderNode = function (node, contextTransform, refsHandler, withinDefs, withinClipPath, attributeState) {
     var parentAttributeState = attributeState;
     attributeState = attributeState.clone();
+
+    if (nodeIs(node, "defs,clippath,pattern,lineargradient,radialgradient,marker")) {
+      // we will only render them on demand
+      return;
+    }
 
     if (getAttribute(node, "display") === "none") {
       return;
@@ -1801,7 +1806,7 @@ SOFTWARE.
     var hasClipPath = node.hasAttribute("clip-path") && node.getAttribute("clip-path") !== "none";
     if (hasClipPath) {
       var clipPathId = iriReference.exec(node.getAttribute("clip-path"));
-      var clipPathNode = getFromDefs(svgIdPrefix.get() + clipPathId[1], defs);
+      var clipPathNode = refsHandler.getRendered(clipPathId[1]);
 
       var clipPathMatrix = tfMatrix;
       if (clipPathNode.hasAttribute("clipPathUnits")
@@ -1820,7 +1825,7 @@ SOFTWARE.
       _pdf.saveGraphicsState();
       _pdf.setCurrentTransformationMatrix(clipPathMatrix);
 
-      renderChildren(clipPathNode, _pdf.unitMatrix, defs, svgIdPrefix, false, true, attributeState);
+      renderChildren(clipPathNode, _pdf.unitMatrix, refsHandler, false, true, attributeState);
       _pdf.clip().discardPath();
 
       // as we cannot use restoreGraphicsState() to reset the transform (this would reset the clipping path, as well),
@@ -1845,8 +1850,8 @@ SOFTWARE.
         var url = iriReference.exec(fillColor);
         if (url) {
           // probably a gradient or pattern (or something unsupported)
-          var fillUrl = svgIdPrefix.get() + url[1];
-          var fillNode = getFromDefs(fillUrl, defs);
+          var fillUrl = url[1];
+          var fillNode = refsHandler.getRendered(fillUrl);
           if (fillNode && nodeIs(fillNode, "lineargradient,radialgradient")) {
 
             // matrix to convert between gradient space and user space
@@ -2037,27 +2042,19 @@ SOFTWARE.
     // do the actual drawing
     switch (node.tagName.toLowerCase()) {
       case 'svg':
-        svg(node, tfMatrix, defs, svgIdPrefix, withinDefs, attributeState);
-        break;
       case 'g':
-        findAndRenderDefs(node, tfMatrix, defs, svgIdPrefix, withinDefs, attributeState);
       case 'a':
-      case "marker":
-        renderChildren(node, tfMatrix, defs, svgIdPrefix, withinDefs, false, attributeState);
-        break;
-
-      case 'defs':
-        renderChildren(node, tfMatrix, defs, svgIdPrefix, true, false, attributeState);
+        renderChildren(node, tfMatrix, refsHandler, withinDefs, false, attributeState);
         break;
 
       case 'use':
-        use(node, tfMatrix, svgIdPrefix);
+        use(node, tfMatrix, refsHandler);
         break;
 
       case 'line':
         if (!withinClipPath) {
           _pdf.setCurrentTransformationMatrix(tfMatrix);
-          line(node, svgIdPrefix, attributeState);
+          line(node, refsHandler, attributeState);
         }
         break;
 
@@ -2089,7 +2086,7 @@ SOFTWARE.
         if (!withinClipPath) {
           _pdf.setCurrentTransformationMatrix(tfMatrix);
         }
-        path(node, tfMatrix, svgIdPrefix, withinClipPath, attributeState);
+        path(node, tfMatrix, refsHandler, withinClipPath, attributeState);
         break;
 
       case 'polygon':
@@ -2097,40 +2094,12 @@ SOFTWARE.
         if (!withinClipPath) {
           _pdf.setCurrentTransformationMatrix(tfMatrix);
         }
-        polygon(node, svgIdPrefix, attributeState, node.tagName.toLowerCase() === "polygon");
+        polygon(node, refsHandler, attributeState, node.tagName.toLowerCase() === "polygon");
         break;
 
       case 'image':
         _pdf.setCurrentTransformationMatrix(tfMatrix);
-        image(node, svgIdPrefix);
-        break;
-
-      case "lineargradient":
-        putGradient(node, "axial", [
-          node.getAttribute("x1") || 0,
-          node.getAttribute("y1") || 0,
-          node.getAttribute("x2") || 1,
-          node.getAttribute("y2") || 0
-        ], defs, svgIdPrefix);
-        break;
-
-      case "radialgradient":
-        putGradient(node, "radial", [
-          node.getAttribute("fx") || node.getAttribute("cx") || 0.5,
-          node.getAttribute("fy") || node.getAttribute("cy") || 0.5,
-          0,
-          node.getAttribute("cx") || 0.5,
-          node.getAttribute("cy") || 0.5,
-          node.getAttribute("r") || 0.5
-        ], defs, svgIdPrefix);
-        break;
-
-      case "pattern":
-        pattern(node, defs, svgIdPrefix, attributeState);
-        break;
-
-      case "clippath":
-        clipPath(node, defs, svgIdPrefix);
+        image(node);
         break;
     }
 
@@ -2146,7 +2115,7 @@ SOFTWARE.
 
     // close either the formObject or the graphics context
     if (targetIsFormObject) {
-      _pdf.endFormObject(svgIdPrefix.get() + node.getAttribute("id"));
+      _pdf.endFormObject(node.getAttribute("id"));
     } else if (!withinClipPath) {
       _pdf.restoreGraphicsState();
     }
@@ -2164,6 +2133,7 @@ SOFTWARE.
         xOffset = options.xOffset || 0.0,
         yOffset = options.yOffset || 0.0;
 
+
     _pdf.advancedAPI(function () {
 
       // set offsets and scale everything by k
@@ -2178,8 +2148,9 @@ SOFTWARE.
       _pdf.setFont(attributeState.fontFamily);
       _pdf.setFontSize(attributeState.fontSize);
 
-      // start rendering
-      renderNode(element.cloneNode(true), _pdf.unitMatrix, {}, new SvgPrefix(""), false, false, attributeState);
+
+      var refsHandler = new ReferencesHandler(element);
+      renderNode(element.cloneNode(true), _pdf.unitMatrix, refsHandler, false, false, attributeState);
 
       _pdf.restoreGraphicsState();
 
