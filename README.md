@@ -47,7 +47,7 @@ svg2pdf(svgElement, pdf, {
 // get the data URI
 const uri = pdf.output('datauristring');
 
-// or simply safe the created pdf
+// or simply save the created pdf
 pdf.save('myPDF.pdf');
 ```
 
