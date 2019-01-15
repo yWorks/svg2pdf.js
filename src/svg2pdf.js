@@ -2180,6 +2180,8 @@ SOFTWARE.
         _pdf.fill(patternOrGradient);
       } else if (stroke) {
         _pdf.stroke();
+      } else {
+        _pdf.discardPath();
       }
     }
 
