@@ -35,7 +35,8 @@ const tests = [
     "text-placement",
     "transparent-pngs",
     "url-references-with-quotes",
-    "zero-width-strokes"
+    "zero-width-strokes",
+    "xml-space"
 ];
 
 for (let name of tests) {

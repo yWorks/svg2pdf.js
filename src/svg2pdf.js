@@ -277,6 +277,7 @@ SOFTWARE.
   };
 
   var AttributeState = function () {
+    this.xmlSpace = null;
     this.color = null;
     this.fill = null;
     this.fillOpacity = 1.0;
@@ -303,6 +304,7 @@ SOFTWARE.
   AttributeState.default = function () {
     var attributeState = new AttributeState();
 
+    attributeState.xmlSpace = "default";
     attributeState.fill = new RGBColor("rgb(0, 0, 0)");
     attributeState.fillOpacity = 1.0;
     // attributeState.fillRule = "nonzero";
@@ -330,6 +332,7 @@ SOFTWARE.
   AttributeState.prototype.clone = function () {
     var clone = new AttributeState();
 
+    clone.xmlSpace = this.xmlSpace;
     clone.fill = this.fill;
     clone.fillOpacity = this.fillOpacity;
     // clone.fillRule = this.fillRule;
@@ -404,10 +407,25 @@ SOFTWARE.
     this.angle = angle;
   }
 
-  // replace any newline characters by space and trim
-  var removeNewlinesAndTrim = function (str) {
-    return str.replace(/[\n\s\r]+/g, " ").trim();
-  };
+  function removeNewlines(str) {
+    return str.replace(/[\n\r]/g, "");
+  }
+
+  function replaceTabsBySpace(str) {
+    return str.replace(/[\t]/g, " ");
+  }
+
+  function consolidateSpaces(str) {
+    return str.replace(/ +/g, " ");
+  }
+
+  function trimLeft(str) {
+    return str.replace(/^\s+/,"");
+  }
+
+  function trimRight(str) {
+    return str.replace(/\s+$/,"");
+  }
 
   function computeViewBoxTransform(node, viewBox, eX, eY, eWidth, eHeight) {
     var vbX = viewBox[0];
@@ -1289,6 +1307,7 @@ SOFTWARE.
       textNode.setAttribute("font-size", fontSize);
       textNode.setAttribute("font-style", fontStyle);
       textNode.setAttribute("font-weight", fontWeight);
+      textNode.setAttributeNS("http://www.w3.org/XML/1998/namespace", "xml:space", "preserve");
       textNode.appendChild(document.createTextNode(text));
 
       var svg = document.createElementNS(svgNamespaceURI, "svg");
@@ -1425,12 +1444,6 @@ SOFTWARE.
 
       currentTextX = x + measureTextWidth(this.texts[i], tSpanAttributeState);
 
-      // add an additional "." (which has approximately the same size as a space character) in order to put
-      // some space between the tSpans (I can't find this in the spec but all browsers do it)
-      if (i < this.tSpans.length - 1) {
-        currentTextX += measureTextWidth(".", tSpanAttributeState);
-      }
-
       currentTextY = y;
 
       minX = Math.min(minX, x);
@@ -1486,6 +1499,18 @@ SOFTWARE.
   }
 
 
+  function transformXmlSpace(trimmedText, attributeState) {
+    trimmedText = removeNewlines(trimmedText);
+    trimmedText = replaceTabsBySpace(trimmedText);
+
+    if (attributeState.xmlSpace === "default") {
+      trimmedText = trimmedText.trim();
+      trimmedText = consolidateSpaces(trimmedText);
+    }
+
+    return trimmedText;
+  }
+
   /**
    * Draws a text element and its tspan children.
    * @param {SVGElement} node
@@ -1508,8 +1533,10 @@ SOFTWARE.
 
     var visibility = attributeState.visibility;
     // when there are no tspans draw the text directly
-    if (node.childElementCount === 0) {
-      var transformedText = transformText(node, removeNewlinesAndTrim(node.textContent));
+    var tSpanCount = node.childElementCount;
+    if (tSpanCount === 0) {
+      var trimmedText = transformXmlSpace(node.textContent, attributeState);
+      var transformedText = transformText(node, trimmedText);
       xOffset = getTextOffset(transformedText, attributeState);
 
       if (visibility === "visible") {
@@ -1548,7 +1575,28 @@ SOFTWARE.
           currentTextSegment = new TextChunk(tSpan.getAttribute("text-anchor") || attributeState.textAnchor, lastPositions[0], y);
         }
 
-        transformedText = transformText(node, removeNewlinesAndTrim(tSpan.textContent));
+        var trimmedText = tSpan.textContent;
+        trimmedText = removeNewlines(trimmedText);
+        trimmedText = replaceTabsBySpace(trimmedText);
+
+        var xmlSpace = attributeState.xmlSpace;
+        var tSpanXmlSpace = tSpan.getAttribute("xml:space");
+        if (tSpanXmlSpace) {
+          xmlSpace = tSpanXmlSpace;
+        }
+
+        if (xmlSpace === "default") {
+          if (i === 0) {
+            trimmedText = trimLeft(trimmedText);
+          }
+          if (i === tSpanCount - 1) {
+            trimmedText = trimRight(trimmedText);
+          }
+
+          trimmedText = consolidateSpaces(trimmedText);
+        }
+
+        transformedText = transformText(node, trimmedText);
         currentTextSegment.add(tSpan, transformedText);
       });
 
@@ -2034,6 +2082,11 @@ SOFTWARE.
     }
     if (stroke === "inherit") {
       stroke = attributeState.stroke !== null;
+    }
+
+    var xmlSpace = node.getAttribute("xml:space");
+    if (xmlSpace) {
+      attributeState.xmlSpace = xmlSpace;
     }
 
     setTextProperties(node, fillRGB, attributeState);
