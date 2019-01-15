@@ -615,6 +615,12 @@ SOFTWARE.
 
   // extends RGBColor by rgba colors as RGBColor is not capable of it
   var parseColor = function (colorString) {
+    if (colorString === "transparent") {
+      var transparent = new RGBColor("rgb(0,0,0)");
+      transparent.a = 0;
+      return transparent
+    }
+
     var match = /\s*rgba\(((?:[^,\)]*,){3}[^,\)]*)\)\s*/.exec(colorString);
     if (match) {
       var floats = parseFloats(match[1]);
