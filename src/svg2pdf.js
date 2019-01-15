@@ -1394,7 +1394,7 @@ SOFTWARE.
    */
   function TextChunk(textAnchor, originX, originY) {
     this.texts = [];
-    this.tSpans = [];
+    this.textNodes = [];
     this.textAnchor = textAnchor;
     this.originX = originX;
     this.originY = originY;
@@ -1406,7 +1406,7 @@ SOFTWARE.
    */
   TextChunk.prototype.add = function(tSpan, text) {
     this.texts.push(text);
-    this.tSpans.push(tSpan);
+    this.textNodes.push(tSpan);
   };
   /**
    * Outputs the chunk to pdf.
@@ -1415,34 +1415,41 @@ SOFTWARE.
    * @returns {[number, number]} The last current text position.
    */
   TextChunk.prototype.put = function (transform, attributeState) {
-    var i, tSpan;
+    var i, textNode;
 
     var xs = [], ys = [], attributeStates = [];
     var currentTextX = this.originX, currentTextY = this.originY;
     var minX = currentTextX, maxX = currentTextX;
-    for (i = 0; i < this.tSpans.length; i++) {
-      tSpan = this.tSpans[i];
-      var tSpanAttributeState = attributeStates[i] = attributeState.clone();
-      var tSpanColor = getAttribute(tSpan, "fill");
-      setTextProperties(tSpan, tSpanColor && new RGBColor(tSpanColor), tSpanAttributeState);
+    for (i = 0; i < this.textNodes.length; i++) {
+      textNode = this.textNodes[i];
 
       var x = currentTextX;
       var y = currentTextY;
 
-      var tSpanDx = tSpan.getAttribute("dx");
-      if (tSpanDx !== null) {
-        x += toPixels(tSpanDx, tSpanAttributeState.fontSize);
+      if (textNode.nodeName === "#text") {
+        textNodeAttributeState = attributeState
+      } else {
+        var textNodeAttributeState = attributeState.clone();
+        var tSpanColor = getAttribute(textNode, "fill");
+        setTextProperties(textNode, tSpanColor && new RGBColor(tSpanColor), textNodeAttributeState);
+
+        var tSpanDx = textNode.getAttribute("dx");
+        if (tSpanDx !== null) {
+          x += toPixels(tSpanDx, textNodeAttributeState.fontSize);
+        }
+
+        var tSpanDy = textNode.getAttribute("dy");
+        if (tSpanDy !== null) {
+          y += toPixels(tSpanDy, textNodeAttributeState.fontSize);
+        }
       }
 
-      var tSpanDy = tSpan.getAttribute("dy");
-      if (tSpanDy !== null) {
-        y += toPixels(tSpanDy, tSpanAttributeState.fontSize);
-      }
+      attributeStates[i] = textNodeAttributeState;
 
       xs[i] = x;
       ys[i] = y;
 
-      currentTextX = x + measureTextWidth(this.texts[i], tSpanAttributeState);
+      currentTextX = x + measureTextWidth(this.texts[i], textNodeAttributeState);
 
       currentTextY = y;
 
@@ -1457,12 +1464,14 @@ SOFTWARE.
       case "end": textOffset = maxX - minX; break;
     }
 
-    for (i = 0; i < this.tSpans.length; i++) {
-      tSpan = this.tSpans[i];
+    for (i = 0; i < this.textNodes.length; i++) {
+      textNode = this.textNodes[i];
 
-      var tSpanVisibility = getAttribute(tSpan, "visibility") || attributeState.visibility;
-      if (tSpanVisibility === "hidden") {
-        continue;
+      if (textNode.nodeName !== "#text") {
+        var tSpanVisibility = getAttribute(textNode, "visibility") || attributeState.visibility;
+        if (tSpanVisibility === "hidden") {
+          continue;
+        }
       }
 
       _pdf.saveGraphicsState();
@@ -1552,38 +1561,46 @@ SOFTWARE.
       // otherwise loop over tspans and position each relative to the previous one
       var currentTextSegment = new TextChunk(attributeState.textAnchor, textX + dx, textY + dy);
 
-      forEachChild(node, function (i, tSpan) {
-        if (!tSpan.textContent || nodeIs(tSpan, 'title,desc,metadata')) {
-          return;
+      for (var i = 0; i < node.childNodes.length; i++) {
+        var textNode = node.childNodes[i];
+        if (!textNode.textContent) {
+          continue;
         }
-
-        var lastPositions;
-
-        var tSpanAbsX = tSpan.getAttribute("x");
-        if (tSpanAbsX !== null) {
-          var x = toPixels(tSpanAbsX, pdfFontSize);
-
-          lastPositions = currentTextSegment.put(tfMatrix, attributeState);
-          currentTextSegment = new TextChunk(tSpan.getAttribute("text-anchor") || attributeState.textAnchor, x, lastPositions[1]);
-        }
-
-        var tSpanAbsY = tSpan.getAttribute("y");
-        if (tSpanAbsY !== null) {
-          var y = toPixels(tSpanAbsY, pdfFontSize);
-
-          lastPositions = currentTextSegment.put(tfMatrix, attributeState);
-          currentTextSegment = new TextChunk(tSpan.getAttribute("text-anchor") || attributeState.textAnchor, lastPositions[0], y);
-        }
-
-        var trimmedText = tSpan.textContent;
-        trimmedText = removeNewlines(trimmedText);
-        trimmedText = replaceTabsBySpace(trimmedText);
 
         var xmlSpace = attributeState.xmlSpace;
-        var tSpanXmlSpace = tSpan.getAttribute("xml:space");
-        if (tSpanXmlSpace) {
-          xmlSpace = tSpanXmlSpace;
+
+        if (textNode.nodeName === "#text") {
+
+        } else if (nodeIs(textNode, "tspan")) {
+          var tSpan = textNode;
+
+          var lastPositions;
+
+          var tSpanAbsX = tSpan.getAttribute("x");
+          if (tSpanAbsX !== null) {
+            var x = toPixels(tSpanAbsX, pdfFontSize);
+
+            lastPositions = currentTextSegment.put(tfMatrix, attributeState);
+            currentTextSegment = new TextChunk(tSpan.getAttribute("text-anchor") || attributeState.textAnchor, x, lastPositions[1]);
+          }
+
+          var tSpanAbsY = tSpan.getAttribute("y");
+          if (tSpanAbsY !== null) {
+            var y = toPixels(tSpanAbsY, pdfFontSize);
+
+            lastPositions = currentTextSegment.put(tfMatrix, attributeState);
+            currentTextSegment = new TextChunk(tSpan.getAttribute("text-anchor") || attributeState.textAnchor, lastPositions[0], y);
+          }
+
+          var tSpanXmlSpace = tSpan.getAttribute("xml:space");
+          if (tSpanXmlSpace) {
+            xmlSpace = tSpanXmlSpace;
+          }
         }
+
+        trimmedText = textNode.textContent;
+        trimmedText = removeNewlines(trimmedText);
+        trimmedText = replaceTabsBySpace(trimmedText);
 
         if (xmlSpace === "default") {
           if (i === 0) {
@@ -1597,8 +1614,8 @@ SOFTWARE.
         }
 
         transformedText = transformText(node, trimmedText);
-        currentTextSegment.add(tSpan, transformedText);
-      });
+        currentTextSegment.add(textNode, transformedText);
+      }
 
       currentTextSegment.put(tfMatrix, attributeState);
     }

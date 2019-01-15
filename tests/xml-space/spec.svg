@@ -37,4 +37,15 @@
 
   <text xml:space="preserve" x="20" y="260" fill="orange"><tspan>Correct inheritance: </tspan><tspan>"preserve"    inherited</tspan><tspan xml:space="default">set    to       "default"</tspan></text>
 
+  <text xml:space="default" x="20" y="300" fill="red">
+    Mixed
+    <tspan>tSpans</tspan>
+    and normal text ("default")
+  </text>
+
+  <text xml:space="preserve" x="20" y="340" fill="blue">
+    Mixed
+    <tspan>tSpans</tspan>
+    and normal text ("preserve")
+  </text>
 </svg>
