@@ -1,4 +1,7 @@
 # svg2pdf.js
+
+[![NPM version](https://img.shields.io/npm/v/svg2pdf.js.svg?style=flat)](https://www.npmjs.org/package/svg2pdf.js)
+
 A javascript-only SVG to PDF conversion utility that runs in the browser leveraging jsPDF.
 
 ## Installation
@@ -6,10 +9,6 @@ You can get svg2pf.js via npm:
 
 ```
 $ npm install svg2pdf.js --save
-```
-or bower:
-```
-$ bower install svg2pdf.js --save
 ```
 
 Then import via [requirejs](http://requirejs.org/):
