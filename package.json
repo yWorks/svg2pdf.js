@@ -45,6 +45,7 @@
     "babel-core": "^6.26.3",
     "babel-preset-env": "^1.7.0",
     "browserify": "^16.2.2",
+    "cssesc": "^2.0.0",
     "exorcist": "^1.0.1",
     "font-family": "^0.2.0",
     "jasmine": "^3.2.0",

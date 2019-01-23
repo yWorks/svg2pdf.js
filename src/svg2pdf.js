@@ -36,6 +36,7 @@ SOFTWARE.
   var RGBColor;
   var SvgPath;
   var FontFamily;
+  var cssEsc;
 
   var _pdf; // jsPDF pdf-document
 
@@ -239,7 +240,7 @@ SOFTWARE.
       return this.renderedElements[id];
     }
 
-    var node = this.rootSvg.getElementById(id);
+    var node = this.rootSvg.querySelector("#" + cssEsc(id, {isIdentifier: true}));
 
     if (nodeIs(node, "lineargradient")) {
       putGradient(node, "axial", [
@@ -2238,21 +2239,24 @@ SOFTWARE.
   };
 
   if (typeof define === "function" && define.amd) {
-    define(["./rgbcolor", "SvgPath", "font-family"], function (rgbcolor, svgpath, fontFamily) {
+    define(["./rgbcolor", "SvgPath", "font-family", "cssesc"], function (rgbcolor, svgpath, fontFamily, cssesc) {
       RGBColor = rgbcolor;
       SvgPath = svgpath;
       FontFamily = fontFamily;
+      cssEsc = cssesc;
       return svg2pdf;
     });
   } else if (typeof module !== "undefined" && module.exports) {
     RGBColor = require("./rgbcolor.js");
     SvgPath = require("SvgPath");
     FontFamily = require("font-family");
+    cssEsc = require("cssesc");
     module.exports = svg2pdf;
   } else {
     SvgPath = global.SvgPath;
     RGBColor = global.RGBColor;
     FontFamily = global.FontFamily;
+    cssEsc = global.cssesc;
     global.svg2pdf = svg2pdf;
     // for compatibility reasons
     global.svgElementToPdf = svg2pdf;
