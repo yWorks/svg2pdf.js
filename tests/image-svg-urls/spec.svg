@@ -1,6 +1,7 @@
-<!-- NOTE: currently the second image is not displayed correctly because we cannot asynchronously load it -->
-<svg xmlns="http://www.w3.org/2000/svg" width="100px" height="220px">
+<!-- NOTE: currently the third image is not displayed correctly because we cannot asynchronously load it -->
+<svg xmlns="http://www.w3.org/2000/svg" width="100px" height="340px">
     <image href="data:image/svg+xml;charset=utf-8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDBweCIgaGVpZ2h0PSIxMDBweCI+CiAgICAgIDxyZWN0IGZpbGw9InJlZCIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiPjwvcmVjdD4KICAgIDwvc3ZnPg=="
            width="100" height="100"/>
-    <image href="./myImage.svg" y="120" width="100" height="100"/>
+    <image width="100" height="100" y="120" href="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'100px'%20height%3D'100px'%20viewBox%3D'0%200%20100%20100'%3E%3Cdefs%3E%3ClinearGradient%20id%3D'grad'%3E%3Cstop%20offset%3D'0'%20stop-color%3D'green'%2F%3E%3Cstop%20offset%3D'1'%20stop-color%3D'gold'%2F%3E%3C%2FlinearGradient%3E%3Crect%20id%3D'rect'%20width%3D'50'%20height%3D'50'%20fill%3D'red'%2F%3E%3C%2Fdefs%3E%3Crect%20fill%3D'url(%23grad)'%20width%3D'100'%20height%3D'100'%2F%3E%3Cuse%20href%3D'%23rect'%20x%3D'25'%20y%3D'25'%2F%3E%3C%2Fsvg%3E"/>
+    <image href="./myImage.svg" y="240" width="100" height="100"/>
 </svg>

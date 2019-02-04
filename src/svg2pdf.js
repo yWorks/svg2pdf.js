@@ -962,7 +962,7 @@ SOFTWARE.
       svgElement.setAttribute("width", String(width));
       svgElement.setAttribute("height", String(height));
 
-      renderNode(svgElement, _pdf.unitMatrix, {}, false, false, AttributeState.default());
+      renderNode(svgElement, _pdf.unitMatrix, new ReferencesHandler(svgElement), false, false, AttributeState.default());
       return;
     }
 
