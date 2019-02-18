@@ -1813,6 +1813,34 @@ SOFTWARE.
   }
 
 
+  function isPartlyVisible(node, parentHidden) {
+    if (getAttribute(node, "display") === "none") {
+      return false;
+    }
+
+    var visible = !parentHidden;
+
+    var visibility = getAttribute(node,"visibility");
+    if (visibility) {
+      visible = visibility !== "hidden";
+    }
+
+    if (nodeIs(node, "svg,g,marker,a,pattern,defs,text,clippath")) {
+      var hasChildren = false;
+      forEachChild(node, function(i, child) {
+        hasChildren = true;
+        if (isPartlyVisible(child, !visible)) {
+          visible = true;
+        }
+      });
+      if (!hasChildren) {
+        return false;
+      }
+    }
+
+    return visible;
+  }
+
   /**
    * Renders a svg node.
    * @param node The svg element
@@ -1880,6 +1908,10 @@ SOFTWARE.
       var clipPathId = iriReference.exec(node.getAttribute("clip-path"));
       var clipPathNode = refsHandler.getRendered(clipPathId[1]);
 
+      if (!isPartlyVisible(clipPathNode)) {
+        return;
+      }
+
       var clipPathMatrix = tfMatrix;
       if (clipPathNode.hasAttribute("clipPathUnits")
           && clipPathNode.getAttribute("clipPathUnits").toLowerCase() === "objectboundingbox") {
@@ -1897,7 +1929,7 @@ SOFTWARE.
       _pdf.saveGraphicsState();
       _pdf.setCurrentTransformationMatrix(clipPathMatrix);
 
-      renderChildren(clipPathNode, _pdf.unitMatrix, refsHandler, false, true, attributeState);
+      renderChildren(clipPathNode, _pdf.unitMatrix, refsHandler, false, true, AttributeState.default());
       _pdf.clip().discardPath();
 
       // as we cannot use restoreGraphicsState() to reset the transform (this would reset the clipping path, as well),

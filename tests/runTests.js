@@ -22,6 +22,7 @@ const tests = [
     "gradient-default-coordinates",
     "gradient-units",
     "gradients-and-patterns-mixed",
+    "hidden-clippath",
     "image-svg-urls",
     "line-default-coordinates",
     "markers",
