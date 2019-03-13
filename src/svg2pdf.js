@@ -1575,11 +1575,24 @@ SOFTWARE.
         }
 
         var xmlSpace = attributeState.xmlSpace;
+        var textContent = textNode.textContent;
 
         if (textNode.nodeName === "#text") {
 
+        } else if (nodeIs(textNode, "title")) {
+          continue;
         } else if (nodeIs(textNode, "tspan")) {
           var tSpan = textNode;
+
+          if (tSpan.childElementCount > 0) {
+            // filter <title> elements...
+            textContent = "";
+            for (var j = 0; j < tSpan.childNodes.length; j++) {
+              if (tSpan.childNodes[j].nodeName === "#text") {
+                textContent += tSpan.childNodes[j].textContent;
+              }
+            }
+          }
 
           var lastPositions;
 
@@ -1605,8 +1618,7 @@ SOFTWARE.
           }
         }
 
-        trimmedText = textNode.textContent;
-        trimmedText = removeNewlines(trimmedText);
+        trimmedText = removeNewlines(textContent);
         trimmedText = replaceTabsBySpace(trimmedText);
 
         if (xmlSpace === "default") {

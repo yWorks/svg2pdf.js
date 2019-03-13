@@ -34,6 +34,7 @@ const tests = [
     "remote-images",
     "strokes-and-bounding-boxes",
     "text-placement",
+    "title-element",
     "transparent-pngs",
     "url-references-with-quotes",
     "zero-width-strokes",
