@@ -2283,7 +2283,7 @@ SOFTWARE.
   };
 
   if (typeof define === "function" && define.amd) {
-    define(["./rgbcolor", "SvgPath", "font-family", "cssesc"], function (rgbcolor, svgpath, fontFamily, cssesc) {
+    define(["./rgbcolor", "SvgPath", "font-family-papandreou", "cssesc"], function (rgbcolor, svgpath, fontFamily, cssesc) {
       RGBColor = rgbcolor;
       SvgPath = svgpath;
       FontFamily = fontFamily;
@@ -2293,7 +2293,7 @@ SOFTWARE.
   } else if (typeof module !== "undefined" && module.exports) {
     RGBColor = require("./rgbcolor.js");
     SvgPath = require("SvgPath");
-    FontFamily = require("font-family");
+    FontFamily = require("font-family-papandreou");
     cssEsc = require("cssesc");
     module.exports = svg2pdf;
   } else {

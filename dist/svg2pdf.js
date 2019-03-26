@@ -14,11 +14,11 @@
  *   homepage: https://mths.be/cssesc
  *   version: 2.0.0
  *
- * font-family:
+ * font-family-papandreou:
  *   license: MIT (http://opensource.org/licenses/MIT)
  *   author: Taro Hanamura <m@hanamurataro.com>
  *   homepage: https://github.com/hanamura/font-family
- *   version: 0.2.0
+ *   version: 0.2.0-patch1
  *
  * svgpath:
  *   license: MIT (http://opensource.org/licenses/MIT)
@@ -1604,11 +1604,12 @@ module.exports = cssesc;
 // states
 // ------
 
-var PLAIN      = 0;
-var STRINGS    = 1;
-var ESCAPING   = 2;
-var IDENTIFIER = 3;
-var SEPARATING = 4;
+var PLAIN                = 0;
+var STRINGS              = 1;
+var ESCAPING             = 2;
+var IDENTIFIER           = 3;
+var SEPARATING           = 4;
+var SPACEAFTERIDENTIFIER = 5;
 
 // patterns
 // --------
@@ -1725,10 +1726,31 @@ var parse = function(str) {
 
       } else if (spacePattern.test(c)) {
 
+        state = SPACEAFTERIDENTIFIER;
+      } else {
+
+        throw new Error('Parse error');
+
+      }
+    } else if (state === SPACEAFTERIDENTIFIER) {
+
+      if (!c) {
+
+        names.push(buffer);
+        break;
+
+      } else if (identifierPattern.test(c)) {
+
+        buffer += ' ' + c;
+        state = IDENTIFIER;
+
+      } else if (c === ',') {
+
         names.push(buffer);
         buffer = '';
-        state = SEPARATING;
+        state = PLAIN;
 
+      } else if (spacePattern.test(c)) {
       } else {
 
         throw new Error('Parse error');
@@ -3696,11 +3718,24 @@ SOFTWARE.
         }
 
         var xmlSpace = attributeState.xmlSpace;
+        var textContent = textNode.textContent;
 
         if (textNode.nodeName === "#text") {
 
+        } else if (nodeIs(textNode, "title")) {
+          continue;
         } else if (nodeIs(textNode, "tspan")) {
           var tSpan = textNode;
+
+          if (tSpan.childElementCount > 0) {
+            // filter <title> elements...
+            textContent = "";
+            for (var j = 0; j < tSpan.childNodes.length; j++) {
+              if (tSpan.childNodes[j].nodeName === "#text") {
+                textContent += tSpan.childNodes[j].textContent;
+              }
+            }
+          }
 
           var lastPositions;
 
@@ -3726,8 +3761,7 @@ SOFTWARE.
           }
         }
 
-        trimmedText = textNode.textContent;
-        trimmedText = removeNewlines(trimmedText);
+        trimmedText = removeNewlines(textContent);
         trimmedText = replaceTabsBySpace(trimmedText);
 
         if (xmlSpace === "default") {
@@ -3934,6 +3968,34 @@ SOFTWARE.
   }
 
 
+  function isPartlyVisible(node, parentHidden) {
+    if (getAttribute(node, "display") === "none") {
+      return false;
+    }
+
+    var visible = !parentHidden;
+
+    var visibility = getAttribute(node,"visibility");
+    if (visibility) {
+      visible = visibility !== "hidden";
+    }
+
+    if (nodeIs(node, "svg,g,marker,a,pattern,defs,text,clippath")) {
+      var hasChildren = false;
+      forEachChild(node, function(i, child) {
+        hasChildren = true;
+        if (isPartlyVisible(child, !visible)) {
+          visible = true;
+        }
+      });
+      if (!hasChildren) {
+        return false;
+      }
+    }
+
+    return visible;
+  }
+
   /**
    * Renders a svg node.
    * @param node The svg element
@@ -4001,6 +4063,10 @@ SOFTWARE.
       var clipPathId = iriReference.exec(node.getAttribute("clip-path"));
       var clipPathNode = refsHandler.getRendered(clipPathId[1]);
 
+      if (!isPartlyVisible(clipPathNode)) {
+        return;
+      }
+
       var clipPathMatrix = tfMatrix;
       if (clipPathNode.hasAttribute("clipPathUnits")
           && clipPathNode.getAttribute("clipPathUnits").toLowerCase() === "objectboundingbox") {
@@ -4018,7 +4084,7 @@ SOFTWARE.
       _pdf.saveGraphicsState();
       _pdf.setCurrentTransformationMatrix(clipPathMatrix);
 
-      renderChildren(clipPathNode, _pdf.unitMatrix, refsHandler, false, true, attributeState);
+      renderChildren(clipPathNode, _pdf.unitMatrix, refsHandler, false, true, AttributeState.default());
       _pdf.clip().discardPath();
 
       // as we cannot use restoreGraphicsState() to reset the transform (this would reset the clipping path, as well),
@@ -4360,7 +4426,7 @@ SOFTWARE.
   };
 
   if (typeof define === "function" && define.amd) {
-    define(["./rgbcolor", "SvgPath", "font-family", "cssesc"], function (rgbcolor, svgpath, fontFamily, cssesc) {
+    define(["./rgbcolor", "SvgPath", "font-family-papandreou", "cssesc"], function (rgbcolor, svgpath, fontFamily, cssesc) {
       RGBColor = rgbcolor;
       SvgPath = svgpath;
       FontFamily = fontFamily;
@@ -4370,7 +4436,7 @@ SOFTWARE.
   } else if (typeof module !== "undefined" && module.exports) {
     RGBColor = require("./rgbcolor.js");
     SvgPath = require("SvgPath");
-    FontFamily = require("font-family");
+    FontFamily = require("font-family-papandreou");
     cssEsc = require("cssesc");
     module.exports = svg2pdf;
   } else {
@@ -4385,6 +4451,6 @@ SOFTWARE.
   return svg2pdf;
 }(typeof self !== "undefined" && self || typeof window !== "undefined" && window || this));
 
-},{"./rgbcolor.js":10,"SvgPath":1,"cssesc":8,"font-family":9}]},{},[11])(11)
+},{"./rgbcolor.js":10,"SvgPath":1,"cssesc":8,"font-family-papandreou":9}]},{},[11])(11)
 });
 //# sourceMappingURL=svg2pdf.js.map
