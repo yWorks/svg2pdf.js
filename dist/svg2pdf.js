@@ -3744,7 +3744,7 @@ SOFTWARE.
             var x = toPixels(tSpanAbsX, pdfFontSize);
 
             lastPositions = currentTextSegment.put(tfMatrix, attributeState);
-            currentTextSegment = new TextChunk(tSpan.getAttribute("text-anchor") || attributeState.textAnchor, x, lastPositions[1]);
+            currentTextSegment = new TextChunk(getAttribute(tSpan, "text-anchor") || attributeState.textAnchor, x, lastPositions[1]);
           }
 
           var tSpanAbsY = tSpan.getAttribute("y");
@@ -3752,7 +3752,7 @@ SOFTWARE.
             var y = toPixels(tSpanAbsY, pdfFontSize);
 
             lastPositions = currentTextSegment.put(tfMatrix, attributeState);
-            currentTextSegment = new TextChunk(tSpan.getAttribute("text-anchor") || attributeState.textAnchor, lastPositions[0], y);
+            currentTextSegment = new TextChunk(getAttribute(tSpan, "text-anchor") || attributeState.textAnchor, lastPositions[0], y);
           }
 
           var tSpanXmlSpace = tSpan.getAttribute("xml:space");

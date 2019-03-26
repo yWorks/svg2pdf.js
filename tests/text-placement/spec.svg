@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="500" height="800" font-family="Arial"
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="1000" font-family="Arial"
      font-size="15px" style="border: 1px dotted gray">
 
-    <path d="M 200 10 L 200 800 M 10 20 L 490 20 z" stroke="blue" stroke-width="1" />
+    <path d="M 200 10 L 200 1000 M 10 20 L 490 20 z" stroke="blue" stroke-width="1" />
     <text fill="blue" x="200" y="20">
         <tspan>text-anchor auto</tspan>
     </text>
@@ -97,5 +97,11 @@
     <text fill="blue" x="200" y="740" text-anchor="start">
         <tspan>text-anchor="start", </tspan>
         <tspan x="200" y="740" text-anchor="end">absolute x, anchor="end"</tspan>
+    </text>
+
+    <text fill="red">
+        <tspan x="200" y="800" style="text-anchor: end;">css text-anchor="end"</tspan>
+        <tspan x="200" y="800" style="text-anchor: start;">css text-anchor="start"</tspan>
+        <tspan x="200" y="820" style="text-anchor: middle;">css text-anchor="middle"</tspan>
     </text>
 </svg>
