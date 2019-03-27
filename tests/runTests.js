@@ -1,6 +1,7 @@
 const debug = false;
 
 const tests = [
+    "attribute-style-precedence",
     "clippath",
     "complete-bpmn",
     "complete-computer-network",

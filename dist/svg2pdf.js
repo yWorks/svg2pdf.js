@@ -2195,7 +2195,7 @@ SOFTWARE.
 
   // pathSegList is marked deprecated in chrome, so parse the d attribute manually if necessary
   var getPathSegList = function (node) {
-    var d = node.getAttribute("d");
+    var d = getAttribute(node, "d");
 
     // Replace arcs before path segment list is handled
     if (SvgPath) {
@@ -2293,7 +2293,11 @@ SOFTWARE.
   // returns an attribute of a node, either from the node directly or from css
   var getAttribute = function (node, propertyNode, propertyCss) {
     propertyCss = propertyCss || propertyNode;
-    return node.getAttribute(propertyNode) || node.style && node.style[propertyCss];
+    if (node.hasAttribute(propertyNode)) {
+      return node.getAttribute(propertyNode)
+    } else {
+      return global.getComputedStyle(node)[propertyCss];
+    }
   };
 
   /**
@@ -2632,14 +2636,14 @@ SOFTWARE.
     var viewBox, x, y;
     var nodeTransform = _pdf.unitMatrix;
     if (nodeIs(node, "svg,g")) {
-      x = parseFloat(node.getAttribute("x")) || 0;
-      y = parseFloat(node.getAttribute("y")) || 0;
+      x = parseFloat(getAttribute(node, "x")) || 0;
+      y = parseFloat(getAttribute(node, "y")) || 0;
 
       viewBox = node.getAttribute("viewBox");
       if (viewBox) {
         var box = parseFloats(viewBox);
-        var width = parseFloat(node.getAttribute("width")) || box[2];
-        var height = parseFloat(node.getAttribute("height")) || box[3];
+        var width = parseFloat(getAttribute(node, "width")) || box[2];
+        var height = parseFloat(getAttribute(node, "height")) || box[3];
         nodeTransform = computeViewBoxTransform(node, box, x, y, width, height)
       } else {
         nodeTransform = new _pdf.Matrix(1, 0, 0, 1, x, y);
@@ -2665,7 +2669,7 @@ SOFTWARE.
       }
     }
 
-    var transformString = node.getAttribute("transform");
+    var transformString = getAttribute(node, "transform");
     if (!transformString)
       return nodeTransform;
     else
@@ -2686,7 +2690,7 @@ SOFTWARE.
 
   // parses the "transform" string
   var parseTransform = function (transformString) {
-    if (!transformString)
+    if (!transformString || transformString === "none")
       return _pdf.unitMatrix;
 
     var mRegex = /^\s*matrix\(([^\)]+)\)\s*/,
@@ -2928,10 +2932,10 @@ SOFTWARE.
         vb = parseFloats(viewBox);
       }
       return [
-        pf(node.getAttribute("x")) || (vb && vb[0]) || 0,
-        pf(node.getAttribute("y")) || (vb && vb[1]) || 0,
-        pf(node.getAttribute("width")) || (vb && vb[2]) || 0,
-        pf(node.getAttribute("height")) || (vb && vb[3]) || 0
+        pf(getAttribute(node, "x")) || (vb && vb[0]) || 0,
+        pf(getAttribute(node, "y")) || (vb && vb[1]) || 0,
+        pf(getAttribute(node, "width")) || (vb && vb[2]) || 0,
+        pf(getAttribute(node, "height")) || (vb && vb[3]) || 0
       ];
     } else if (nodeIs(node, "g,clippath")) {
       boundingBox = [0, 0, 0, 0];
@@ -2964,10 +2968,10 @@ SOFTWARE.
       ]
     } else {
       // TODO: check if there are other possible coordinate attributes
-      var x1 = pf(node.getAttribute("x1")) || pf(node.getAttribute("x")) || pf((node.getAttribute("cx")) - pf(node.getAttribute("r"))) || 0;
-      var x2 = pf(node.getAttribute("x2")) || (x1 + pf(node.getAttribute("width"))) || (pf(node.getAttribute("cx")) + pf(node.getAttribute("r"))) || 0;
-      var y1 = pf(node.getAttribute("y1")) || pf(node.getAttribute("y")) || (pf(node.getAttribute("cy")) - pf(node.getAttribute("r"))) || 0;
-      var y2 = pf(node.getAttribute("y2")) || (y1 + pf(node.getAttribute("height"))) || (pf(node.getAttribute("cy")) + pf(node.getAttribute("r"))) || 0;
+      var x1 = pf(node.getAttribute("x1")) || pf(getAttribute(node, "x")) || pf((getAttribute(node, "cx")) - pf(getAttribute(node, "r"))) || 0;
+      var x2 = pf(node.getAttribute("x2")) || (x1 + pf(getAttribute(node, "width"))) || (pf(getAttribute(node, "cx")) + pf(getAttribute(node, "r"))) || 0;
+      var y1 = pf(node.getAttribute("y1")) || pf(getAttribute(node, "y")) || (pf(getAttribute(node, "cy")) - pf(getAttribute(node, "r"))) || 0;
+      var y2 = pf(node.getAttribute("y2")) || (y1 + pf(getAttribute(node, "height"))) || (pf(getAttribute(node, "cy")) + pf(getAttribute(node, "r"))) || 0;
       boundingBox = [
         Math.min(x1, x2),
         Math.min(y1, y2),
@@ -3032,9 +3036,9 @@ SOFTWARE.
 
     _pdf.path(lines);
 
-    var markerEnd = node.getAttribute("marker-end"),
-        markerStart = node.getAttribute("marker-start"),
-        markerMid = node.getAttribute("marker-mid");
+    var markerEnd = getAttribute(node, "marker-end"),
+        markerStart = getAttribute(node, "marker-start"),
+        markerMid = getAttribute(node, "marker-mid");
 
     if (markerStart || markerMid || markerEnd) {
       var length = lines.length;
@@ -3072,10 +3076,10 @@ SOFTWARE.
 
   // draws an image
   var image = function (node) {
-    var width = parseFloat(node.getAttribute("width")),
-        height = parseFloat(node.getAttribute("height")),
-        x = parseFloat(node.getAttribute("x") || 0),
-        y = parseFloat(node.getAttribute("y") || 0);
+    var width = parseFloat(getAttribute(node, "width")),
+        height = parseFloat(getAttribute(node, "height")),
+        x = parseFloat(getAttribute(node, "x") || 0),
+        y = parseFloat(getAttribute(node, "y") || 0);
 
 
     var imageUrl = node.getAttribute("xlink:href") || node.getAttribute("href");
@@ -3128,9 +3132,9 @@ SOFTWARE.
   // draws a path
   var path = function (node, tfMatrix, refsHandler, withinClipPath, attributeState) {
     var list = getPathSegList(node);
-    var markerEnd = node.getAttribute("marker-end"),
-        markerStart = node.getAttribute("marker-start"),
-        markerMid = node.getAttribute("marker-mid");
+    var markerEnd = getAttribute(node, "marker-end"),
+        markerStart = getAttribute(node, "marker-start"),
+        markerMid = getAttribute(node, "marker-mid");
 
     markerEnd && (markerEnd = iriReference.exec(markerEnd)[1]);
     markerStart && (markerStart = iriReference.exec(markerStart)[1]);
@@ -3343,10 +3347,10 @@ SOFTWARE.
     var formObject = _pdf.getFormObject(id);
 
     // scale and position it right
-    var x = node.getAttribute("x") || 0;
-    var y = node.getAttribute("y") || 0;
-    var width = node.getAttribute("width") || formObject.width;
-    var height = node.getAttribute("height") || formObject.height;
+    var x = getAttribute(node, "x") || 0;
+    var y = getAttribute(node, "y") || 0;
+    var width = getAttribute(node, "width") || formObject.width;
+    var height = getAttribute(node, "height") || formObject.height;
     var t = new _pdf.Matrix(width / formObject.width || 0, 0, 0, height / formObject.height || 0, x, y);
     t = _pdf.matrixMult(t, tfMatrix);
     _pdf.doFormObject(id, t);
@@ -3361,8 +3365,8 @@ SOFTWARE.
       _pdf.line(p1[0], p1[1], p2[0], p2[1]);
     }
 
-    var markerStart = node.getAttribute("marker-start"),
-        markerEnd = node.getAttribute("marker-end");
+    var markerStart = getAttribute(node, "marker-start"),
+        markerEnd = getAttribute(node, "marker-end");
 
     if (markerStart || markerEnd) {
       var markers = new MarkerList();
@@ -3380,31 +3384,31 @@ SOFTWARE.
   // draws a rect
   var rect = function (node) {
     _pdf.roundedRect(
-        parseFloat(node.getAttribute('x')) || 0,
-        parseFloat(node.getAttribute('y')) || 0,
-        parseFloat(node.getAttribute('width')),
-        parseFloat(node.getAttribute('height')),
-        parseFloat(node.getAttribute('rx')) || 0,
-        parseFloat(node.getAttribute('ry')) || 0
+        parseFloat(getAttribute(node, 'x')) || 0,
+        parseFloat(getAttribute(node, 'y')) || 0,
+        parseFloat(getAttribute(node, 'width')),
+        parseFloat(getAttribute(node, 'height')),
+        parseFloat(getAttribute(node, 'rx')) || 0,
+        parseFloat(getAttribute(node, 'ry')) || 0
     );
   };
 
   // draws an ellipse
   var ellipse = function (node) {
     _pdf.ellipse(
-        parseFloat(node.getAttribute('cx')) || 0,
-        parseFloat(node.getAttribute('cy')) || 0,
-        parseFloat(node.getAttribute('rx')),
-        parseFloat(node.getAttribute('ry'))
+        parseFloat(getAttribute(node, 'cx')) || 0,
+        parseFloat(getAttribute(node, 'cy')) || 0,
+        parseFloat(getAttribute(node, 'rx')),
+        parseFloat(getAttribute(node, 'ry'))
     );
   };
 
   // draws a circle
   var circle = function (node) {
-    var radius = parseFloat(node.getAttribute('r')) || 0;
+    var radius = parseFloat(getAttribute(node, 'r')) || 0;
     _pdf.ellipse(
-        parseFloat(node.getAttribute('cx')) || 0,
-        parseFloat(node.getAttribute('cy')) || 0,
+        parseFloat(getAttribute(node, 'cx')) || 0,
+        parseFloat(getAttribute(node, 'cy')) || 0,
         radius,
         radius
     );
@@ -4058,9 +4062,9 @@ SOFTWARE.
       }
     }
 
-    var hasClipPath = node.hasAttribute("clip-path") && node.getAttribute("clip-path") !== "none";
+    var hasClipPath = node.hasAttribute("clip-path") && getAttribute(node, "clip-path") !== "none";
     if (hasClipPath) {
-      var clipPathId = iriReference.exec(node.getAttribute("clip-path"));
+      var clipPathId = iriReference.exec(getAttribute(node, "clip-path"));
       var clipPathNode = refsHandler.getRendered(clipPathId[1]);
 
       if (!isPartlyVisible(clipPathNode)) {
@@ -4126,7 +4130,7 @@ SOFTWARE.
             }
 
             // matrix that is applied to the gradient before any other transformations
-            var gradientTransform = parseTransform(fillNode.getAttribute("gradientTransform"));
+            var gradientTransform = parseTransform(getAttribute(fillNode, "gradientTransform", "transform"));
 
             patternOrGradient = {
               key: fillUrl,
@@ -4173,7 +4177,7 @@ SOFTWARE.
 
             var patternTransformMatrix = _pdf.unitMatrix;
             if (fillNode.hasAttribute("patternTransform")) {
-              patternTransformMatrix = parseTransform(fillNode.getAttribute("patternTransform"));
+              patternTransformMatrix = parseTransform(getAttribute(fillNode, "patternTransform", "transform"));
             }
 
             var matrix = patternContentUnitsMatrix;
