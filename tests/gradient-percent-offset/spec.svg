@@ -1,0 +1,12 @@
+<svg width="320" height="500" xmlns="http://www.w3.org/2000/svg">
+    <linearGradient id="linear">
+        <stop offset="0%" stop-color="green"/>
+        <stop offset="100%" stop-color="gold"/>
+    </linearGradient>
+    <radialGradient id="radial">
+        <stop offset="0%" stop-color="green"/>
+        <stop offset="100%" stop-color="gold"/>
+    </radialGradient>
+    <rect fill="url(#linear)" x="10" y="10" width="100" height="100"/>
+    <rect fill="url(#radial)" x="10" y="120" width="100" height="100"/>
+</svg>

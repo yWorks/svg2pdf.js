@@ -21,6 +21,7 @@ const tests = [
     "font-family-attribute",
     "font-style",
     "gradient-default-coordinates",
+    "gradient-percent-offset",
     "gradient-units",
     "gradients-and-patterns-mixed",
     "hidden-clippath",
