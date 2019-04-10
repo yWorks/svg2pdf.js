@@ -5,6 +5,8 @@
     </linearGradient>
     <radialGradient id="radial">
         <stop offset="0%" stop-color="green"/>
+        <stop offset="60%" stop-color="green"/>
+        <stop offset="70%" stop-color="blue"/>
         <stop offset="100%" stop-color="gold"/>
     </radialGradient>
     <rect fill="url(#linear)" x="10" y="10" width="100" height="100"/>
