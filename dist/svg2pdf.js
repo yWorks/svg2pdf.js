@@ -6,7 +6,7 @@
  *   license: MIT (http://opensource.org/licenses/MIT)
  *   author: yFiles for HTML Support Team <yfileshtml@yworks.com>
  *   homepage: https://github.com/yWorks/svg2pdf.js#readme
- *   version: 1.3.3
+ *   version: 1.3.4
  *
  * cssesc:
  *   license: MIT (http://opensource.org/licenses/MIT)
@@ -2293,10 +2293,13 @@ SOFTWARE.
   // returns an attribute of a node, either from the node directly or from css
   var getAttribute = function (node, propertyNode, propertyCss) {
     propertyCss = propertyCss || propertyNode;
-    if (node.hasAttribute(propertyNode)) {
-      return node.getAttribute(propertyNode)
+    var attribute = node.style[propertyCss];
+    if (attribute) {
+      return attribute;
+    } else if (node.hasAttribute(propertyNode)) {
+      return node.getAttribute(propertyNode);
     } else {
-      return global.getComputedStyle(node)[propertyCss];
+      return void 0
     }
   };
 
@@ -3796,6 +3799,18 @@ SOFTWARE.
     });
   };
 
+  /**
+   * Convert percentage to decimal
+   * @param {string} value
+   */
+  function parseGradientOffset(value) {
+    var parsedValue = parseFloat(value);
+    if (!isNaN(parsedValue) && value.indexOf("%") >= 0) {
+      return parsedValue / 100;
+    }
+    return parsedValue;
+  }
+
   // adds a gradient to defs and the pdf document for later use, type is either "axial" or "radial"
   // opacity is only supported rudimentary by averaging over all stops
   // transforms are applied on use
@@ -3809,7 +3824,7 @@ SOFTWARE.
       if (element.tagName.toLowerCase() === "stop") {
         var color = new RGBColor(getAttribute(element, "stop-color"));
         colors.push({
-          offset: parseFloat(element.getAttribute("offset")),
+          offset: parseGradientOffset(element.getAttribute("offset")),
           color: [color.r, color.g, color.b]
         });
         var opacity = getAttribute(element, "stop-opacity");
