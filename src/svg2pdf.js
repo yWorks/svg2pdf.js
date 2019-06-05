@@ -54,6 +54,10 @@ SOFTWARE.
   var getPathSegList = function (node) {
     var d = getAttribute(node, "d");
 
+    if (!d) {
+      return []
+    }
+
     // Replace arcs before path segment list is handled
     if (SvgPath) {
       d = SvgPath(d).unshort().unarc().abs().toString();
