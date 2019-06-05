@@ -1822,7 +1822,7 @@ SOFTWARE.
       }
     }
 
-    if (attributeState.fill !== parentAttributeState.fill && attributeState.fill.ok) {
+    if (attributeState.fill && attributeState.fill !== parentAttributeState.fill && attributeState.fill.ok) {
       var fillRGB = attributeState.fill;
       _pdf.setTextColor(fillRGB.r, fillRGB.g, fillRGB.b);
     }
@@ -2120,52 +2120,60 @@ SOFTWARE.
 
     if (nodeIs(node, "g,path,rect,ellipse,line,circle,polygon,polyline")) {
       // text has no fill color, so don't apply it until here
-      if (hasFillColor) {
+      if (fillColor === "none") {
+        attributeState.fill = null
+      } else if (hasFillColor) {
         attributeState.fill = fillRGB;
         _pdf.setFillColor(fillRGB.r, fillRGB.g, fillRGB.b);
       }
 
       // stroke mode
+      var strokeWidth = getAttribute(node, "stroke-width");
+      if (strokeWidth !== void 0 && strokeWidth !== "") {
+        strokeWidth = Math.abs(parseFloat(strokeWidth));
+        attributeState.strokeWidth = strokeWidth;
+        _pdf.setLineWidth(strokeWidth);
+      } else {
+        // needed for inherited zero width strokes
+        strokeWidth = attributeState.strokeWidth
+      }
+
       var strokeColor = getAttribute(node, "stroke");
       if (strokeColor) {
-        var strokeWidth = getAttribute(node, "stroke-width");
-        if (strokeWidth !== void 0 && strokeWidth !== "") {
-          strokeWidth = Math.abs(parseFloat(strokeWidth));
-          attributeState.strokeWidth = strokeWidth;
-          _pdf.setLineWidth(strokeWidth);
+        if (strokeColor === "none") {
+          attributeState.stroke = null;
         } else {
-          // needed for inherited zero width strokes
-          strokeWidth = attributeState.strokeWidth
-        }
-        var strokeRGB = new RGBColor(strokeColor);
-        if (strokeRGB.ok) {
-          attributeState.stroke = strokeRGB;
-          _pdf.setDrawColor(strokeRGB.r, strokeRGB.g, strokeRGB.b);
+          var strokeRGB = new RGBColor(strokeColor);
+          if (strokeRGB.ok) {
+            attributeState.stroke = strokeRGB;
+            _pdf.setDrawColor(strokeRGB.r, strokeRGB.g, strokeRGB.b);
 
-          // pdf spec states: "A line width of 0 denotes the thinnest line that can be rendered at device resolution:
-          // 1 device pixel wide". SVG, however, does not draw zero width lines.
-          stroke = strokeWidth !== 0;
+            // pdf spec states: "A line width of 0 denotes the thinnest line that can be rendered at device resolution:
+            // 1 device pixel wide". SVG, however, does not draw zero width lines.
+            stroke = strokeWidth !== 0;
+          }
         }
-        var lineCap = getAttribute(node, "stroke-linecap");
-        if (lineCap) {
-          _pdf.setLineCap(attributeState.strokeLinecap = lineCap);
-        }
-        var lineJoin = getAttribute(node, "stroke-linejoin");
-        if (lineJoin) {
-          _pdf.setLineJoin(attributeState.strokeLinejoin = lineJoin);
-        }
-        var dashArray = getAttribute(node, "stroke-dasharray");
-        if (dashArray) {
-          dashArray = parseFloats(dashArray);
-          var dashOffset = parseInt(getAttribute(node, "stroke-dashoffset")) || 0;
-          attributeState.strokeDasharray = dashArray;
-          attributeState.strokeDashoffset = dashOffset;
-          _pdf.setLineDashPattern(dashArray, dashOffset);
-        }
-        var miterLimit = getAttribute(node, "stroke-miterlimit");
-        if (miterLimit !== void 0 && miterLimit !== "") {
-          _pdf.setLineMiterLimit(attributeState.strokeMiterlimit = parseFloat(miterLimit));
-        }
+      }
+
+      var lineCap = getAttribute(node, "stroke-linecap");
+      if (lineCap) {
+        _pdf.setLineCap(attributeState.strokeLinecap = lineCap);
+      }
+      var lineJoin = getAttribute(node, "stroke-linejoin");
+      if (lineJoin) {
+        _pdf.setLineJoin(attributeState.strokeLinejoin = lineJoin);
+      }
+      var dashArray = getAttribute(node, "stroke-dasharray");
+      if (dashArray) {
+        dashArray = parseFloats(dashArray);
+        var dashOffset = parseInt(getAttribute(node, "stroke-dashoffset")) || 0;
+        attributeState.strokeDasharray = dashArray;
+        attributeState.strokeDashoffset = dashOffset;
+        _pdf.setLineDashPattern(dashArray, dashOffset);
+      }
+      var miterLimit = getAttribute(node, "stroke-miterlimit");
+      if (miterLimit !== void 0 && miterLimit !== "") {
+        _pdf.setLineMiterLimit(attributeState.strokeMiterlimit = parseFloat(miterLimit));
       }
     }
 
