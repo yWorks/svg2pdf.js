@@ -557,12 +557,12 @@ SOFTWARE.
     if (!transformString || transformString === "none")
       return _pdf.unitMatrix;
 
-    var mRegex = /^\s*matrix\(([^\)]+)\)\s*/,
-        tRegex = /^\s*translate\(([^\)]+)\)\s*/,
-        rRegex = /^\s*rotate\(([^\)]+)\)\s*/,
-        sRegex = /^\s*scale\(([^\)]+)\)\s*/,
-        sXRegex = /^\s*skewX\(([^\)]+)\)\s*/,
-        sYRegex = /^\s*skewY\(([^\)]+)\)\s*/;
+    var mRegex = /^[\s,]*matrix\(([^\)]+)\)\s*/,
+        tRegex = /^[\s,]*translate\(([^\)]+)\)\s*/,
+        rRegex = /^[\s,]*rotate\(([^\)]+)\)\s*/,
+        sRegex = /^[\s,]*scale\(([^\)]+)\)\s*/,
+        sXRegex = /^[\s,]*skewX\(([^\)]+)\)\s*/,
+        sYRegex = /^[\s,]*skewY\(([^\)]+)\)\s*/;
 
     var resultMatrix = _pdf.unitMatrix, m;
 
@@ -602,12 +602,14 @@ SOFTWARE.
       match = sXRegex.exec(transformString);
       if (match) {
         m = parseFloat(match[1]);
+        m *= Math.PI / 180;
         resultMatrix = _pdf.matrixMult(new _pdf.Matrix(1, 0, Math.tan(m), 1, 0, 0), resultMatrix);
         transformString = transformString.substr(match[0].length);
       }
       match = sYRegex.exec(transformString);
       if (match) {
         m = parseFloat(match[1]);
+        m *= Math.PI / 180;
         resultMatrix = _pdf.matrixMult(new _pdf.Matrix(1, Math.tan(m), 0, 1, 0, 0), resultMatrix);
         transformString = transformString.substr(match[0].length);
       }

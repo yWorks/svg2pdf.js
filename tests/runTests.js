@@ -38,6 +38,7 @@ const tests = [
     "strokes-and-bounding-boxes",
     "text-placement",
     "title-element",
+    "transforms-parsing",
     "transparent-pngs",
     "url-references-with-quotes",
     "zero-width-strokes",
