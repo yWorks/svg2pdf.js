@@ -2316,7 +2316,7 @@ SOFTWARE.
   };
 
   if (typeof define === "function" && define.amd) {
-    define(["./rgbcolor", "SvgPath", "font-family-papandreou", "cssesc"], function (rgbcolor, svgpath, fontFamily, cssesc) {
+    define(["./rgbcolor", "svgpath", "font-family-papandreou", "cssesc"], function (rgbcolor, svgpath, fontFamily, cssesc) {
       RGBColor = rgbcolor;
       SvgPath = svgpath;
       FontFamily = fontFamily;
