@@ -2325,7 +2325,7 @@ SOFTWARE.
     });
   } else if (typeof module !== "undefined" && module.exports) {
     RGBColor = require("./rgbcolor.js");
-    SvgPath = require("SvgPath");
+    SvgPath = require("svgpath");
     FontFamily = require("font-family-papandreou");
     cssEsc = require("cssesc");
     module.exports = svg2pdf;
