@@ -14,9 +14,9 @@
     "browserify": "browserify src/svg2pdf.js --debug -p licensify -s svg2pdf -o dist/svg2pdf.js",
     "exorcist:svg2pdf": "browserify src/svg2pdf.js --debug -p licensify -s svg2pdf | exorcist dist/svg2pdf.js.map > dist/svg2pdf.js",
     "uglify:dist": "uglifyjs -m -c --source-map \"includeSources,content='dist/svg2pdf.js.map',url='svg2pdf.min.js.map' dist/svg2pdf.min.js.map\" --comments /@license/ -o dist/svg2pdf.min.js dist/svg2pdf.js",
-    "build": "npm run browserify && npm run exorcist:svg2pdf && npm run uglify:dist",
+    "build": "yarpm run browserify && yarpm run exorcist:svg2pdf && yarpm run uglify:dist",
     "test": "karma start",
-    "test:coverage": "npm run browserify && karma start --coverage",
+    "test:coverage": "yarpm run browserify && karma start --coverage",
     "createreferences": "node tests/utils/reference-server.js"
   },
   "repository": {
@@ -63,6 +63,7 @@
     "requirejs": "^2.3.6",
     "svgpath": "^2.2.2",
     "uglify-js": "^3.6.0",
-    "watchify": "^3.11.1"
+    "watchify": "^3.11.1",
+    "yarpm": "^0.2.1"
   }
 }
