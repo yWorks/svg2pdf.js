@@ -1845,7 +1845,8 @@ SOFTWARE.
     }
 
     if (attributeState.fontSize !== parentAttributeState.fontSize) {
-      _pdf.setFontSize(attributeState.fontSize);
+      // correct for a jsPDF-instance measurement unit that differs from `pt`
+      _pdf.setFontSize(attributeState.fontSize * _pdf.internal.scaleFactor);
     }
   }
 
@@ -2302,7 +2303,8 @@ SOFTWARE.
       var fill = attributeState.fill;
       _pdf.setFillColor(fill.r, fill.g, fill.b);
       _pdf.setFont(attributeState.fontFamily);
-      _pdf.setFontSize(attributeState.fontSize);
+      // correct for a jsPDF-instance measurement unit that differs from `pt`
+      _pdf.setFontSize(attributeState.fontSize * _pdf.internal.scaleFactor);
 
 
       var refsHandler = new ReferencesHandler(element);
