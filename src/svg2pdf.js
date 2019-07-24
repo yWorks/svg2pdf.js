@@ -1315,6 +1315,29 @@ SOFTWARE.
     }
   };
 
+  var textMeasuringTextElement = null;
+  function getMeasurementTextNode() {
+    if (!textMeasuringTextElement) {
+      textMeasuringTextElement = document.createElementNS(svgNamespaceURI, "text");
+
+      var svg = document.createElementNS(svgNamespaceURI, "svg");
+      svg.appendChild(textMeasuringTextElement);
+
+      svg.style.setProperty("position", "absolute");
+      svg.style.setProperty("visibility", "hidden");
+      document.body.appendChild(svg);
+    }
+
+    return textMeasuringTextElement
+  }
+
+  function cleanupTextMeasuring() {
+    if (textMeasuringTextElement) {
+      document.body.removeChild(textMeasuringTextElement.parentNode);
+      textMeasuringTextElement = null
+    }
+  }
+
   /**
    * Canvas text measuring is a lot faster than svg measuring. However, it is inaccurate for some fonts. So test each
    * font once and decide if canvas is accurate enough.
@@ -1346,24 +1369,15 @@ SOFTWARE.
      * @param {string} fontWeight
      */
     function svgTextMeasure(text, fontFamily, fontSize, fontStyle, fontWeight) {
-      var textNode = document.createElementNS(svgNamespaceURI, "text");
+      var textNode = getMeasurementTextNode();
       textNode.setAttribute("font-family", fontFamily);
       textNode.setAttribute("font-size", fontSize);
       textNode.setAttribute("font-style", fontStyle);
       textNode.setAttribute("font-weight", fontWeight);
       textNode.setAttributeNS("http://www.w3.org/XML/1998/namespace", "xml:space", "preserve");
-      textNode.appendChild(document.createTextNode(text));
+      textNode.textContent = text;
 
-      var svg = document.createElementNS(svgNamespaceURI, "svg");
-      svg.appendChild(textNode);
-      svg.setAttribute("visibility", "hidden");
-      document.body.appendChild(svg);
-
-      var width = textNode.getBBox().width;
-
-      document.body.removeChild(svg);
-
-      return width;
+      return textNode.getBBox().width;
     }
 
     var testString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789!\"$%&/()=?'\\+*-_.:,;^}][{#~|<>";
@@ -2338,6 +2352,8 @@ SOFTWARE.
       _pdf.restoreGraphicsState();
 
     });
+
+    cleanupTextMeasuring();
 
     return _pdf;
   };
