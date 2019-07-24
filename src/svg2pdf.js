@@ -947,8 +947,15 @@ SOFTWARE.
         x = parseFloat(getAttribute(node, "x") || 0),
         y = parseFloat(getAttribute(node, "y") || 0);
 
+    if (!isFinite(width) || width <= 0 || !isFinite(height) || height <= 0) {
+      return;
+    }
 
     var imageUrl = node.getAttribute("xlink:href") || node.getAttribute("href");
+
+    if (!imageUrl) {
+      return;
+    }
 
     var dataUrl = imageUrl.match(dataUrlRegex);
     if (dataUrl && dataUrl[2] === "image/svg+xml") {
@@ -1249,11 +1256,16 @@ SOFTWARE.
 
   // draws a rect
   var rect = function (node) {
+    var width = parseFloat(getAttribute(node, 'width'));
+    var height = parseFloat(getAttribute(node, 'height'));
+    if (!isFinite(width) || width <= 0 || !isFinite(height) || height <= 0) {
+      return
+    }
     _pdf.roundedRect(
         parseFloat(getAttribute(node, 'x')) || 0,
         parseFloat(getAttribute(node, 'y')) || 0,
-        parseFloat(getAttribute(node, 'width')),
-        parseFloat(getAttribute(node, 'height')),
+        width,
+        height,
         parseFloat(getAttribute(node, 'rx')) || 0,
         parseFloat(getAttribute(node, 'ry')) || 0
     );
@@ -1261,17 +1273,29 @@ SOFTWARE.
 
   // draws an ellipse
   var ellipse = function (node) {
+    var rx = parseFloat(getAttribute(node, 'rx'));
+    var ry = parseFloat(getAttribute(node, 'ry'));
+
+    if (!isFinite(rx) || rx <= 0 || !isFinite(ry)  || ry <= 0) {
+      return;
+    }
+
     _pdf.ellipse(
         parseFloat(getAttribute(node, 'cx')) || 0,
         parseFloat(getAttribute(node, 'cy')) || 0,
-        parseFloat(getAttribute(node, 'rx')),
-        parseFloat(getAttribute(node, 'ry'))
+        rx,
+        ry
     );
   };
 
   // draws a circle
   var circle = function (node) {
-    var radius = parseFloat(getAttribute(node, 'r')) || 0;
+    var radius = parseFloat(getAttribute(node, 'r'));
+
+    if (!isFinite(radius) || radius <= 0) {
+      return;
+    }
+
     _pdf.ellipse(
         parseFloat(getAttribute(node, 'cx')) || 0,
         parseFloat(getAttribute(node, 'cy')) || 0,

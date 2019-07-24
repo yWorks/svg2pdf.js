@@ -16,7 +16,7 @@ const tests = [
     "complete-organization-chart",
     "complete-organization-chart-new",
     "display-none-and-visibility-inheritance",
-    "empty-paths",
+    "empty-elements",
     "fill-and-stroke-inheritance",
     "fill-and-stroke-opacity",
     "font-family-attribute",
