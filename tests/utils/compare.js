@@ -83,17 +83,17 @@ function resetFile(pdfFile) {
  * Find a better way to set this
  * @type {Boolean}
  */
-window.comparePdf = (actual, expectedFile, alwaysCreateReferences = false) => {
+window.comparePdf = (actual, filePath, alwaysCreateReferences = false) => {
   let reference
 
   if (alwaysCreateReferences) {
-    sendReference(expectedFile, resetFile(actual))
+    sendReference(filePath, resetFile(actual))
     reference = actual
   } else {
     try {
-      reference = loadBinaryResource("/base" + expectedFile, true)
+      reference = loadBinaryResource("/base" + filePath, true)
     } catch (error) {
-      sendReference(expectedFile, resetFile(actual))
+      sendReference(filePath, resetFile(actual))
       reference = actual
     }
   }
@@ -101,5 +101,10 @@ window.comparePdf = (actual, expectedFile, alwaysCreateReferences = false) => {
   const expected = resetFile(reference.trim())
   actual = resetFile(actual.trim())
 
-  expect(actual).toEqual(expected)
+  try {
+    expect(actual).to.equal(expected)
+  } catch (e) {
+    sendReference(filePath, actual)
+    throw e
+  }
 }

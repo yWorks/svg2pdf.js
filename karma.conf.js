@@ -21,7 +21,7 @@ module.exports = (config) => {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['jasmine'].concat(testCoverage ? [] : ['browserify']),
+    frameworks: ['mocha', 'chai'].concat(testCoverage ? [] : ['browserify']),
 
     // list of files / patterns to load in the browser
     files: [
