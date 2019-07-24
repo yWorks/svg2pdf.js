@@ -1947,6 +1947,7 @@ SOFTWARE.
       var clipPathNode = refsHandler.getRendered(clipPathId[1]);
 
       if (!isPartlyVisible(clipPathNode)) {
+        _pdf.restoreGraphicsState();
         return;
       }
 
