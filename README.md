@@ -28,6 +28,10 @@ or script-tag:
 <script src="[node_modules|bower_components]/svg2pdf.js/dist/svg2pdf.min.js"></script>
 ```
 
+If you want to use a development version from the repository, pay attention to the fact that the files in dist may
+reflect the last release version. So a simple package.json dependency link to the branch or revision will fail.
+See [#102](https://github.com/yWorks/svg2pdf.js/issues/102) for details.
+
 ## Usage
 ```javascript
 const svgElement = document.getElementById('svg');
