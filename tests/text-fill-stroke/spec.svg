@@ -1,0 +1,15 @@
+<svg width="300" height="500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 500" font-size="20px" fill="none">
+  <text x="20" y="30" fill="black">Fill black</text>
+  <text x="20" y="60" stroke="red">Stroke red</text>
+  <text x="20" y="90" fill="black" stroke="red">Fill black, stroke red</text>
+  <text x="20" y="120" stroke="red" stroke-width="0.5">stroke-width="0.5"</text>
+  <text x="20" y="150" stroke="red" stroke-width="1">stroke-width="1"</text>
+  <text x="20" y="180" stroke="red" stroke-width="2">stroke-width="2"</text>
+
+  <text x="20" y="210"><tspan fill="black">Fill black</tspan></text>
+  <text x="20" y="240"><tspan stroke="red">Stroke red</tspan></text>
+  <text x="20" y="270"><tspan fill="black" stroke="red">Fill black, stroke red</tspan></text>
+  <text x="20" y="300"><tspan stroke="red" stroke-width="0.5">stroke-width="0.5"</tspan></text>
+  <text x="20" y="330"><tspan stroke="red" stroke-width="1">stroke-width="1"</tspan></text>
+  <text x="20" y="360"><tspan stroke="red" stroke-width="2">stroke-width="2"</tspan></text>
+</svg>

@@ -1444,6 +1444,18 @@ SOFTWARE.
     return xOffset;
   }
 
+  function getTextRenderingMode(attributeState) {
+    var renderingMode = "invisible";
+    if (attributeState.fill && attributeState.stroke) {
+      renderingMode = "fillThenStroke";
+    } else if (attributeState.fill) {
+      renderingMode = "fill";
+    } else if (attributeState.stroke) {
+      renderingMode = "stroke";
+    }
+    return renderingMode;
+  }
+
   /**
    * @param {string} textAnchor
    * @param {number} originX
@@ -1490,6 +1502,17 @@ SOFTWARE.
         var textNodeAttributeState = attributeState.clone();
         var tSpanColor = getAttribute(textNode, "fill");
         setTextProperties(textNode, tSpanColor && new RGBColor(tSpanColor), textNodeAttributeState);
+        var tSpanStrokeColor = getAttribute(textNode, "stroke");
+        if (tSpanStrokeColor) {
+          var strokeRGB = new RGBColor(tSpanStrokeColor);
+          if (strokeRGB.ok) {
+            textNodeAttributeState.stroke = strokeRGB;
+          }
+        }
+        var strokeWidth = getAttribute(textNode, "stroke-width");
+        if (strokeWidth !== void 0) {
+          textNodeAttributeState.strokeWidth = parseFloat(strokeWidth)
+        }
 
         var tSpanDx = textNode.getAttribute("dx");
         if (tSpanDx !== null) {
@@ -1534,8 +1557,16 @@ SOFTWARE.
 
       _pdf.saveGraphicsState();
       putTextProperties(attributeStates[i], attributeState);
+      if (attributeStates[i].stroke && attributeStates[i].stroke !== attributeState.stroke && attributeStates[i].stroke.ok) {
+        var strokeRGB = attributeStates[i].stroke;
+        _pdf.setDrawColor(strokeRGB.r, strokeRGB.g, strokeRGB.b);
+      }
+      if (attributeStates[i].strokeWidth !== null && attributeStates[i].strokeWidth !== attributeState.strokeWidth) {
+        _pdf.setLineWidth(attributeStates[i].strokeWidth)
+      }
 
-      _pdf.text(xs[i] - textOffset, ys[i], this.texts[i], void 0, transform);
+      var textRenderingMode = getTextRenderingMode(attributeStates[i]);
+      _pdf.text(this.texts[i], xs[i] - textOffset, ys[i], {angle: transform, renderingMode: textRenderingMode === "fill" ? void 0 : textRenderingMode});
 
       _pdf.restoreGraphicsState();
     }
@@ -1607,12 +1638,15 @@ SOFTWARE.
       xOffset = getTextOffset(transformedText, attributeState);
 
       if (visibility === "visible") {
+        var textRenderingMode = getTextRenderingMode(attributeState);
         _pdf.text(
-            textX + dx - xOffset,
-            textY + dy,
-            transformedText,
-            void 0,
-            tfMatrix
+          transformedText,
+          textX + dx - xOffset,
+          textY + dy,
+          {
+            angle: tfMatrix,
+            renderingMode: textRenderingMode === "fill" ? void 0 : textRenderingMode
+          }
         );
       }
     } else {
@@ -2019,7 +2053,7 @@ SOFTWARE.
     //
 
     // fill mode
-    if (nodeIs(node, "g,path,rect,text,ellipse,line,circle,polygon,polyline")) {
+    if (nodeIs(node, "svg,g,path,rect,text,ellipse,line,circle,polygon,polyline")) {
       function setDefaultColor() {
         fillRGB = new RGBColor("rgb(0, 0, 0)");
         hasFillColor = true;
@@ -2158,13 +2192,15 @@ SOFTWARE.
 
     }
 
-    if (nodeIs(node, "g,path,rect,ellipse,line,circle,polygon,polyline")) {
-      // text has no fill color, so don't apply it until here
+    if (nodeIs(node, "svg,text,g,path,rect,ellipse,line,circle,polygon,polyline")) {
       if (fillColor === "none") {
         attributeState.fill = null
       } else if (hasFillColor) {
         attributeState.fill = fillRGB;
-        _pdf.setFillColor(fillRGB.r, fillRGB.g, fillRGB.b);
+        if (!nodeIs(node, "text")) {
+          // text fill color will be applied through setTextColor()
+          _pdf.setFillColor(fillRGB.r, fillRGB.g, fillRGB.b);
+        }
       }
 
       // stroke mode
