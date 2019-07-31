@@ -76,7 +76,6 @@ function resetFile(pdfFile) {
       "/ID [ <00000000000000000000000000000000> <00000000000000000000000000000000> ]"
   );
   pdfFile = pdfFile.replace(/(\/Producer \(jsPDF [1-9].[0-9].[0-9]\))/, "/Producer (jsPDF 1.0.0)");
-  pdfFile = pdfFile.replace(/\r/g, "");
   return pdfFile;
 }
 
@@ -103,7 +102,8 @@ window.comparePdf = (actual, filePath, alwaysCreateReferences = false) => {
   actual = resetFile(actual.trim())
 
   try {
-    expect(actual).to.equal(expected)
+    expect(actual.replace(/\r\n/g, "\n").split("\n")).to.deep.equal(expected.replace(/\r\n/g, "\n").split("\n"))
+    // expect(actual).to.equal(expected)
   } catch (e) {
     sendReference(filePath, actual)
     throw e
