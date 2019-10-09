@@ -1,0 +1,9 @@
+<svg viewBox="0 0 500 500" width="500" height="500" xmlns="http://www.w3.org/2000/svg">
+  <polygon stroke="red" points="50,0 21,90 98,35 2,35 79,90" transform="translate(0 0)"/>
+  <polygon fill-rule="nonzero" stroke="red" points="50,0 21,90 98,35 2,35 79,90" transform="translate(150 0)"/>
+  <polygon fill-rule="evenodd" stroke="red" points="50,0 21,90 98,35 2,35 79,90" transform="translate(300 0)"/>
+
+  <path stroke="red" d="M 50,0 21,90 98,35 2,35 79,90 z" transform="translate(0 150)"/>
+  <path fill-rule="nonzero" stroke="red" d="M 50,0 21,90 98,35 2,35 79,90 z" transform="translate(150 150)"/>
+  <path fill-rule="evenodd" stroke="red" d="M 50,0 21,90 98,35 2,35 79,90 z" transform="translate(300 150)"/>
+</svg>

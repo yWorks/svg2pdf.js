@@ -19,6 +19,7 @@ const tests = [
     "empty-elements",
     "fill-and-stroke-inheritance",
     "fill-and-stroke-opacity",
+    "fill-rule",
     "font-family-attribute",
     "font-style",
     "gradient-default-coordinates",
