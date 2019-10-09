@@ -2334,10 +2334,19 @@ SOFTWARE.
     }
 
     if (nodeIs(node, "path,rect,ellipse,circle,polygon,polyline") && !withinClipPath) {
+      var isNodeFillRuleEvenOdd = getAttribute(node, "fill-rule") === "evenodd";
       if (fill && stroke) {
-        _pdf.fillStroke(patternOrGradient);
+        if (isNodeFillRuleEvenOdd) {
+          _pdf.fillStrokeEvenOdd(patternOrGradient);
+        } else {
+          _pdf.fillStroke(patternOrGradient);
+        }
       } else if (fill) {
-        _pdf.fill(patternOrGradient);
+        if (isNodeFillRuleEvenOdd) {
+          _pdf.fillEvenOdd(patternOrGradient);
+        } else {
+          _pdf.fill(patternOrGradient);
+        }
       } else if (stroke) {
         _pdf.stroke();
       } else {
