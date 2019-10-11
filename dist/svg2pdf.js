@@ -6,7 +6,7 @@
  *   license: MIT (http://opensource.org/licenses/MIT)
  *   author: yFiles for HTML Support Team <yfileshtml@yworks.com>
  *   homepage: https://github.com/yWorks/svg2pdf.js#readme
- *   version: 1.4.0
+ *   version: 1.5.0
  *
  * cssesc:
  *   license: MIT (http://opensource.org/licenses/MIT)
@@ -4473,10 +4473,19 @@ SOFTWARE.
     }
 
     if (nodeIs(node, "path,rect,ellipse,circle,polygon,polyline") && !withinClipPath) {
+      var isNodeFillRuleEvenOdd = getAttribute(node, "fill-rule") === "evenodd";
       if (fill && stroke) {
-        _pdf.fillStroke(patternOrGradient);
+        if (isNodeFillRuleEvenOdd) {
+          _pdf.fillStrokeEvenOdd(patternOrGradient);
+        } else {
+          _pdf.fillStroke(patternOrGradient);
+        }
       } else if (fill) {
-        _pdf.fill(patternOrGradient);
+        if (isNodeFillRuleEvenOdd) {
+          _pdf.fillEvenOdd(patternOrGradient);
+        } else {
+          _pdf.fill(patternOrGradient);
+        }
       } else if (stroke) {
         _pdf.stroke();
       } else {
