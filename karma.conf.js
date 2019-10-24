@@ -25,7 +25,7 @@ module.exports = (config) => {
 
     // list of files / patterns to load in the browser
     files: [
-        'node_modules/jspdf-yworks/dist/jspdf.min.js',
+        'node_modules/jspdf-yworks/dist/jspdf.debug.js',
 
         'tests/utils/compare.js',
         'tests/runTests.js',
