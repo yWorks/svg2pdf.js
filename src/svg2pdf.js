@@ -2169,7 +2169,7 @@ SOFTWARE.
     //
 
     // fill mode
-    if (nodeIs(node, "svg,g,path,rect,text,ellipse,line,circle,polygon,polyline")) {
+    if (nodeIs(node, "svg,g,use,path,rect,text,ellipse,line,circle,polygon,polyline")) {
       function setDefaultColor() {
         fillRGB = new RGBColor("rgb(0, 0, 0)");
         hasFillColor = true;
@@ -2308,7 +2308,7 @@ SOFTWARE.
 
     }
 
-    if (nodeIs(node, "svg,text,g,path,rect,ellipse,line,circle,polygon,polyline")) {
+    if (nodeIs(node, "svg,text,g,use,path,rect,ellipse,line,circle,polygon,polyline")) {
       if (fillColor === "none") {
         attributeState.fill = null
       } else if (hasFillColor) {
