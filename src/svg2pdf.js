@@ -280,7 +280,7 @@ SOFTWARE.
       renderChildren(node, _pdf.unitMatrix, this, false, false, AttributeState.default());
       _pdf.endFormObject(node.getAttribute("id"));
     } else if (nodeIs(node, "symbol,svg")) {
-      // create unclipped form object
+      // create unclipped and untransformed form object
       var bBox = getUntransformedBBox(node);
       _pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], _pdf.unitMatrix);
       renderChildren(node, _pdf.unitMatrix, this, false, false, AttributeState.default());
@@ -538,12 +538,11 @@ SOFTWARE.
         nodeTransform = new _pdf.Matrix(1, 0, 0, 1, -x, -y);
       }
     } else if (nodeIs(node, "symbol")) {
-      //  Until now, this is similar to the svg,g case. But maybe, one day, this could change...
       x = parseFloat(getAttribute(node, "x")) || 0;
       y = parseFloat(getAttribute(node, "y")) || 0;
-
-      // x += parseFloat(node.getAttribute("refX")) || 0; // TODO: refX/refY feature is part of SVG 2
-      // y += parseFloat(node.getAttribute("refY")) || 0;
+      // TODO:
+      // x += parseFloat(node.getAttribute("refX")) || 0; ???
+      // y += parseFloat(node.getAttribute("refY")) || 0; ???
 
       viewBox = node.getAttribute("viewBox");
       if (viewBox) {
@@ -1268,30 +1267,34 @@ SOFTWARE.
     
 
     //  calculate the transformation matrix
-    if (nodeIs(refNode, "symbol,svg")) {
+    if (nodeIs(refNode, "symbol,svg")) {  //  <use> inherits width/height only to svg/symbol
       var width = pf(getAttribute(node, "width") || getAttribute(refNode, "width"));
       var height = pf(getAttribute(node, "height") || getAttribute(refNode, "height"));      
 
       if (getAttribute(refNode, "viewBox")) {
+        //  TODO: maybe use computeNodeTransform()
+        //  inherit width/height from the parent svg if necessary
         width = pf(width || getAttribute(node.ownerSVGElement, "width"));
         height = pf(height || getAttribute(node.ownerSVGElement, "height"));
+        //  accumulate x/y to calculate the viewBox transform
         x += pf(getAttribute(refNode, "x")) || 0;
         y += pf(getAttribute(refNode, "y")) || 0;
 
         var t = computeViewBoxTransform(refNode, parseFloats(getAttribute(refNode,"viewBox")), x, y, width, height);
-        
       } else {
         var t = new _pdf.Matrix((width || formObject.width) / formObject.width || 0, 0, 0, (height || formObject.height) / formObject.height || 0, x, y);
       }
     } else {
       var t = new _pdf.Matrix(1, 0, 0, 1, x, y);
 
+      //  set width/height for bbox-like clip
       var width = pf(formObject.width);
       var height = pf(formObject.height);
     }
+    //   respect already applied transformations
     t = _pdf.matrixMult(t, tfMatrix);
 
-    //  clip, apply the transformations and write the form object
+    //  apply the bbox (i.e. clip) if needed, transform, and write the form object
     _pdf.saveGraphicsState();
     if (getAttribute(refNode, "overflow") !== "visible") {
       _pdf.rect(x, y, width, height).clip().discardPath();
