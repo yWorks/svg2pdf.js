@@ -1,12 +1,16 @@
 <svg id="svgElement" width="500" height="500" xmlns="http://www.w3.org/2000/svg">
-  <symbol id="myDot" width="80" height="100"   viewBox="0 0 80 100">                                                   
-    <circle cx="80" cy="50" r="50"/>
+  <symbol id="myDot" x="1" height="100" viewBox="0 0 80 100" >                                          
+    <circle cx="50" cy="50" r="50"/>
+  </symbol>
+  <symbol id="myDot-overflow" height="100" overflow="visible" viewBox="0 0 80 100" >                                          
+    <circle cx="50" cy="50" r="50"/>
   </symbol>
   
   <use href="#myDot"   />    
-  <use href="#myDot" x="100"                        height="10"  />
+  <use href="#myDot" x="99"                         height="10"  fill="red" />
   <use href="#myDot"          y="100"   width="20"    />
-  <use href="#myDot" x="100"  y="100"   width="270" height="200" />
+  <use href="#myDot" x="99"   y="100"   width="200" height="200" />
+  <use href="#myDot-overflow" y="200"   width="100" />
 
   <path style="fill:none;stroke:black;stroke-width:1" d="M0 0 L0 500 M50 0 L50 500 M100 0 L100 500 M150 0 L150 500 M200 0 L200 500 M250 0 L250 500 M300 0 L300 500 M350 0 L350 500 M400 0 L400 500 M450 0 L450 500 M500 0 L500 500 M0 0 L500 0 M0 50 L500 50 M0 100 L500 100 M0 150 L500 150 M0 200 L500 200 M0 250 L500 250 M0 300 L500 300 M0 350 L500 350 M0 400 L500 400 M 0 450 L500 450 M0 500 L500 500 Z" />  
 </svg>

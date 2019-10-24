@@ -253,22 +253,6 @@ SOFTWARE.
 
     var node = this.rootSvg.querySelector("#" + cssEsc(id, {isIdentifier: true}));
 
-    if (nodeIs(node, "use")) {
-      var width = getAttribute(node, "width");
-      var height = getAttribute(node, "height");
-
-      var refId = id.split("-")[0];
-      node = this.rootSvg.querySelector("#" + cssEsc(refId, {isIdentifier: true})).cloneNode(true);
-
-      if (width) {
-        node.setAttribute("width", width);
-      }
-      if (height) {
-        node.setAttribute("height", height);
-      }
-    }
-  
-
     if (nodeIs(node, "lineargradient")) {
       putGradient(node, "axial", [
         node.getAttribute("x1") || 0,
@@ -296,18 +280,10 @@ SOFTWARE.
       renderChildren(node, _pdf.unitMatrix, this, false, false, AttributeState.default());
       _pdf.endFormObject(node.getAttribute("id"));
     } else if (nodeIs(node, "symbol,svg")) {
-      //  Eventually this could join the marker case
-
-      // the transformations directly at the node are written to the pdf form object transformation matrix
-      var tfMatrix = computeNodeTransform(node);  //  )- TODO: fix rendering of svgs
-      var bBox = getUntransformedBBox(node);      //  )
-
-      var clip = getAttribute(node, "overflow")!=="visible";  //  choose on whom the transformations are to apply
-      var viewportMatrix = clip ? _pdf.unitMatrix : tfMatrix;
-      var innerMatrix = clip ? tfMatrix : _pdf.unitMatrix;
-
-      _pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], viewportMatrix);
-      renderChildren(node, innerMatrix, this, false, false, AttributeState.default());
+      // create unclipped form object
+      var bBox = getUntransformedBBox(node);
+      _pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], _pdf.unitMatrix);
+      renderChildren(node, _pdf.unitMatrix, this, false, false, AttributeState.default());
       _pdf.endFormObject(id);
     } else if (!nodeIs(node, "clippath")) {
       // all other nodes will be rendered as PDF form object
@@ -881,16 +857,7 @@ SOFTWARE.
           pf(node.getAttribute("height")) || 0
       ]
     } else if(nodeIs(node, "symbol")) {
-      if (getAttribute(node, "overflow")==="visible") {
-        return getBoundingBoxByChildren(node);
-      }
-
-      return [
-        pf(getAttribute(node, "x")) ||  0,
-        pf(getAttribute(node, "y")) ||  0,
-        pf(getAttribute(node, "width") || getAttribute(node.ownerSVGElement, "width")),
-        pf(getAttribute(node, "height") || getAttribute(node.ownerSVGElement, "height"))
-      ];
+      return getBoundingBoxByChildren(node);
     } else {
       // TODO: check if there are other possible coordinate attributes
       var x1 = pf(node.getAttribute("x1")) || pf(getAttribute(node, "x")) || pf((getAttribute(node, "cx")) - pf(getAttribute(node, "r"))) || 0;
@@ -1282,6 +1249,8 @@ SOFTWARE.
   // draws the element referenced by a use node, makes use of pdf's XObjects/FormObjects so nodes are only written once
   // to the pdf document. This highly reduces the file size and computation time.
   var use = function (node, tfMatrix, refsHandler) {
+    var pf = parseFloat;
+    
     var url = (node.getAttribute("href") || node.getAttribute("xlink:href"));
     // just in case someone has the idea to use empty use-tags, wtf???
     if (!url)
@@ -1294,55 +1263,43 @@ SOFTWARE.
     var formObject = _pdf.getFormObject(id);
 
     // scale and position it right
-    var x = getAttribute(node, "x") || 0;
-    var y = getAttribute(node, "y") || 0;
-    var width = getAttribute(node, "width") || formObject.width;
-    var height = getAttribute(node, "height") || formObject.height;
+    var x = pf(getAttribute(node, "x")) || 0;
+    var y = pf(getAttribute(node, "y")) || 0;
+    
 
-    // The code below is not that beautiful (yet) but recalculates the transformation matrix of the referenced element if needed
-    var refNodeNeedsRetransform = nodeIs(refNode, "symbol,svg") && ((getAttribute(node, "width") && getAttribute(node, "width") !== getAttribute(refNode, "width")) || (getAttribute(node, "height") && getAttribute(node, "height") !== getAttribute(refNode, "height")));   
-    var refNodeNeedsRerendering = calcIfRefNodeNeedsRerendering(refNode, refNodeNeedsRetransform);
-    if (refNodeNeedsRetransform && !refNodeNeedsRerendering) {
+    //  calculate the transformation matrix
+    if (nodeIs(refNode, "symbol,svg")) {
+      var width = pf(getAttribute(node, "width") || getAttribute(refNode, "width"));
+      var height = pf(getAttribute(node, "height") || getAttribute(refNode, "height"));      
+
       if (getAttribute(refNode, "viewBox")) {
-        var width = width || getAttribute(node.ownerSVGElement, "width");
-        var height = height || getAttribute(node.ownerSVGElement, "height");
+        width = pf(width || getAttribute(node.ownerSVGElement, "width"));
+        height = pf(height || getAttribute(node.ownerSVGElement, "height"));
+        x += pf(getAttribute(refNode, "x")) || 0;
+        y += pf(getAttribute(refNode, "y")) || 0;
 
-        var refNodeTfMatrix = computeNodeTransform(refNode);
-        var newTfMatrix = computeViewBoxTransform(refNode, parseFloats(getAttribute(refNode,"viewBox")), Number(x) + Number(getAttribute(refNode, "x")||0), Number(y) + Number(getAttribute(refNode, "y")||0), width, height);
+        var t = computeViewBoxTransform(refNode, parseFloats(getAttribute(refNode,"viewBox")), x, y, width, height);
         
-        var t = _pdf.matrixMult(refNodeTfMatrix.inversed(), newTfMatrix);
       } else {
-        var t = new _pdf.Matrix(width / formObject.width || 0, 0, 0, height / formObject.height || 0, x, y);
+        var t = new _pdf.Matrix((width || formObject.width) / formObject.width || 0, 0, 0, (height || formObject.height) / formObject.height || 0, x, y);
       }
     } else {
       var t = new _pdf.Matrix(1, 0, 0, 1, x, y);
+
+      var width = pf(formObject.width);
+      var height = pf(formObject.height);
     }
     t = _pdf.matrixMult(t, tfMatrix);
 
-    //  rerender if needed
-    if (refNodeNeedsRerendering) {
-      //  generate new id
-      var newId = id;
-      for (var i=0; refsHandler.renderedElements.hasOwnProperty(newId); newId = id+"-"+i, i++) {}
-      node.id = newId;
-      
-
-      //   render
-      refsHandler.getRendered(newId);
-      id = newId;
+    //  clip, apply the transformations and write the form object
+    _pdf.saveGraphicsState();
+    if (getAttribute(refNode, "overflow") !== "visible") {
+      _pdf.rect(x, y, width, height).clip().discardPath();
     }
-
-    _pdf.doFormObject(id, t);
+    _pdf.setCurrentTransformationMatrix(t);
+    _pdf.doFormObject(id, _pdf.unitMatrix);
+    _pdf.restoreGraphicsState();
   };
-
-  var calcIfRefNodeNeedsRerendering = function (refNode, refNodeNeedsRetransform) {
-    if (nodeIs(refNode, "symbol") && refNodeNeedsRetransform && getAttribute(refNode, "overflow") !== "visible") {
-      //  TODO: check if there is any cheap and elegant way to check if a retransformed element has to be rerendered
-      //        at the moment, this seems to be more expensive than just rerendering every element without retransform
-      return true;
-    }
-    return false;
-  }
 
   // draws a line
   var line = function (node, refsHandler, attributeState) {
