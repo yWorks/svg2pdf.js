@@ -309,6 +309,7 @@ SOFTWARE.
     this.strokeOpacity = 1.0;
     this.strokeWidth = 1.0;
     // this.textAlign = null;
+    this.verticalAlign = null;
     this.textAnchor = null;
     this.visibility = null;
   };
@@ -335,6 +336,7 @@ SOFTWARE.
     attributeState.strokeOpacity = 1.0;
     attributeState.strokeWidth = 1.0;
     // attributeState.textAlign = "start";
+    AttributeState.verticalAlign = "baseline";
     attributeState.textAnchor = "start";
     attributeState.visibility = "visible";
 
@@ -1565,8 +1567,13 @@ SOFTWARE.
         _pdf.setLineWidth(attributeStates[i].strokeWidth)
       }
 
+      var verticalAlign = attributeStates[i].verticalAlign;
       var textRenderingMode = getTextRenderingMode(attributeStates[i]);
-      _pdf.text(this.texts[i], xs[i] - textOffset, ys[i], {angle: transform, renderingMode: textRenderingMode === "fill" ? void 0 : textRenderingMode});
+      _pdf.text(this.texts[i], xs[i] - textOffset, ys[i], {
+        baseline: verticalAlign,
+        angle: transform,
+        renderingMode: textRenderingMode === "fill" ? void 0 : textRenderingMode
+      });
 
       _pdf.restoreGraphicsState();
     }
@@ -1629,7 +1636,8 @@ SOFTWARE.
     dx = toPixels(node.getAttribute("dx"), pdfFontSize);
     dy = toPixels(node.getAttribute("dy"), pdfFontSize);
 
-    var visibility = attributeState.visibility;
+    var visibility = attributeState.visibility;    
+
     // when there are no tspans draw the text directly
     var tSpanCount = node.childElementCount;
     if (tSpanCount === 0) {
@@ -1638,12 +1646,14 @@ SOFTWARE.
       xOffset = getTextOffset(transformedText, attributeState);
 
       if (visibility === "visible") {
+        var verticalAlign = attributeState.verticalAlign;
         var textRenderingMode = getTextRenderingMode(attributeState);
         _pdf.text(
           transformedText,
           textX + dx - xOffset,
           textY + dy,
           {
+            baseline: verticalAlign,
             angle: tfMatrix,
             renderingMode: textRenderingMode === "fill" ? void 0 : textRenderingMode
           }
@@ -1873,6 +1883,11 @@ SOFTWARE.
     var fontSize = getAttribute(node, "font-size");
     if (fontSize) {
       attributeState.fontSize = parseFloat(fontSize);
+    }
+
+    var verticalAlign = getAttribute(node, "vertical-align") || getAttribute(node, "alignment-baseline");
+    if (verticalAlign) {
+      attributeState.verticalAlign = verticalAlign;
     }
 
     var textAnchor = getAttribute(node, "text-anchor");

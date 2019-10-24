@@ -104,4 +104,19 @@
         <tspan x="200" y="800" style="text-anchor: start;">css text-anchor="start"</tspan>
         <tspan x="200" y="820" style="text-anchor: middle;">css text-anchor="middle"</tspan>
     </text>
+
+    <svg y="850" x="100">
+        <path
+        d="M60,10 L60,110 
+        M30,10 L300,10 
+        M30,65 L300,65 
+        M30,110 L300,110
+        "
+        stroke="grey"
+        />
+        
+        <text alignment-baseline="hanging" x="60" y="10">A hanging</text>
+        <text alignment-baseline="middle" x="60" y="65">A middle</text>
+        <text alignment-baseline="baseline" x="60" y="110">A baseline</text>
+    </svg>
 </svg>
