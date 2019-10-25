@@ -1291,15 +1291,21 @@ SOFTWARE.
       var width = pf(formObject.width);
       var height = pf(formObject.height);
     }
-    //   respect already applied transformations
-    t = _pdf.matrixMult(t, tfMatrix);
 
-    //  apply the bbox (i.e. clip) if needed, transform, and write the form object
+    //  transform respecting already applied transformations
     _pdf.saveGraphicsState();
+    _pdf.setCurrentTransformationMatrix(_pdf.matrixMult(t, tfMatrix));
+    
+    //  apply the bbox (i.e. clip) if needed
     if (getAttribute(refNode, "overflow") !== "visible") {
-      _pdf.rect(x, y, width, height).clip().discardPath();
+      _pdf.saveGraphicsState();
+      _pdf.setCurrentTransformationMatrix(t.inversed());
+      _pdf.rect(x, y, width, height);
+      _pdf.restoreGraphicsState();
+      _pdf.clip().discardPath();
     }
-    _pdf.setCurrentTransformationMatrix(t);
+
+    //  write the form object
     _pdf.doFormObject(id, _pdf.unitMatrix);
     _pdf.restoreGraphicsState();
   };
