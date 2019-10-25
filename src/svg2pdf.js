@@ -281,7 +281,7 @@ SOFTWARE.
       _pdf.endFormObject(node.getAttribute("id"));
     } else if (nodeIs(node, "symbol,svg")) {
       // create unclipped and untransformed form object
-      var bBox = getUntransformedBBox(node);
+      var bBox = getBoundingBoxByChildren(node);
       _pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], _pdf.unitMatrix);
       renderChildren(node, _pdf.unitMatrix, this, false, false, AttributeState.default());
       _pdf.endFormObject(id);
@@ -835,8 +835,8 @@ SOFTWARE.
         pf(getAttribute(node, "width")) || (vb && vb[2]) || 0,
         pf(getAttribute(node, "height")) || (vb && vb[3]) || 0
       ];
-    } else if (nodeIs(node, "g,clippath")) {
-      var boundingBox = getBoundingBoxByChildren(node); //  this function is reused at the symbol's case
+    } else if (nodeIs(node, "g,clippath,symbol")) {
+      var boundingBox = getBoundingBoxByChildren(node);
     } else if (nodeIs(node, "marker")) {
       viewBox = node.getAttribute("viewBox");
       if (viewBox) {
@@ -855,8 +855,6 @@ SOFTWARE.
           pf(node.getAttribute("width")) || 0,
           pf(node.getAttribute("height")) || 0
       ]
-    } else if(nodeIs(node, "symbol")) {
-      return getBoundingBoxByChildren(node);
     } else {
       // TODO: check if there are other possible coordinate attributes
       var x1 = pf(node.getAttribute("x1")) || pf(getAttribute(node, "x")) || pf((getAttribute(node, "cx")) - pf(getAttribute(node, "r"))) || 0;
@@ -871,7 +869,7 @@ SOFTWARE.
       ];
     }
 
-    if (!nodeIs(node, "marker,svg,g")) {  //  TODO: and !symbol ???
+    if (!nodeIs(node, "marker,svg,g,symbol")) {
       // add line-width
       var lineWidth = getAttribute(node, "stroke-width") || 1;
       var miterLimit = getAttribute(node, "stroke-miterlimit");
@@ -889,7 +887,7 @@ SOFTWARE.
   };
 
   var getBoundingBoxByChildren = function (node) {
-    boundingBox = [0, 0, 0, 0];
+    var boundingBox = [0, 0, 0, 0];
       forEachChild(node, function (i, node) {
         var nodeBox = getUntransformedBBox(node);
         boundingBox = [
@@ -1249,6 +1247,7 @@ SOFTWARE.
   // to the pdf document. This highly reduces the file size and computation time.
   var use = function (node, tfMatrix, refsHandler) {
     var pf = parseFloat;
+    var x, y, width, height, t;
     
     var url = (node.getAttribute("href") || node.getAttribute("xlink:href"));
     // just in case someone has the idea to use empty use-tags, wtf???
@@ -1262,14 +1261,14 @@ SOFTWARE.
     var formObject = _pdf.getFormObject(id);
 
     // scale and position it right
-    var x = pf(getAttribute(node, "x")) || 0;
-    var y = pf(getAttribute(node, "y")) || 0;
+    x = pf(getAttribute(node, "x")) || 0;
+    y = pf(getAttribute(node, "y")) || 0;
     
 
     //  calculate the transformation matrix
     if (nodeIs(refNode, "symbol,svg")) {  //  <use> inherits width/height only to svg/symbol
-      var width = pf(getAttribute(node, "width") || getAttribute(refNode, "width"));
-      var height = pf(getAttribute(node, "height") || getAttribute(refNode, "height"));      
+      width = pf(getAttribute(node, "width") || getAttribute(refNode, "width"));
+      height = pf(getAttribute(node, "height") || getAttribute(refNode, "height"));      
 
       if (getAttribute(refNode, "viewBox")) {
         //  TODO: maybe use computeNodeTransform()
@@ -1280,16 +1279,16 @@ SOFTWARE.
         x += pf(getAttribute(refNode, "x")) || 0;
         y += pf(getAttribute(refNode, "y")) || 0;
 
-        var t = computeViewBoxTransform(refNode, parseFloats(getAttribute(refNode,"viewBox")), x, y, width, height);
+        t = computeViewBoxTransform(refNode, parseFloats(getAttribute(refNode,"viewBox")), x, y, width, height);
       } else {
-        var t = new _pdf.Matrix((width || formObject.width) / formObject.width || 0, 0, 0, (height || formObject.height) / formObject.height || 0, x, y);
+        t = new _pdf.Matrix((width || formObject.width) / formObject.width || 0, 0, 0, (height || formObject.height) / formObject.height || 0, x, y);
       }
     } else {
-      var t = new _pdf.Matrix(1, 0, 0, 1, x, y);
+      t = new _pdf.Matrix(1, 0, 0, 1, x, y);
 
       //  set width/height for bbox-like clip
-      var width = pf(formObject.width);
-      var height = pf(formObject.height);
+      width = pf(formObject.width);
+      height = pf(formObject.height);
     }
 
     //  transform respecting already applied transformations
