@@ -2046,7 +2046,7 @@ SOFTWARE.
     var parentAttributeState = attributeState;
     attributeState = attributeState.clone();
 
-    if (nodeIs(node, "defs,clippath,pattern,lineargradient,radialgradient,marker")) { // TODO: symbol
+    if (nodeIs(node, "defs,symbol,clippath,pattern,lineargradient,radialgradient,marker")) {
       // we will only render them on demand
       return;
     }
