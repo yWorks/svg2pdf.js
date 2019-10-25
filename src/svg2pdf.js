@@ -1259,6 +1259,7 @@ SOFTWARE.
     var id = url.substring(1);
     var refNode = refsHandler.getRendered(id);
     var formObject = _pdf.getFormObject(id);
+    var refNodeOpensViewport = nodeIs(refNode, "symbol,svg");
 
     // scale and position it right
     x = pf(getAttribute(node, "x")) || 0;
@@ -1266,7 +1267,7 @@ SOFTWARE.
     
 
     //  calculate the transformation matrix
-    if (nodeIs(refNode, "symbol,svg")) {  //  <use> inherits width/height only to svg/symbol
+    if (refNodeOpensViewport) {  //  <use> inherits width/height only to svg/symbol
       width = pf(getAttribute(node, "width") || getAttribute(refNode, "width"));
       height = pf(getAttribute(node, "height") || getAttribute(refNode, "height"));      
 
@@ -1296,7 +1297,7 @@ SOFTWARE.
     _pdf.setCurrentTransformationMatrix(_pdf.matrixMult(t, tfMatrix));
     
     //  apply the bbox (i.e. clip) if needed
-    if (getAttribute(refNode, "overflow") !== "visible") {
+    if (refNodeOpensViewport && getAttribute(refNode, "overflow") !== "visible") {
       _pdf.saveGraphicsState();
       _pdf.setCurrentTransformationMatrix(t.inversed());
       _pdf.rect(x, y, width, height);
@@ -2045,7 +2046,7 @@ SOFTWARE.
     var parentAttributeState = attributeState;
     attributeState = attributeState.clone();
 
-    if (nodeIs(node, "defs,clippath,pattern,lineargradient,radialgradient,marker")) {
+    if (nodeIs(node, "defs,clippath,pattern,lineargradient,radialgradient,marker")) { // TODO: symbol
       // we will only render them on demand
       return;
     }
