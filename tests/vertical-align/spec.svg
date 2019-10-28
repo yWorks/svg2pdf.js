@@ -1,0 +1,48 @@
+<svg  xmlns="http://www.w3.org/2000/svg"  id="svgElement" width="300" height="500">
+    <path
+    d="M60,0 L60,500 
+    M30,15 L300,15 
+    M30,55 L300,55 
+    M30,95 L300,95
+    M30,135 L300,135
+    M30,175 L300,175
+    M30,215 L300,215
+    M30,255 L300,255
+    M30,295 L300,295
+    M30,335 L300,335
+    M30,375 L300,375
+    M30,415 L300,415
+    M30,455 L300,455
+    Z
+    "
+    stroke="gray"
+    />
+    
+    <text alignment-baseline="baseline" x="60" y="15">A baseline</text>
+    <text alignment-baseline="text-bottom" x="60" y="55">A text-bottom</text>
+    <text alignment-baseline="alphabetic" x="60" y="95">An alphabetic</text>
+    <text alignment-baseline="ideographic" x="60" y="135">An ideographic</text>
+    <text alignment-baseline="middle" x="60" y="175">A middle</text>
+    <text alignment-baseline="central" x="60" y="215">A central</text>
+    <text alignment-baseline="mathematical" x="60" y="255">A mathematical</text>
+    <text alignment-baseline="text-top" x="60" y="295">A text-top</text>
+    <text alignment-baseline="bottom" x="60" y="335">A bottom</text>
+    <text alignment-baseline="center" x="60" y="375">A center</text>
+    <text alignment-baseline="top" x="60" y="415">A top</text>
+    <text alignment-baseline="hanging" x="60" y="455">A hanging</text>
+
+    <!-- vertical-align in svg is not yet supported by common browsers
+    <text style="vertical-align:baseline" x="60" y="15">A baseline</text>
+    <text style="vertical-align:text-bottom" x="60" y="55">A text-bottom</text>
+    <text style="vertical-align:alphabetic" x="60" y="95">An alphabetic</text>
+    <text style="vertical-align:ideographic" x="60" y="135">An ideographic</text>
+    <text style="vertical-align:middle" x="60" y="175">A middle</text>
+    <text style="vertical-align:central" x="60" y="215">A central</text>
+    <text style="vertical-align:mathematical" x="60" y="255">A mathematical</text>
+    <text style="vertical-align:text-top" x="60" y="295">A text-top</text>
+    <text style="vertical-align:bottom" x="60" y="335">A bottom</text>
+    <text style="vertical-align:center" x="60" y="375">A center</text>
+    <text style="vertical-align:top" x="60" y="415">A top</text>
+    <text style="vertical-align:hanging" x="60" y="455">A hanging</text>
+    -->
+</svg>

@@ -43,8 +43,9 @@ const tests = [
     "transforms-parsing",
     "transparent-pngs",
     "url-references-with-quotes",
-    "zero-width-strokes",
-    "xml-space"
+    "vertical-align",
+    "xml-space",
+    "zero-width-strokes"
 ];
 
 for (let name of tests) {
