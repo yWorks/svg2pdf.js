@@ -309,7 +309,7 @@ SOFTWARE.
     this.strokeOpacity = 1.0;
     this.strokeWidth = 1.0;
     // this.textAlign = null;
-    this.verticalAlign = null;
+    this.alignmentBaseline = null;
     this.textAnchor = null;
     this.visibility = null;
   };
@@ -336,7 +336,7 @@ SOFTWARE.
     attributeState.strokeOpacity = 1.0;
     attributeState.strokeWidth = 1.0;
     // attributeState.textAlign = "start";
-    AttributeState.verticalAlign = "baseline";
+    AttributeState.alignmentBaseline = "baseline";
     attributeState.textAnchor = "start";
     attributeState.visibility = "visible";
 
@@ -1567,10 +1567,10 @@ SOFTWARE.
         _pdf.setLineWidth(attributeStates[i].strokeWidth)
       }
 
-      var verticalAlign = attributeStates[i].verticalAlign;
+      var alignmentBaseline = attributeStates[i].alignmentBaseline;
       var textRenderingMode = getTextRenderingMode(attributeStates[i]);
       _pdf.text(this.texts[i], xs[i] - textOffset, ys[i], {
-        baseline: verticalAlign,
+        baseline: alignmentBaseline,
         angle: transform,
         renderingMode: textRenderingMode === "fill" ? void 0 : textRenderingMode
       });
@@ -1646,14 +1646,14 @@ SOFTWARE.
       xOffset = getTextOffset(transformedText, attributeState);
 
       if (visibility === "visible") {
-        var verticalAlign = attributeState.verticalAlign;
+        var alignmentBaseline = attributeState.alignmentBaseline;
         var textRenderingMode = getTextRenderingMode(attributeState);
         _pdf.text(
           transformedText,
           textX + dx - xOffset,
           textY + dy,
           {
-            baseline: verticalAlign,
+            baseline: alignmentBaseline,
             angle: tfMatrix,
             renderingMode: textRenderingMode === "fill" ? void 0 : textRenderingMode
           }
@@ -1885,11 +1885,12 @@ SOFTWARE.
       attributeState.fontSize = parseFloat(fontSize);
     }
 
-    var verticalAlign = getAttribute(node, "vertical-align") || getAttribute(node, "alignment-baseline");
-    if (verticalAlign) {
-      attributeState.verticalAlign = verticalAlign.split(" ").find(function (keyWord) {
-        return ["baseline", "text-bottom", "alphabetic", "ideographic", "middle", "central", "mathematical", "text-top", "bottom", "center", "top", "hanging"].includes(keyWord);
-      });
+    var alignmentBaseline = getAttribute(node, "vertical-align") || getAttribute(node, "alignment-baseline");
+    if (alignmentBaseline) {
+      var matchArr = alignmentBaseline.match(/(baseline|text-bottom|alphabetic|ideographic|middle|central|mathematical|text-top|bottom|center|top|hanging)/);
+      if (isArray(matchArr)) {
+        attributeState.alignmentBaseline = matchArr[0];
+      } 
     }
 
     var textAnchor = getAttribute(node, "text-anchor");
