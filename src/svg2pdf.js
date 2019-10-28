@@ -1268,8 +1268,8 @@ SOFTWARE.
 
     //  calculate the transformation matrix
     if (refNodeOpensViewport) {  //  <use> inherits width/height only to svg/symbol
-      width = pf(getAttribute(node, "width") || getAttribute(refNode, "width"));
-      height = pf(getAttribute(node, "height") || getAttribute(refNode, "height"));      
+      width = pf(getAttribute(node, "width") || getAttribute(refNode, "width") || formObject.width);
+      height = pf(getAttribute(node, "height") || getAttribute(refNode, "height") || formObject.height);      
 
       if (getAttribute(refNode, "viewBox")) {
         //  TODO: maybe use computeNodeTransform()
