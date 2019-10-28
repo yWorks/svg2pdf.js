@@ -1887,7 +1887,9 @@ SOFTWARE.
 
     var verticalAlign = getAttribute(node, "vertical-align") || getAttribute(node, "alignment-baseline");
     if (verticalAlign) {
-      attributeState.verticalAlign = verticalAlign;
+      attributeState.verticalAlign = verticalAlign.split(" ").find(function (keyWord) {
+        return ["baseline", "text-bottom", "alphabetic", "ideographic", "middle", "central", "mathematical", "text-top", "bottom", "center", "top", "hanging"].includes(keyWord);
+      });
     }
 
     var textAnchor = getAttribute(node, "text-anchor");
