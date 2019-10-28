@@ -540,7 +540,7 @@ SOFTWARE.
     } else if (nodeIs(node, "symbol")) {
       x = parseFloat(getAttribute(node, "x")) || 0;
       y = parseFloat(getAttribute(node, "y")) || 0;
-      // TODO:
+      // TODO: implement refX/refY - this is still to do because common browsers don't seem to support the feature yet
       // x += parseFloat(node.getAttribute("refX")) || 0; ???
       // y += parseFloat(node.getAttribute("refY")) || 0; ???
 
@@ -1272,7 +1272,6 @@ SOFTWARE.
       height = pf(getAttribute(node, "height") || getAttribute(refNode, "height") || formObject.height);      
 
       if (getAttribute(refNode, "viewBox")) {
-        //  TODO: maybe use computeNodeTransform()
         //  inherit width/height from the parent svg if necessary
         width = pf(width || getAttribute(node.ownerSVGElement, "width"));
         height = pf(height || getAttribute(node.ownerSVGElement, "height"));
