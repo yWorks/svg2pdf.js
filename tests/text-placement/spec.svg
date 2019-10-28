@@ -107,20 +107,16 @@
 
     <svg y="850" x="100">
         <path
-        d="M60,10 L60,150 
+        d="M60,10 L60,110 
         M30,10 L300,10 
-        M30,40 L300,40
-        M30,70 L300,70
-        M30,100 L300,100
-        M30,130 L300,130
+        M30,65 L300,65 
+        M30,110 L300,110
         "
-        stroke="gray"
+        stroke="grey"
         />
         
         <text alignment-baseline="hanging" x="60" y="10">A hanging</text>
-        <text alignment-baseline="middle" x="60" y="40">A middle</text>
-        <text alignment-baseline="top" x="60" y="70">A top</text>
-        <text alignment-baseline="bottom" x="60" y="100">A bottom</text>
-        <text alignment-baseline="othervalue" x="60" y="130">all other values won't be treated</text>
+        <text alignment-baseline="middle" x="60" y="65">A middle</text>
+        <text alignment-baseline="baseline" x="60" y="110">A baseline</text>
     </svg>
 </svg>
