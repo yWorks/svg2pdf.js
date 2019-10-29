@@ -151,6 +151,20 @@ SOFTWARE.
     return pathSegList;
   };
 
+  function StyleSheets(rootSvg) {
+    this.rootSvg = rootSvg;
+    this.loadExternCss = true;
+    this.sheets = [];
+  }
+
+  StyleSheets.prototype.renderStyleSheets = function (loadExternCss) {
+    this.sheets.push();
+  }
+
+  StyleSheets.prototype.getRuleFor = function (node, attribute) {
+    return null;
+  }
+
   // returns an attribute of a node, either from the node directly or from css
   var getAttribute = function (node, propertyNode, propertyCss) {
     propertyCss = propertyCss || propertyNode;
@@ -2390,9 +2404,10 @@ SOFTWARE.
       // correct for a jsPDF-instance measurement unit that differs from `pt`
       _pdf.setFontSize(attributeState.fontSize * _pdf.internal.scaleFactor);
 
-
-      var refsHandler = new ReferencesHandler(element);
-      renderNode(element.cloneNode(true), _pdf.unitMatrix, refsHandler, false, false, attributeState);
+      var clonedSvg = element.cloneNode(true);
+      var refsHandler = new ReferencesHandler(clonedSvg);
+      renderStyleSheets(clonedSvg);
+      renderNode(clonedSvg, _pdf.unitMatrix, refsHandler, false, false, attributeState);
 
       _pdf.restoreGraphicsState();
 
