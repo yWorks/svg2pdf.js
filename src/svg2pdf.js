@@ -231,6 +231,12 @@ SOFTWARE.
     return p2;
   };
 
+  function Context(values = {}) {
+    this.attributeState = values["attributeState"] || AttributeState.default();
+    this.contextTransform = values["contextTransform"] || _pdf.unitMatrix;
+    this.refsHandler = values["refsHandler"] || null;
+  }
+
   /**
    * @param {Element} rootSvg
    * @constructor
@@ -277,11 +283,11 @@ SOFTWARE.
       var bBox = getUntransformedBBox(node);
 
       _pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], tfMatrix);
-      renderChildren(node, _pdf.unitMatrix, this, false, false, AttributeState.default());
+      renderChildren(node, true, false, new Context({"refsHandler": this}));
       _pdf.endFormObject(node.getAttribute("id"));
     } else if (!nodeIs(node, "clippath")) {
       // all other nodes will be rendered as PDF form object
-      renderNode(node, _pdf.unitMatrix, this, true, false, AttributeState.default());
+      renderNode(node, true, false, new Context({"refsHandler": this}));
     }
 
     this.renderedElements[id] = node;
@@ -982,7 +988,7 @@ SOFTWARE.
       svgElement.setAttribute("width", String(width));
       svgElement.setAttribute("height", String(height));
 
-      renderNode(svgElement, _pdf.unitMatrix, new ReferencesHandler(svgElement), false, false, AttributeState.default());
+      renderNode(svgElement, false, false, new Context({"refsHandler": new ReferencesHandler(svgElement)}));
       return;
     }
 
@@ -1728,9 +1734,9 @@ SOFTWARE.
   };
 
   // renders all children of a node
-  var renderChildren = function (node, tfMatrix, refsHandler, withinDefs, withinClipPath, attributeState) {
+  var renderChildren = function (node, withinDefs, withinClipPath, context) {
     forEachChild(node, function (i, node) {
-      renderNode(node, tfMatrix, refsHandler, withinDefs, withinClipPath, attributeState);
+      renderNode(node, withinDefs, withinClipPath, context);
     });
   };
 
@@ -1789,7 +1795,10 @@ SOFTWARE.
 
     _pdf.beginTilingPattern(pattern);
     // continue without transformation
-    renderChildren(node, _pdf.unitMatrix, refsHandler, false, false, attributeState);
+    renderChildren(node, false, false, new Context({
+      "attributeState": attributeState,
+      "refsHandler": refsHandler
+    }));
     _pdf.endTilingPattern(id, pattern);
   };
 
@@ -1960,9 +1969,9 @@ SOFTWARE.
    * @param {boolean} withinClipPath
    * @param {AttributeState} attributeState Keeps track of parent attributes that are inherited automatically
    */
-  var renderNode = function (node, contextTransform, refsHandler, withinDefs, withinClipPath, attributeState) {
-    var parentAttributeState = attributeState;
-    attributeState = attributeState.clone();
+  var renderNode = function (node, withinDefs, withinClipPath, context) {
+    var parentAttributeState = context.attributeState;
+    context = new Context(context);
 
     if (nodeIs(node, "defs,clippath,pattern,lineargradient,radialgradient,marker")) {
       // we will only render them on demand
@@ -1973,13 +1982,12 @@ SOFTWARE.
       return;
     }
 
-    var visibility = attributeState.visibility = getAttribute(node, "visibility") || attributeState.visibility;
+    var visibility = context.attributeState.visibility = getAttribute(node, "visibility") || context.attributeState.visibility;
     if (visibility === "hidden" && !nodeIs(node, "svg,g,marker,a,pattern,defs,text")) {
       return;
     }
 
-    var tfMatrix,
-        hasFillColor = false,
+    var hasFillColor = false,
         fillRGB = null,
         fill = "inherit",
         stroke = "inherit",
@@ -1996,17 +2004,17 @@ SOFTWARE.
     if (targetIsFormObject) {
 
       // the transformations directly at the node are written to the pdf form object transformation matrix
-      tfMatrix = computeNodeTransform(node);
+      context.contextTransform = computeNodeTransform(node);
       bBox = getUntransformedBBox(node);
 
-      _pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], tfMatrix);
+      _pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], context.contextTransform);
 
       // continue without transformation and set withinDefs to false to prevent child nodes from starting new form objects
-      tfMatrix = _pdf.unitMatrix;
+      context.contextTransform = _pdf.unitMatrix;
       withinDefs = false;
 
     } else {
-      tfMatrix = _pdf.matrixMult(computeNodeTransform(node), contextTransform);
+      context.contextTransform = _pdf.matrixMult(computeNodeTransform(node), context.contextTransform);
 
       if (!withinClipPath) {
         _pdf.saveGraphicsState();
@@ -2016,14 +2024,14 @@ SOFTWARE.
     var hasClipPath = node.hasAttribute("clip-path") && getAttribute(node, "clip-path") !== "none";
     if (hasClipPath) {
       var clipPathId = iriReference.exec(getAttribute(node, "clip-path"));
-      var clipPathNode = refsHandler.getRendered(clipPathId[1]);
+      var clipPathNode = context.refsHandler.getRendered(clipPathId[1]);
 
       if (!isPartlyVisible(clipPathNode)) {
         _pdf.restoreGraphicsState();
         return;
       }
 
-      var clipPathMatrix = tfMatrix;
+      var clipPathMatrix = context.contextTransform;
       if (clipPathNode.hasAttribute("clipPathUnits")
           && clipPathNode.getAttribute("clipPathUnits").toLowerCase() === "objectboundingbox") {
         bBox = getUntransformedBBox(node);
@@ -2040,7 +2048,7 @@ SOFTWARE.
       _pdf.saveGraphicsState();
       _pdf.setCurrentTransformationMatrix(clipPathMatrix);
 
-      renderChildren(clipPathNode, _pdf.unitMatrix, refsHandler, false, true, AttributeState.default());
+      renderChildren(clipPathNode, false, true, new Context({"refsHandler": context.refsHandler}));
       _pdf.clip().discardPath();
 
       // as we cannot use restoreGraphicsState() to reset the transform (this would reset the clipping path, as well),
@@ -2066,7 +2074,7 @@ SOFTWARE.
         if (url) {
           // probably a gradient or pattern (or something unsupported)
           var fillUrl = url[1];
-          var fillNode = refsHandler.getRendered(fillUrl);
+          var fillNode = context.refsHandler.getRendered(fillUrl);
           if (fillNode && nodeIs(fillNode, "lineargradient,radialgradient")) {
 
             // matrix to convert between gradient space and user space
@@ -2135,7 +2143,7 @@ SOFTWARE.
             var matrix = patternContentUnitsMatrix;
             matrix = _pdf.matrixMult(matrix, patternUnitsMatrix);
             matrix = _pdf.matrixMult(matrix, patternTransformMatrix);
-            matrix = _pdf.matrixMult(matrix, tfMatrix);
+            matrix = _pdf.matrixMult(matrix, context.contextTransform);
 
             patternOrGradient.matrix = matrix;
 
@@ -2194,9 +2202,9 @@ SOFTWARE.
 
     if (nodeIs(node, "svg,text,g,path,rect,ellipse,line,circle,polygon,polyline")) {
       if (fillColor === "none") {
-        attributeState.fill = null
+        context.attributeState.fill = null
       } else if (hasFillColor) {
-        attributeState.fill = fillRGB;
+        context.attributeState.fill = fillRGB;
         if (!nodeIs(node, "text")) {
           // text fill color will be applied through setTextColor()
           _pdf.setFillColor(fillRGB.r, fillRGB.g, fillRGB.b);
@@ -2207,21 +2215,21 @@ SOFTWARE.
       var strokeWidth = getAttribute(node, "stroke-width");
       if (strokeWidth !== void 0 && strokeWidth !== "") {
         strokeWidth = Math.abs(parseFloat(strokeWidth));
-        attributeState.strokeWidth = strokeWidth;
+        context.attributeState.strokeWidth = strokeWidth;
         _pdf.setLineWidth(strokeWidth);
       } else {
         // needed for inherited zero width strokes
-        strokeWidth = attributeState.strokeWidth
+        strokeWidth = context.attributeState.strokeWidth
       }
 
       var strokeColor = getAttribute(node, "stroke");
       if (strokeColor) {
         if (strokeColor === "none") {
-          attributeState.stroke = null;
+          context.attributeState.stroke = null;
         } else {
           var strokeRGB = new RGBColor(strokeColor);
           if (strokeRGB.ok) {
-            attributeState.stroke = strokeRGB;
+            context.attributeState.stroke = strokeRGB;
             _pdf.setDrawColor(strokeRGB.r, strokeRGB.g, strokeRGB.b);
 
             // pdf spec states: "A line width of 0 denotes the thinnest line that can be rendered at device resolution:
@@ -2233,102 +2241,102 @@ SOFTWARE.
 
       var lineCap = getAttribute(node, "stroke-linecap");
       if (lineCap) {
-        _pdf.setLineCap(attributeState.strokeLinecap = lineCap);
+        _pdf.setLineCap(context.attributeState.strokeLinecap = lineCap);
       }
       var lineJoin = getAttribute(node, "stroke-linejoin");
       if (lineJoin) {
-        _pdf.setLineJoin(attributeState.strokeLinejoin = lineJoin);
+        _pdf.setLineJoin(context.attributeState.strokeLinejoin = lineJoin);
       }
       var dashArray = getAttribute(node, "stroke-dasharray");
       if (dashArray) {
         dashArray = parseFloats(dashArray);
         var dashOffset = parseInt(getAttribute(node, "stroke-dashoffset")) || 0;
-        attributeState.strokeDasharray = dashArray;
-        attributeState.strokeDashoffset = dashOffset;
+        context.attributeState.strokeDasharray = dashArray;
+        context.attributeState.strokeDashoffset = dashOffset;
         _pdf.setLineDashPattern(dashArray, dashOffset);
       }
       var miterLimit = getAttribute(node, "stroke-miterlimit");
       if (miterLimit !== void 0 && miterLimit !== "") {
-        _pdf.setLineMiterLimit(attributeState.strokeMiterlimit = parseFloat(miterLimit));
+        _pdf.setLineMiterLimit(context.attributeState.strokeMiterlimit = parseFloat(miterLimit));
       }
     }
 
     // inherit fill and stroke mode if not specified at this node
     if (fill === "inherit") {
-      fill = attributeState.fill !== null;
+      fill = context.attributeState.fill !== null;
     }
     if (stroke === "inherit") {
-      stroke = attributeState.stroke !== null;
+      stroke = context.attributeState.stroke !== null;
     }
 
     var xmlSpace = node.getAttribute("xml:space");
     if (xmlSpace) {
-      attributeState.xmlSpace = xmlSpace;
+      context.attributeState.xmlSpace = xmlSpace;
     }
 
-    setTextProperties(node, fillRGB, attributeState);
-    putTextProperties(attributeState, parentAttributeState);
+    setTextProperties(node, fillRGB, context.attributeState);
+    putTextProperties(context.attributeState, parentAttributeState);
 
     // do the actual drawing
     switch (node.tagName.toLowerCase()) {
       case 'svg':
       case 'g':
       case 'a':
-        renderChildren(node, tfMatrix, refsHandler, withinDefs, false, attributeState);
+        renderChildren(node, withinDefs, false, context);
         break;
 
       case 'use':
-        use(node, tfMatrix, refsHandler);
+        use(node, context.contextTransform, context.refsHandler);
         break;
 
       case 'line':
         if (!withinClipPath) {
-          _pdf.setCurrentTransformationMatrix(tfMatrix);
-          line(node, refsHandler, attributeState);
+          _pdf.setCurrentTransformationMatrix(context.contextTransform);
+          line(node, context.refsHandler, context.attributeState);
         }
         break;
 
       case 'rect':
         if (!withinClipPath) {
-          _pdf.setCurrentTransformationMatrix(tfMatrix);
+          _pdf.setCurrentTransformationMatrix(context.contextTransform);
         }
         rect(node);
         break;
 
       case 'ellipse':
         if (!withinClipPath) {
-          _pdf.setCurrentTransformationMatrix(tfMatrix);
+          _pdf.setCurrentTransformationMatrix(context.contextTransform);
         }
         ellipse(node);
         break;
 
       case 'circle':
         if (!withinClipPath) {
-          _pdf.setCurrentTransformationMatrix(tfMatrix);
+          _pdf.setCurrentTransformationMatrix(context.contextTransform);
         }
         circle(node);
         break;
       case 'text':
-        text(node, tfMatrix, hasFillColor, fillRGB, attributeState);
+        text(node, context.contextTransform, hasFillColor, fillRGB, context.attributeState);
         break;
 
       case 'path':
         if (!withinClipPath) {
-          _pdf.setCurrentTransformationMatrix(tfMatrix);
+          _pdf.setCurrentTransformationMatrix(context.contextTransform);
         }
-        path(node, tfMatrix, refsHandler, withinClipPath, attributeState);
+        path(node, context.contextTransform, context.refsHandler, withinClipPath, context.attributeState);
         break;
 
       case 'polygon':
       case 'polyline':
         if (!withinClipPath) {
-          _pdf.setCurrentTransformationMatrix(tfMatrix);
+          _pdf.setCurrentTransformationMatrix(context.contextTransform);
         }
-        polygon(node, refsHandler, attributeState, node.tagName.toLowerCase() === "polygon");
+        polygon(node, context.refsHandler, context.attributeState, node.tagName.toLowerCase() === "polygon");
         break;
 
       case 'image':
-        _pdf.setCurrentTransformationMatrix(tfMatrix);
+        _pdf.setCurrentTransformationMatrix(context.contextTransform);
         image(node);
         break;
     }
@@ -2381,18 +2389,20 @@ SOFTWARE.
       _pdf.saveGraphicsState();
       _pdf.setCurrentTransformationMatrix(new _pdf.Matrix(k, 0, 0, k, xOffset, yOffset));
 
+      //  create context object
+      var context = new Context();
+
       // set default values that differ from pdf defaults
-      var attributeState = AttributeState.default();
-      _pdf.setLineWidth(attributeState.strokeWidth);
-      var fill = attributeState.fill;
+      _pdf.setLineWidth(context.attributeState.strokeWidth);
+      var fill = context.attributeState.fill;
       _pdf.setFillColor(fill.r, fill.g, fill.b);
-      _pdf.setFont(attributeState.fontFamily);
+      _pdf.setFont(context.attributeState.fontFamily);
       // correct for a jsPDF-instance measurement unit that differs from `pt`
-      _pdf.setFontSize(attributeState.fontSize * _pdf.internal.scaleFactor);
+      _pdf.setFontSize(context.attributeState.fontSize * _pdf.internal.scaleFactor);
 
-
-      var refsHandler = new ReferencesHandler(element);
-      renderNode(element.cloneNode(true), _pdf.unitMatrix, refsHandler, false, false, attributeState);
+      var clonedSvg = element.cloneNode(true);
+      context.refsHandler = new ReferencesHandler(clonedSvg);
+      renderNode(clonedSvg, false, false, context);
 
       _pdf.restoreGraphicsState();
 
