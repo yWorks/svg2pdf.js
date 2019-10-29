@@ -1943,8 +1943,7 @@ SOFTWARE.
 
     var fontSize = getAttribute(node, "font-size");
     if (fontSize) {
-      var pdfFontSize =_pdf.getFontSize();
-      attributeState.fontSize = toPixels(fontSize, pdfFontSize);
+      attributeState.fontSize = parseFloat(fontSize);
     }
 
     var textAnchor = getAttribute(node, "text-anchor");
