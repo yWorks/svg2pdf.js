@@ -1,35 +1,39 @@
 <svg id="svgElement" width="500" height="500" xmlns="http://www.w3.org/2000/svg">
-  <path style="fill:none;stroke:black;stroke-width:1"  d="M0 0 L0 500 M50 0 L50 500 M100 0 L100 500 M150 0 L150 500 M200 0 L200 500 M250 0 L250 500 M300 0 L300 500 M350 0 L350 500 M400 0 L400 500 M450 0 L450 500 M500 0 L500 500
-                                                          M0 0 L500 0 M0 50 L500 50 M0 100 L500 100 M0 150 L500 150 M0 200 L500 200 M0 250 L500 250 M0 300 L500 300 M0 350 L500 350 M0 400 L500 400 M 0 450 L500 450 M0 500 L500 500 Z" />  
-  <path style="fill:none;stroke:black;stroke-width:3" d="M0 100 L500 100 M0 200 L500 200 M0 300 L500 300 M0 400 L500 400 M250 0 L250 500 Z" />
-  
-  <symbol id="myDot-0">                                          
+  <path style="fill:none;stroke:black;stroke-width:1" d="M0 0 L0 500 M50 0 L50 500 M100 0 L100 500 M150 0 L150 500 M200 0 L200 500 M250 0 L250 500 M300 0 L300 500 M350 0 L350 500 M400 0 L400 500 M450 0 L450 500 M500 0 L500 500
+                                                          M0 0 L500 0 M0 50 L500 50 M0 100 L500 100 M0 150 L500 150 M0 200 L500 200 M0 250 L500 250 M0 300 L500 300 M0 350 L500 350 M0 400 L500 400 M 0 450 L500 450 M0 500 L500 500 Z"/>
+  <path style="fill:none;stroke:black;stroke-width:3"
+        d="M0 100 L500 100 M0 200 L500 200 M0 300 L500 300 M0 400 L500 400 M250 0 L250 500 Z"/>
+
+  <symbol id="myDot-0">
     <circle cx="50" cy="50" r="50"/>
   </symbol>
-  <symbol id="myDot" y="10" height="100" width="250" viewBox="-50 0 80 50" >                                          
+  <symbol id="myDot" y="10" height="100" width="250" viewBox="-50 0 80 50">
     <circle cx="50" cy="50" r="50"/>
   </symbol>
-  <symbol id="myDot-overflow" width="100" height="100" overflow="visible"  viewBox="-5 0 80 50" >                                      
-    <circle cx="50" cy="50" r="50"/>    
+  <symbol id="myDot-overflow" width="100" height="100" overflow="visible" viewBox="-5 0 80 50">
+    <circle cx="50" cy="50" r="50"/>
   </symbol>
-  
-  <use href="#myDot-0"   x="250" />
+
+  <use href="#myDot-0" x="250"/>
 
   <g fill="blue">
-  <use href="#myDot-0"   x="250" y="100" />
+    <use href="#myDot-0" x="250" y="100"/>
   </g>
 
-  <use href="#myDot-0"   x="250" y="200"                             fill="red" />
+  <use href="#myDot-0" x="250" y="200" fill="red"/>
 
-  <use href="#myDot-0"   x="250" y="300"                             style="fill:green" />
+  <use href="#myDot-0" x="250" y="300" style="fill:green"/>
 
-  
-  <use href="#myDot"             y="-10" />
 
-  <use href="#myDot"             y="90"    width="100" height="100"  fill="pink" />
+  <use href="#myDot" y="-10"/>
 
-  <path style="fill:none;stroke:red;stroke-width:4" d="M0 200 L0 300 L100 300 L100 200 L0 200 Z" />
-  <use href="#myDot-overflow"    y="200"/>
+  <use href="#myDot" y="90" width="100" height="100" fill="pink"/>
 
-  <use href="#myDot"             y="390"   width="40"                fill="orange" transform="rotate(-17 620 380) translate(0 764)  scale(1 -1)"  /> 
+  <path style="fill:none;stroke:red;stroke-width:4" d="M0 200 L0 300 L100 300 L100 200 L0 200 Z"/>
+  <use href="#myDot-overflow" y="200"/>
+
+  <use href="#myDot" y="390" width="40" fill="orange" transform="rotate(-17 620 380) translate(0 714) scale(1 -1)"/>
+  <g transform="rotate(-17 620 380) translate(0 764) scale(1 -1)" fill="orange" stroke="black" stroke-width="5px">
+    <use href="#myDot" y="390" width="40"/>
+  </g>
 </svg>
