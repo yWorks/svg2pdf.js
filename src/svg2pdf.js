@@ -1297,15 +1297,15 @@ SOFTWARE.
     
     //  apply the bbox (i.e. clip) if needed
     if (refNodeOpensViewport && getAttribute(refNode, "overflow") !== "visible") {
-      _pdf.saveGraphicsState();
       _pdf.setCurrentTransformationMatrix(t.inversed());
       _pdf.rect(x, y, width, height);
-      _pdf.restoreGraphicsState();
       _pdf.clip().discardPath();
+
+      _pdf.doFormObject(id, t);
+    } else {
+      _pdf.doFormObject(id, _pdf.unitMatrix);
     }
 
-    //  write the form object
-    _pdf.doFormObject(id, _pdf.unitMatrix);
     _pdf.restoreGraphicsState();
   };
 
