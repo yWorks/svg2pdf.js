@@ -151,22 +151,32 @@ SOFTWARE.
     return pathSegList;
   };
 
-  function StyleSheets(rootSvg) {
+  function StyleSheets(rootSvg, loadExtSheets) {
     this.rootSvg = rootSvg;
-    this.loadExternCss = true;
+    this.loadExtSheets = loadExtSheets;
     this.sheets = [];
   }
 
-  StyleSheets.prototype.renderStyleSheets = function (loadExternCss) {
-    this.sheets.push();
+  StyleSheets.init = function (rootSvg, loadExtSheets) {
+    var styleSheets = new StyleSheets(rootSvg, loadExtSheets);
+  }
+
+  StyleSheets.prototype.getParsedSheets = function () {
+    if (this.sheets.length === 0) {
+      // if (this.rootSvg.children[])
+    }
+    return this.sheets;
   }
 
   StyleSheets.prototype.getRuleFor = function (node, attribute) {
-    return null;
+    for (sheet of this.getParsedSheets()) {
+      return null;
+    }
   }
 
   // returns an attribute of a node, either from the node directly or from css
   var getAttribute = function (node, propertyNode, propertyCss) {
+
     propertyCss = propertyCss || propertyNode;
     var attribute = node.style[propertyCss];
     if (attribute) {
@@ -2406,7 +2416,7 @@ SOFTWARE.
 
       var clonedSvg = element.cloneNode(true);
       var refsHandler = new ReferencesHandler(clonedSvg);
-      renderStyleSheets(clonedSvg);
+      StyleSheets.init(clonedSvg, options.loadExternalStyleSheets);
       renderNode(clonedSvg, _pdf.unitMatrix, refsHandler, false, false, attributeState);
 
       _pdf.restoreGraphicsState();
