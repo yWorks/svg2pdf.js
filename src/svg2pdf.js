@@ -281,7 +281,7 @@ SOFTWARE.
       _pdf.endFormObject(node.getAttribute("id"));
     } else if (nodeIs(node, "symbol,svg")) {
       // create unclipped and untransformed form object
-      var bBox = getBoundingBoxByChildren(node);
+      bBox = getBoundingBoxByChildren(node);
       _pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], _pdf.unitMatrix);
       renderChildren(node, _pdf.unitMatrix, this, false, false, AttributeState.default());
       _pdf.endFormObject(id);
@@ -503,7 +503,7 @@ SOFTWARE.
   // computes the transform directly applied at the node (such as viewbox scaling and the "transform" atrribute)
   // x,y,cx,cy,r,... are omitted
   var computeNodeTransform = function (node) {
-    var viewBox, x, y;
+    var box, viewBox, x, y, width, height;
     var nodeTransform = _pdf.unitMatrix;
     if (nodeIs(node, "svg,g")) {
       x = parseFloat(getAttribute(node, "x")) || 0;
@@ -511,9 +511,9 @@ SOFTWARE.
 
       viewBox = node.getAttribute("viewBox");
       if (viewBox) {
-        var box = parseFloats(viewBox);
-        var width = parseFloat(getAttribute(node, "width")) || box[2];
-        var height = parseFloat(getAttribute(node, "height")) || box[3];
+        box = parseFloats(viewBox);
+        width = parseFloat(getAttribute(node, "width")) || box[2];
+        height = parseFloat(getAttribute(node, "height")) || box[3];
         nodeTransform = computeViewBoxTransform(node, box, x, y, width, height)
       } else {
         nodeTransform = new _pdf.Matrix(1, 0, 0, 1, x, y);
@@ -546,9 +546,9 @@ SOFTWARE.
 
       viewBox = node.getAttribute("viewBox");
       if (viewBox) {
-        var box = parseFloats(viewBox);
-        var width = parseFloat(getAttribute(node, "width") || getAttribute(node.ownerSVGElement, "width"));
-        var height = parseFloat(getAttribute(node, "height") || getAttribute(node.ownerSVGElement, "height"));
+        box = parseFloats(viewBox);
+        width = parseFloat(getAttribute(node, "width") || getAttribute(node.ownerSVGElement, "width"));
+        height = parseFloat(getAttribute(node, "height") || getAttribute(node.ownerSVGElement, "height"));
         nodeTransform = computeViewBoxTransform(node, box, x, y, width, height);
       } else {
         nodeTransform = new _pdf.Matrix(1, 0, 0, 1, x, y);
@@ -836,7 +836,7 @@ SOFTWARE.
         pf(getAttribute(node, "height")) || (vb && vb[3]) || 0
       ];
     } else if (nodeIs(node, "g,clippath,symbol")) {
-      var boundingBox = getBoundingBoxByChildren(node);
+      boundingBox = getBoundingBoxByChildren(node);
     } else if (nodeIs(node, "marker")) {
       viewBox = node.getAttribute("viewBox");
       if (viewBox) {
@@ -898,7 +898,7 @@ SOFTWARE.
         ];
       });
     return boundingBox;
-  }
+  };
 
   // transforms a bounding box and returns a new rect that contains it
   var transformBBox = function (box, matrix) {
@@ -1271,7 +1271,7 @@ SOFTWARE.
       width = pf(getAttribute(node, "width") || getAttribute(refNode, "width") || formObject.width);
       height = pf(getAttribute(node, "height") || getAttribute(refNode, "height") || formObject.height);      
 
-      if (getAttribute(refNode, "viewBox")) {
+      if (refNode.getAttribute("viewBox")) {
         //  inherit width/height from the parent svg if necessary
         width = pf(width || getAttribute(node.ownerSVGElement, "width"));
         height = pf(height || getAttribute(node.ownerSVGElement, "height"));
@@ -1279,7 +1279,7 @@ SOFTWARE.
         x += pf(getAttribute(refNode, "x")) || 0;
         y += pf(getAttribute(refNode, "y")) || 0;
 
-        t = computeViewBoxTransform(refNode, parseFloats(getAttribute(refNode,"viewBox")), x, y, width, height);
+        t = computeViewBoxTransform(refNode, parseFloats(refNode.getAttribute("viewBox")), x, y, width, height);
       } else {
         t = new _pdf.Matrix((width || formObject.width) / formObject.width || 0, 0, 0, (height || formObject.height) / formObject.height || 0, x, y);
       }
