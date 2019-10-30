@@ -233,16 +233,16 @@ SOFTWARE.
 
   /**
    * 
-   * @param {Object} values 
+   * @param {object} values 
    * @constructor
    * @property {AttributeState} attributeState
-   * @property {_pdf.Matrix} contextTransform
+   * @property {jspdf.Matrix} transform
    * @property {ReferencesHandler} refsHandler
    */
   function Context(values) {
     values = values || {};
     this.attributeState = values["attributeState"] ? values["attributeState"].clone() : AttributeState.default();
-    this.contextTransform = values["contextTransform"] || _pdf.unitMatrix;
+    this.transform = values["transform"] || _pdf.unitMatrix;
     this.refsHandler = values["refsHandler"] || null;
   }
 
@@ -1165,9 +1165,9 @@ SOFTWARE.
           prevY = y;
 
           if (withinClipPath) {
-            p2 = multVecMatrix(p2, context.contextTransform);
-            p3 = multVecMatrix(p3, context.contextTransform);
-            to = multVecMatrix(to, context.contextTransform);
+            p2 = multVecMatrix(p2, context.transform);
+            p3 = multVecMatrix(p3, context.transform);
+            to = multVecMatrix(to, context.transform);
           }
 
           lines.push({
@@ -1190,7 +1190,7 @@ SOFTWARE.
           prevAngle = curAngle;
 
           if (withinClipPath) {
-            to = multVecMatrix(to, context.contextTransform);
+            to = multVecMatrix(to, context.transform);
           }
 
           lines.push({op: op, c: to});
@@ -1240,7 +1240,7 @@ SOFTWARE.
     var width = getAttribute(node, "width") || formObject.width;
     var height = getAttribute(node, "height") || formObject.height;
     var t = new _pdf.Matrix(width / formObject.width || 0, 0, 0, height / formObject.height || 0, x, y);
-    t = _pdf.matrixMult(t, context.contextTransform);
+    t = _pdf.matrixMult(t, context.transform);
     _pdf.doFormObject(id, t);
   };
 
@@ -1659,7 +1659,7 @@ SOFTWARE.
           textX + dx - xOffset,
           textY + dy,
           {
-            angle: context.contextTransform,
+            angle: context.transform,
             renderingMode: textRenderingMode === "fill" ? void 0 : textRenderingMode
           }
         );
@@ -1700,7 +1700,7 @@ SOFTWARE.
           if (tSpanAbsX !== null) {
             var x = toPixels(tSpanAbsX, pdfFontSize);
 
-            lastPositions = currentTextSegment.put(context.contextTransform, context.attributeState);
+            lastPositions = currentTextSegment.put(context.transform, context.attributeState);
             currentTextSegment = new TextChunk(getAttribute(tSpan, "text-anchor") || context.attributeState.textAnchor, x, lastPositions[1]);
           }
 
@@ -1708,7 +1708,7 @@ SOFTWARE.
           if (tSpanAbsY !== null) {
             var y = toPixels(tSpanAbsY, pdfFontSize);
 
-            lastPositions = currentTextSegment.put(context.contextTransform, context.attributeState);
+            lastPositions = currentTextSegment.put(context.transform, context.attributeState);
             currentTextSegment = new TextChunk(getAttribute(tSpan, "text-anchor") || context.attributeState.textAnchor, lastPositions[0], y);
           }
 
@@ -1736,7 +1736,7 @@ SOFTWARE.
         currentTextSegment.add(textNode, transformedText);
       }
 
-      currentTextSegment.put(context.contextTransform, context.attributeState);
+      currentTextSegment.put(context.transform, context.attributeState);
     }
 
     _pdf.restoreGraphicsState();
@@ -2013,17 +2013,17 @@ SOFTWARE.
     if (targetIsFormObject) {
 
       // the transformations directly at the node are written to the pdf form object transformation matrix
-      context.contextTransform = computeNodeTransform(node);
+      context.transform = computeNodeTransform(node);
       bBox = getUntransformedBBox(node);
 
-      _pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], context.contextTransform);
+      _pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], context.transform);
 
       // continue without transformation and set withinDefs to false to prevent child nodes from starting new form objects
-      context.contextTransform = _pdf.unitMatrix;
+      context.transform = _pdf.unitMatrix;
       withinDefs = false;
 
     } else {
-      context.contextTransform = _pdf.matrixMult(computeNodeTransform(node), context.contextTransform);
+      context.transform = _pdf.matrixMult(computeNodeTransform(node), context.transform);
 
       if (!withinClipPath) {
         _pdf.saveGraphicsState();
@@ -2040,7 +2040,7 @@ SOFTWARE.
         return;
       }
 
-      var clipPathMatrix = context.contextTransform;
+      var clipPathMatrix = context.transform;
       if (clipPathNode.hasAttribute("clipPathUnits")
           && clipPathNode.getAttribute("clipPathUnits").toLowerCase() === "objectboundingbox") {
         bBox = getUntransformedBBox(node);
@@ -2152,7 +2152,7 @@ SOFTWARE.
             var matrix = patternContentUnitsMatrix;
             matrix = _pdf.matrixMult(matrix, patternUnitsMatrix);
             matrix = _pdf.matrixMult(matrix, patternTransformMatrix);
-            matrix = _pdf.matrixMult(matrix, context.contextTransform);
+            matrix = _pdf.matrixMult(matrix, context.transform);
 
             patternOrGradient.matrix = matrix;
 
@@ -2300,28 +2300,28 @@ SOFTWARE.
 
       case 'line':
         if (!withinClipPath) {
-          _pdf.setCurrentTransformationMatrix(context.contextTransform);
+          _pdf.setCurrentTransformationMatrix(context.transform);
           line(node, context);
         }
         break;
 
       case 'rect':
         if (!withinClipPath) {
-          _pdf.setCurrentTransformationMatrix(context.contextTransform);
+          _pdf.setCurrentTransformationMatrix(context.transform);
         }
         rect(node);
         break;
 
       case 'ellipse':
         if (!withinClipPath) {
-          _pdf.setCurrentTransformationMatrix(context.contextTransform);
+          _pdf.setCurrentTransformationMatrix(context.transform);
         }
         ellipse(node);
         break;
 
       case 'circle':
         if (!withinClipPath) {
-          _pdf.setCurrentTransformationMatrix(context.contextTransform);
+          _pdf.setCurrentTransformationMatrix(context.transform);
         }
         circle(node);
         break;
@@ -2339,13 +2339,13 @@ SOFTWARE.
       case 'polygon':
       case 'polyline':
         if (!withinClipPath) {
-          _pdf.setCurrentTransformationMatrix(context.contextTransform);
+          _pdf.setCurrentTransformationMatrix(context.transform);
         }
         polygon(node, context, node.tagName.toLowerCase() === "polygon");
         break;
 
       case 'image':
-        _pdf.setCurrentTransformationMatrix(context.contextTransform);
+        _pdf.setCurrentTransformationMatrix(context.transform);
         image(node);
         break;
     }
