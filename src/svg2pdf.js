@@ -236,14 +236,18 @@ SOFTWARE.
    * @param {object} values 
    * @constructor
    * @property {AttributeState} attributeState
-   * @property {jspdf.Matrix} transform
    * @property {ReferencesHandler} refsHandler
+   * @property {jspdf.Matrix} transform
+   * @property {boolean} withinClipPath
+   * @property {boolean} withinDefs
    */
   function Context(values) {
     values = values || {};
     this.attributeState = values["attributeState"] ? values["attributeState"].clone() : AttributeState.default();
     this.transform = values["transform"] || _pdf.unitMatrix;
     this.refsHandler = values["refsHandler"] || null;
+    this.withinClipPath = values["withinClipPath"] || false;
+    this.withinDefs = values["withinDefs"] || false;
   }
 
   Context.prototype.set = function (property, value) {
@@ -297,11 +301,11 @@ SOFTWARE.
       var bBox = getUntransformedBBox(node);
 
       _pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], tfMatrix);
-      renderChildren(node, false, false, new Context({"refsHandler": this}));
+      renderChildren(node, new Context({"refsHandler": this}));
       _pdf.endFormObject(node.getAttribute("id"));
     } else if (!nodeIs(node, "clippath")) {
       // all other nodes will be rendered as PDF form object
-      renderNode(node, true, false, new Context({"refsHandler": this}));
+      renderNode(node, new Context({"refsHandler": this, "withinDefs": true}));
     }
 
     this.renderedElements[id] = node;
@@ -1002,7 +1006,7 @@ SOFTWARE.
       svgElement.setAttribute("width", String(width));
       svgElement.setAttribute("height", String(height));
 
-      renderNode(svgElement, false, false, new Context({"refsHandler": new ReferencesHandler(svgElement)}));
+      renderNode(svgElement, new Context({"refsHandler": new ReferencesHandler(svgElement)}));
       return;
     }
 
@@ -1023,7 +1027,7 @@ SOFTWARE.
   };
 
   // draws a path
-  var path = function (node, withinClipPath, context) {
+  var path = function (node, context) {
     var list = getPathSegList(node);
     var markerEnd = getAttribute(node, "marker-end"),
         markerStart = getAttribute(node, "marker-start"),
@@ -1169,7 +1173,7 @@ SOFTWARE.
           prevX = x;
           prevY = y;
 
-          if (withinClipPath) {
+          if (context.withinClipPath) {
             p2 = multVecMatrix(p2, context.transform);
             p3 = multVecMatrix(p3, context.transform);
             to = multVecMatrix(to, context.transform);
@@ -1194,7 +1198,7 @@ SOFTWARE.
           }
           prevAngle = curAngle;
 
-          if (withinClipPath) {
+          if (context.withinClipPath) {
             to = multVecMatrix(to, context.transform);
           }
 
@@ -1748,9 +1752,9 @@ SOFTWARE.
   };
 
   // renders all children of a node
-  var renderChildren = function (node, withinDefs, withinClipPath, context) {
+  var renderChildren = function (node, context) {
     forEachChild(node, function (i, node) {
-      renderNode(node, withinDefs, withinClipPath, context);
+      renderNode(node, context);
     });
   };
 
@@ -1809,7 +1813,7 @@ SOFTWARE.
 
     _pdf.beginTilingPattern(pattern);
     // continue without transformation
-    renderChildren(node, false, false, new Context({
+    renderChildren(node, new Context({
       "attributeState": attributeState,
       "refsHandler": refsHandler
     }));
@@ -1983,7 +1987,7 @@ SOFTWARE.
    * @param {boolean} withinClipPath
    * @param {AttributeState} attributeState Keeps track of parent attributes that are inherited automatically
    */
-  var renderNode = function (node, withinDefs, withinClipPath, context) {
+  var renderNode = function (node, context) {
     var parentAttributeState = context.attributeState;
     context = new Context(context);
 
@@ -2014,7 +2018,7 @@ SOFTWARE.
 
     // if we are within a defs node, start a new pdf form object and draw this node and all children on that instead
     // of the top-level page
-    var targetIsFormObject = withinDefs && !nodeIs(node, "lineargradient,radialgradient,pattern,clippath");
+    var targetIsFormObject = context.withinDefs && !nodeIs(node, "lineargradient,radialgradient,pattern,clippath");
     if (targetIsFormObject) {
 
       // the transformations directly at the node are written to the pdf form object transformation matrix
@@ -2025,12 +2029,12 @@ SOFTWARE.
 
       // continue without transformation and set withinDefs to false to prevent child nodes from starting new form objects
       context.transform = _pdf.unitMatrix;
-      withinDefs = false;
+      context.withinDefs = false;
 
     } else {
       context.transform = _pdf.matrixMult(computeNodeTransform(node), context.transform);
 
-      if (!withinClipPath) {
+      if (!context.withinClipPath) {
         _pdf.saveGraphicsState();
       }
     }
@@ -2062,7 +2066,10 @@ SOFTWARE.
       _pdf.saveGraphicsState();
       _pdf.setCurrentTransformationMatrix(clipPathMatrix);
 
-      renderChildren(clipPathNode, false, true, new Context({"refsHandler": context.refsHandler}));
+      renderChildren(clipPathNode, new Context({
+        "refsHandler": context.refsHandler,
+        "withinClipPath": true
+      }));
       _pdf.clip().discardPath();
 
       // as we cannot use restoreGraphicsState() to reset the transform (this would reset the clipping path, as well),
@@ -2296,7 +2303,7 @@ SOFTWARE.
       case 'svg':
       case 'g':
       case 'a':
-        renderChildren(node, withinDefs, false, context);
+        renderChildren(node, (new Context(context)).set("withinClipPath"));
         break;
 
       case 'use':
@@ -2304,28 +2311,28 @@ SOFTWARE.
         break;
 
       case 'line':
-        if (!withinClipPath) {
+        if (!context.withinClipPath) {
           _pdf.setCurrentTransformationMatrix(context.transform);
           line(node, context);
         }
         break;
 
       case 'rect':
-        if (!withinClipPath) {
+        if (!context.withinClipPath) {
           _pdf.setCurrentTransformationMatrix(context.transform);
         }
         rect(node);
         break;
 
       case 'ellipse':
-        if (!withinClipPath) {
+        if (!context.withinClipPath) {
           _pdf.setCurrentTransformationMatrix(context.transform);
         }
         ellipse(node);
         break;
 
       case 'circle':
-        if (!withinClipPath) {
+        if (!context.withinClipPath) {
           _pdf.setCurrentTransformationMatrix(context.transform);
         }
         circle(node);
@@ -2335,15 +2342,15 @@ SOFTWARE.
         break;
 
       case 'path':
-        if (!withinClipPath) {
+        if (!context.withinClipPath) {
           _pdf.setCurrentTransformationMatrix(context.transform);
         }
-        path(node, withinClipPath, context);
+        path(node, context);
         break;
 
       case 'polygon':
       case 'polyline':
-        if (!withinClipPath) {
+        if (!context.withinClipPath) {
           _pdf.setCurrentTransformationMatrix(context.transform);
         }
         polygon(node, context, node.tagName.toLowerCase() === "polygon");
@@ -2355,7 +2362,7 @@ SOFTWARE.
         break;
     }
 
-    if (nodeIs(node, "path,rect,ellipse,circle,polygon,polyline") && !withinClipPath) {
+    if (nodeIs(node, "path,rect,ellipse,circle,polygon,polyline") && !context.withinClipPath) {
       var isNodeFillRuleEvenOdd = getAttribute(node, "fill-rule") === "evenodd";
       if (fill && stroke) {
         if (isNodeFillRuleEvenOdd) {
@@ -2379,7 +2386,7 @@ SOFTWARE.
     // close either the formObject or the graphics context
     if (targetIsFormObject) {
       _pdf.endFormObject(node.getAttribute("id"));
-    } else if (!withinClipPath) {
+    } else if (!context.withinClipPath) {
       _pdf.restoreGraphicsState();
     }
 
@@ -2416,7 +2423,7 @@ SOFTWARE.
 
       var clonedSvg = element.cloneNode(true);
       context.refsHandler = new ReferencesHandler(clonedSvg);
-      renderNode(clonedSvg, false, false, context);
+      renderNode(clonedSvg, context);
 
       _pdf.restoreGraphicsState();
 
