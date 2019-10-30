@@ -235,11 +235,11 @@ SOFTWARE.
    * 
    * @param {object} values 
    * @constructor
-   * @property {AttributeState} attributeState
-   * @property {ReferencesHandler} refsHandler
-   * @property {jspdf.Matrix} transform
-   * @property {boolean} withinClipPath
-   * @property {boolean} withinDefs
+   * @property {AttributeState} attributeState  Keeps track of parent attributes that are inherited automatically
+   * @property {ReferencesHandler} refsHandler  The handler that will render references on demand
+   * @property {jspdf.Matrix} transform The current transformation matrix
+   * @property {boolean} withinClipPath 
+   * @property {boolean} withinDefs True if we are top-level within a defs node, so the target can be switched to an pdf form object
    */
   function Context(values) {
     values = values || {};
@@ -1981,11 +1981,7 @@ SOFTWARE.
   /**
    * Renders a svg node.
    * @param node The svg element
-   * @param contextTransform The current transformation matrix
-   * @param refsHandler The handler that will render references on demand
-   * @param withinDefs True iff we are top-level within a defs node, so the target can be switched to an pdf form object
-   * @param {boolean} withinClipPath
-   * @param {AttributeState} attributeState Keeps track of parent attributes that are inherited automatically
+   * @param {Context} context
    */
   var renderNode = function (node, context) {
     var parentAttributeState = context.attributeState;
