@@ -1508,7 +1508,7 @@ SOFTWARE.
    * @param {AttributeState} attributeState
    * @returns {[number, number]} The last current text position.
    */
-  TextChunk.prototype.put = function (transform, attributeState) {
+  TextChunk.prototype.put = function (context) {
     var i, textNode;
 
     var xs = [], ys = [], attributeStates = [];
@@ -1521,9 +1521,9 @@ SOFTWARE.
       var y = currentTextY;
 
       if (textNode.nodeName === "#text") {
-        textNodeAttributeState = attributeState
+        textNodeAttributeState = context.attributeState
       } else {
-        var textNodeAttributeState = attributeState.clone();
+        var textNodeAttributeState = context.attributeState.clone();
         var tSpanColor = getAttribute(textNode, "fill");
         setTextProperties(textNode, tSpanColor && new RGBColor(tSpanColor), textNodeAttributeState);
         var tSpanStrokeColor = getAttribute(textNode, "stroke");
@@ -1573,24 +1573,24 @@ SOFTWARE.
       textNode = this.textNodes[i];
 
       if (textNode.nodeName !== "#text") {
-        var tSpanVisibility = getAttribute(textNode, "visibility") || attributeState.visibility;
+        var tSpanVisibility = getAttribute(textNode, "visibility") || context.attributeState.visibility;
         if (tSpanVisibility === "hidden") {
           continue;
         }
       }
 
       _pdf.saveGraphicsState();
-      putTextProperties(attributeStates[i], attributeState);
-      if (attributeStates[i].stroke && attributeStates[i].stroke !== attributeState.stroke && attributeStates[i].stroke.ok) {
+      putTextProperties(attributeStates[i], context.attributeState);
+      if (attributeStates[i].stroke && attributeStates[i].stroke !== context.attributeState.stroke && attributeStates[i].stroke.ok) {
         var strokeRGB = attributeStates[i].stroke;
         _pdf.setDrawColor(strokeRGB.r, strokeRGB.g, strokeRGB.b);
       }
-      if (attributeStates[i].strokeWidth !== null && attributeStates[i].strokeWidth !== attributeState.strokeWidth) {
+      if (attributeStates[i].strokeWidth !== null && attributeStates[i].strokeWidth !== context.attributeState.strokeWidth) {
         _pdf.setLineWidth(attributeStates[i].strokeWidth)
       }
 
       var textRenderingMode = getTextRenderingMode(attributeStates[i]);
-      _pdf.text(this.texts[i], xs[i] - textOffset, ys[i], {angle: transform, renderingMode: textRenderingMode === "fill" ? void 0 : textRenderingMode});
+      _pdf.text(this.texts[i], xs[i] - textOffset, ys[i], {angle: context.transform, renderingMode: textRenderingMode === "fill" ? void 0 : textRenderingMode});
 
       _pdf.restoreGraphicsState();
     }
@@ -1709,7 +1709,7 @@ SOFTWARE.
           if (tSpanAbsX !== null) {
             var x = toPixels(tSpanAbsX, pdfFontSize);
 
-            lastPositions = currentTextSegment.put(context.transform, context.attributeState);
+            lastPositions = currentTextSegment.put(context);
             currentTextSegment = new TextChunk(getAttribute(tSpan, "text-anchor") || context.attributeState.textAnchor, x, lastPositions[1]);
           }
 
@@ -1717,7 +1717,7 @@ SOFTWARE.
           if (tSpanAbsY !== null) {
             var y = toPixels(tSpanAbsY, pdfFontSize);
 
-            lastPositions = currentTextSegment.put(context.transform, context.attributeState);
+            lastPositions = currentTextSegment.put(context);
             currentTextSegment = new TextChunk(getAttribute(tSpan, "text-anchor") || context.attributeState.textAnchor, lastPositions[0], y);
           }
 
@@ -1745,7 +1745,7 @@ SOFTWARE.
         currentTextSegment.add(textNode, transformedText);
       }
 
-      currentTextSegment.put(context.transform, context.attributeState);
+      currentTextSegment.put(context);
     }
 
     _pdf.restoreGraphicsState();
