@@ -250,11 +250,6 @@ SOFTWARE.
     this.withinDefs = values["withinDefs"] || false;
   }
 
-  Context.prototype.set = function (property, value) {
-    this[property] = value !== undefined ? value : (new Context())[property];
-    return this;
-  }
-
   /**
    * @param {Element} rootSvg
    * @constructor
@@ -959,8 +954,9 @@ SOFTWARE.
         angle = addVectors(getDirectionVector(lines[0].c, lines[1].c), getDirectionVector(lines[length - 2].c, lines[0].c));
         markers.addMarker(new Marker(markerEnd, lines[0].c, Math.atan2(angle[1], angle[0])));
       }
-
-      markers.draw((new Context(context)).set("transform"));
+      var markerContext = new Context(context);
+      markerContext.transform = _pdf.unitMatrix;
+      markers.draw(markerContext);
     }
   };
 
@@ -1226,7 +1222,9 @@ SOFTWARE.
     }
 
     if (markerEnd || markerStart || markerMid) {
-      lines.markers.draw((new Context(context)).set("transform"));
+      var markerContext = new Context(context);
+      markerContext.transform = _pdf.unitMatrix;      
+      lines.markers.draw(markerContext);
     }
   };
 
@@ -1274,7 +1272,9 @@ SOFTWARE.
       if (markerEnd) {
         markers.addMarker(new Marker(iriReference.exec(markerEnd)[1], p2, angle));
       }
-      markers.draw((new Context(context)).set("transform"));
+      var markerContext = new Context(context);
+      markerContext.transform = _pdf.unitMatrix;
+      markers.draw(markerContext);
     }
   };
 
@@ -2298,7 +2298,9 @@ SOFTWARE.
       case 'svg':
       case 'g':
       case 'a':
-        renderChildren(node, (new Context(context)).set("withinClipPath"));
+        var childContext = new Context(context);
+        childContext.withinClipPath = false;
+        renderChildren(node, childContext);
         break;
 
       case 'use':
