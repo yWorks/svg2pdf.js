@@ -246,6 +246,11 @@ SOFTWARE.
     this.refsHandler = values["refsHandler"] || null;
   }
 
+  Context.prototype.set = function (property, value) {
+    this[property] = value !== undefined ? value : (new Context())[property];
+    return this;
+  }
+
   /**
    * @param {Element} rootSvg
    * @constructor
@@ -399,7 +404,7 @@ SOFTWARE.
     this.markers.push(marker);
   };
 
-  MarkerList.prototype.draw = function (tfMatrix, context) {
+  MarkerList.prototype.draw = function (context) {
     for (var i = 0; i < this.markers.length; i++) {
       var marker = this.markers[i];
 
@@ -412,7 +417,7 @@ SOFTWARE.
       // scale with stroke-width
       tf = _pdf.matrixMult(new _pdf.Matrix(context.attributeState.strokeWidth, 0, 0, context.attributeState.strokeWidth, 0, 0), tf);
 
-      tf = _pdf.matrixMult(tf, tfMatrix);
+      tf = _pdf.matrixMult(tf, context.transform);
 
       // as the marker is already scaled by the current line width we must not apply the line width twice!
       _pdf.saveGraphicsState();
@@ -951,7 +956,7 @@ SOFTWARE.
         markers.addMarker(new Marker(markerEnd, lines[0].c, Math.atan2(angle[1], angle[0])));
       }
 
-      markers.draw(_pdf.unitMatrix, context);
+      markers.draw((new Context(context)).set("transform"));
     }
   };
 
@@ -1217,7 +1222,7 @@ SOFTWARE.
     }
 
     if (markerEnd || markerStart || markerMid) {
-      lines.markers.draw(_pdf.unitMatrix, context);
+      lines.markers.draw((new Context(context)).set("transform"));
     }
   };
 
@@ -1265,7 +1270,7 @@ SOFTWARE.
       if (markerEnd) {
         markers.addMarker(new Marker(iriReference.exec(markerEnd)[1], p2, angle));
       }
-      markers.draw(_pdf.unitMatrix, context);
+      markers.draw((new Context(context)).set("transform"));
     }
   };
 
@@ -2331,7 +2336,7 @@ SOFTWARE.
 
       case 'path':
         if (!withinClipPath) {
-          _pdf.setCurrentTransformationMatrix(context.contextTransform);
+          _pdf.setCurrentTransformationMatrix(context.transform);
         }
         path(node, withinClipPath, context);
         break;
