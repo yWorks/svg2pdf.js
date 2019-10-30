@@ -231,6 +231,14 @@ SOFTWARE.
     return p2;
   };
 
+  /**
+   * 
+   * @param {Object} values 
+   * @constructor
+   * @property {AttributeState} attributeState
+   * @property {_pdf.Matrix} contextTransform
+   * @property {ReferencesHandler} refsHandler
+   */
   function Context(values) {
     values = values || {};
     this.attributeState = values["attributeState"] ? values["attributeState"].clone() : AttributeState.default();
