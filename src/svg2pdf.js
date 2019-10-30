@@ -1636,10 +1636,9 @@ SOFTWARE.
   /**
    * Draws a text element and its tspan children.
    * @param {SVGElement} node
-   * @param {jsPDF.Matrix} tfMatrix
    * @param {boolean} hasFillColor
    * @param {RGBColor} fillRGB
-   * @param {AttributeState} attributeState
+   * @param {Context} context
    */
   var text = function (node, hasFillColor, fillRGB, context) {
     _pdf.saveGraphicsState();
