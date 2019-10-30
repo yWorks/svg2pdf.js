@@ -243,11 +243,11 @@ SOFTWARE.
    */
   function Context(values) {
     values = values || {};
-    this.attributeState = values["attributeState"] ? values["attributeState"].clone() : AttributeState.default();
-    this.transform = values["transform"] || _pdf.unitMatrix;
-    this.refsHandler = values["refsHandler"] || null;
-    this.withinClipPath = values["withinClipPath"] || false;
-    this.withinDefs = values["withinDefs"] || false;
+    this.attributeState = values.attributeState ? values.attributeState.clone() : AttributeState.default();
+    this.transform = values.transform || _pdf.unitMatrix;
+    this.refsHandler = values.refsHandler || null;
+    this.withinClipPath = values.withinClipPath || false;
+    this.withinDefs = values.withinDefs || false;
   }
 
   /**
@@ -296,11 +296,11 @@ SOFTWARE.
       var bBox = getUntransformedBBox(node);
 
       _pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], tfMatrix);
-      renderChildren(node, new Context({"refsHandler": this}));
+      renderChildren(node, new Context({refsHandler: this}));
       _pdf.endFormObject(node.getAttribute("id"));
     } else if (!nodeIs(node, "clippath")) {
       // all other nodes will be rendered as PDF form object
-      renderNode(node, new Context({"refsHandler": this, "withinDefs": true}));
+      renderNode(node, new Context({refsHandler: this, withinDefs: true}));
     }
 
     this.renderedElements[id] = node;
@@ -903,7 +903,7 @@ SOFTWARE.
   };
 
   // draws a polygon
-  var polygon = function (node, context, closed) {
+  var polygon = function(node, closed, context) {
     if (!node.hasAttribute("points") || node.getAttribute("points") === "") {
       return;
     }
@@ -1002,7 +1002,7 @@ SOFTWARE.
       svgElement.setAttribute("width", String(width));
       svgElement.setAttribute("height", String(height));
 
-      renderNode(svgElement, new Context({"refsHandler": new ReferencesHandler(svgElement)}));
+      renderNode(svgElement, new Context({refsHandler: new ReferencesHandler(svgElement)}));
       return;
     }
 
@@ -1813,8 +1813,8 @@ SOFTWARE.
     _pdf.beginTilingPattern(pattern);
     // continue without transformation
     renderChildren(node, new Context({
-      "attributeState": attributeState,
-      "refsHandler": refsHandler
+      attributeState: attributeState,
+      refsHandler: refsHandler
     }));
     _pdf.endTilingPattern(id, pattern);
   };
@@ -2062,8 +2062,8 @@ SOFTWARE.
       _pdf.setCurrentTransformationMatrix(clipPathMatrix);
 
       renderChildren(clipPathNode, new Context({
-        "refsHandler": context.refsHandler,
-        "withinClipPath": true
+        refsHandler: context.refsHandler,
+        withinClipPath: true
       }));
       _pdf.clip().discardPath();
 
@@ -2350,7 +2350,7 @@ SOFTWARE.
         if (!context.withinClipPath) {
           _pdf.setCurrentTransformationMatrix(context.transform);
         }
-        polygon(node, context, node.tagName.toLowerCase() === "polygon");
+        polygon(node, node.tagName.toLowerCase() === "polygon", context);
         break;
 
       case 'image':
