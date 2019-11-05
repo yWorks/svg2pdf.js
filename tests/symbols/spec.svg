@@ -22,7 +22,9 @@
 
   <use href="#myDot-0" x="250" y="200" fill="red"/>
 
-  <use href="#myDot-0" x="250" y="300" style="fill:green"/>
+  <use href="#myDot-0" x="250" y="300" fill="none" stroke="red" stroke-width="3" />
+  
+  <use href="#myDot-0" x="250" y="400" style="fill:green"/>  
 
 
   <use href="#myDot" y="-10"/>
@@ -33,7 +35,8 @@
   <use href="#myDot-overflow" y="200"/>
 
   <use href="#myDot" y="390" width="40" fill="orange" transform="rotate(-17 620 380) translate(0 714) scale(1 -1)"/>
-  <g transform="rotate(-17 620 380) translate(0 764) scale(1 -1)" fill="orange" stroke="black" stroke-width="5px">
+  <!-- stroke-width is only fully supported on the use-element itself -->
+  <g transform="rotate(-17 620 380) translate(0 764) scale(1 -1)" fill="orange" stroke="black" stroke-width="10">
     <use href="#myDot" y="390" width="40"/>
   </g>
 </svg>

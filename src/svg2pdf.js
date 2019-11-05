@@ -173,6 +173,19 @@ SOFTWARE.
     return tagsString.split(",").indexOf(node.tagName.toLowerCase()) >= 0;
   };
 
+  var nodeIsChildOf = function (node, tagString) {
+    var root = node.ownerSVGElement;
+    if(!root) {
+      return false;
+    }
+    for (var tmp = node.parentNode; tmp !== root; tmp = tmp.parentNode) {
+      if (nodeIs(tmp, tagString)) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   var forEachChild = function (node, fn) {
     // copy list of children, as the original might be modified
     var children = [];
@@ -251,6 +264,8 @@ SOFTWARE.
       return this.renderedElements[id];
     }
 
+    this.renderedElements[id] = "todo";
+
     var node = this.rootSvg.querySelector("#" + cssEsc(id, {isIdentifier: true}));
 
     if (nodeIs(node, "lineargradient")) {
@@ -278,10 +293,15 @@ SOFTWARE.
 
       _pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], tfMatrix);
       renderChildren(node, _pdf.unitMatrix, this, false, false, AttributeState.default());
-      _pdf.endFormObject(node.getAttribute("id"));
-    } else if (nodeIs(node, "symbol,svg")) {
+      _pdf.endFormObject(id);
+    } else if (nodeIs(node, "symbol")) {
       // create unclipped and untransformed form object
-      bBox = getBoundingBoxByChildren(node);
+      var bBox = getUntransformedBBox(node);
+      _pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], _pdf.unitMatrix);
+      renderNode(node, _pdf.unitMatrix, this, false, false, AttributeState.default());
+      _pdf.endFormObject(id); 
+    } else if (nodeIs(node, "svg")) {
+      var bBox = getBoundingBoxByChildren(node);
       _pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], _pdf.unitMatrix);
       renderChildren(node, _pdf.unitMatrix, this, false, false, AttributeState.default());
       _pdf.endFormObject(id);
@@ -725,7 +745,7 @@ SOFTWARE.
       maxY = Number.NEGATIVE_INFINITY;
       var x = 0, y = 0;
       var prevX, prevY, newX, newY;
-      var p2, p3, to;
+      var pF, p2, p3, to;
       for (i = 0; i < list.numberOfItems; i++) {
         var seg = list.getItem(i);
         var cmd = seg.pathSegTypeAsLetter;
@@ -767,27 +787,27 @@ SOFTWARE.
             to = [seg.x + x, seg.y + y];
             break;
           case "Q":
-            pf = [seg.x1, seg.y1];
-            p2 = toCubic([x, y], pf);
-            p3 = toCubic([seg.x, seg.y], pf);
+            pF = [seg.x1, seg.y1];
+            p2 = toCubic([x, y], pF);
+            p3 = toCubic([seg.x, seg.y], pF);
             to = [seg.x, seg.y];
             break;
           case "q":
-            pf = [seg.x1 + x, seg.y1 + y];
-            p2 = toCubic([x, y], pf);
-            p3 = toCubic([x + seg.x, y + seg.y], pf);
+            pF = [seg.x1 + x, seg.y1 + y];
+            p2 = toCubic([x, y], pF);
+            p3 = toCubic([x + seg.x, y + seg.y], pF);
             to = [seg.x + x, seg.y + y];
             break;
           case "T":
             p2 = getControlPointFromPrevious(i, [x, y], list, prevX, prevY);
-            p2 = toCubic([x, y], pf);
-            p3 = toCubic([seg.x, seg.y], pf);
+            p2 = toCubic([x, y], pF);
+            p3 = toCubic([seg.x, seg.y], pF);
             to = [seg.x, seg.y];
             break;
           case "t":
-            pf = getControlPointFromPrevious(i, [x, y], list, prevX, prevY);
-            p2 = toCubic([x, y], pf);
-            p3 = toCubic([x + seg.x, y + seg.y], pf);
+            pF = getControlPointFromPrevious(i, [x, y], list, prevX, prevY);
+            p2 = toCubic([x, y], pF);
+            p3 = toCubic([x + seg.x, y + seg.y], pF);
             to = [seg.x + x, seg.y + y];
             break;
           // TODO: A,a
@@ -869,12 +889,25 @@ SOFTWARE.
       ];
     }
 
-    if (!nodeIs(node, "marker,svg,g,symbol")) {
-      // add line-width
-      var lineWidth = getAttribute(node, "stroke-width") || 1;
-      var miterLimit = getAttribute(node, "stroke-miterlimit");
-      // miterLength / lineWidth = 1 / sin(phi / 2)
-      miterLimit && (lineWidth *= 0.5 / (Math.sin(Math.PI / 12)));
+    if (!nodeIs(node, "marker,svg,g")) { 
+      var referencedBy;    
+      if (nodeIs(node, "symbol")) {
+        for (el of node.ownerSVGElement.getElementsByTagName("use")) {
+          if (/* nodeIs(el, "use") &&  */(el.getAttribute("href") || el.getAttribute("xlink:href")) === "#" + node.id) {
+            referencedBy = referencedBy || [];
+            referencedBy.push(el);
+          }
+        }
+      }
+      var lineWidth = 0;
+      for (var nodes = (referencedBy || [node]), i = 0; i < nodes.length; i++) {
+        // add line-width
+        var tmpLineWidth = pf(getAttribute(nodes[i], "stroke-width") || 1);
+        var miterLimit = pf(getAttribute(nodes[i], "stroke-miterlimit"));
+        // miterLength / lineWidth = 1 / sin(phi / 2)
+        miterLimit && (tmpLineWidth *= 0.5 / (Math.sin(Math.PI / 12)));
+        lineWidth = Math.max(lineWidth, tmpLineWidth);
+      }
       return [
           boundingBox[0] - lineWidth,
           boundingBox[1] - lineWidth,
@@ -1271,7 +1304,8 @@ SOFTWARE.
       width = pf(getAttribute(node, "width") || getAttribute(refNode, "width") || formObject.width);
       height = pf(getAttribute(node, "height") || getAttribute(refNode, "height") || formObject.height);      
 
-      if (refNode.getAttribute("viewBox")) {
+      var hasViewBox = refNode.getAttribute("viewBox");
+      if (hasViewBox) {
         //  inherit width/height from the parent svg if necessary
         width = pf(width || getAttribute(node.ownerSVGElement, "width"));
         height = pf(height || getAttribute(node.ownerSVGElement, "height"));
@@ -2022,6 +2056,18 @@ SOFTWARE.
     return visible;
   }
 
+  var refIsSymbol = function (node) {
+    var id = (node.getAttribute("href") || node.getAttribute("xlink:href"));
+    if (!id) {
+      return false;
+    }
+    var refNode = node.ownerSVGElement.getElementById(id.substring(1));
+    if (!refNode) {
+      return false;
+    }
+    return nodeIs(refNode, "symbol");
+  };
+
   /**
    * Renders a svg node.
    * @param node The svg element
@@ -2037,7 +2083,10 @@ SOFTWARE.
 
     if (nodeIs(node, "defs,symbol,clippath,pattern,lineargradient,radialgradient,marker")) {
       // we will only render them on demand
-      return;
+      
+      if (!refsHandler.renderedElements[node.id]) {      
+        return;
+      }
     }
 
     if (getAttribute(node, "display") === "none") {
@@ -2076,12 +2125,14 @@ SOFTWARE.
       tfMatrix = _pdf.unitMatrix;
       withinDefs = false;
 
-    } else {
+    } else if (!nodeIs(node, "symbol")) {
       tfMatrix = _pdf.matrixMult(computeNodeTransform(node), contextTransform);
 
       if (!withinClipPath) {
         _pdf.saveGraphicsState();
       }
+    } else {
+      tfMatrix = contextTransform;
     }
 
     var hasClipPath = node.hasAttribute("clip-path") && getAttribute(node, "clip-path") !== "none";
@@ -2124,7 +2175,7 @@ SOFTWARE.
     //
 
     // fill mode
-    if (nodeIs(node, "svg,g,use,path,rect,text,ellipse,line,circle,polygon,polyline")) {
+    if (nodeIs(node, "svg,text,g,use,symbol,path,rect,ellipse,line,circle,polygon,polyline")) {
       function setDefaultColor() {
         fillRGB = new RGBColor("rgb(0, 0, 0)");
         hasFillColor = true;
@@ -2227,6 +2278,26 @@ SOFTWARE.
         }
       }
 
+      var strokeWidth = getAttribute(node, "stroke-width");
+      var hasStrokeWidth = strokeWidth !== void 0 && strokeWidth !== "";
+      if (hasStrokeWidth) {
+        strokeWidth = Math.abs(parseFloat(strokeWidth));
+      }
+
+      var strokeColor = getAttribute(node, "stroke");
+      if (strokeColor) {
+        if (strokeColor !== "none") {
+          var strokeRGB = new RGBColor(strokeColor);
+          if (strokeRGB.ok) {            
+            // pdf spec states: "A line width of 0 denotes the thinnest line that can be rendered at device resolution:
+            // 1 device pixel wide". SVG, however, does not draw zero width lines.
+            stroke = strokeWidth !== 0;
+          }
+        }
+      }
+
+
+
       // opacity is realized via a pdf graphics state
       var fillOpacity = 1.0, strokeOpacity = 1.0;
       var nodeFillOpacity = getAttribute(node, "fill-opacity");
@@ -2254,6 +2325,13 @@ SOFTWARE.
 
       var hasFillOpacity = fillOpacity < 1.0;
       var hasStrokeOpacity = strokeOpacity < 1.0;
+      if (nodeIs(node, "use") && refIsSymbol(node)) {
+        (hasFillOpacity = !fill || (fill==="inherit" && attributeState.fill === "none")) && (fillOpacity = 0.0);
+        (hasStrokeOpacity = !stroke || (stroke==="inherit" && attributeState.stroke === null)) && (strokeOpacity = 0.0);
+      } else if (nodeIsChildOf(node, "symbol")) {
+        hasFillOpacity = fill && fill !== "inherit";
+        hasStrokeOpacity = stroke && stroke !== "inherit";
+      }
       if (hasFillOpacity || hasStrokeOpacity) {
         var gState = {};
         hasFillOpacity && (gState["opacity"] = fillOpacity);
@@ -2263,7 +2341,7 @@ SOFTWARE.
 
     }
 
-    if (nodeIs(node, "svg,text,g,use,path,rect,ellipse,line,circle,polygon,polyline")) {
+    if (nodeIs(node, "svg,text,g,use,symbol,path,rect,ellipse,line,circle,polygon,polyline")) {
       if (fillColor === "none") {
         attributeState.fill = null
       } else if (hasFillColor) {
@@ -2275,9 +2353,7 @@ SOFTWARE.
       }
 
       // stroke mode
-      var strokeWidth = getAttribute(node, "stroke-width");
-      if (strokeWidth !== void 0 && strokeWidth !== "") {
-        strokeWidth = Math.abs(parseFloat(strokeWidth));
+      if (hasStrokeWidth) {
         attributeState.strokeWidth = strokeWidth;
         _pdf.setLineWidth(strokeWidth);
       } else {
@@ -2285,19 +2361,13 @@ SOFTWARE.
         strokeWidth = attributeState.strokeWidth
       }
 
-      var strokeColor = getAttribute(node, "stroke");
       if (strokeColor) {
         if (strokeColor === "none") {
           attributeState.stroke = null;
         } else {
-          var strokeRGB = new RGBColor(strokeColor);
           if (strokeRGB.ok) {
             attributeState.stroke = strokeRGB;
             _pdf.setDrawColor(strokeRGB.r, strokeRGB.g, strokeRGB.b);
-
-            // pdf spec states: "A line width of 0 denotes the thinnest line that can be rendered at device resolution:
-            // 1 device pixel wide". SVG, however, does not draw zero width lines.
-            stroke = strokeWidth !== 0;
           }
         }
       }
@@ -2345,11 +2415,12 @@ SOFTWARE.
       case 'svg':
       case 'g':
       case 'a':
+      case 'symbol':
         renderChildren(node, tfMatrix, refsHandler, withinDefs, false, attributeState);
         break;
 
       case 'use':
-        use(node, tfMatrix, refsHandler);
+        use(node, tfMatrix, refsHandler, attributeState);
         break;
 
       case 'line':
@@ -2406,7 +2477,7 @@ SOFTWARE.
 
     if (nodeIs(node, "path,rect,ellipse,circle,polygon,polyline") && !withinClipPath) {
       var isNodeFillRuleEvenOdd = getAttribute(node, "fill-rule") === "evenodd";
-      if (fill && stroke) {
+      if (fill && stroke || nodeIsChildOf(node, "symbol")) {
         if (isNodeFillRuleEvenOdd) {
           _pdf.fillStrokeEvenOdd(patternOrGradient);
         } else {
@@ -2428,7 +2499,7 @@ SOFTWARE.
     // close either the formObject or the graphics context
     if (targetIsFormObject) {
       _pdf.endFormObject(node.getAttribute("id"));
-    } else if (!withinClipPath) {
+    } else if (!withinClipPath && !nodeIs(node, "symbol")) {
       _pdf.restoreGraphicsState();
     }
 
