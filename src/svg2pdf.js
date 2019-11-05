@@ -889,24 +889,16 @@ SOFTWARE.
       ];
     }
 
-    if (!nodeIs(node, "marker,svg,g")) { 
-      var referencedBy;    
+    if (!nodeIs(node, "marker,svg,g")) {      
+      // add line-width
+      var lineWidth;
       if (nodeIs(node, "symbol")) {
-        for (el of node.ownerSVGElement.getElementsByTagName("use")) {
-          if (/* nodeIs(el, "use") &&  */(el.getAttribute("href") || el.getAttribute("xlink:href")) === "#" + node.id) {
-            referencedBy = referencedBy || [];
-            referencedBy.push(el);
-          }
-        }
-      }
-      var lineWidth = 0;
-      for (var nodes = (referencedBy || [node]), i = 0; i < nodes.length; i++) {
-        // add line-width
-        var tmpLineWidth = pf(getAttribute(nodes[i], "stroke-width") || 1);
-        var miterLimit = pf(getAttribute(nodes[i], "stroke-miterlimit"));
+        lineWidth = 0.5 * Math.max(boundingBox[2] - boundingBox[0], boundingBox[3] - boundingBox[1]);
+      } else {
+        lineWidth = pf(getAttribute(node, "stroke-width") || 1);
+        var miterLimit = getAttribute(node, "stroke-miterlimit");
         // miterLength / lineWidth = 1 / sin(phi / 2)
-        miterLimit && (tmpLineWidth *= 0.5 / (Math.sin(Math.PI / 12)));
-        lineWidth = Math.max(lineWidth, tmpLineWidth);
+        miterLimit && (lineWidth *= 0.5 / (Math.sin(Math.PI / 12)));
       }
       return [
           boundingBox[0] - lineWidth,
@@ -2323,15 +2315,18 @@ SOFTWARE.
         fillOpacity *= opacity;
       }
 
+
       var hasFillOpacity = fillOpacity < 1.0;
       var hasStrokeOpacity = strokeOpacity < 1.0;
+
       if (nodeIs(node, "use") && refIsSymbol(node)) {
-        (hasFillOpacity = !fill || (fill==="inherit" && attributeState.fill === "none")) && (fillOpacity = 0.0);
-        (hasStrokeOpacity = !stroke || (stroke==="inherit" && attributeState.stroke === null)) && (strokeOpacity = 0.0);
+        (hasFillOpacity = !fill || (fill === "inherit" && attributeState.fill === null)) && (fillOpacity = 0.0);
+        (hasStrokeOpacity = !stroke || (stroke === "inherit" && attributeState.stroke === null)) && (strokeOpacity = 0.0);
       } else if (nodeIsChildOf(node, "symbol")) {
-        hasFillOpacity = fill && fill !== "inherit";
-        hasStrokeOpacity = stroke && stroke !== "inherit";
+        hasFillOpacity = hasFillOpacity || fill && fill !== "inherit";
+        hasStrokeOpacity = hasStrokeOpacity || stroke && stroke !== "inherit";
       }
+
       if (hasFillOpacity || hasStrokeOpacity) {
         var gState = {};
         hasFillOpacity && (gState["opacity"] = fillOpacity);
