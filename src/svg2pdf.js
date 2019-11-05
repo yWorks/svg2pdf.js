@@ -250,6 +250,17 @@ SOFTWARE.
     this.withinDefs = values.withinDefs || false;
   }
 
+  Context.prototype.clone = function (values) {
+    values = values || {};
+    var clone = new Context();
+    clone.attributeState = values.attributeState ? values.attributeState.clone() : this.attributeState.clone();
+    clone.transform = values.transform || this.transform;
+    clone.refsHandler = values.refsHandler || this.refsHandler;
+    clone.withinClipPath = values.withinClipPath || this.withinClipPath;
+    clone.withinDefs = values.withinDefs || this.withinDefs;
+    return clone;
+  }
+
   /**
    * @param {Element} rootSvg
    * @constructor
@@ -289,7 +300,7 @@ SOFTWARE.
         node.getAttribute("r") || 0.5
       ]);
     } else if (nodeIs(node, "pattern")) {
-      pattern(node, this, AttributeState.default())
+      pattern(node, new Context({refsHandler: this}));
     } else if (nodeIs(node, "marker")) {
       // the transformations directly at the node are written to the pdf form object transformation matrix
       var tfMatrix = computeNodeTransform(node);
@@ -954,9 +965,8 @@ SOFTWARE.
         angle = addVectors(getDirectionVector(lines[0].c, lines[1].c), getDirectionVector(lines[length - 2].c, lines[0].c));
         markers.addMarker(new Marker(markerEnd, lines[0].c, Math.atan2(angle[1], angle[0])));
       }
-      var markerContext = new Context(context);
-      markerContext.transform = _pdf.unitMatrix;
-      markers.draw(markerContext);
+      
+      markers.draw(context.clone({transform: _pdf.unitMatrix}));
     }
   };
 
@@ -1221,10 +1231,8 @@ SOFTWARE.
       _pdf.path(lines.lines);
     }
 
-    if (markerEnd || markerStart || markerMid) {
-      var markerContext = new Context(context);
-      markerContext.transform = _pdf.unitMatrix;      
-      lines.markers.draw(markerContext);
+    if (markerEnd || markerStart || markerMid) {      
+      lines.markers.draw(context.clone({transform: _pdf.unitMatrix}));
     }
   };
 
@@ -1272,9 +1280,7 @@ SOFTWARE.
       if (markerEnd) {
         markers.addMarker(new Marker(iriReference.exec(markerEnd)[1], p2, angle));
       }
-      var markerContext = new Context(context);
-      markerContext.transform = _pdf.unitMatrix;
-      markers.draw(markerContext);
+      markers.draw(context.clone({transform: _pdf.unitMatrix}));
     }
   };
 
@@ -1802,7 +1808,7 @@ SOFTWARE.
     _pdf.addShadingPattern(id, pattern);
   };
 
-  var pattern = function (node, refsHandler, attributeState) {
+  var pattern = function (node, context) {
     var id = node.getAttribute("id");
 
     // the transformations directly at the node are written to the pattern transformation matrix
@@ -1812,10 +1818,7 @@ SOFTWARE.
 
     _pdf.beginTilingPattern(pattern);
     // continue without transformation
-    renderChildren(node, new Context({
-      attributeState: attributeState,
-      refsHandler: refsHandler
-    }));
+    renderChildren(node, context);
     _pdf.endTilingPattern(id, pattern);
   };
 
@@ -1984,7 +1987,7 @@ SOFTWARE.
    */
   var renderNode = function (node, context) {
     var parentAttributeState = context.attributeState;
-    context = new Context(context);
+    context = context.clone();
 
     if (nodeIs(node, "defs,clippath,pattern,lineargradient,radialgradient,marker")) {
       // we will only render them on demand
@@ -2298,9 +2301,7 @@ SOFTWARE.
       case 'svg':
       case 'g':
       case 'a':
-        var childContext = new Context(context);
-        childContext.withinClipPath = false;
-        renderChildren(node, childContext);
+        renderChildren(node, context.clone({withinClipPath: false}));
         break;
 
       case 'use':
