@@ -2320,11 +2320,11 @@ SOFTWARE.
       var hasStrokeOpacity = strokeOpacity < 1.0;
 
       if (nodeIs(node, "use") && refIsSymbol(node)) {
-        (hasFillOpacity = !fill || (fill === "inherit" && attributeState.fill === null)) && (fillOpacity = 0.0);
-        (hasStrokeOpacity = !stroke || (stroke === "inherit" && attributeState.stroke === null)) && (strokeOpacity = 0.0);
-      } else if (nodeIsChildOf(node, "symbol")) {
-        hasFillOpacity = hasFillOpacity || fill && fill !== "inherit";
-        hasStrokeOpacity = hasStrokeOpacity || stroke && stroke !== "inherit";
+        hasFillOpacity || (hasFillOpacity = !fill || (fill === "inherit" && attributeState.fill === null)) && (fillOpacity = 0.0);
+        hasStrokeOpacity || (hasStrokeOpacity = !stroke || (stroke === "inherit" && attributeState.stroke === null)) && (strokeOpacity = 0.0);
+      } else if (nodeIsChildOf(node, "symbol") || nodeIs(node, "symbol")) {
+        hasFillOpacity = hasFillOpacity || !fill && !(fillOpacity = 0.0) || fill && fill !== "inherit";
+        hasStrokeOpacity = hasStrokeOpacity || !stroke && !(strokeOpacity = 0.0) || stroke && stroke !== "inherit";
       }
 
       if (hasFillOpacity || hasStrokeOpacity) {
