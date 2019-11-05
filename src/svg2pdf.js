@@ -1888,7 +1888,7 @@ SOFTWARE.
     var alignmentBaseline = getAttribute(node, "vertical-align") || getAttribute(node, "alignment-baseline");
     if (alignmentBaseline) {
       var matchArr = alignmentBaseline.match(/(baseline|text-bottom|alphabetic|ideographic|middle|central|mathematical|text-top|bottom|center|top|hanging)/);
-      if (isArray(matchArr)) {
+      if (matchArr) {
         attributeState.alignmentBaseline = matchArr[0];
       } 
     }
