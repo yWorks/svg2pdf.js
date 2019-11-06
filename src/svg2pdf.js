@@ -37,6 +37,7 @@ SOFTWARE.
   var SvgPath;
   var FontFamily;
   var cssEsc;
+  var Css;
 
   var _pdf; // jsPDF pdf-document
 
@@ -157,15 +158,50 @@ SOFTWARE.
     this.sheets = [];
   }
 
-  StyleSheets.init = function (rootSvg, loadExtSheets) {
-    var styleSheets = new StyleSheets(rootSvg, loadExtSheets);
-  }
-
   StyleSheets.prototype.getParsedSheets = function () {
     if (this.sheets.length === 0) {
-      // if (this.rootSvg.children[])
+      var styleTags = this.rootSvg.getElementsByTagName("style") || [];
+      for (styleTag of styleTags) {
+        this.sheets.push(Css.parse(styleTag.textContent, {silent: true}));
+      }
+
+      if (this.loadExtSheets || true) {
+        var paths = [];
+        var links = this.rootSvg.getElementsByTagName("link");
+        for (var link of links) {
+          if (link.getAttribute("rel") === "stylesheet") {
+            paths.push(link.getAttribute("href"));            
+          }
+        }
+
+        for (var node of this.rootSvg.ownerDocument.childNodes) {
+          if (node.nodeName === "xml-stylesheet") {
+            paths.push(node.data.match(/href=[\"|\'|\`|\`].*?[\"|\'|\`|\`]/)[0].split("=")[1].slice(1,-1));
+          }
+        }
+
+        for (var path of paths) {
+          var response = StyleSheets.loadSheet(path);
+          if (!(response instanceof Error)) {
+            this.sheets.push(Css.parse(response, {silent: true}));
+          }
+        }
+      }
     }
     return this.sheets;
+  }
+
+  StyleSheets.loadSheet = function (url) {
+    const request = new XMLHttpRequest();
+    request.open('GET', url, false);
+    request.overrideMimeType('text\/plain; charset=x-user-defined');
+    request.send();
+
+    if (request.status !== 200) {
+      return new Error(`Unable to fetch ${url}, status code: ${request.status}`);
+    }
+
+    return request.responseText;
   }
 
   StyleSheets.prototype.getRuleFor = function (node, attribute) {
@@ -261,6 +297,7 @@ SOFTWARE.
    * @constructor
    * @property {AttributeState} attributeState  Keeps track of parent attributes that are inherited automatically
    * @property {ReferencesHandler} refsHandler  The handler that will render references on demand
+   * @property {StyleSheets} styleSheets  CSS rules will be stored here
    * @property {jspdf.Matrix} transform The current transformation matrix
    * @property {boolean} withinClipPath 
    * @property {boolean} withinDefs True if we are top-level within a defs node, so the target can be switched to an pdf form object
@@ -268,8 +305,9 @@ SOFTWARE.
   function Context(values) {
     values = values || {};
     this.attributeState = values.attributeState ? values.attributeState.clone() : AttributeState.default();
-    this.transform = values.transform || _pdf.unitMatrix;
     this.refsHandler = values.refsHandler || null;
+    this.styleSheets = values.styleSheets || null;
+    this.transform = values.transform || _pdf.unitMatrix;    
     this.withinClipPath = values.withinClipPath || false;
     this.withinDefs = values.withinDefs || false;
   }
@@ -2423,6 +2461,7 @@ SOFTWARE.
     var k = options.scale || 1.0,
         xOffset = options.xOffset || 0.0,
         yOffset = options.yOffset || 0.0;
+        extCss = options.loadExternalStyleSheets || false;
 
 
     _pdf.advancedAPI(function () {
@@ -2444,7 +2483,7 @@ SOFTWARE.
 
       var clonedSvg = element.cloneNode(true);
       context.refsHandler = new ReferencesHandler(clonedSvg);
-      StyleSheets.init(clonedSvg, options.loadExternalStyleSheets);
+      context.styleSheets = new StyleSheets(clonedSvg, extCss);
       renderNode(clonedSvg, context);
 
       _pdf.restoreGraphicsState();
@@ -2457,11 +2496,12 @@ SOFTWARE.
   };
 
   if (typeof define === "function" && define.amd) {
-    define(["./rgbcolor", "svgpath", "font-family-papandreou", "cssesc"], function (rgbcolor, svgpath, fontFamily, cssesc) {
+    define(["./rgbcolor", "svgpath", "font-family-papandreou", "cssesc", "css"], function (rgbcolor, svgpath, fontFamily, cssesc, css) {
       RGBColor = rgbcolor;
       SvgPath = svgpath;
       FontFamily = fontFamily;
       cssEsc = cssesc;
+      Css = css;
       return svg2pdf;
     });
   } else if (typeof module !== "undefined" && module.exports) {
@@ -2469,12 +2509,14 @@ SOFTWARE.
     SvgPath = require("svgpath");
     FontFamily = require("font-family-papandreou");
     cssEsc = require("cssesc");
+    Css = require("css");
     module.exports = svg2pdf;
   } else {
     SvgPath = global.SvgPath;
     RGBColor = global.RGBColor;
     FontFamily = global.FontFamily;
     cssEsc = global.cssesc;
+    Css = global.css;
     global.svg2pdf = svg2pdf;
     // for compatibility reasons
     global.svgElementToPdf = svg2pdf;

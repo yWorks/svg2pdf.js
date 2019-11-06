@@ -39,6 +39,10 @@ module.exports = (config) => {
           included: false,
           watched: false,
           served: true
+        }, {
+          pattern: 'tests/**/*.css',
+          included: false,
+          served: true
         }
     ].concat(testCoverage ? 'dist/svg2pdf.js' : 'src/*.js'),
 
