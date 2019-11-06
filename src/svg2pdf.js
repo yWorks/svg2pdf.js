@@ -151,6 +151,24 @@ SOFTWARE.
     return pathSegList;
   };
 
+  var alignmentBaselineMap = {
+    "bottom": "bottom",
+    "text-bottom": "bottom",
+    "top": "top",
+    "text-top": "top",
+    "hanging": "hanging",
+    "middle": "middle",
+    "central": "middle",
+    "center": "middle",
+    "mathematical": "middle",
+    "ideographic": "ideographic",
+    "alphabetic": "alphabetic",
+    "baseline": "alphabetic"
+  };
+  var mapAlignmentBaseline = function (value) {
+    return alignmentBaselineMap[value] || "alphabetic";
+  };
+
   // returns an attribute of a node, either from the node directly or from css
   var getAttribute = function (node, propertyNode, propertyCss) {
     propertyCss = propertyCss || propertyNode;
@@ -328,6 +346,7 @@ SOFTWARE.
     this.strokeOpacity = 1.0;
     this.strokeWidth = 1.0;
     // this.textAlign = null;
+    this.alignmentBaseline = null;
     this.textAnchor = null;
     this.visibility = null;
   };
@@ -354,6 +373,7 @@ SOFTWARE.
     attributeState.strokeOpacity = 1.0;
     attributeState.strokeWidth = 1.0;
     // attributeState.textAlign = "start";
+    AttributeState.alignmentBaseline = "baseline";
     attributeState.textAnchor = "start";
     attributeState.visibility = "visible";
 
@@ -1589,8 +1609,13 @@ SOFTWARE.
         _pdf.setLineWidth(attributeStates[i].strokeWidth)
       }
 
+      var alignmentBaseline = attributeStates[i].alignmentBaseline;
       var textRenderingMode = getTextRenderingMode(attributeStates[i]);
-      _pdf.text(this.texts[i], xs[i] - textOffset, ys[i], {angle: context.transform, renderingMode: textRenderingMode === "fill" ? void 0 : textRenderingMode});
+      _pdf.text(this.texts[i], xs[i] - textOffset, ys[i], {
+        baseline: mapAlignmentBaseline(alignmentBaseline),
+        angle: context.transform,
+        renderingMode: textRenderingMode === "fill" ? void 0 : textRenderingMode
+      });
 
       _pdf.restoreGraphicsState();
     }
@@ -1661,12 +1686,14 @@ SOFTWARE.
       xOffset = getTextOffset(transformedText, context.attributeState);
 
       if (visibility === "visible") {
+        var alignmentBaseline = context.attributeState.alignmentBaseline;
         var textRenderingMode = getTextRenderingMode(context.attributeState);
         _pdf.text(
           transformedText,
           textX + dx - xOffset,
           textY + dy,
           {
+            baseline: mapAlignmentBaseline(alignmentBaseline),
             angle: context.transform,
             renderingMode: textRenderingMode === "fill" ? void 0 : textRenderingMode
           }
@@ -1899,6 +1926,14 @@ SOFTWARE.
     var fontSize = getAttribute(node, "font-size");
     if (fontSize) {
       attributeState.fontSize = parseFloat(fontSize);
+    }
+
+    var alignmentBaseline = getAttribute(node, "vertical-align") || getAttribute(node, "alignment-baseline");
+    if (alignmentBaseline) {
+      var matchArr = alignmentBaseline.match(/(baseline|text-bottom|alphabetic|ideographic|middle|central|mathematical|text-top|bottom|center|top|hanging)/);
+      if (matchArr) {
+        attributeState.alignmentBaseline = matchArr[0];
+      }
     }
 
     var textAnchor = getAttribute(node, "text-anchor");
