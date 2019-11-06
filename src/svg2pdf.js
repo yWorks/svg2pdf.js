@@ -161,9 +161,11 @@ SOFTWARE.
 
   StyleSheets.prototype.getParsedSheets = function () {
     if (this.sheets.length === 0) {
+      var sheetTexts = [];
+
       var styleTags = this.rootSvg.getElementsByTagName("style") || [];
       for (styleTag of styleTags) {
-        this.sheets.push(Css.parse(styleTag.textContent, {silent: true}));
+        sheetTexts.push(styleTag.textContent);
       }
 
       if (this.loadExtSheets || true) {
@@ -184,9 +186,14 @@ SOFTWARE.
         for (var path of paths) {
           var response = StyleSheets.loadSheet(path);
           if (!(response instanceof Error)) {
-            this.sheets.push(Css.parse(response, {silent: true}));
+            sheetTexts.push(response);
           }
         }
+      }
+
+      for (var text of sheetTexts) {
+        var sheet = Css.parse(text, {silent: true});
+        this.sheets.push(sheet);
       }
     }
     return this.sheets;
@@ -205,23 +212,39 @@ SOFTWARE.
     return request.responseText;
   }
 
-  StyleSheets.prototype.getRuleFor = function (node, attribute) {
-    for (sheet of this.getParsedSheets()) {
-      return null;
+  StyleSheets.prototype.getRuleFor = function (node, propertyCss) {
+    for (var sheet of this.getParsedSheets()) {
+      for (var rule of sheet.stylesheet.rules) {
+        for (var selector of rule.selectors) {
+          if (CSSselect.is(node, selector)) {
+            for (var declaration of rule.declarations) {
+              if (declaration.property === propertyCss) {
+                return declaration.value;
+              }
+            }            
+          }
+        }
+      }
     }
+    return null;
   }
 
   // returns an attribute of a node, either from the node directly or from css
-  var getAttribute = function (node, propertyNode, propertyCss) {
-
-    propertyCss = propertyCss || propertyNode;
+  var getAttribute = function (node, propertyNames, styleSheets) {
+    var propertyCss, propertyNode;
+    if (Array.isArray(propertyNames)) {
+      propertyCss = propertyNames[1] || propertyNames[0];
+      propertyNode = propertyNames[0];
+    } else {
+      propertyCss = propertyNode = propertyNames;
+    }
     var attribute = node.style[propertyCss];
     if (attribute) {
       return attribute;
     } else if (node.hasAttribute(propertyNode)) {
       return node.getAttribute(propertyNode);
     } else {
-      return void 0
+      return styleSheets && styleSheets.getRuleFor(node, propertyCss) || void 0;
     }
   };
 
@@ -2169,7 +2192,7 @@ SOFTWARE.
             }
 
             // matrix that is applied to the gradient before any other transformations
-            var gradientTransform = parseTransform(getAttribute(fillNode, "gradientTransform", "transform"));
+            var gradientTransform = parseTransform(getAttribute(fillNode, ["gradientTransform", "transform"]));
 
             patternOrGradient = {
               key: fillUrl,
@@ -2216,7 +2239,7 @@ SOFTWARE.
 
             var patternTransformMatrix = _pdf.unitMatrix;
             if (fillNode.hasAttribute("patternTransform")) {
-              patternTransformMatrix = parseTransform(getAttribute(fillNode, "patternTransform", "transform"));
+              patternTransformMatrix = parseTransform(getAttribute(fillNode, ["patternTransform", "transform"]));
             }
 
             var matrix = patternContentUnitsMatrix;
@@ -2485,6 +2508,7 @@ SOFTWARE.
       var clonedSvg = element.cloneNode(true);
       context.refsHandler = new ReferencesHandler(clonedSvg);
       context.styleSheets = new StyleSheets(clonedSvg, extCss);
+
       renderNode(clonedSvg, context);
 
       _pdf.restoreGraphicsState();
