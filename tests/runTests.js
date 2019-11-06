@@ -37,6 +37,7 @@ const tests = [
     "references",
     "remote-images",
     "strokes-and-bounding-boxes",
+    "style-sheets",
     "text-fill-stroke",
     "text-placement",
     "title-element",

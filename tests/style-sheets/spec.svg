@@ -1,5 +1,6 @@
-<?xml-stylesheet href="style.css" type="text/css"?>
+<?xml-stylesheet href="/base/tests/style-sheets/style.css" type="text/css"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="500" height="500">
+    <link xmlns="http://www.w3.org/1999/xhtml" rel="stylesheet" href="/base/tests/style-sheets/style2.css" type="text/css" />
     <style>
         <![CDATA[
         .blue {
@@ -8,4 +9,6 @@
         ]]>
     </style>
     <circle cx="100" cy="100" r="75" class="blue" />
+    <circle cx="200" cy="200" r="75" class="red" />
+    <circle cx="300" cy="300" r="75" class="green" />
 </svg>
