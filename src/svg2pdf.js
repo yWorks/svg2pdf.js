@@ -1007,9 +1007,9 @@ SOFTWARE.
 
     _pdf.path(lines);
 
-    var markerEnd = getAttribute(node, "marker-end"),
-        markerStart = getAttribute(node, "marker-start"),
-        markerMid = getAttribute(node, "marker-mid");
+    var markerEnd = getAttribute(node, "marker-end", context.styleSheets),
+        markerStart = getAttribute(node, "marker-start", context.styleSheets),
+        markerMid = getAttribute(node, "marker-mid", context.styleSheets);
 
     if (markerStart || markerMid || markerEnd) {
       var length = lines.length;
@@ -1111,9 +1111,9 @@ SOFTWARE.
   // draws a path
   var path = function (node, context) {
     var list = getPathSegList(node);
-    var markerEnd = getAttribute(node, "marker-end"),
-        markerStart = getAttribute(node, "marker-start"),
-        markerMid = getAttribute(node, "marker-mid");
+    var markerEnd = getAttribute(node, "marker-end", context.styleSheets),
+        markerStart = getAttribute(node, "marker-start", context.styleSheets),
+        markerMid = getAttribute(node, "marker-mid", context.styleSheets);
 
     markerEnd && (markerEnd = iriReference.exec(markerEnd)[1]);
     markerStart && (markerStart = iriReference.exec(markerStart)[1]);
@@ -1328,10 +1328,10 @@ SOFTWARE.
     var formObject = _pdf.getFormObject(id);
 
     // scale and position it right
-    var x = getAttribute(node, "x") || 0;
-    var y = getAttribute(node, "y") || 0;
-    var width = getAttribute(node, "width") || formObject.width;
-    var height = getAttribute(node, "height") || formObject.height;
+    var x = getAttribute(node, "x", context.styleSheets) || 0;
+    var y = getAttribute(node, "y", context.styleSheets) || 0;
+    var width = getAttribute(node, "width", context.styleSheets) || formObject.width;
+    var height = getAttribute(node, "height", context.styleSheets) || formObject.height;
     var t = new _pdf.Matrix(width / formObject.width || 0, 0, 0, height / formObject.height || 0, x, y);
     t = _pdf.matrixMult(t, context.transform);
     _pdf.doFormObject(id, t);
@@ -1346,8 +1346,8 @@ SOFTWARE.
       _pdf.line(p1[0], p1[1], p2[0], p2[1]);
     }
 
-    var markerStart = getAttribute(node, "marker-start"),
-        markerEnd = getAttribute(node, "marker-end");
+    var markerStart = getAttribute(node, "marker-start", context.styleSheets),
+        markerEnd = getAttribute(node, "marker-end", context.styleSheets);
 
     if (markerStart || markerEnd) {
       var markers = new MarkerList();
@@ -1610,16 +1610,16 @@ SOFTWARE.
         textNodeAttributeState = context.attributeState
       } else {
         var textNodeAttributeState = context.attributeState.clone();
-        var tSpanColor = getAttribute(textNode, "fill");
+        var tSpanColor = getAttribute(textNode, "fill", context.styleSheets);
         setTextProperties(textNode, tSpanColor && new RGBColor(tSpanColor), textNodeAttributeState);
-        var tSpanStrokeColor = getAttribute(textNode, "stroke");
+        var tSpanStrokeColor = getAttribute(textNode, "stroke", context.styleSheets);
         if (tSpanStrokeColor) {
           var strokeRGB = new RGBColor(tSpanStrokeColor);
           if (strokeRGB.ok) {
             textNodeAttributeState.stroke = strokeRGB;
           }
         }
-        var strokeWidth = getAttribute(textNode, "stroke-width");
+        var strokeWidth = getAttribute(textNode, "stroke-width", context.styleSheets);
         if (strokeWidth !== void 0) {
           textNodeAttributeState.strokeWidth = parseFloat(strokeWidth)
         }
@@ -1659,7 +1659,7 @@ SOFTWARE.
       textNode = this.textNodes[i];
 
       if (textNode.nodeName !== "#text") {
-        var tSpanVisibility = getAttribute(textNode, "visibility") || context.attributeState.visibility;
+        var tSpanVisibility = getAttribute(textNode, "visibility", context.styleSheets) || context.attributeState.visibility;
         if (tSpanVisibility === "hidden") {
           continue;
         }
@@ -1795,7 +1795,7 @@ SOFTWARE.
             var x = toPixels(tSpanAbsX, pdfFontSize);
 
             lastPositions = currentTextSegment.put(context);
-            currentTextSegment = new TextChunk(getAttribute(tSpan, "text-anchor") || context.attributeState.textAnchor, x, lastPositions[1]);
+            currentTextSegment = new TextChunk(getAttribute(tSpan, "text-anchor", context.styleSheets) || context.attributeState.textAnchor, x, lastPositions[1]);
           }
 
           var tSpanAbsY = tSpan.getAttribute("y");
@@ -1803,7 +1803,7 @@ SOFTWARE.
             var y = toPixels(tSpanAbsY, pdfFontSize);
 
             lastPositions = currentTextSegment.put(context);
-            currentTextSegment = new TextChunk(getAttribute(tSpan, "text-anchor") || context.attributeState.textAnchor, lastPositions[0], y);
+            currentTextSegment = new TextChunk(getAttribute(tSpan, "text-anchor", context.styleSheets) || context.attributeState.textAnchor, lastPositions[0], y);
           }
 
           var tSpanXmlSpace = tSpan.getAttribute("xml:space");
@@ -2077,11 +2077,11 @@ SOFTWARE.
       return;
     }
 
-    if (getAttribute(node, "display") === "none") {
+    if (getAttribute(node, "display", context.styleSheets) === "none") {
       return;
     }
 
-    var visibility = context.attributeState.visibility = getAttribute(node, "visibility") || context.attributeState.visibility;
+    var visibility = context.attributeState.visibility = getAttribute(node, "visibility", context.styleSheets) || context.attributeState.visibility;
     if (visibility === "hidden" && !nodeIs(node, "svg,g,marker,a,pattern,defs,text")) {
       return;
     }
@@ -2120,9 +2120,9 @@ SOFTWARE.
       }
     }
 
-    var hasClipPath = node.hasAttribute("clip-path") && getAttribute(node, "clip-path") !== "none";
+    var hasClipPath = node.hasAttribute("clip-path") && getAttribute(node, "clip-path", context.styleSheets) !== "none";
     if (hasClipPath) {
-      var clipPathId = iriReference.exec(getAttribute(node, "clip-path"));
+      var clipPathId = iriReference.exec(getAttribute(node, "clip-path", context.styleSheets));
       var clipPathNode = context.refsHandler.getRendered(clipPathId[1]);
 
       if (!isPartlyVisible(clipPathNode)) {
@@ -2170,7 +2170,7 @@ SOFTWARE.
         fill = true;
       }
 
-      var fillColor = getAttribute(node, "fill");
+      var fillColor = getAttribute(node, "fill", context.styleSheets);
       if (fillColor) {
         var url = iriReference.exec(fillColor);
         if (url) {
@@ -2192,7 +2192,7 @@ SOFTWARE.
             }
 
             // matrix that is applied to the gradient before any other transformations
-            var gradientTransform = parseTransform(getAttribute(fillNode, ["gradientTransform", "transform"]));
+            var gradientTransform = parseTransform(getAttribute(fillNode, ["gradientTransform", "transform"], context.styleSheets));
 
             patternOrGradient = {
               key: fillUrl,
@@ -2239,7 +2239,7 @@ SOFTWARE.
 
             var patternTransformMatrix = _pdf.unitMatrix;
             if (fillNode.hasAttribute("patternTransform")) {
-              patternTransformMatrix = parseTransform(getAttribute(fillNode, ["patternTransform", "transform"]));
+              patternTransformMatrix = parseTransform(getAttribute(fillNode, ["patternTransform", "transform"], context.styleSheets));
             }
 
             var matrix = patternContentUnitsMatrix;
@@ -2268,7 +2268,7 @@ SOFTWARE.
 
       // opacity is realized via a pdf graphics state
       var fillOpacity = 1.0, strokeOpacity = 1.0;
-      var nodeFillOpacity = getAttribute(node, "fill-opacity");
+      var nodeFillOpacity = getAttribute(node, "fill-opacity", context.styleSheets);
       if (nodeFillOpacity) {
         fillOpacity *= parseFloat(nodeFillOpacity);
       }
@@ -2276,7 +2276,7 @@ SOFTWARE.
         fillOpacity *= fillRGB.a;
       }
 
-      var nodeStrokeOpacity = getAttribute(node, "stroke-opacity");
+      var nodeStrokeOpacity = getAttribute(node, "stroke-opacity", context.styleSheets);
       if (nodeStrokeOpacity) {
         strokeOpacity *= parseFloat(nodeStrokeOpacity);
       }
@@ -2284,7 +2284,7 @@ SOFTWARE.
         strokeOpacity *= strokeRGB.a;
       }
 
-      var nodeOpacity = getAttribute(node, "opacity");
+      var nodeOpacity = getAttribute(node, "opacity", context.styleSheets);
       if (nodeOpacity) {
         var opacity = parseFloat(nodeOpacity);
         strokeOpacity *= opacity;
@@ -2314,7 +2314,7 @@ SOFTWARE.
       }
 
       // stroke mode
-      var strokeWidth = getAttribute(node, "stroke-width");
+      var strokeWidth = getAttribute(node, "stroke-width", context.styleSheets);
       if (strokeWidth !== void 0 && strokeWidth !== "") {
         strokeWidth = Math.abs(parseFloat(strokeWidth));
         context.attributeState.strokeWidth = strokeWidth;
@@ -2324,7 +2324,7 @@ SOFTWARE.
         strokeWidth = context.attributeState.strokeWidth
       }
 
-      var strokeColor = getAttribute(node, "stroke");
+      var strokeColor = getAttribute(node, "stroke", context.styleSheets);
       if (strokeColor) {
         if (strokeColor === "none") {
           context.attributeState.stroke = null;
@@ -2341,23 +2341,23 @@ SOFTWARE.
         }
       }
 
-      var lineCap = getAttribute(node, "stroke-linecap");
+      var lineCap = getAttribute(node, "stroke-linecap", context.styleSheets);
       if (lineCap) {
         _pdf.setLineCap(context.attributeState.strokeLinecap = lineCap);
       }
-      var lineJoin = getAttribute(node, "stroke-linejoin");
+      var lineJoin = getAttribute(node, "stroke-linejoin", context.styleSheets);
       if (lineJoin) {
         _pdf.setLineJoin(context.attributeState.strokeLinejoin = lineJoin);
       }
-      var dashArray = getAttribute(node, "stroke-dasharray");
+      var dashArray = getAttribute(node, "stroke-dasharray", context.styleSheets);
       if (dashArray) {
         dashArray = parseFloats(dashArray);
-        var dashOffset = parseInt(getAttribute(node, "stroke-dashoffset")) || 0;
+        var dashOffset = parseInt(getAttribute(node, "stroke-dashoffset", context.styleSheets)) || 0;
         context.attributeState.strokeDasharray = dashArray;
         context.attributeState.strokeDashoffset = dashOffset;
         _pdf.setLineDashPattern(dashArray, dashOffset);
       }
-      var miterLimit = getAttribute(node, "stroke-miterlimit");
+      var miterLimit = getAttribute(node, "stroke-miterlimit", context.styleSheets);
       if (miterLimit !== void 0 && miterLimit !== "") {
         _pdf.setLineMiterLimit(context.attributeState.strokeMiterlimit = parseFloat(miterLimit));
       }
@@ -2446,7 +2446,7 @@ SOFTWARE.
     }
 
     if (nodeIs(node, "path,rect,ellipse,circle,polygon,polyline") && !context.withinClipPath) {
-      var isNodeFillRuleEvenOdd = getAttribute(node, "fill-rule") === "evenodd";
+      var isNodeFillRuleEvenOdd = getAttribute(node, "fill-rule", context.styleSheets) === "evenodd";
       if (fill && stroke) {
         if (isNodeFillRuleEvenOdd) {
           _pdf.fillStrokeEvenOdd(patternOrGradient);
