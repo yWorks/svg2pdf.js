@@ -216,7 +216,7 @@ SOFTWARE.
     for (var sheet of this.getParsedSheets()) {
       for (var rule of sheet.stylesheet.rules) {
         for (var selector of rule.selectors) {
-          if (CSSselect.is(node, selector)) {
+          if (CSSselect.is(node, selector, {adapter: BrowserDomAdapter})) {
             for (var declaration of rule.declarations) {
               if (declaration.property === propertyCss) {
                 return declaration.value;
@@ -2521,15 +2521,17 @@ SOFTWARE.
   };
 
   if (typeof define === "function" && define.amd) {
-    define(["./rgbcolor", "svgpath", "font-family-papandreou", "cssesc", "css", "css-select"], function (rgbcolor, svgpath, fontFamily, cssesc, css, cssselect) {
-      RGBColor = rgbcolor;
-      SvgPath = svgpath;
-      FontFamily = fontFamily;
-      cssEsc = cssesc;
-      Css = css;
-      CSSselect = cssselect;
-      return svg2pdf;
-    });
+    define(["./rgbcolor", "svgpath", "font-family-papandreou", "cssesc", "css", "css-select", "./css-select-browser-adapter-master"],
+      function (rgbcolor, svgpath, fontFamily, cssesc, css, cssselect, browserDomAdapter) {
+        RGBColor = rgbcolor;
+        SvgPath = svgpath;
+        FontFamily = fontFamily;
+        cssEsc = cssesc;
+        Css = css;
+        CSSselect = cssselect;
+        BrowserDomAdapter = browserDomAdapter;
+        return svg2pdf;
+      });
   } else if (typeof module !== "undefined" && module.exports) {
     RGBColor = require("./rgbcolor.js");
     SvgPath = require("svgpath");
@@ -2537,6 +2539,7 @@ SOFTWARE.
     cssEsc = require("cssesc");
     Css = require("css");
     CSSselect = require("css-select");
+    BrowserDomAdapter = require("./css-select-browser-adapter-master");
     module.exports = svg2pdf;
   } else {
     SvgPath = global.SvgPath;
@@ -2545,6 +2548,7 @@ SOFTWARE.
     cssEsc = global.cssesc;
     Css = global.css;
     CSSselect = global.cssselect;
+    BrowserDomAdapter = global.browserDomAdapter;
     global.svg2pdf = svg2pdf;
     // for compatibility reasons
     global.svgElementToPdf = svg2pdf;

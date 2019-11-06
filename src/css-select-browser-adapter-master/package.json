@@ -1,0 +1,33 @@
+{
+  "name": "css-select-browser-adapter",
+  "version": "0.1.2",
+  "description": "Browser adapter for css-select",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nrkn/css-select-browser-adapter.git"
+  },
+  "keywords": [
+    "css",
+    "select",
+    "browser",
+    "adapter"
+  ],
+  "author": "Nik Coughlin <nrkn.com@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nrkn/css-select-browser-adapter/issues"
+  },
+  "homepage": "https://github.com/nrkn/css-select-browser-adapter#readme",
+  "devDependencies": {
+    "css-select": "^2.0.2",
+    "jsdom": "^14.0.0",
+    "mocha": "^6.0.2"
+  }
+}
