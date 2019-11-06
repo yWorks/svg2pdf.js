@@ -151,14 +151,23 @@ SOFTWARE.
     return pathSegList;
   };
 
-  function AlignmentBaselineMap() {
-    this.bottom = this["text-bottom"] = "bottom";
-    this.top = this["text-top"] = "top";
-    this.hanging = "hanging";
-    this.middle = this.central = this.center = this.mathematical = "middle";
-    this.ideographic = "ideographic";
-    this.alphabetic = this.baseline = "alphabetic";
-  } 
+  var alignmentBaselineMap = {
+    "bottom": "bottom",
+    "text-bottom": "bottom",
+    "top": "top",
+    "text-top": "top",
+    "hanging": "hanging",
+    "middle": "middle",
+    "central": "middle",
+    "center": "middle",
+    "mathematical": "middle",
+    "ideographic": "ideographic",
+    "alphabetic": "alphabetic",
+    "baseline": "alphabetic"
+  }
+  var mapAlignmentBaseline = function (value) {
+    return alignmentBaselineMap[value] || "baseline";
+  }
 
   // returns an attribute of a node, either from the node directly or from css
   var getAttribute = function (node, propertyNode, propertyCss) {
@@ -244,7 +253,6 @@ SOFTWARE.
    * 
    * @param {object} values 
    * @constructor
-   * @property {AlignmentBaselineMap} alignmentBaselineMap  Maps alignment-baseline values not supported by jsPDF to similar supported values
    * @property {AttributeState} attributeState  Keeps track of parent attributes that are inherited automatically
    * @property {ReferencesHandler} refsHandler  The handler that will render references on demand
    * @property {jspdf.Matrix} transform The current transformation matrix
@@ -253,7 +261,6 @@ SOFTWARE.
    */
   function Context(values) {
     values = values || {};
-    this.alignmentBaselineMap = values.alignmentBaselineMap || new AlignmentBaselineMap();
     this.attributeState = values.attributeState ? values.attributeState.clone() : AttributeState.default();
     this.transform = values.transform || _pdf.unitMatrix;
     this.refsHandler = values.refsHandler || null;
@@ -1605,7 +1612,7 @@ SOFTWARE.
       var alignmentBaseline = attributeStates[i].alignmentBaseline;
       var textRenderingMode = getTextRenderingMode(attributeStates[i]);
       _pdf.text(this.texts[i], xs[i] - textOffset, ys[i], {
-        baseline: context.alignmentBaselineMap[alignmentBaseline],
+        baseline: mapAlignmentBaseline(alignmentBaseline),
         angle: context.transform,
         renderingMode: textRenderingMode === "fill" ? void 0 : textRenderingMode
       });
@@ -1686,7 +1693,7 @@ SOFTWARE.
           textX + dx - xOffset,
           textY + dy,
           {
-            baseline: context.alignmentBaselineMap[alignmentBaseline],
+            baseline: mapAlignmentBaseline(alignmentBaseline),
             angle: context.transform,
             renderingMode: textRenderingMode === "fill" ? void 0 : textRenderingMode
           }
