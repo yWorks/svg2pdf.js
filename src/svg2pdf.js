@@ -38,6 +38,7 @@ SOFTWARE.
   var FontFamily;
   var cssEsc;
   var Css;
+  var CSSselect;
 
   var _pdf; // jsPDF pdf-document
 
@@ -2496,12 +2497,13 @@ SOFTWARE.
   };
 
   if (typeof define === "function" && define.amd) {
-    define(["./rgbcolor", "svgpath", "font-family-papandreou", "cssesc", "css"], function (rgbcolor, svgpath, fontFamily, cssesc, css) {
+    define(["./rgbcolor", "svgpath", "font-family-papandreou", "cssesc", "css", "css-select"], function (rgbcolor, svgpath, fontFamily, cssesc, css, cssselect) {
       RGBColor = rgbcolor;
       SvgPath = svgpath;
       FontFamily = fontFamily;
       cssEsc = cssesc;
       Css = css;
+      CSSselect = cssselect;
       return svg2pdf;
     });
   } else if (typeof module !== "undefined" && module.exports) {
@@ -2510,6 +2512,7 @@ SOFTWARE.
     FontFamily = require("font-family-papandreou");
     cssEsc = require("cssesc");
     Css = require("css");
+    CSSselect = require("css-select");
     module.exports = svg2pdf;
   } else {
     SvgPath = global.SvgPath;
@@ -2517,6 +2520,7 @@ SOFTWARE.
     FontFamily = global.FontFamily;
     cssEsc = global.cssesc;
     Css = global.css;
+    CSSselect = global.cssselect;
     global.svg2pdf = svg2pdf;
     // for compatibility reasons
     global.svgElementToPdf = svg2pdf;
