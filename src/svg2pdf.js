@@ -1888,8 +1888,32 @@ SOFTWARE.
     var alignmentBaseline = getAttribute(node, "vertical-align") || getAttribute(node, "alignment-baseline");
     if (alignmentBaseline) {
       var matchArr = alignmentBaseline.match(/(baseline|text-bottom|alphabetic|ideographic|middle|central|mathematical|text-top|bottom|center|top|hanging)/);
-      if (matchArr) {
-        attributeState.alignmentBaseline = matchArr[0];
+      switch (matchArr) {
+        case "text-bottom":
+        case "bottom":
+          attributeState.alignmentBaseline = "bottom";
+          break;
+        case "top":
+        case "text-top":
+          attributeState.alignmentBaseline = "top";
+          break;
+        case "hanging":
+          attributeState.alignmentBaseline = "hanging";
+          break;
+        case "middle":
+        case "central":
+        case "center":
+        case "mathematical":
+          attributeState.alignmentBaseline = "middle";
+          break;
+        case "ideographic":
+          attributeState.alignmentBaseline = "ideographic";
+          break;
+        case "alphabetic":
+        case "baseline":
+        default:
+          attributeState.alignmentBaseline = "alphabetic";
+          break;
       } 
     }
 
