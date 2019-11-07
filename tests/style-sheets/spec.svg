@@ -1,6 +1,6 @@
-<?xml-stylesheet href="/base/tests/style-sheets/style.css" type="text/css"?>
+<?xml-stylesheet href="/base/tests/style-sheets/red.css" type="text/css"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="500" height="500">
-    <link xmlns="http://www.w3.org/1999/xhtml" rel="stylesheet" href="/base/tests/style-sheets/style2.css" type="text/css" />
+    <link xmlns="http://www.w3.org/1999/xhtml" rel="stylesheet" href="/base/tests/style-sheets/green.css" type="text/css" />
     <style>
         <![CDATA[
         .blue {
