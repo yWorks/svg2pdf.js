@@ -1610,43 +1610,40 @@ SOFTWARE.
       var y = currentTextY;
 
       if (textNode.nodeName === "#text") {
-        textNodeAttributeState = context.attributeState
+        textNodeContext.attributeState = context.attributeState
       } else {
-        var textNodeAttributeState = context.attributeState.clone();
+        var textNodeContext = new Context({attributeState: context.attributeState, styleSheets:context.styleSheets});
         var tSpanColor = getAttribute(textNode, "fill", context.styleSheets);
-        setTextProperties(textNode, tSpanColor && new RGBColor(tSpanColor), new Context({
-          attributeState: textNodeAttributeState,
-          styleSheets: context.styleSheets
-        }));
+        setTextProperties(textNode, tSpanColor && new RGBColor(tSpanColor), textNodeContext);
         var tSpanStrokeColor = getAttribute(textNode, "stroke", context.styleSheets);
         if (tSpanStrokeColor) {
           var strokeRGB = new RGBColor(tSpanStrokeColor);
           if (strokeRGB.ok) {
-            textNodeAttributeState.stroke = strokeRGB;
+            textNodeContext.attributeState.stroke = strokeRGB;
           }
         }
         var strokeWidth = getAttribute(textNode, "stroke-width", context.styleSheets);
         if (strokeWidth !== void 0) {
-          textNodeAttributeState.strokeWidth = parseFloat(strokeWidth)
+          textNodeContext.attributeState.strokeWidth = parseFloat(strokeWidth)
         }
 
         var tSpanDx = textNode.getAttribute("dx");
         if (tSpanDx !== null) {
-          x += toPixels(tSpanDx, textNodeAttributeState.fontSize);
+          x += toPixels(tSpanDx, textNodeContext.attributeState.fontSize);
         }
 
         var tSpanDy = textNode.getAttribute("dy");
         if (tSpanDy !== null) {
-          y += toPixels(tSpanDy, textNodeAttributeState.fontSize);
+          y += toPixels(tSpanDy, textNodeContext.attributeState.fontSize);
         }
       }
 
-      attributeStates[i] = textNodeAttributeState;
+      attributeStates[i] = textNodeContext.attributeState;
 
       xs[i] = x;
       ys[i] = y;
 
-      currentTextX = x + measureTextWidth(this.texts[i], textNodeAttributeState);
+      currentTextX = x + measureTextWidth(this.texts[i], textNodeContext.attributeState);
 
       currentTextY = y;
 
