@@ -12,21 +12,21 @@ export default class RGBColor {
   public g: number
   public b: number
 
-  private simple_colors: any
-  private color_defs: any
-
+  private simple_colors: { [key: string]: string }
+  private color_defs: { re: RegExp; example: string[]; process: Function }[]
 
   constructor(color_string: string) {
-    this.ok = false;
-    
+    this.ok = false
+
     // strip any leading #
-    if (color_string.charAt(0) == '#') { // remove # if any
-      color_string = color_string.substr(1, 6);
+    if (color_string.charAt(0) == '#') {
+      // remove # if any
+      color_string = color_string.substr(1, 6)
     }
-    
-    color_string = color_string.replace(/ /g, '');
-    color_string = color_string.toLowerCase();
-    
+
+    color_string = color_string.replace(/ /g, '')
+    color_string = color_string.toLowerCase()
+
     // before getting into regexps, try simple matches
     // and overwrite the input
     this.simple_colors = {
@@ -180,36 +180,28 @@ export default class RGBColor {
       whitesmoke: 'f5f5f5',
       yellow: 'ffff00',
       yellowgreen: '9acd32'
-    };
+    }
     for (var key in this.simple_colors) {
       if (color_string == key) {
-        color_string = this.simple_colors[key];
+        color_string = this.simple_colors[key]
       }
     }
     // emd of simple type-in colors
-    
+
     // array of color definition objects
     this.color_defs = [
       {
         re: /^rgb\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})\)$/,
         example: ['rgb(123, 234, 45)', 'rgb(255,234,245)'],
         process: function(bits: any) {
-          return [
-            parseInt(bits[1]),
-            parseInt(bits[2]),
-            parseInt(bits[3])
-          ];
+          return [parseInt(bits[1]), parseInt(bits[2]), parseInt(bits[3])]
         }
       },
       {
         re: /^(\w{2})(\w{2})(\w{2})$/,
         example: ['#00ff00', '336699'],
         process: function(bits: any) {
-          return [
-            parseInt(bits[1], 16),
-            parseInt(bits[2], 16),
-            parseInt(bits[3], 16)
-          ];
+          return [parseInt(bits[1], 16), parseInt(bits[2], 16), parseInt(bits[3], 16)]
         }
       },
       {
@@ -220,86 +212,83 @@ export default class RGBColor {
             parseInt(bits[1] + bits[1], 16),
             parseInt(bits[2] + bits[2], 16),
             parseInt(bits[3] + bits[3], 16)
-          ];
+          ]
         }
       }
-    ];
-    
+    ]
+
     // search through the definitions to find a match
     for (var i = 0; i < this.color_defs.length; i++) {
-      var re = this.color_defs[i].re;
-      var processor = this.color_defs[i].process;
-      var bits = re.exec(color_string);
+      var re = this.color_defs[i].re
+      var processor = this.color_defs[i].process
+      var bits = re.exec(color_string)
       if (bits) {
-        var channels = processor(bits);
-        this.r = channels[0];
-        this.g = channels[1];
-        this.b = channels[2];
-        this.ok = true;
+        var channels = processor(bits)
+        this.r = channels[0]
+        this.g = channels[1]
+        this.b = channels[2]
+        this.ok = true
       }
-    
     }
-    
+
     // validate/cleanup values
-    this.r = (this.r < 0 || isNaN(this.r)) ? 0 : ((this.r > 255) ? 255 : this.r);
-    this.g = (this.g < 0 || isNaN(this.g)) ? 0 : ((this.g > 255) ? 255 : this.g);
-    this.b = (this.b < 0 || isNaN(this.b)) ? 0 : ((this.b > 255) ? 255 : this.b);
+    this.r = this.r < 0 || isNaN(this.r) ? 0 : this.r > 255 ? 255 : this.r
+    this.g = this.g < 0 || isNaN(this.g) ? 0 : this.g > 255 ? 255 : this.g
+    this.b = this.b < 0 || isNaN(this.b) ? 0 : this.b > 255 ? 255 : this.b
   }
 
   toRGB() {
-    return 'rgb(' + this.r + ', ' + this.g + ', ' + this.b + ')';
+    return 'rgb(' + this.r + ', ' + this.g + ', ' + this.b + ')'
   }
   toHex() {
-    var r = this.r.toString(16);
-    var g = this.g.toString(16);
-    var b = this.b.toString(16);
-    if (r.length == 1) r = '0' + r;
-    if (g.length == 1) g = '0' + g;
-    if (b.length == 1) b = '0' + b;
-    return '#' + r + g + b;
+    var r = this.r.toString(16)
+    var g = this.g.toString(16)
+    var b = this.b.toString(16)
+    if (r.length == 1) r = '0' + r
+    if (g.length == 1) g = '0' + g
+    if (b.length == 1) b = '0' + b
+    return '#' + r + g + b
   }
-  
+
   // help
   getHelpXML() {
-  
-    var examples = new Array();
+    var examples = new Array()
     // add regexps
     for (var i = 0; i < this.color_defs.length; i++) {
-      var example = this.color_defs[i].example;
+      var example = this.color_defs[i].example
       for (var j = 0; j < example.length; j++) {
-        examples[examples.length] = example[j];
+        examples[examples.length] = example[j]
       }
     }
     // add type-in colors
     for (var sc in this.simple_colors) {
-      examples[examples.length] = sc;
+      examples[examples.length] = sc
     }
-  
-    var xml = document.createElement('ul');
-    xml.setAttribute('id', 'rgbcolor-examples');
+
+    var xml = document.createElement('ul')
+    xml.setAttribute('id', 'rgbcolor-examples')
     for (var i = 0; i < examples.length; i++) {
       try {
-        var list_item = document.createElement('li');
-        var list_color = new RGBColor(examples[i]);
-        var example_div = document.createElement('div');
+        var list_item = document.createElement('li')
+        var list_color = new RGBColor(examples[i])
+        var example_div = document.createElement('div')
         example_div.style.cssText =
-          'margin: 3px; '
-          + 'border: 1px solid black; '
-          + 'background:' + list_color.toHex() + '; '
-          + 'color:' + list_color.toHex()
-        ;
-        example_div.appendChild(document.createTextNode('test'));
+          'margin: 3px; ' +
+          'border: 1px solid black; ' +
+          'background:' +
+          list_color.toHex() +
+          '; ' +
+          'color:' +
+          list_color.toHex()
+        example_div.appendChild(document.createTextNode('test'))
         var list_item_value = document.createTextNode(
           ' ' + examples[i] + ' -> ' + list_color.toRGB() + ' -> ' + list_color.toHex()
-        );
-        list_item.appendChild(example_div);
-        list_item.appendChild(list_item_value);
-        xml.appendChild(list_item);
-  
-      } catch (e) {
-      }
+        )
+        list_item.appendChild(example_div)
+        list_item.appendChild(list_item_value)
+        xml.appendChild(list_item)
+      } catch (e) {}
     }
-    return xml;
-  
+    return xml
   }
 }

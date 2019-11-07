@@ -41,7 +41,8 @@
   },
   "homepage": "https://github.com/yWorks/svg2pdf.js#readme",
   "dependencies": {
-    "jspdf-yworks": "^2.1.1"
+    "jspdf-yworks": "^2.1.1",
+    "tsc": "^1.20150623.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
