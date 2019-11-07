@@ -25,17 +25,16 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 const pdfMimeType = 'text/plain; charset=x-user-defined'
 
-
 /* global XMLHttpRequest, expect */
 
-function loadBinaryResource (url, unicodeCleanUp) {
+function loadBinaryResource(url, unicodeCleanUp) {
   const req = new XMLHttpRequest()
   req.open('GET', url, false)
-   // XHR binary charset opt by Marcus Granado 2006 [http://mgran.blogspot.com]
-  req.overrideMimeType(pdfMimeType);
+  // XHR binary charset opt by Marcus Granado 2006 [http://mgran.blogspot.com]
+  req.overrideMimeType(pdfMimeType)
   req.send(null)
   if (req.status !== 200) {
-    throw new Error('Unable to load file');
+    throw new Error('Unable to load file')
   }
 
   const responseText = req.responseText
@@ -46,13 +45,13 @@ function loadBinaryResource (url, unicodeCleanUp) {
     for (let i = 0; i < responseText.length; i += 1) {
       byteArray[i] = StringFromCharCode(responseText.charCodeAt(i) & 0xff)
     }
-    return byteArray.join("")
+    return byteArray.join('')
   }
 
   return req.responseText
 }
 
-function sendReference (filename, data) {
+function sendReference(filename, data) {
   const req = new XMLHttpRequest()
   req.open('POST', `http://localhost:9090${filename}`, true)
   req.setRequestHeader('Content-Type', pdfMimeType)
@@ -64,19 +63,19 @@ function sendReference (filename, data) {
   for (let i = 0; i < data.length; i++) {
     uint8Array[i] = data.charCodeAt(i)
   }
-  const blob = new Blob([uint8Array], {type: pdfMimeType})
+  const blob = new Blob([uint8Array], { type: pdfMimeType })
 
   req.send(blob)
 }
 
 function resetFile(pdfFile) {
-  pdfFile = pdfFile.replace(/\/CreationDate \(D:(.*?)\)/, "/CreationDate (D:19871210000000+00'00')");
+  pdfFile = pdfFile.replace(/\/CreationDate \(D:(.*?)\)/, "/CreationDate (D:19871210000000+00'00')")
   pdfFile = pdfFile.replace(
-      /(\/ID \[ (<[0-9a-fA-F]+> ){2}\])/,
-      "/ID [ <00000000000000000000000000000000> <00000000000000000000000000000000> ]"
-  );
-  pdfFile = pdfFile.replace(/(\/Producer \(jsPDF [1-9].[0-9].[0-9]\))/, "/Producer (jsPDF 1.0.0)");
-  return pdfFile;
+    /(\/ID \[ (<[0-9a-fA-F]+> ){2}\])/,
+    '/ID [ <00000000000000000000000000000000> <00000000000000000000000000000000> ]'
+  )
+  pdfFile = pdfFile.replace(/(\/Producer \(jsPDF [1-9].[0-9].[0-9]\))/, '/Producer (jsPDF 1.0.0)')
+  return pdfFile
 }
 
 /**
@@ -91,7 +90,7 @@ window.comparePdf = (actual, filePath, alwaysCreateReferences = false) => {
     reference = actual
   } else {
     try {
-      reference = loadBinaryResource("/base" + filePath, true)
+      reference = loadBinaryResource('/base' + filePath, true)
     } catch (error) {
       sendReference(filePath, resetFile(actual))
       reference = actual
@@ -102,7 +101,9 @@ window.comparePdf = (actual, filePath, alwaysCreateReferences = false) => {
   actual = resetFile(actual.trim())
 
   try {
-    expect(actual.replace(/\r\n/g, "\n").split("\n")).to.deep.equal(expected.replace(/\r\n/g, "\n").split("\n"))
+    expect(actual.replace(/\r\n/g, '\n').split('\n')).to.deep.equal(
+      expected.replace(/\r\n/g, '\n').split('\n')
+    )
     // expect(actual).to.equal(expected)
   } catch (e) {
     sendReference(filePath, actual)
