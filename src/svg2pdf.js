@@ -157,6 +157,7 @@ SOFTWARE.
     this.rootSvg = rootSvg;
     this.loadExtSheets = loadExtSheets;
     this.sheets = [];
+    this.selectorMap = {};
   }
 
   StyleSheets.prototype.getParsedSheets = function () {
@@ -216,7 +217,7 @@ SOFTWARE.
     for (var sheet of this.getParsedSheets()) {
       for (var rule of sheet.stylesheet.rules) {
         for (var selector of rule.selectors) {
-          if (CSSselect.is(node, selector, {adapter: BrowserDomAdapter})) {
+          if (this.getCompiledRule(selector)(node, selector)) {
             for (var declaration of rule.declarations) {
               if (declaration.property === propertyCss) {
                 return declaration.value;
@@ -227,6 +228,10 @@ SOFTWARE.
       }
     }
     return null;
+  }
+
+  StyleSheets.prototype.getCompiledRule = function(selector) {
+    return this.selectorMap[selector] || (this.selectorMap[selector] = CSSselect.compile(selector, {adapter: BrowserDomAdapter}));      
   }
 
   // returns an attribute of a node, either from the node directly or from css
