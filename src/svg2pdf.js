@@ -351,7 +351,7 @@ SOFTWARE.
    * @param {string} id
    * @return {*}
    */
-  ReferencesHandler.prototype.getRendered = function (id) {
+  ReferencesHandler.prototype.getRendered = function (id, context) {
     if (this.renderedElements.hasOwnProperty(id)) {
       return this.renderedElements[id];
     }
@@ -364,7 +364,7 @@ SOFTWARE.
         node.getAttribute("y1") || 0,
         node.getAttribute("x2") || 1,
         node.getAttribute("y2") || 0
-      ]);
+      ], context);
     } else if (nodeIs(node, "radialgradient")) {
       putGradient(node, "radial", [
         node.getAttribute("fx") || node.getAttribute("cx") || 0.5,
@@ -373,13 +373,16 @@ SOFTWARE.
         node.getAttribute("cx") || 0.5,
         node.getAttribute("cy") || 0.5,
         node.getAttribute("r") || 0.5
-      ]);
+      ], context);
     } else if (nodeIs(node, "pattern")) {
-      pattern(node, this, AttributeState.default())
+      pattern(node, new Context({
+        refsHandler: this,
+        styleSheets: context.styleSheets
+      }));
     } else if (nodeIs(node, "marker")) {
       // the transformations directly at the node are written to the pdf form object transformation matrix
-      var tfMatrix = computeNodeTransform(node);
-      var bBox = getUntransformedBBox(node);
+      var tfMatrix = computeNodeTransform(node, context);
+      var bBox = getUntransformedBBox(node, context);
 
       _pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], tfMatrix);
       renderChildren(node, new Context({refsHandler: this}));
@@ -507,7 +510,7 @@ SOFTWARE.
       // as the marker is already scaled by the current line width we must not apply the line width twice!
       _pdf.saveGraphicsState();
       _pdf.setLineWidth(1.0);
-      context.refsHandler.getRendered(marker.id);
+      context.refsHandler.getRendered(marker.id, context);
       _pdf.doFormObject(marker.id, tf);
       _pdf.restoreGraphicsState();
     }
@@ -601,18 +604,18 @@ SOFTWARE.
 
   // computes the transform directly applied at the node (such as viewbox scaling and the "transform" atrribute)
   // x,y,cx,cy,r,... are omitted
-  var computeNodeTransform = function (node) {
+  var computeNodeTransform = function (node, context) {
     var viewBox, x, y;
     var nodeTransform = _pdf.unitMatrix;
     if (nodeIs(node, "svg,g")) {
-      x = parseFloat(getAttribute(node, "x")) || 0;
-      y = parseFloat(getAttribute(node, "y")) || 0;
+      x = parseFloat(getAttribute(node, "x", context.styleSheets)) || 0;
+      y = parseFloat(getAttribute(node, "y", context.styleSheets)) || 0;
 
       viewBox = node.getAttribute("viewBox");
       if (viewBox) {
         var box = parseFloats(viewBox);
-        var width = parseFloat(getAttribute(node, "width")) || box[2];
-        var height = parseFloat(getAttribute(node, "height")) || box[3];
+        var width = parseFloat(getAttribute(node, "width", context.styleSheets)) || box[2];
+        var height = parseFloat(getAttribute(node, "height", context.styleSheets)) || box[3];
         nodeTransform = computeViewBoxTransform(node, box, x, y, width, height)
       } else {
         nodeTransform = new _pdf.Matrix(1, 0, 0, 1, x, y);
@@ -638,7 +641,7 @@ SOFTWARE.
       }
     }
 
-    var transformString = getAttribute(node, "transform");
+    var transformString = getAttribute(node, "transform", context.styleSheets);
     if (!transformString)
       return nodeTransform;
     else
@@ -763,7 +766,7 @@ SOFTWARE.
 
   // returns the untransformed bounding box [x, y, width, height] of an svg element (quite expensive for path and polygon objects, as
   // the whole points/d-string has to be processed)
-  var getUntransformedBBox = function (node) {
+  var getUntransformedBBox = function (node, context) {
     if (getAttribute(node, "display") === "none") {
       return [0, 0, 0, 0];
     }
@@ -903,15 +906,15 @@ SOFTWARE.
         vb = parseFloats(viewBox);
       }
       return [
-        pf(getAttribute(node, "x")) || (vb && vb[0]) || 0,
-        pf(getAttribute(node, "y")) || (vb && vb[1]) || 0,
-        pf(getAttribute(node, "width")) || (vb && vb[2]) || 0,
-        pf(getAttribute(node, "height")) || (vb && vb[3]) || 0
+        pf(getAttribute(node, "x", context.styleSheets)) || (vb && vb[0]) || 0,
+        pf(getAttribute(node, "y", context.styleSheets)) || (vb && vb[1]) || 0,
+        pf(getAttribute(node, "width", context.styleSheets)) || (vb && vb[2]) || 0,
+        pf(getAttribute(node, "height", context.styleSheets)) || (vb && vb[3]) || 0
       ];
     } else if (nodeIs(node, "g,clippath")) {
       boundingBox = [0, 0, 0, 0];
       forEachChild(node, function (i, node) {
-        var nodeBox = getUntransformedBBox(node);
+        var nodeBox = getUntransformedBBox(node, context);
         boundingBox = [
             Math.min(boundingBox[0], nodeBox[0]),
             Math.min(boundingBox[1], nodeBox[1]),
@@ -939,10 +942,10 @@ SOFTWARE.
       ]
     } else {
       // TODO: check if there are other possible coordinate attributes
-      var x1 = pf(node.getAttribute("x1")) || pf(getAttribute(node, "x")) || pf((getAttribute(node, "cx")) - pf(getAttribute(node, "r"))) || 0;
-      var x2 = pf(node.getAttribute("x2")) || (x1 + pf(getAttribute(node, "width"))) || (pf(getAttribute(node, "cx")) + pf(getAttribute(node, "r"))) || 0;
-      var y1 = pf(node.getAttribute("y1")) || pf(getAttribute(node, "y")) || (pf(getAttribute(node, "cy")) - pf(getAttribute(node, "r"))) || 0;
-      var y2 = pf(node.getAttribute("y2")) || (y1 + pf(getAttribute(node, "height"))) || (pf(getAttribute(node, "cy")) + pf(getAttribute(node, "r"))) || 0;
+      var x1 = pf(node.getAttribute("x1")) || pf(getAttribute(node, "x", context.styleSheets)) || pf((getAttribute(node, "cx", context.styleSheets)) - pf(getAttribute(node, "r", context.styleSheets))) || 0;
+      var x2 = pf(node.getAttribute("x2")) || (x1 + pf(getAttribute(node, "width", context.styleSheets))) || (pf(getAttribute(node, "cx", context.styleSheets)) + pf(getAttribute(node, "r", context.styleSheets))) || 0;
+      var y1 = pf(node.getAttribute("y1")) || pf(getAttribute(node, "y", context.styleSheets)) || (pf(getAttribute(node, "cy", context.styleSheets)) - pf(getAttribute(node, "r", context.styleSheets))) || 0;
+      var y2 = pf(node.getAttribute("y2")) || (y1 + pf(getAttribute(node, "height", context.styleSheets))) || (pf(getAttribute(node, "cy", context.styleSheets)) + pf(getAttribute(node, "r", context.styleSheets))) || 0;
       boundingBox = [
         Math.min(x1, x2),
         Math.min(y1, y2),
@@ -953,8 +956,8 @@ SOFTWARE.
 
     if (!nodeIs(node, "marker,svg,g")) {
       // add line-width
-      var lineWidth = getAttribute(node, "stroke-width") || 1;
-      var miterLimit = getAttribute(node, "stroke-miterlimit");
+      var lineWidth = getAttribute(node, "stroke-width", context.styleSheets) || 1;
+      var miterLimit = getAttribute(node, "stroke-miterlimit", context.styleSheets);
       // miterLength / lineWidth = 1 / sin(phi / 2)
       miterLimit && (lineWidth *= 0.5 / (Math.sin(Math.PI / 12)));
       return [
@@ -1047,11 +1050,11 @@ SOFTWARE.
   };
 
   // draws an image
-  var image = function (node) {
-    var width = parseFloat(getAttribute(node, "width")),
-        height = parseFloat(getAttribute(node, "height")),
-        x = parseFloat(getAttribute(node, "x") || 0),
-        y = parseFloat(getAttribute(node, "y") || 0);
+  var image = function (node, context) {
+    var width = parseFloat(getAttribute(node, "width", context.styleSheets)),
+        height = parseFloat(getAttribute(node, "height", context.styleSheets)),
+        x = parseFloat(getAttribute(node, "x", context.styleSheets) || 0),
+        y = parseFloat(getAttribute(node, "y", context.styleSheets) || 0);
 
     if (!isFinite(width) || width <= 0 || !isFinite(height) || height <= 0) {
       return;
@@ -1324,7 +1327,7 @@ SOFTWARE.
 
     // get the size of the referenced form object (to apply the correct scaling)
     var id = url.substring(1);
-    context.refsHandler.getRendered(id);
+    context.refsHandler.getRendered(id, context);
     var formObject = _pdf.getFormObject(id);
 
     // scale and position it right
@@ -1366,33 +1369,33 @@ SOFTWARE.
 
   // draws a rect
   var rect = function (node) {
-    var width = parseFloat(getAttribute(node, 'width'));
-    var height = parseFloat(getAttribute(node, 'height'));
+    var width = parseFloat(getAttribute(node, 'width', context.styleSheets));
+    var height = parseFloat(getAttribute(node, 'height', context.styleSheets));
     if (!isFinite(width) || width <= 0 || !isFinite(height) || height <= 0) {
       return
     }
     _pdf.roundedRect(
-        parseFloat(getAttribute(node, 'x')) || 0,
-        parseFloat(getAttribute(node, 'y')) || 0,
+        parseFloat(getAttribute(node, 'x', context.styleSheets)) || 0,
+        parseFloat(getAttribute(node, 'y', context.styleSheets)) || 0,
         width,
         height,
-        parseFloat(getAttribute(node, 'rx')) || 0,
-        parseFloat(getAttribute(node, 'ry')) || 0
+        parseFloat(getAttribute(node, 'rx', context.styleSheets)) || 0,
+        parseFloat(getAttribute(node, 'ry', context.styleSheets)) || 0
     );
   };
 
   // draws an ellipse
   var ellipse = function (node) {
-    var rx = parseFloat(getAttribute(node, 'rx'));
-    var ry = parseFloat(getAttribute(node, 'ry'));
+    var rx = parseFloat(getAttribute(node, 'rx', context.styleSheets));
+    var ry = parseFloat(getAttribute(node, 'ry', context.styleSheets));
 
     if (!isFinite(rx) || rx <= 0 || !isFinite(ry)  || ry <= 0) {
       return;
     }
 
     _pdf.ellipse(
-        parseFloat(getAttribute(node, 'cx')) || 0,
-        parseFloat(getAttribute(node, 'cy')) || 0,
+        parseFloat(getAttribute(node, 'cx', context.styleSheets)) || 0,
+        parseFloat(getAttribute(node, 'cy', context.styleSheets)) || 0,
         rx,
         ry
     );
@@ -1400,23 +1403,23 @@ SOFTWARE.
 
   // draws a circle
   var circle = function (node) {
-    var radius = parseFloat(getAttribute(node, 'r'));
+    var radius = parseFloat(getAttribute(node, 'r', context.styleSheets));
 
     if (!isFinite(radius) || radius <= 0) {
       return;
     }
 
     _pdf.ellipse(
-        parseFloat(getAttribute(node, 'cx')) || 0,
-        parseFloat(getAttribute(node, 'cy')) || 0,
+        parseFloat(getAttribute(node, 'cx', context.styleSheets)) || 0,
+        parseFloat(getAttribute(node, 'cy', context.styleSheets)) || 0,
         radius,
         radius
     );
   };
 
   // applies text transformations to a text node
-  var transformText = function (node, text) {
-    var textTransform = getAttribute(node, "text-transform");
+  var transformText = function (node, text, context) {
+    var textTransform = getAttribute(node, "text-transform", context.styleSheets);
     switch (textTransform) {
       case "uppercase": return text.toUpperCase();
       case "lowercase": return text.toLowerCase();
@@ -1611,7 +1614,10 @@ SOFTWARE.
       } else {
         var textNodeAttributeState = context.attributeState.clone();
         var tSpanColor = getAttribute(textNode, "fill", context.styleSheets);
-        setTextProperties(textNode, tSpanColor && new RGBColor(tSpanColor), textNodeAttributeState);
+        setTextProperties(textNode, tSpanColor && new RGBColor(tSpanColor), new Context({
+          attributeState: textNodeAttributeState,
+          styleSheets: context.styleSheets
+        }));
         var tSpanStrokeColor = getAttribute(textNode, "stroke", context.styleSheets);
         if (tSpanStrokeColor) {
           var strokeRGB = new RGBColor(tSpanStrokeColor);
@@ -1743,7 +1749,7 @@ SOFTWARE.
     var tSpanCount = node.childElementCount;
     if (tSpanCount === 0) {
       var trimmedText = transformXmlSpace(node.textContent, context.attributeState);
-      var transformedText = transformText(node, trimmedText);
+      var transformedText = transformText(node, trimmedText, context);
       xOffset = getTextOffset(transformedText, context.attributeState);
 
       if (visibility === "visible") {
@@ -1826,7 +1832,7 @@ SOFTWARE.
           trimmedText = consolidateSpaces(trimmedText);
         }
 
-        transformedText = transformText(node, trimmedText);
+        transformedText = transformText(node, trimmedText, context);
         currentTextSegment.add(textNode, transformedText);
       }
 
@@ -1858,7 +1864,7 @@ SOFTWARE.
   // adds a gradient to defs and the pdf document for later use, type is either "axial" or "radial"
   // opacity is only supported rudimentary by averaging over all stops
   // transforms are applied on use
-  var putGradient = function (node, type, coords) {
+  var putGradient = function (node, type, coords, context) {
     var colors = [];
     var opacitySum = 0;
     var hasOpacity = false;
@@ -1866,9 +1872,9 @@ SOFTWARE.
     forEachChild(node, function (i, element) {
       // since opacity gradients are hard to realize, average the opacity over the control points
       if (element.tagName.toLowerCase() === "stop") {
-        var color = new RGBColor(getAttribute(element, "stop-color"));
+        var color = new RGBColor(getAttribute(element, "stop-color", context.styleSheets));
         colors.push({
-          offset: parseGradientOffset(element.getAttribute("offset")),
+          offset: parseGradientOffset(element.getAttribute("offset", context.styleSheets)),
           color: [color.r, color.g, color.b]
         });
         var opacity = getAttribute(element, "stop-opacity");
@@ -1888,19 +1894,20 @@ SOFTWARE.
     _pdf.addShadingPattern(id, pattern);
   };
 
-  var pattern = function (node, refsHandler, attributeState) {
+  var pattern = function (node, context) {
     var id = node.getAttribute("id");
 
     // the transformations directly at the node are written to the pattern transformation matrix
-    var bBox = getUntransformedBBox(node);
+    var bBox = getUntransformedBBox(node, context);
     var pattern = new _pdf.TilingPattern([bBox[0], bBox[1], bBox[0] + bBox[2], bBox[1] + bBox[3]], bBox[2], bBox[3],
         null, _pdf.unitMatrix /* this parameter is ignored !*/);
 
     _pdf.beginTilingPattern(pattern);
     // continue without transformation
     renderChildren(node, new Context({
-      attributeState: attributeState,
-      refsHandler: refsHandler
+      attributeState: context.attributeState,
+      refsHandler: context.refsHandler,
+      styleSheets: context.styleSheets
     }));
     _pdf.endTilingPattern(id, pattern);
   };
@@ -1961,35 +1968,35 @@ SOFTWARE.
     return firstAvailable;
   }
 
-  function setTextProperties(node, fillRGB, attributeState) {
+  function setTextProperties(node, fillRGB, context) {
     if (fillRGB && fillRGB.ok) {
-      attributeState.fill = fillRGB;
+      context.attributeState.fill = fillRGB;
     }
 
-    var fontWeight = getAttribute(node, "font-weight");
+    var fontWeight = getAttribute(node, "font-weight", context.styleSheets);
     if (fontWeight) {
-      attributeState.fontWeight = fontWeight;
+      context.attributeState.fontWeight = fontWeight;
     }
 
-    var fontStyle = getAttribute(node, "font-style");
+    var fontStyle = getAttribute(node, "font-style", context.styleSheets);
     if (fontStyle) {
-      attributeState.fontStyle = fontStyle;
+      context.attributeState.fontStyle = fontStyle;
     }
 
-    var fontFamily = getAttribute(node, "font-family");
+    var fontFamily = getAttribute(node, "font-family", context.styleSheets);
     if (fontFamily) {
       var fontFamilies = FontFamily.parse(fontFamily);
-      attributeState.fontFamily = findFirstAvailableFontFamily(attributeState, fontFamilies);
+      context.attributeState.fontFamily = findFirstAvailableFontFamily(context.attributeState, fontFamilies);
     }
 
-    var fontSize = getAttribute(node, "font-size");
+    var fontSize = getAttribute(node, "font-size", context.styleSheets);
     if (fontSize) {
-      attributeState.fontSize = parseFloat(fontSize);
+      context.attributeState.fontSize = parseFloat(fontSize);
     }
 
-    var textAnchor = getAttribute(node, "text-anchor");
+    var textAnchor = getAttribute(node, "text-anchor", context.styleSheets);
     if (textAnchor) {
-      attributeState.textAnchor = textAnchor;
+      context.attributeState.textAnchor = textAnchor;
     }
   }
 
@@ -2035,14 +2042,14 @@ SOFTWARE.
   }
 
 
-  function isPartlyVisible(node, parentHidden) {
-    if (getAttribute(node, "display") === "none") {
+  function isPartlyVisible(node, context, parentHidden) {
+    if (getAttribute(node, "display", context.styleSheets) === "none") {
       return false;
     }
 
     var visible = !parentHidden;
 
-    var visibility = getAttribute(node,"visibility");
+    var visibility = getAttribute(node,"visibility", context.styleSheets);
     if (visibility) {
       visible = visibility !== "hidden";
     }
@@ -2051,7 +2058,7 @@ SOFTWARE.
       var hasChildren = false;
       forEachChild(node, function(i, child) {
         hasChildren = true;
-        if (isPartlyVisible(child, !visible)) {
+        if (isPartlyVisible(child, context, !visible)) {
           visible = true;
         }
       });
@@ -2103,8 +2110,8 @@ SOFTWARE.
     if (targetIsFormObject) {
 
       // the transformations directly at the node are written to the pdf form object transformation matrix
-      context.transform = computeNodeTransform(node);
-      bBox = getUntransformedBBox(node);
+      context.transform = computeNodeTransform(node, context);
+      bBox = getUntransformedBBox(node, context);
 
       _pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], context.transform);
 
@@ -2113,7 +2120,7 @@ SOFTWARE.
       context.withinDefs = false;
 
     } else {
-      context.transform = _pdf.matrixMult(computeNodeTransform(node), context.transform);
+      context.transform = _pdf.matrixMult(computeNodeTransform(node, context), context.transform);
 
       if (!context.withinClipPath) {
         _pdf.saveGraphicsState();
@@ -2123,9 +2130,9 @@ SOFTWARE.
     var hasClipPath = node.hasAttribute("clip-path") && getAttribute(node, "clip-path", context.styleSheets) !== "none";
     if (hasClipPath) {
       var clipPathId = iriReference.exec(getAttribute(node, "clip-path", context.styleSheets));
-      var clipPathNode = context.refsHandler.getRendered(clipPathId[1]);
+      var clipPathNode = context.refsHandler.getRendered(clipPathId[1], context);
 
-      if (!isPartlyVisible(clipPathNode)) {
+      if (!isPartlyVisible(clipPathNode, context)) {
         _pdf.restoreGraphicsState();
         return;
       }
@@ -2133,7 +2140,7 @@ SOFTWARE.
       var clipPathMatrix = context.transform;
       if (clipPathNode.hasAttribute("clipPathUnits")
           && clipPathNode.getAttribute("clipPathUnits").toLowerCase() === "objectboundingbox") {
-        bBox = getUntransformedBBox(node);
+        bBox = getUntransformedBBox(node, context);
         clipPathMatrix = _pdf.matrixMult(new _pdf.Matrix(bBox[2], 0, 0, bBox[3], bBox[0], bBox[1]), clipPathMatrix);
       }
 
@@ -2142,7 +2149,7 @@ SOFTWARE.
       // attribute for clipPath elements, although not explicitly explaining its behavior. This implementation follows
       // IE/Edge and considers the "transform" attribute as additional transformation within the coordinate system
       // established by the "clipPathUnits" attribute.
-      clipPathMatrix = _pdf.matrixMult(computeNodeTransform(clipPathNode), clipPathMatrix);
+      clipPathMatrix = _pdf.matrixMult(computeNodeTransform(clipPathNode, context), clipPathMatrix);
 
       _pdf.saveGraphicsState();
       _pdf.setCurrentTransformationMatrix(clipPathMatrix);
@@ -2176,7 +2183,7 @@ SOFTWARE.
         if (url) {
           // probably a gradient or pattern (or something unsupported)
           var fillUrl = url[1];
-          var fillNode = context.refsHandler.getRendered(fillUrl);
+          var fillNode = context.refsHandler.getRendered(fillUrl, context);
           if (fillNode && nodeIs(fillNode, "lineargradient,radialgradient")) {
 
             // matrix to convert between gradient space and user space
@@ -2185,7 +2192,7 @@ SOFTWARE.
             var gradientUnitsMatrix;
             if (!fillNode.hasAttribute("gradientUnits")
                 || fillNode.getAttribute("gradientUnits").toLowerCase() === "objectboundingbox") {
-              bBox || (bBox = getUntransformedBBox(node));
+              bBox || (bBox = getUntransformedBBox(node, context));
               gradientUnitsMatrix = new _pdf.Matrix(bBox[2], 0, 0, bBox[3], bBox[0], bBox[1]);
             } else {
               gradientUnitsMatrix = _pdf.unitMatrix;
@@ -2207,11 +2214,11 @@ SOFTWARE.
             var patternUnitsMatrix = _pdf.unitMatrix;
             if (!fillNode.hasAttribute("patternUnits")
                 || fillNode.getAttribute("patternUnits").toLowerCase() === "objectboundingbox") {
-              bBox || (bBox = getUntransformedBBox(node));
+              bBox || (bBox = getUntransformedBBox(node, context));
               patternUnitsMatrix = new _pdf.Matrix(1, 0, 0, 1, bBox[0], bBox[1]);
 
               // TODO: slightly inaccurate (rounding errors? line width bBoxes?)
-              fillBBox = getUntransformedBBox(fillNode);
+              fillBBox = getUntransformedBBox(fillNode, context);
               x = fillBBox[0] * bBox[0];
               y = fillBBox[1] * bBox[1];
               width = fillBBox[2] * bBox[2];
@@ -2224,10 +2231,10 @@ SOFTWARE.
             var patternContentUnitsMatrix = _pdf.unitMatrix;
             if (fillNode.hasAttribute("patternContentUnits")
                 && fillNode.getAttribute("patternContentUnits").toLowerCase() === "objectboundingbox") {
-              bBox || (bBox = getUntransformedBBox(node));
+              bBox || (bBox = getUntransformedBBox(node, context));
               patternContentUnitsMatrix = new _pdf.Matrix(bBox[2], 0, 0, bBox[3], 0, 0);
 
-              fillBBox = patternOrGradient.boundingBox || getUntransformedBBox(fillNode);
+              fillBBox = patternOrGradient.boundingBox || getUntransformedBBox(fillNode, context);
               x = fillBBox[0] / bBox[0];
               y = fillBBox[1] / bBox[1];
               width = fillBBox[2] / bBox[2];
@@ -2376,7 +2383,7 @@ SOFTWARE.
       context.attributeState.xmlSpace = xmlSpace;
     }
 
-    setTextProperties(node, fillRGB, context.attributeState);
+    setTextProperties(node, fillRGB, context);
     putTextProperties(context.attributeState, parentAttributeState);
 
     // do the actual drawing
@@ -2404,21 +2411,21 @@ SOFTWARE.
         if (!context.withinClipPath) {
           _pdf.setCurrentTransformationMatrix(context.transform);
         }
-        rect(node);
+        rect(node, context);
         break;
 
       case 'ellipse':
         if (!context.withinClipPath) {
           _pdf.setCurrentTransformationMatrix(context.transform);
         }
-        ellipse(node);
+        ellipse(node, context);
         break;
 
       case 'circle':
         if (!context.withinClipPath) {
           _pdf.setCurrentTransformationMatrix(context.transform);
         }
-        circle(node);
+        circle(node, context);
         break;
       case 'text':
         text(node, hasFillColor, fillRGB, context);
@@ -2441,7 +2448,7 @@ SOFTWARE.
 
       case 'image':
         _pdf.setCurrentTransformationMatrix(context.transform);
-        image(node);
+        image(node, context);
         break;
     }
 
