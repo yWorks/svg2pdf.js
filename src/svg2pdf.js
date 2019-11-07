@@ -1610,7 +1610,8 @@ SOFTWARE.
       var y = currentTextY;
 
       if (textNode.nodeName === "#text") {
-        textNodeContext.attributeState = context.attributeState
+        var textNodeContext = new Context({styleSheets:context.styleSheets});
+        textNodeContext.attributeState = context.attributeState;
       } else {
         var textNodeContext = new Context({attributeState: context.attributeState, styleSheets:context.styleSheets});
         var tSpanColor = getAttribute(textNode, "fill", context.styleSheets);
