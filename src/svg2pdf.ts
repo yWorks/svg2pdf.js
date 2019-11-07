@@ -362,7 +362,7 @@ class AttributeState {
   // public fontVariant: string
   public fontWeight: string
   public opacity: number
-  public stroke: string
+  public stroke: any
   public strokeDasharray: []
   public strokeDashoffset: number
   public strokeLinecap: string
@@ -1591,7 +1591,8 @@ class TextChunk {
 
   put(context: Context) {
     var i, textNode;
-  
+    
+    var strokeRGB: any;
     var xs = [], ys = [], attributeStates = [];
     var currentTextX = this.originX, currentTextY = this.originY;
     var minX = currentTextX, maxX = currentTextX;
@@ -1609,7 +1610,7 @@ class TextChunk {
         setTextProperties(textNode, tSpanColor && new RGBColor(tSpanColor), textNodeAttributeState);
         var tSpanStrokeColor = getAttribute(textNode, "stroke");
         if (tSpanStrokeColor) {
-          var strokeRGB = new RGBColor(tSpanStrokeColor);
+          strokeRGB = new RGBColor(tSpanStrokeColor);
           if (strokeRGB.ok) {
             textNodeAttributeState.stroke = strokeRGB;
           }
@@ -2193,7 +2194,7 @@ var renderNode = function(node: HTMLElement, context: Context) {
 
   // fill mode
   if (nodeIs(node, "svg,g,path,rect,text,ellipse,line,circle,polygon,polyline")) {
-    function setDefaultColor() {
+    var setDefaultColor = function() {
       fillRGB = new RGBColor("rgb(0, 0, 0)");
       hasFillColor = true;
       fill = true;
@@ -2450,7 +2451,7 @@ var renderNode = function(node: HTMLElement, context: Context) {
       circle(node);
       break;
     case "text":
-      text(node, hasFillColor, fillRGB as boolean, context);
+      text(node, hasFillColor, fillRGB as unknown as boolean, context);
       break;
 
     case "path":
