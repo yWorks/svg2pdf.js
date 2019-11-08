@@ -687,17 +687,20 @@ var parsePointsString = function(string: string) {
 var parseTransform = function(transformString: string) {
   if (!transformString || transformString === 'none') return _pdf.unitMatrix
 
-  var mRegex = /^[\s,]*matrix\(([^\)]+)\)\s*!/,
-    tRegex = /^[\s,]*translate\(([^\)]+)\)\s*!/,
-    rRegex = /^[\s,]*rotate\(([^\)]+)\)\s*!/,
-    sRegex = /^[\s,]*scale\(([^\)]+)\)\s*!/,
-    sXRegex = /^[\s,]*skewX\(([^\)]+)\)\s*!/,
-    sYRegex = /^[\s,]*skewY\(([^\)]+)\)\s*!/
+  var mRegex = /^[\s,]*matrix\(([^\)]+)\)\s*/,
+    tRegex = /^[\s,]*translate\(([^\)]+)\)\s*/,
+    rRegex = /^[\s,]*rotate\(([^\)]+)\)\s*/,
+    sRegex = /^[\s,]*scale\(([^\)]+)\)\s*/,
+    sXRegex = /^[\s,]*skewX\(([^\)]+)\)\s*/,
+    sYRegex = /^[\s,]*skewY\(([^\)]+)\)\s*/
 
   var resultMatrix = _pdf.unitMatrix,
     m
 
-  while (transformString.length > 0) {
+  var tSLength;
+  while (transformString.length > 0 && transformString.length !== tSLength) {
+    tSLength = transformString.length
+
     var match = mRegex.exec(transformString)
     if (match) {
       m = parseFloats(match[1])
