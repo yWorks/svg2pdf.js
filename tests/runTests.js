@@ -1,3 +1,5 @@
+import svg2pdf from '../src/svg2pdf'
+
 const debug = false
 
 const tests = [

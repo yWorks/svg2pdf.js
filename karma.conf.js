@@ -3,7 +3,7 @@
 module.exports = (config) => {
   const testCoverage = process.argv.indexOf('--coverage') >= 0
   const preprocessors = {
-    'tests/runTests.ts': 'ts-loader'
+    'tests/tests.js': 'babel'
   };
 
   // currently it is not possible to have both coverage and browserify, so a coverage run needs to have the files
@@ -11,7 +11,7 @@ module.exports = (config) => {
   if (testCoverage) {
     preprocessors['dist/svg2pdf.js'] = 'coverage'
   } else {
-    preprocessors['src/*.js'] = 'webpack'
+    preprocessors['tests/runTests.js'] = 'webpack'
   }
 
   config.set({
@@ -21,14 +21,23 @@ module.exports = (config) => {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['mocha', 'chai'].concat(testCoverage ? [] : ['webpack']),
+    frameworks: ['mocha', 'chai']/* .concat(testCoverage ? [] : ['']) */,
+
+    webpack: require('./webpack.config.js'),
 
     // list of files / patterns to load in the browser
     files: [
         'node_modules/jspdf-yworks/dist/jspdf.min.js',
 
         'tests/utils/compare.js',
-        'tests/runTests.js',
+
+        {
+          pattern: 'tests/runTests.js',
+          included: true,
+          served: true,
+          watched: true,
+          type: "module"
+        },
 
         {
           pattern: 'tests/**/spec.svg',
@@ -40,7 +49,7 @@ module.exports = (config) => {
           watched: false,
           served: true
         }
-    ].concat(testCoverage ? 'dist/svg2pdf.js' : 'src/*.js'),
+    ],
 
     // list of files to exclude
     exclude: [],
