@@ -39,6 +39,7 @@
   },
   "homepage": "https://github.com/yWorks/svg2pdf.js#readme",
   "dependencies": {
+    "css-select-browser-adapter": "^0.1.2",
     "jspdf-yworks": "^2.1.1"
   },
   "devDependencies": {
@@ -49,6 +50,7 @@
     "chalk": "^2.4.2",
     "css": "^2.2.4",
     "css-select": "^2.0.2",
+    "css-select-browser-adapter": "^0.1.2",
     "cssesc": "^3.0.0",
     "exorcist": "^1.0.1",
     "font-family-papandreou": "^0.2.0-patch1",

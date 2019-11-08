@@ -246,10 +246,12 @@ SOFTWARE.
     var attribute = node.style[propertyCss];
     if (attribute) {
       return attribute;
+    } else if(styleSheets && styleSheets.getRuleFor(node, propertyCss)) {
+      return styleSheets.getRuleFor(node, propertyCss);
     } else if (node.hasAttribute(propertyNode)) {
       return node.getAttribute(propertyNode);
     } else {
-      return styleSheets && styleSheets.getRuleFor(node, propertyCss) || void 0;
+      return void 0;
     }
   };
 
@@ -2531,7 +2533,7 @@ SOFTWARE.
   };
 
   if (typeof define === "function" && define.amd) {
-    define(["./rgbcolor", "svgpath", "font-family-papandreou", "cssesc", "css", "css-select", "./css-select-browser-adapter-master"],
+    define(["./rgbcolor", "svgpath", "font-family-papandreou", "cssesc", "css", "css-select", "css-select-browser-adapter"],
       function (rgbcolor, svgpath, fontFamily, cssesc, css, cssselect, browserDomAdapter) {
         RGBColor = rgbcolor;
         SvgPath = svgpath;
@@ -2549,7 +2551,7 @@ SOFTWARE.
     cssEsc = require("cssesc");
     Css = require("css");
     CSSselect = require("css-select");
-    BrowserDomAdapter = require("./css-select-browser-adapter-master");
+    BrowserDomAdapter = require("css-select-browser-adapter");
     module.exports = svg2pdf;
   } else {
     SvgPath = global.SvgPath;
