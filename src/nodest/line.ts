@@ -1,4 +1,3 @@
-import * as Constants from '../utils/constants'
 import Context from '../context/context'
 import Marker from '../marker'
 import MarkerList from '../markerlist'
@@ -6,6 +5,7 @@ import NodeStructureTree from './nst'
 import { getAngle } from '../utils/math'
 import { defaultBoundingBox, addLineWidth } from '../utils/bbox'
 import { getAttribute } from '../utils/node'
+import { iriReference } from '../utils/constants'
 
 export default class Line extends NodeStructureTree {
   renderCore(context: Context): void {
@@ -31,10 +31,10 @@ export default class Line extends NodeStructureTree {
         var markers = new MarkerList()
         var angle = getAngle(p1, p2)
         if (markerStart) {
-          markers.addMarker(new Marker(Constants.iriReference.exec(markerStart)[1], p1, angle))
+          markers.addMarker(new Marker(iriReference.exec(markerStart)[1], p1, angle))
         }
         if (markerEnd) {
-          markers.addMarker(new Marker(Constants.iriReference.exec(markerEnd)[1], p2, angle))
+          markers.addMarker(new Marker(iriReference.exec(markerEnd)[1], p2, angle))
         }
         markers.draw(context.clone({ transform: context._pdf.unitMatrix }))
       }
@@ -45,7 +45,7 @@ export default class Line extends NodeStructureTree {
     return addLineWidth(defaultBoundingBox(this.element, context), this.element)
   }
 
-  computeNodeTransformCore(context:Context):any{
+  computeNodeTransformCore(context: Context): any {
     return context._pdf.unitMatrix
   }
 }

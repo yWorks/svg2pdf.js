@@ -1,5 +1,5 @@
-import AttributeState from "./attributestate"
-import { svgNamespaceURI } from "../utils/constants"
+import AttributeState from './attributestate'
+import { svgNamespaceURI } from '../utils/constants'
 
 export default class TextMeasure {
   textMeasuringTextElement: SVGTextElement

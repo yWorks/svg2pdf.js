@@ -5,7 +5,7 @@ import { parseFloats } from '../utils/math'
 import { setTextProperties, putTextProperties } from '../utils/text'
 import parse from '../utils/parse'
 import { nodeIs, getAttribute, isPartlyVisible } from '../utils/node'
-import { computeNodeTransform, parseTransform } from '../utils/transform'
+import { parseTransform } from '../utils/transform'
 import { getFill } from '../utils/misc'
 
 export default abstract class NodeStructureTree {
@@ -36,7 +36,6 @@ export default abstract class NodeStructureTree {
 
   protected abstract renderCore(context: Context): void
   render(context: Context) {
-    //alert('hey')
     if (nodeIs(this.element, 'defs,clippath,pattern,lineargradient,radialgradient,marker')) {
       // we will only render them on demand
       return
@@ -295,6 +294,7 @@ export default abstract class NodeStructureTree {
       if (openOrClose === 'open') {
         var clipPathId = iriReference.exec(getAttribute(this.element, 'clip-path'))
         var clipPathNode = context.refsHandler.getRendered(clipPathId[1], context)
+        var clipPathNST = parse(clipPathNode)
 
         if (!isPartlyVisible(clipPathNode)) {
           //context._pdf.restoreGraphicsState()
@@ -319,14 +319,14 @@ export default abstract class NodeStructureTree {
         // IE/Edge and considers the "transform" attribute as additional transformation within the coordinate system
         // established by the "clipPathUnits" attribute.
         clipPathMatrix = context._pdf.matrixMult(
-          computeNodeTransform(clipPathNode, context),
+          clipPathNST.computeNodeTransform(context),
           clipPathMatrix
         )
 
         context._pdf.saveGraphicsState()
         context._pdf.setCurrentTransformationMatrix(clipPathMatrix)
 
-        parse(clipPathNode).children.forEach(child =>
+        clipPathNST.children.forEach(child =>
           child.render(
             new Context(context._pdf, {
               refsHandler: context.refsHandler,

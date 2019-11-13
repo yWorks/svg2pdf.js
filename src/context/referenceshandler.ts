@@ -5,11 +5,10 @@ import Context from './context'
 import parse from '../utils/parse'
 import { nodeIs } from '../utils/node'
 import { pattern, putGradient } from '../utils/patterngradient'
-import { computeNodeTransform } from '../utils/transform'
 
 /**
  * @constructor
- * @param {Element} rootSvg *
+ * @param {Element} rootSvg
  * @property {Object.<String,Element>} renderedElements
  * @property {Element} rootSvg
  */

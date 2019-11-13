@@ -7,7 +7,7 @@ export default class DefaultNST extends NodeStructureTree {
   getBoundingBoxCore(context: Context): number[] {
     return defaultBoundingBox(this.element, context)
   }
-  computeNodeTransformCore(context:Context):any{
+  computeNodeTransformCore(context: Context): any {
     return context._pdf.unitMatrix
   }
 }

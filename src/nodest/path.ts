@@ -232,7 +232,7 @@ export default class Path extends NodeStructureTree {
       lines.markers.draw(context.clone({ transform: context._pdf.unitMatrix }))
     }
   }
-  
+
   getBoundingBoxCore(context: Context): number[] {
     var list = PathSegList.get(this.element)
     var minX = Number.POSITIVE_INFINITY
@@ -338,7 +338,7 @@ export default class Path extends NodeStructureTree {
     return addLineWidth([minX, minY, maxX - minX, maxY - minY], this.element)
   }
 
-  computeNodeTransformCore(context:Context):any{
+  computeNodeTransformCore(context: Context): any {
     return context._pdf.unitMatrix
   }
 }

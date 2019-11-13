@@ -1,6 +1,6 @@
 import AttributeState from '../context/attributestate'
 import Context from '../context/context'
-import { fontAliases, svgNamespaceURI } from './constants'
+import { fontAliases } from './constants'
 import RGBColor from './rgbcolor'
 import FontFamily from 'font-family-papandreou'
 import { getAttribute } from './node'
@@ -174,5 +174,3 @@ export function trimLeft(str: string) {
 export function trimRight(str: string) {
   return str.replace(/\s+$/, '')
 }
-
-

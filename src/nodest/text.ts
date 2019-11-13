@@ -140,7 +140,7 @@ export default class TextAst extends NodeStructureTree {
     return addLineWidth(defaultBoundingBox(this.element, context), this.element)
   }
 
-  computeNodeTransformCore(context:Context):any{
+  computeNodeTransformCore(context: Context): any {
     return context._pdf.unitMatrix
   }
 }

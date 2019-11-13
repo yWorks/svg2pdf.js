@@ -65,55 +65,6 @@ export function computeViewBoxTransform(
   return context._pdf.matrixMult(scale, translate)
 }
 
-// computes the transform directly applied at the node (such as viewbox scaling and the "transform" atrribute)
-// x,y,cx,cy,r,... are omitted
-export function computeNodeTransform(node: HTMLElement, context: Context) {
-  var viewBox, x, y
-  var nodeTransform = context._pdf.unitMatrix
-  if (nodeIs(node, 'svg,g')) {
-    x = parseFloat(getAttribute(node, 'x')) || 0
-    y = parseFloat(getAttribute(node, 'y')) || 0
-
-    viewBox = node.getAttribute('viewBox')
-    if (viewBox) {
-      var box = parseFloats(viewBox)
-      var width = parseFloat(getAttribute(node, 'width')) || box[2]
-      var height = parseFloat(getAttribute(node, 'height')) || box[3]
-      nodeTransform = computeViewBoxTransform(node, box, x, y, width, height, context)
-    } else {
-      nodeTransform = new context._pdf.Matrix(1, 0, 0, 1, x, y)
-    }
-  } else if (nodeIs(node, 'marker')) {
-    x = parseFloat(node.getAttribute('refX')) || 0
-    y = parseFloat(node.getAttribute('refY')) || 0
-
-    viewBox = node.getAttribute('viewBox')
-    if (viewBox) {
-      var bounds = parseFloats(viewBox)
-      bounds[0] = bounds[1] = 0 // for some reason vbX anc vbY seem to be ignored for markers
-      nodeTransform = computeViewBoxTransform(
-        node,
-        bounds,
-        0,
-        0,
-        parseFloat(node.getAttribute('markerWidth')) || 3,
-        parseFloat(node.getAttribute('markerHeight')) || 3,
-        context
-      )
-      nodeTransform = context._pdf.matrixMult(
-        new context._pdf.Matrix(1, 0, 0, 1, -x, -y),
-        nodeTransform
-      )
-    } else {
-      nodeTransform = new context._pdf.Matrix(1, 0, 0, 1, -x, -y)
-    }
-  }
-
-  var transformString = getAttribute(node, 'transform')
-  if (!transformString) return nodeTransform
-  else return context._pdf.matrixMult(nodeTransform, parseTransform(transformString, context))
-}
-
 // parses the "transform" string
 export function parseTransform(transformString: string, context: Context) {
   if (!transformString || transformString === 'none') return context._pdf.unitMatrix

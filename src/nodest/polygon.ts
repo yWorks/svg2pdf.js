@@ -95,7 +95,7 @@ export default class Polygon extends NodeStructureTree {
     return addLineWidth([minX, minY, maxX - minX, maxY - minY], this.element)
   }
 
-  computeNodeTransformCore(context:Context):any{
+  computeNodeTransformCore(context: Context): any {
     return context._pdf.unitMatrix
   }
 }

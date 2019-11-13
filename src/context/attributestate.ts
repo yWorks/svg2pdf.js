@@ -55,6 +55,7 @@ export default class AttributeState {
     var clone = new AttributeState()
 
     clone.xmlSpace = this.xmlSpace
+    clone.color = this.color
     clone.fill = this.fill
     clone.fillOpacity = this.fillOpacity
     // clone.fillRule = this.fillRule;
@@ -74,6 +75,7 @@ export default class AttributeState {
     clone.strokeWidth = this.strokeWidth
     // clone.textAlign = this.textAlign;
     clone.textAnchor = this.textAnchor
+    clone.alignmentBaseline = this.alignmentBaseline
     clone.visibility = this.visibility
 
     return clone
