@@ -1,6 +1,6 @@
-import NodeStructureTree from './nst'
-import Context from '../context/context'
-import PathSegList from '../utils/pathseglist'
+import { SvgNode } from './svgnode'
+import { Context } from '../context/context'
+import { PathSegList } from '../utils/pathseglist'
 import { addLineWidth } from '../utils/bbox'
 import {
   toCubic,
@@ -11,18 +11,17 @@ import {
   multVecMatrix
 } from '../utils/math'
 import { iriReference } from '../utils/constants'
-import MarkerList from '../markerlist'
-import Marker from '../marker'
+import { MarkerList, Marker } from '../markerlist'
 import { getAttribute } from '../utils/node'
 import { getControlPointFromPrevious } from '../utils/misc'
 
-export default class Path extends NodeStructureTree {
+export class Path extends SvgNode {
   renderCore(context: Context): void {
     if (!context.withinClipPath) {
       context._pdf.setCurrentTransformationMatrix(context.transform)
     }
-    var list = PathSegList.get(this.element)
-    var markerEnd = getAttribute(this.element, 'marker-end'),
+    const list = new PathSegList(this.element)
+    let markerEnd = getAttribute(this.element, 'marker-end'),
       markerStart = getAttribute(this.element, 'marker-start'),
       markerMid = getAttribute(this.element, 'marker-mid')
 
@@ -30,22 +29,22 @@ export default class Path extends NodeStructureTree {
     markerStart && (markerStart = iriReference.exec(markerStart)[1])
     markerMid && (markerMid = iriReference.exec(markerMid)[1])
 
-    var getLinesFromPath = function() {
-      var x = 0,
+    const getLinesFromPath = () => {
+      let x = 0,
         y = 0
-      var x0 = x,
+      let x0 = x,
         y0 = y
-      var prevX, prevY, newX, newY
-      var to, p, p2, p3
-      var lines = []
-      var markers = new MarkerList()
-      var op
-      var prevAngle = [0, 0],
+      let prevX, prevY, newX, newY
+      let to, p, p2, p3
+      let lines = []
+      let markers = new MarkerList()
+      let op
+      let prevAngle = [0, 0],
         curAngle
 
-      for (var i = 0; i < list.numberOfItems; i++) {
-        var seg = list.getItem(i)
-        var cmd = seg.pathSegTypeAsLetter
+      for (let i = 0; i < list.numberOfItems; i++) {
+        const seg = list.getItem(i)
+        const cmd = seg.pathSegTypeAsLetter
         switch (cmd) {
           case 'M':
             x0 = x
@@ -144,15 +143,15 @@ export default class Path extends NodeStructureTree {
             break
         }
 
-        var hasStartMarker =
+        const hasStartMarker =
           markerStart &&
           (i === 1 ||
             ('mM'.indexOf(cmd) < 0 && 'mM'.indexOf(list.getItem(i - 1).pathSegTypeAsLetter) >= 0))
-        var hasEndMarker =
+        const hasEndMarker =
           markerEnd &&
           (i === list.numberOfItems - 1 ||
             ('mM'.indexOf(cmd) < 0 && 'mM'.indexOf(list.getItem(i + 1).pathSegTypeAsLetter) >= 0))
-        var hasMidMarker =
+        const hasMidMarker =
           markerMid &&
           i > 0 &&
           !(i === 1 && 'mM'.indexOf(list.getItem(i - 1).pathSegTypeAsLetter) >= 0)
@@ -191,7 +190,7 @@ export default class Path extends NodeStructureTree {
           hasEndMarker &&
             markers.addMarker(new Marker(markerEnd, to, Math.atan2(curAngle[1], curAngle[0])))
           if (hasMidMarker) {
-            var angle =
+            let angle =
               'mM'.indexOf(cmd) >= 0
                 ? prevAngle
                 : 'mM'.indexOf(list.getItem(i - 1).pathSegTypeAsLetter) >= 0
@@ -222,7 +221,7 @@ export default class Path extends NodeStructureTree {
 
       return { lines: lines, markers: markers }
     }
-    var lines = getLinesFromPath()
+    let lines = getLinesFromPath()
 
     if (lines.lines.length > 0) {
       context._pdf.path(lines.lines)
@@ -234,18 +233,18 @@ export default class Path extends NodeStructureTree {
   }
 
   getBoundingBoxCore(context: Context): number[] {
-    var list = PathSegList.get(this.element)
-    var minX = Number.POSITIVE_INFINITY
-    var minY = Number.POSITIVE_INFINITY
-    var maxX = Number.NEGATIVE_INFINITY
-    var maxY = Number.NEGATIVE_INFINITY
-    var x = 0,
+    const list = new PathSegList(this.element)
+    let minX = Number.POSITIVE_INFINITY
+    let minY = Number.POSITIVE_INFINITY
+    let maxX = Number.NEGATIVE_INFINITY
+    let maxY = Number.NEGATIVE_INFINITY
+    let x = 0,
       y = 0
-    var prevX, prevY, newX, newY
-    var pF, p2, p3, to
-    for (var i = 0; i < list.numberOfItems; i++) {
-      var seg = list.getItem(i)
-      var cmd = seg.pathSegTypeAsLetter
+    let prevX, prevY, newX, newY
+    let pF, p2, p3, to
+    for (let i = 0; i < list.numberOfItems; i++) {
+      const seg = list.getItem(i)
+      const cmd = seg.pathSegTypeAsLetter
       switch (cmd) {
         case 'H':
           newX = seg.x

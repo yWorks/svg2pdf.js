@@ -4,12 +4,12 @@ export function nodeIs(node: HTMLElement, tagsString: string) {
 
 export function forEachChild(node: HTMLElement, fn: (n: number, e: HTMLElement) => void) {
   // copy list of children, as the original might be modified
-  var children = []
-  for (var i = 0; i < node.childNodes.length; i++) {
-    var childNode = node.childNodes[i]
+  const children = []
+  for (let i = 0; i < node.childNodes.length; i++) {
+    const childNode = node.childNodes[i]
     if (childNode.nodeName.charAt(0) !== '#') children.push(childNode)
   }
-  for (i = 0; i < children.length; i++) {
+  for (let i = 0; i < children.length; i++) {
     fn(i, children[i] as HTMLElement)
   }
 }
@@ -17,7 +17,7 @@ export function forEachChild(node: HTMLElement, fn: (n: number, e: HTMLElement) 
 // returns an attribute of a node, either from the node directly or from css
 export function getAttribute(node: HTMLElement, propertyNode: string, propertyCss?: string) {
   propertyCss = propertyCss || propertyNode
-  var attribute = node.style.getPropertyValue(propertyCss)
+  const attribute = node.style.getPropertyValue(propertyCss)
   if (attribute) {
     return attribute
   } else if (node.hasAttribute(propertyNode)) {
@@ -32,16 +32,16 @@ export function isPartlyVisible(node: HTMLElement, parentHidden?: boolean) {
     return false
   }
 
-  var visible = !parentHidden
+  let visible = !parentHidden
 
-  var visibility = getAttribute(node, 'visibility')
+  const visibility = getAttribute(node, 'visibility')
   if (visibility) {
     visible = visibility !== 'hidden'
   }
 
   if (nodeIs(node, 'svg,g,marker,a,pattern,defs,text,clippath')) {
-    var hasChildren = false
-    forEachChild(node, function(i, child) {
+    let hasChildren = false
+    forEachChild(node, (i, child) =>{
       hasChildren = true
       if (isPartlyVisible(child, !visible)) {
         visible = true

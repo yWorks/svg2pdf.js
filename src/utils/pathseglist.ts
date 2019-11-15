@@ -13,9 +13,17 @@ interface PathSeg {
 }
 
 // pathSegList is marked deprecated in chrome, so parse the d attribute manually if necessary
-export default class PathSegList {
-  static get(node: HTMLElement): any {
-    var d = getAttribute(node, 'd')
+export class PathSegList {
+  list: any
+  numberOfItems: number
+
+  constructor(node: HTMLElement) {
+    this.list = this.get(node)
+    this.numberOfItems = this.list.length
+  }
+
+  private get(node: HTMLElement): any {
+    let d = getAttribute(node, 'd')
 
     if (!d) {
       return []
@@ -31,7 +39,7 @@ export default class PathSegList {
       node.setAttribute('d', d)
     }
 
-    var pathSegList = (node as any).pathSegList
+    let pathSegList = (node as any).pathSegList
 
     if (pathSegList) {
       return pathSegList
@@ -39,13 +47,13 @@ export default class PathSegList {
 
     pathSegList = []
 
-    var regex = /([a-df-zA-DF-Z])([^a-df-zA-DF-Z]*)/g,
-      match
+    const regex = /([a-df-zA-DF-Z])([^a-df-zA-DF-Z]*)/g
+    let match
     while ((match = regex.exec(d))) {
-      var coords = parseFloats(match[2])
+      const coords = parseFloats(match[2])
 
-      var type = match[1]
-      var length =
+      let type = match[1]
+      const length =
         'zZ'.indexOf(type) >= 0
           ? 0
           : 'hHvV'.indexOf(type) >= 0
@@ -60,9 +68,9 @@ export default class PathSegList {
           ? 6
           : -1
 
-      var i = 0
+      let i = 0
       do {
-        var pathSeg: PathSeg = { pathSegTypeAsLetter: type }
+        const pathSeg: PathSeg = { pathSegTypeAsLetter: type }
         switch (type) {
           case 'h':
           case 'H':
@@ -117,12 +125,9 @@ export default class PathSegList {
         i += length
       } while (i < coords.length)
     }
-
-    pathSegList.getItem = function(i: number) {
-      return this[i]
-    }
-    pathSegList.numberOfItems = pathSegList.length
-
     return pathSegList
+  }
+  getItem = (i: any): any => {
+    return this.list[i]
   }
 }

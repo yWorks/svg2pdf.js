@@ -22,11 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import Context from './context/context'
-import ReferencesHandler from './context/referenceshandler'
-
-import { multVecMatrix } from './utils/math'
-import parse from './utils/parse'
+import { SvgNode } from './nodes/svgnode'
+import { Context } from './context/context'
+import { ReferencesHandler } from './context/referenceshandler'
+import { parse } from './parse'
 
 /**
  * Renders an svg element to a jsPDF document.
@@ -39,62 +38,41 @@ import parse from './utils/parse'
  *                            influenced by the scale attribute).
  */
 
-// transforms a bounding box and returns a new rect that contains it
-var transformBBox = function(box: number[], matrix: any) {
-  var bl = multVecMatrix([box[0], box[1]], matrix)
-  var br = multVecMatrix([box[0] + box[2], box[1]], matrix)
-  var tl = multVecMatrix([box[0], box[1] + box[3]], matrix)
-  var tr = multVecMatrix([box[0] + box[2], box[1] + box[3]], matrix)
-
-  var bottom = Math.min(bl[1], br[1], tl[1], tr[1])
-  var left = Math.min(bl[0], br[0], tl[0], tr[0])
-  var top = Math.max(bl[1], br[1], tl[1], tr[1])
-  var right = Math.max(bl[0], br[0], tl[0], tr[0])
-
-  return [left, bottom, right - left, top - bottom]
-}
-
-function cleanupTextMeasuring(context: Context) {
-  if (context.textMeasure.textMeasuringTextElement) {
-    document.body.removeChild(context.textMeasure.textMeasuringTextElement.parentNode)
-    context.textMeasure.textMeasuringTextElement = null
-  }
-}
-
 // the actual svgToPdf function (see above)
-var svg2pdf = function(element: HTMLElement, pdf: any, options: any) {
-  var _pdf = pdf
+function svg2pdf(element: HTMLElement, pdf: any, options: any) {
+  const _pdf = pdf
 
   //  create context object
-  var context = new Context(_pdf)
+  let context = new Context(_pdf)
 
-  var k = options.scale || 1.0,
+  const k = options.scale || 1.0,
     xOffset = options.xOffset || 0.0,
     yOffset = options.yOffset || 0.0
 
-  _pdf.advancedAPI(function() {
+  _pdf.advancedAPI(() => {
     // set offsets and scale everything by k
     _pdf.saveGraphicsState()
     _pdf.setCurrentTransformationMatrix(new _pdf.Matrix(k, 0, 0, k, xOffset, yOffset))
 
     // set default values that differ from pdf defaults
     _pdf.setLineWidth(context.attributeState.strokeWidth)
-    var fill = context.attributeState.fill
+    const fill = context.attributeState.fill
     _pdf.setFillColor(fill.r, fill.g, fill.b)
     _pdf.setFont(context.attributeState.fontFamily)
     // correct for a jsPDF-instance measurement unit that differs from `pt`
     _pdf.setFontSize(context.attributeState.fontSize * _pdf.internal.scaleFactor)
 
-    var clonedSvg = element.cloneNode(true) as HTMLElement
-    context.refsHandler = new ReferencesHandler(clonedSvg)
-    var svgNST = parse(clonedSvg)
-    context.transform = svgNST.computeNodeTransform(context)
-    svgNST.render(context)
+    const clonedSvg = element.cloneNode(true) as HTMLElement
+    let idMap:{[id:string]:SvgNode} = {}
+    const svgnode = parse(clonedSvg, idMap)
+    context.refsHandler = new ReferencesHandler(idMap)
+    context.transform = svgnode.computeNodeTransform(context)
+    svgnode.render(context)
 
     _pdf.restoreGraphicsState()
   })
 
-  cleanupTextMeasuring(context)
+  context.textMeasure.cleanupTextMeasuring()
 
   return _pdf
 }

@@ -1,8 +1,8 @@
-import AttributeState from '../context/attributestate'
-import Context from '../context/context'
+import { AttributeState } from '../context/attributestate'
+import { Context } from '../context/context'
 import { fontAliases } from './constants'
-import RGBColor from './rgbcolor'
 import FontFamily from 'font-family-papandreou'
+import { RGBColor } from './rgbcolor'
 import { getAttribute } from './node'
 import { findFirstAvailableFontFamily } from './misc'
 
@@ -34,7 +34,7 @@ export function putTextProperties(
     attributeState.fill !== parentAttributeState.fill &&
     attributeState.fill.ok
   ) {
-    var fillRGB = attributeState.fill
+    const fillRGB = attributeState.fill
     context._pdf.setTextColor(fillRGB.r, fillRGB.g, fillRGB.b)
   }
 
@@ -42,7 +42,7 @@ export function putTextProperties(
     attributeState.fontWeight !== parentAttributeState.fontWeight ||
     attributeState.fontStyle !== parentAttributeState.fontStyle
   ) {
-    var fontType = ''
+    let fontType = ''
     if (attributeState.fontWeight === 'bold') {
       fontType = 'bold'
     }
@@ -64,7 +64,7 @@ export function putTextProperties(
 }
 
 export function getTextRenderingMode(attributeState: AttributeState) {
-  var renderingMode = 'invisible'
+  let renderingMode = 'invisible'
   if (attributeState.fill && attributeState.stroke) {
     renderingMode = 'fillThenStroke'
   } else if (attributeState.fill) {
@@ -111,19 +111,19 @@ export function setTextProperties(node: HTMLElement, fillRGB: RGBColor, context:
     context.attributeState.fill = fillRGB
   }
 
-  var fontWeight = getAttribute(node, 'font-weight')
+  const fontWeight = getAttribute(node, 'font-weight')
   if (fontWeight) {
     context.attributeState.fontWeight = fontWeight
   }
 
-  var fontStyle = getAttribute(node, 'font-style')
+  const fontStyle = getAttribute(node, 'font-style')
   if (fontStyle) {
     context.attributeState.fontStyle = fontStyle
   }
 
-  var fontFamily = getAttribute(node, 'font-family')
+  const fontFamily = getAttribute(node, 'font-family')
   if (fontFamily) {
-    var fontFamilies = FontFamily.parse(fontFamily)
+    const fontFamilies = FontFamily.parse(fontFamily)
     context.attributeState.fontFamily = findFirstAvailableFontFamily(
       context.attributeState,
       fontFamilies,
@@ -131,15 +131,15 @@ export function setTextProperties(node: HTMLElement, fillRGB: RGBColor, context:
     )
   }
 
-  var fontSize = getAttribute(node, 'font-size')
+  const fontSize = getAttribute(node, 'font-size')
   if (fontSize) {
     context.attributeState.fontSize = parseFloat(fontSize)
   }
 
-  var alignmentBaseline =
+  const alignmentBaseline =
     getAttribute(node, 'vertical-align') || getAttribute(node, 'alignment-baseline')
   if (alignmentBaseline) {
-    var matchArr = alignmentBaseline.match(
+    const matchArr = alignmentBaseline.match(
       /(baseline|text-bottom|alphabetic|ideographic|middle|central|mathematical|text-top|bottom|center|top|hanging)/
     )
     if (matchArr) {
@@ -147,7 +147,7 @@ export function setTextProperties(node: HTMLElement, fillRGB: RGBColor, context:
     }
   }
 
-  var textAnchor = getAttribute(node, 'text-anchor')
+  const textAnchor = getAttribute(node, 'text-anchor')
   if (textAnchor) {
     context.attributeState.textAnchor = textAnchor
   }
@@ -155,7 +155,7 @@ export function setTextProperties(node: HTMLElement, fillRGB: RGBColor, context:
 
 // applies text transformations to a text node
 export function transformText(node: HTMLElement, text: string) {
-  var textTransform = getAttribute(node, 'text-transform')
+  const textTransform = getAttribute(node, 'text-transform')
   switch (textTransform) {
     case 'uppercase':
       return text.toUpperCase()

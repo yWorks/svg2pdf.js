@@ -1,6 +1,6 @@
-import RGBColor from '../utils/rgbcolor'
+import { RGBColor } from '../utils/rgbcolor'
 
-export default class AttributeState {
+export class AttributeState {
   public xmlSpace: string
   public color: any
   public fill: any
@@ -52,7 +52,7 @@ export default class AttributeState {
   }
 
   clone() {
-    var clone = new AttributeState()
+    let clone = new AttributeState()
 
     clone.xmlSpace = this.xmlSpace
     clone.color = this.color
@@ -82,7 +82,7 @@ export default class AttributeState {
   }
 
   static default() {
-    var attributeState = new AttributeState()
+    let attributeState = new AttributeState()
 
     attributeState.xmlSpace = 'default'
     attributeState.fill = new RGBColor('rgb(0, 0, 0)')

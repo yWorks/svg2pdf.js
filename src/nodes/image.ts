@@ -1,15 +1,15 @@
-import NodeStructureTree from './nst'
-import Context from '../context/context'
+import { SvgNode } from './svgnode'
+import { Context } from '../context/context'
 import { defaultBoundingBox, addLineWidth } from '../utils/bbox'
 import { dataUrlRegex } from '../utils/constants'
-import ReferencesHandler from '../context/referenceshandler'
-import parse from '../utils/parse'
+import { ReferencesHandler } from '../context/referenceshandler'
+import { parse } from '../parse'
 import { getAttribute } from '../utils/node'
 
-export default class ImageNST extends NodeStructureTree {
+export class ImageNode extends SvgNode {
   renderCore(context: Context): void {
     context._pdf.setCurrentTransformationMatrix(context.transform)
-    var width = parseFloat(getAttribute(this.element, 'width')),
+    const width = parseFloat(getAttribute(this.element, 'width')),
       height = parseFloat(getAttribute(this.element, 'height')),
       x = parseFloat(getAttribute(this.element, 'x')) || 0,
       y = parseFloat(getAttribute(this.element, 'y')) || 0
@@ -18,27 +18,27 @@ export default class ImageNST extends NodeStructureTree {
       return
     }
 
-    var imageUrl = this.element.getAttribute('xlink:href') || this.element.getAttribute('href')
+    const imageUrl = this.element.getAttribute('xlink:href') || this.element.getAttribute('href')
 
     if (!imageUrl) {
       return
     }
 
-    var dataUrl = imageUrl.match(dataUrlRegex)
+    const dataUrl = imageUrl.match(dataUrlRegex)
     if (dataUrl && dataUrl[2] === 'image/svg+xml') {
-      var svgText = dataUrl[5]
+      let svgText = dataUrl[5]
       if (dataUrl[4] === 'base64') {
         svgText = atob(svgText)
       } else {
         svgText = decodeURIComponent(svgText)
       }
 
-      var parser = new DOMParser()
-      var svgElement = parser.parseFromString(svgText, 'image/svg+xml')
+      const parser = new DOMParser()
+      let svgElement = parser.parseFromString(svgText, 'image/svg+xml')
         .firstElementChild as HTMLElement
 
       // unless preserveAspectRatio starts with "defer", the preserveAspectRatio attribute of the svg is ignored
-      var preserveAspectRatio = this.element.getAttribute('preserveAspectRatio')
+      const preserveAspectRatio = this.element.getAttribute('preserveAspectRatio')
       if (
         !preserveAspectRatio ||
         preserveAspectRatio.indexOf('defer') < 0 ||
@@ -52,11 +52,12 @@ export default class ImageNST extends NodeStructureTree {
       svgElement.setAttribute('width', String(width))
       svgElement.setAttribute('height', String(height))
 
-      var svgNST = parse(svgElement)
-      svgNST.render(
+      let idMap: {[id:string]: SvgNode}={}
+      const svgnode = parse(svgElement,idMap)
+      svgnode.render(
         new Context(context._pdf, {
-          refsHandler: new ReferencesHandler(svgElement),
-          transform: svgNST.computeNodeTransform(context)
+          refsHandler: new ReferencesHandler(idMap),
+          transform: svgnode.computeNodeTransform(context)
         })
       )
       return

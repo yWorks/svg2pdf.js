@@ -1,7 +1,7 @@
-import AttributeState from './attributestate'
+import { AttributeState } from './attributestate'
 import { svgNamespaceURI } from '../utils/constants'
 
-export default class TextMeasure {
+export class TextMeasure {
   textMeasuringTextElement: SVGTextElement
 
   constructor() {
@@ -14,14 +14,14 @@ export default class TextMeasure {
    * @returns {number}
    */
   getTextOffset(text: string, attributeState: AttributeState) {
-    var textAnchor = attributeState.textAnchor
+    const textAnchor = attributeState.textAnchor
     if (textAnchor === 'start') {
       return 0
     }
 
-    var width = this.measureTextWidth(text, attributeState)
+    const width = this.measureTextWidth(text, attributeState)
 
-    var xOffset = 0
+    let xOffset = 0
     switch (textAnchor) {
       case 'end':
         xOffset = width
@@ -38,7 +38,7 @@ export default class TextMeasure {
     if (!this.textMeasuringTextElement) {
       this.textMeasuringTextElement = document.createElementNS(svgNamespaceURI, 'text')
 
-      var svg = document.createElementNS(svgNamespaceURI, 'svg')
+      let svg = document.createElementNS(svgNamespaceURI, 'svg')
       svg.appendChild(this.textMeasuringTextElement)
 
       svg.style.setProperty('position', 'absolute')
@@ -64,15 +64,15 @@ export default class TextMeasure {
      * @param {string} fontStyle
      * @param {string} fontWeight
      */
-    var canvasTextMeasure = function(
+    const canvasTextMeasure = (
       text: string,
       fontFamily: string,
       fontSize: any,
       fontStyle: string,
       fontWeight: string
-    ) {
-      var canvas = document.createElement('canvas')
-      var context = canvas.getContext('2d')
+    ) => {
+      let canvas = document.createElement('canvas')
+      let context = canvas.getContext('2d')
 
       context.font = [fontStyle, fontWeight, fontSize, fontFamily].join(' ')
       return context.measureText(text).width
@@ -85,16 +85,16 @@ export default class TextMeasure {
      * @param {string} fontStyle
      * @param {string} fontWeight
      */
-    var gotMeasurementTextNode = self.getMeasurementTextNode()
-    var svgTextMeasure = function(
+    const gotMeasurementTextNode = self.getMeasurementTextNode()
+    const svgTextMeasure = (
       text: string,
       fontFamily: string,
       fontSize: any,
       fontStyle: string,
       fontWeight: string,
       measurementTextNode: SVGTextElement = gotMeasurementTextNode
-    ) {
-      var textNode = measurementTextNode
+    ) => {
+      let textNode = measurementTextNode
       textNode.setAttribute('font-family', fontFamily)
       textNode.setAttribute('font-size', fontSize)
       textNode.setAttribute('font-style', fontStyle)
@@ -105,19 +105,19 @@ export default class TextMeasure {
       return textNode.getBBox().width
     }
 
-    var testString =
+    const testString =
       'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789!"$%&/()=?\'\\+*-_.:,;^}][{#~|<>'
-    var epsilon = 0.1
-    var measureMethods = {} as any
+    const epsilon = 0.1
+    let measureMethods = {} as any
 
     return function getMeasureFunction(fontFamily: string) {
-      var method = measureMethods[fontFamily]
+      let method = measureMethods[fontFamily]
       if (!method) {
-        var fontSize = '16px'
-        var fontStyle = 'normal'
-        var fontWeight = 'normal'
-        var canvasWidth = canvasTextMeasure(testString, fontFamily, fontSize, fontStyle, fontWeight)
-        var svgWidth = svgTextMeasure(testString, fontFamily, fontSize, fontStyle, fontWeight)
+        const fontSize = '16px'
+        const fontStyle = 'normal'
+        const fontWeight = 'normal'
+        const canvasWidth = canvasTextMeasure(testString, fontFamily, fontSize, fontStyle, fontWeight)
+        const svgWidth = svgTextMeasure(testString, fontFamily, fontSize, fontStyle, fontWeight)
 
         method = Math.abs(canvasWidth - svgWidth) < epsilon ? canvasTextMeasure : svgTextMeasure
 
@@ -133,8 +133,8 @@ export default class TextMeasure {
       return 0
     }
 
-    var fontFamily = attributeState.fontFamily
-    var measure = this.getMeasureFunction(fontFamily)
+    const fontFamily = attributeState.fontFamily
+    const measure = this.getMeasureFunction(fontFamily)
 
     return measure(
       text,
@@ -143,5 +143,12 @@ export default class TextMeasure {
       attributeState.fontStyle,
       attributeState.fontWeight
     )
+  }
+
+  cleanupTextMeasuring() {
+    if (this.textMeasuringTextElement) {
+      document.body.removeChild(this.textMeasuringTextElement.parentNode)
+      this.textMeasuringTextElement = null
+    }
   }
 }

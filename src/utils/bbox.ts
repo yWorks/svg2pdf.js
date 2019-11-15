@@ -1,11 +1,12 @@
-import Context from '../context/context'
-import { forEachChild, getAttribute } from './node'
-import parse from './parse'
+import { Context } from '../context/context'
+import { getAttribute } from './node'
+import { multVecMatrix } from './math'
+import { SvgNode } from '../nodes/svgnode'
 
 export function addLineWidth(bBox: number[], element: HTMLElement): number[] {
   // add line-width
-  var lineWidth = parseFloat(getAttribute(element, 'stroke-width')) || 1
-  var miterLimit = getAttribute(element, 'stroke-miterlimit')
+  let lineWidth = parseFloat(getAttribute(element, 'stroke-width')) || 1
+  const miterLimit = getAttribute(element, 'stroke-miterlimit')
   // miterLength / lineWidth = 1 / sin(phi / 2)
   miterLimit && (lineWidth *= 0.5 / Math.sin(Math.PI / 12))
   return [
@@ -16,13 +17,13 @@ export function addLineWidth(bBox: number[], element: HTMLElement): number[] {
   ]
 }
 
-export function getBoundingBoxByChildren(context: Context, element: HTMLElement): number[] {
-  if (getAttribute(element, 'display') === 'none') {
+export function getBoundingBoxByChildren(context: Context, svgnode:SvgNode): number[] {
+  if (getAttribute(svgnode.element, 'display') === 'none') {
     return [0, 0, 0, 0]
   }
-  var boundingBox = [0, 0, 0, 0]
-  forEachChild(element, function(i, node) {
-    var nodeBox = parse(node).getBBox(context)
+  let boundingBox = [0, 0, 0, 0]
+  svgnode.children.forEach(child => {
+    const nodeBox = child.getBBox(context)
     boundingBox = [
       Math.min(boundingBox[0], nodeBox[0]),
       Math.min(boundingBox[1], nodeBox[1]),
@@ -36,24 +37,24 @@ export function getBoundingBoxByChildren(context: Context, element: HTMLElement)
 }
 
 export function defaultBoundingBox(element: HTMLElement, context: Context): number[] {
-  var pf = parseFloat
+  const pf = parseFloat
   // TODO: check if there are other possible coordinate attributes
-  var x1 =
+  const x1 =
     pf(element.getAttribute('x1')) ||
     pf(getAttribute(element, 'x')) ||
     pf(getAttribute(element, 'cx')) - pf(getAttribute(element, 'r')) ||
     0
-  var x2 =
+  const x2 =
     pf(element.getAttribute('x2')) ||
     x1 + pf(getAttribute(element, 'width')) ||
     pf(getAttribute(element, 'cx')) + pf(getAttribute(element, 'r')) ||
     0
-  var y1 =
+  const y1 =
     pf(element.getAttribute('y1')) ||
     pf(getAttribute(element, 'y')) ||
     pf(getAttribute(element, 'cy')) - pf(getAttribute(element, 'r')) ||
     0
-  var y2 =
+  const y2 =
     pf(element.getAttribute('y2')) ||
     y1 + pf(getAttribute(element, 'height')) ||
     pf(getAttribute(element, 'cy')) + pf(getAttribute(element, 'r')) ||
@@ -64,4 +65,19 @@ export function defaultBoundingBox(element: HTMLElement, context: Context): numb
     Math.max(x1, x2) - Math.min(x1, x2),
     Math.max(y1, y2) - Math.min(y1, y2)
   ]
+}
+
+// transforms a bounding box and returns a new rect that contains it
+export function transformBBox(box: number[], matrix: any) {
+  const bl = multVecMatrix([box[0], box[1]], matrix)
+  const br = multVecMatrix([box[0] + box[2], box[1]], matrix)
+  const tl = multVecMatrix([box[0], box[1] + box[3]], matrix)
+  const tr = multVecMatrix([box[0] + box[2], box[1] + box[3]], matrix)
+
+  const bottom = Math.min(bl[1], br[1], tl[1], tr[1])
+  const left = Math.min(bl[0], br[0], tl[0], tr[0])
+  const top = Math.max(bl[1], br[1], tl[1], tr[1])
+  const right = Math.max(bl[0], br[0], tl[0], tr[0])
+
+  return [left, bottom, right - left, top - bottom]
 }

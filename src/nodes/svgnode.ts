@@ -1,23 +1,23 @@
-import Context from '../context/context'
-import { iriReference } from '../utils/constants'
-import RGBColor from '../utils/rgbcolor'
+import { Context } from '../context/context'
+import { iriReference, fontAliases } from '../utils/constants'
+import { RGBColor } from '../utils/rgbcolor'
 import { parseFloats } from '../utils/math'
-import { setTextProperties, putTextProperties } from '../utils/text'
-import parse from '../utils/parse'
 import { nodeIs, getAttribute, isPartlyVisible } from '../utils/node'
 import { parseTransform } from '../utils/transform'
-import { getFill } from '../utils/misc'
+import { getFill, findFirstAvailableFontFamily } from '../utils/misc'
+import FontFamily from 'font-family-papandreou'
 
-export default abstract class NodeStructureTree {
+export abstract class SvgNode {
   element: HTMLElement
-  parent: NodeStructureTree
-  children: NodeStructureTree[]
+  parent: SvgNode
+  children: SvgNode[]
 
-  constructor(element: HTMLElement, children: NodeStructureTree[]) {
+  constructor(element: HTMLElement, children: SvgNode[]) {
     this.element = element
     this.children = children
     this.parent = null
   }
+
   protected abstract getBoundingBoxCore(context: Context): number[]
   getBBox(context: Context): number[] {
     if (getAttribute(this.element, 'display') === 'none') {
@@ -28,14 +28,14 @@ export default abstract class NodeStructureTree {
 
   protected abstract computeNodeTransformCore(context: Context): any
   computeNodeTransform(context: Context): any {
-    var nodeTransform = this.computeNodeTransformCore(context)
-    var transformString = getAttribute(this.element, 'transform')
+    const nodeTransform = this.computeNodeTransformCore(context)
+    const transformString = getAttribute(this.element, 'transform')
     if (!transformString) return nodeTransform
     else return context._pdf.matrixMult(nodeTransform, parseTransform(transformString, context))
   }
 
   protected abstract renderCore(context: Context): void
-  render(context: Context) {
+  render(parentContext: Context) {
     if (nodeIs(this.element, 'defs,clippath,pattern,lineargradient,radialgradient,marker')) {
       // we will only render them on demand
       return
@@ -44,11 +44,8 @@ export default abstract class NodeStructureTree {
       return
     }
 
-    var parentContext = context
-    var context = this.parseAttributes(parentContext.clone())
-    if (!context) {
-      return
-    }
+    
+    let context = this.parseAttributes(parentContext.clone())
 
     if (!this.clip(context, 'open')) {
       return
@@ -74,14 +71,14 @@ export default abstract class NodeStructureTree {
       nodeIs(this.element, 'path,rect,ellipse,circle,polygon,polyline') &&
       !childContext.withinClipPath
     ) {
-      var fill = childContext.attributeState.fill
+      const fill = childContext.attributeState.fill
       // pdf spec states: "A line width of 0 denotes the thinnest line that can be rendered at device resolution:
       // 1 device pixel wide". SVG, however, does not draw zero width lines.
-      var stroke =
+      const stroke =
         childContext.attributeState.stroke && childContext.attributeState.strokeWidth !== 0
 
-      var patternOrGradient = fill && fill.key ? fill : undefined
-      var isNodeFillRuleEvenOdd = getAttribute(this.element, 'fill-rule') === 'evenodd'
+      const patternOrGradient = fill && fill.key ? fill : undefined
+      const isNodeFillRuleEvenOdd = getAttribute(this.element, 'fill-rule') === 'evenodd'
       if (fill && stroke) {
         if (isNodeFillRuleEvenOdd) {
           childContext._pdf.fillStrokeEvenOdd(patternOrGradient)
@@ -103,24 +100,14 @@ export default abstract class NodeStructureTree {
   }
 
   protected parseAttributes(context: Context): Context {
-    var visibility = getAttribute(this.element, 'visibility')
+    const visibility = getAttribute(this.element, 'visibility')
     if (visibility) {
       context.attributeState.visibility = visibility
     }
-
-    /* // Set the correct transformation
-    context.transform = context._pdf.matrixMult(
-      computeNodeTransform(this.element, context),
-      context.transform
-    ) */
-
-    if (nodeIs(this.element, 'svg,g,path,rect,text,ellipse,line,circle,polygon,polyline')) {
       // fill mode
-      var fillColor = getAttribute(this.element, 'fill')
+      const fillColor = getAttribute(this.element, 'fill')
       if (fillColor) {
-        context.attributeState.fill = getFill(fillColor, context, this.element)
-      } else {
-        context.attributeState.fill = 'inherit'
+        context.attributeState.fill = getFill(fillColor, context, this)
       }
 
       // opacity is realized via a pdf graphics state
@@ -133,7 +120,7 @@ export default abstract class NodeStructureTree {
       context.attributeState.opacity = parseFloat(getAttribute(this.element, 'opacity') || '1')
 
       // stroke mode
-      var strokeWidth: any = getAttribute(this.element, 'stroke-width')
+      let strokeWidth: any = getAttribute(this.element, 'stroke-width')
       if (strokeWidth !== void 0 && strokeWidth !== '') {
         strokeWidth = Math.abs(parseFloat(strokeWidth))
         context.attributeState.strokeWidth = strokeWidth
@@ -142,45 +129,83 @@ export default abstract class NodeStructureTree {
         strokeWidth = context.attributeState.strokeWidth
       }
 
-      var strokeColor = getAttribute(this.element, 'stroke')
+      const strokeColor = getAttribute(this.element, 'stroke')
       if (strokeColor) {
         if (strokeColor === 'none') {
           context.attributeState.stroke = null
         } else {
-          var strokeRGB = new RGBColor(strokeColor)
+          const strokeRGB = new RGBColor(strokeColor)
           if (strokeRGB.ok) {
             context.attributeState.stroke = strokeRGB
           }
         }
       }
 
-      var lineCap = getAttribute(this.element, 'stroke-linecap')
+      const lineCap = getAttribute(this.element, 'stroke-linecap')
       if (lineCap) {
         context.attributeState.strokeLinecap = lineCap
       }
-      var lineJoin = getAttribute(this.element, 'stroke-linejoin')
+      const lineJoin = getAttribute(this.element, 'stroke-linejoin')
       if (lineJoin) {
         context.attributeState.strokeLinejoin = lineJoin
       }
-      var dashArray: any = getAttribute(this.element, 'stroke-dasharray')
+      let dashArray: any = getAttribute(this.element, 'stroke-dasharray')
       if (dashArray) {
         dashArray = parseFloats(dashArray)
-        var dashOffset = parseInt(getAttribute(this.element, 'stroke-dashoffset')) || 0
+        const dashOffset = parseInt(getAttribute(this.element, 'stroke-dashoffset')) || 0
         context.attributeState.strokeDasharray = dashArray
         context.attributeState.strokeDashoffset = dashOffset
       }
-      var miterLimit = getAttribute(this.element, 'stroke-miterlimit')
+      const miterLimit = getAttribute(this.element, 'stroke-miterlimit')
       if (miterLimit !== void 0 && miterLimit !== '') {
         context.attributeState.strokeMiterlimit = parseFloat(miterLimit)
       }
-    }
 
-    var xmlSpace = this.element.getAttribute('xml:space')
+    const xmlSpace = this.element.getAttribute('xml:space')
     if (xmlSpace) {
       context.attributeState.xmlSpace = xmlSpace
     }
 
-    setTextProperties(this.element, null, context)
+    const fontWeight = getAttribute(this.element, 'font-weight')
+    if (fontWeight) {
+      context.attributeState.fontWeight = fontWeight
+    }
+  
+    const fontStyle = getAttribute(this.element, 'font-style')
+    if (fontStyle) {
+      context.attributeState.fontStyle = fontStyle
+    }
+  
+    const fontFamily = getAttribute(this.element, 'font-family')
+    if (fontFamily) {
+      const fontFamilies = FontFamily.parse(fontFamily)
+      context.attributeState.fontFamily = findFirstAvailableFontFamily(
+        context.attributeState,
+        fontFamilies,
+        context
+      )
+    }
+  
+    const fontSize = getAttribute(this.element, 'font-size')
+    if (fontSize) {
+      context.attributeState.fontSize = parseFloat(fontSize)
+    }
+  
+    const alignmentBaseline =
+      getAttribute(this.element, 'vertical-align') || getAttribute(this.element, 'alignment-baseline')
+    if (alignmentBaseline) {
+      const matchArr = alignmentBaseline.match(
+        /(baseline|text-bottom|alphabetic|ideographic|middle|central|mathematical|text-top|bottom|center|top|hanging)/
+      )
+      if (matchArr) {
+        context.attributeState.alignmentBaseline = matchArr[0]
+      }
+    }
+  
+    const textAnchor = getAttribute(this.element, 'text-anchor')
+    if (textAnchor) {
+      context.attributeState.textAnchor = textAnchor
+    }
 
     return context
   }
@@ -197,7 +222,7 @@ export default abstract class NodeStructureTree {
       childContext._pdf.saveGraphicsState()
     }
 
-    var fillOpacity = 1.0,
+    let fillOpacity = 1.0,
       strokeOpacity = 1.0
 
     fillOpacity *= childContext.attributeState.fillOpacity
@@ -218,10 +243,10 @@ export default abstract class NodeStructureTree {
     }
     strokeOpacity *= childContext.attributeState.opacity
 
-    var hasFillOpacity = fillOpacity < 1.0
-    var hasStrokeOpacity = strokeOpacity < 1.0
+    const hasFillOpacity = fillOpacity < 1.0
+    const hasStrokeOpacity = strokeOpacity < 1.0
     if (hasFillOpacity || hasStrokeOpacity) {
-      var gState: any = {}
+      let gState: any = {}
       hasFillOpacity && (gState['opacity'] = fillOpacity)
       hasStrokeOpacity && (gState['stroke-opacity'] = strokeOpacity)
       childContext._pdf.setGState(new childContext._pdf.GState(gState))
@@ -238,8 +263,6 @@ export default abstract class NodeStructureTree {
         childContext.attributeState.fill.g,
         childContext.attributeState.fill.b
       )
-    } else if (childContext.attributeState.fill === 'inherit') {
-      childContext.attributeState.fill = parentContext.attributeState.fill
     }
 
     if (childContext.attributeState.strokeWidth !== parentContext.attributeState.strokeWidth) {
@@ -283,30 +306,67 @@ export default abstract class NodeStructureTree {
       childContext._pdf.setLineMiterLimit(childContext.attributeState.strokeMiterlimit)
     }
 
-    putTextProperties(childContext.attributeState, parentContext.attributeState, childContext)
+    if (childContext.attributeState.fontFamily !== parentContext.attributeState.fontFamily) {
+      if (fontAliases.hasOwnProperty(childContext.attributeState.fontFamily)) {
+        childContext._pdf.setFont(fontAliases[childContext.attributeState.fontFamily])
+      } else {
+        childContext._pdf.setFont(childContext.attributeState.fontFamily)
+      }
+    }
+  
+    if (
+      childContext.attributeState.fill &&
+      childContext.attributeState.fill !== parentContext.attributeState.fill &&
+      childContext.attributeState.fill.ok
+    ) {
+      const fillRGB = childContext.attributeState.fill
+      childContext._pdf.setTextColor(fillRGB.r, fillRGB.g, fillRGB.b)
+    }
+  
+    if (
+      childContext.attributeState.fontWeight !== parentContext.attributeState.fontWeight ||
+      childContext.attributeState.fontStyle !== parentContext.attributeState.fontStyle
+    ) {
+      let fontType = ''
+      if (childContext.attributeState.fontWeight === 'bold') {
+        fontType = 'bold'
+      }
+      if (childContext.attributeState.fontStyle === 'italic') {
+        fontType += 'italic'
+      }
+  
+      if (fontType === '') {
+        fontType = 'normal'
+      }
+  
+      childContext._pdf.setFontType(fontType)
+    }
+  
+    if (childContext.attributeState.fontSize !== parentContext.attributeState.fontSize) {
+      // correct for a jsPDF-instance measurement unit that differs from `pt`
+      childContext._pdf.setFontSize(childContext.attributeState.fontSize * childContext._pdf.internal.scaleFactor)
+    }
     return true
   }
 
   protected clip(context: Context, openOrClose: string): boolean {
-    var hasClipPath =
+    const hasClipPath =
       this.element.hasAttribute('clip-path') && getAttribute(this.element, 'clip-path') !== 'none'
     if (hasClipPath) {
       if (openOrClose === 'open') {
-        var clipPathId = iriReference.exec(getAttribute(this.element, 'clip-path'))
-        var clipPathNode = context.refsHandler.getRendered(clipPathId[1], context)
-        var clipPathNST = parse(clipPathNode)
+        const clipPathId = iriReference.exec(getAttribute(this.element, 'clip-path'))
+        let clipPathNode = context.refsHandler.getRendered(clipPathId[1], context)
 
-        if (!isPartlyVisible(clipPathNode)) {
-          //context._pdf.restoreGraphicsState()
+        if (!isPartlyVisible(clipPathNode.element)) {
           return false
         }
 
-        var clipPathMatrix = context.transform
+        let clipPathMatrix = context.transform
         if (
-          clipPathNode.hasAttribute('clipPathUnits') &&
-          clipPathNode.getAttribute('clipPathUnits').toLowerCase() === 'objectboundingbox'
+          clipPathNode.element.hasAttribute('clipPathUnits') &&
+          clipPathNode.element.getAttribute('clipPathUnits').toLowerCase() === 'objectboundingbox'
         ) {
-          var bBox = this.getBBox(context)
+          const bBox = this.getBBox(context)
           clipPathMatrix = context._pdf.matrixMult(
             new context._pdf.Matrix(bBox[2], 0, 0, bBox[3], bBox[0], bBox[1]),
             clipPathMatrix
@@ -319,14 +379,14 @@ export default abstract class NodeStructureTree {
         // IE/Edge and considers the "transform" attribute as additional transformation within the coordinate system
         // established by the "clipPathUnits" attribute.
         clipPathMatrix = context._pdf.matrixMult(
-          clipPathNST.computeNodeTransform(context),
+          clipPathNode.computeNodeTransform(context),
           clipPathMatrix
         )
 
         context._pdf.saveGraphicsState()
         context._pdf.setCurrentTransformationMatrix(clipPathMatrix)
 
-        clipPathNST.children.forEach(child =>
+        clipPathNode.children.forEach(child =>
           child.render(
             new Context(context._pdf, {
               refsHandler: context.refsHandler,

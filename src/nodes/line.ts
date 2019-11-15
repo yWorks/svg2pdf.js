@@ -1,21 +1,20 @@
-import Context from '../context/context'
-import Marker from '../marker'
-import MarkerList from '../markerlist'
-import NodeStructureTree from './nst'
+import { SvgNode } from './svgnode'
+import { Context } from '../context/context'
+import { MarkerList, Marker } from '../markerlist'
 import { getAngle } from '../utils/math'
 import { defaultBoundingBox, addLineWidth } from '../utils/bbox'
 import { getAttribute } from '../utils/node'
 import { iriReference } from '../utils/constants'
 
-export default class Line extends NodeStructureTree {
+export class Line extends SvgNode {
   renderCore(context: Context): void {
     if (!context.withinClipPath) {
       context._pdf.setCurrentTransformationMatrix(context.transform)
-      var p1 = [
+      const p1 = [
         parseFloat(this.element.getAttribute('x1')) || 0,
         parseFloat(this.element.getAttribute('y1')) || 0
       ]
-      var p2 = [
+      const p2 = [
         parseFloat(this.element.getAttribute('x2')) || 0,
         parseFloat(this.element.getAttribute('y2')) || 0
       ]
@@ -24,12 +23,12 @@ export default class Line extends NodeStructureTree {
         context._pdf.line(p1[0], p1[1], p2[0], p2[1])
       }
 
-      var markerStart = getAttribute(this.element, 'marker-start'),
+      const markerStart = getAttribute(this.element, 'marker-start'),
         markerEnd = getAttribute(this.element, 'marker-end')
 
       if (markerStart || markerEnd) {
-        var markers = new MarkerList()
-        var angle = getAngle(p1, p2)
+        let markers = new MarkerList()
+        const angle = getAngle(p1, p2)
         if (markerStart) {
           markers.addMarker(new Marker(iriReference.exec(markerStart)[1], p1, angle))
         }

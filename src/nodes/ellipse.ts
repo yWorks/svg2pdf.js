@@ -1,22 +1,16 @@
-import NodeStructureTree from './nst'
-import Context from '../context/context'
+import { SvgNode } from './svgnode'
+import { Context } from '../context/context'
 import { defaultBoundingBox, addLineWidth } from '../utils/bbox'
 import { getAttribute } from '../utils/node'
 
-export default class Ellipse extends NodeStructureTree {
-  r: number
+export class Ellipse extends SvgNode {
   rx: number
   ry: number
 
-  constructor(node: HTMLElement, children: NodeStructureTree[], circle?: any) {
+  constructor(node: HTMLElement, children: SvgNode[]) {
     super(node, children)
-    if (circle) {
-      this.rx = this.ry = this.r = parseFloat(getAttribute(this.element, 'r'))
-    } else {
-      this.r = null
-      this.rx = parseFloat(getAttribute(this.element, 'rx'))
-      this.ry = parseFloat(getAttribute(this.element, 'ry'))
-    }
+    this.rx = parseFloat(getAttribute(this.element, 'rx'))
+    this.ry = parseFloat(getAttribute(this.element, 'ry'))
   }
 
   renderCore(context: Context): void {

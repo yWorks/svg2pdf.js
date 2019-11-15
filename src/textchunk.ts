@@ -1,6 +1,6 @@
-import RGBColor from './utils/rgbcolor'
+import { RGBColor } from './utils/rgbcolor'
 
-import Context from './context/context'
+import { Context } from './context/context'
 import { putTextProperties, getTextRenderingMode, setTextProperties } from './utils/text'
 import { getAttribute } from './utils/node'
 import { toPixels, mapAlignmentBaseline } from './utils/misc'
@@ -11,7 +11,7 @@ import { toPixels, mapAlignmentBaseline } from './utils/misc'
  * @param {number} originY
  * @constructor
  */
-export default class TextChunk {
+export class TextChunk {
   private texts: string[]
   private textNodes: HTMLElement[]
   private textAnchor: string
@@ -32,46 +32,46 @@ export default class TextChunk {
   }
 
   put(context: Context) {
-    var i, textNode
+    let i, textNode
 
-    var strokeRGB: any
-    var xs = [],
+    let strokeRGB: any
+    const xs = [],
       ys = [],
       attributeStates = []
-    var currentTextX = this.originX,
+    let currentTextX = this.originX,
       currentTextY = this.originY
-    var minX = currentTextX,
+      let minX = currentTextX,
       maxX = currentTextX
     for (i = 0; i < this.textNodes.length; i++) {
       textNode = this.textNodes[i]
 
-      var x = currentTextX
-      var y = currentTextY
-
+      let x = currentTextX
+      let y = currentTextY
+      let textNodeContext
       if (textNode.nodeName === '#text') {
         textNodeContext = context
       } else {
-        var textNodeContext = context.clone()
-        var tSpanColor = getAttribute(textNode, 'fill')
+        textNodeContext = context.clone()
+        const tSpanColor = getAttribute(textNode, 'fill')
         setTextProperties(textNode, tSpanColor && new RGBColor(tSpanColor), textNodeContext)
-        var tSpanStrokeColor = getAttribute(textNode, 'stroke')
+        const tSpanStrokeColor = getAttribute(textNode, 'stroke')
         if (tSpanStrokeColor) {
           strokeRGB = new RGBColor(tSpanStrokeColor)
           if (strokeRGB.ok) {
             textNodeContext.attributeState.stroke = strokeRGB
           }
         }
-        var strokeWidth = getAttribute(textNode, 'stroke-width')
+        const strokeWidth = getAttribute(textNode, 'stroke-width')
         if (strokeWidth !== void 0) {
           textNodeContext.attributeState.strokeWidth = parseFloat(strokeWidth)
         }
 
-        var tSpanDx = textNode.getAttribute('dx')
+        const tSpanDx = textNode.getAttribute('dx')
         if (tSpanDx !== null) {
           x += toPixels(tSpanDx, textNodeContext.attributeState.fontSize)
         }
 
-        var tSpanDy = textNode.getAttribute('dy')
+        const tSpanDy = textNode.getAttribute('dy')
         if (tSpanDy !== null) {
           y += toPixels(tSpanDy, textNodeContext.attributeState.fontSize)
         }
@@ -91,7 +91,7 @@ export default class TextChunk {
       maxX = Math.max(maxX, currentTextX)
     }
 
-    var textOffset
+    let textOffset
     switch (this.textAnchor) {
       case 'start':
         textOffset = 0
@@ -108,7 +108,7 @@ export default class TextChunk {
       textNode = this.textNodes[i]
 
       if (textNode.nodeName !== '#text') {
-        var tSpanVisibility =
+        const tSpanVisibility =
           getAttribute(textNode, 'visibility') || context.attributeState.visibility
         if (tSpanVisibility === 'hidden') {
           continue
@@ -122,7 +122,7 @@ export default class TextChunk {
         attributeStates[i].stroke !== context.attributeState.stroke &&
         attributeStates[i].stroke.ok
       ) {
-        var strokeRGB = attributeStates[i].stroke
+        const strokeRGB = attributeStates[i].stroke
         context._pdf.setDrawColor(strokeRGB.r, strokeRGB.g, strokeRGB.b)
       }
       if (
@@ -132,8 +132,8 @@ export default class TextChunk {
         context._pdf.setLineWidth(attributeStates[i].strokeWidth)
       }
 
-      var alignmentBaseline = attributeStates[i].alignmentBaseline
-      var textRenderingMode = getTextRenderingMode(attributeStates[i])
+      const alignmentBaseline = attributeStates[i].alignmentBaseline
+      const textRenderingMode = getTextRenderingMode(attributeStates[i])
       context._pdf.text(this.texts[i], xs[i] - textOffset, ys[i], {
         baseline: mapAlignmentBaseline(alignmentBaseline),
         angle: context.transform,

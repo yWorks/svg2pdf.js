@@ -1,24 +1,33 @@
-import NodeStructureTree from './nst'
-import Context from '../context/context'
+import { Context } from '../context/context'
 import { parseFloats } from '../utils/math'
 import { computeViewBoxTransform } from '../utils/transform'
+import { PassiveNode } from './passivenode'
 
-export default class MarkerNST extends NodeStructureTree {
-  render(context: Context): void {
+export class MarkerNode extends PassiveNode {
+  renderPassive(contextIn: Context): void {
+    // the transformations directly at the node are written to the pdf form object transformation matrix
+    const tfMatrix = this.computeNodeTransform(contextIn)
+    const bBox = this.getBBox(contextIn)
+    let context = new Context(contextIn._pdf, {
+      refsHandler: contextIn.refsHandler,
+      transform: tfMatrix
+    })
+
+    context._pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], tfMatrix)
     this.children.forEach(child =>
       child.render(
         new Context(context._pdf, {
-          refsHandler: this,
+          refsHandler: context.refsHandler,
           transform: child.computeNodeTransform(context)
         })
       )
     )
+    context._pdf.endFormObject(this.element.getAttribute('id'))
   }
-  renderCore(): void {}
 
   getBoundingBoxCore(context: Context): number[] {
-    var viewBox = this.element.getAttribute('viewBox'),
-      vb
+    const viewBox = this.element.getAttribute('viewBox')
+    let vb
     if (viewBox) {
       vb = parseFloats(viewBox)
     }
@@ -31,14 +40,15 @@ export default class MarkerNST extends NodeStructureTree {
   }
 
   computeNodeTransformCore(context: Context): any {
-    var x = parseFloat(this.element.getAttribute('refX')) || 0
-    var y = parseFloat(this.element.getAttribute('refY')) || 0
+    const x = parseFloat(this.element.getAttribute('refX')) || 0
+    const y = parseFloat(this.element.getAttribute('refY')) || 0
 
-    var viewBox = this.element.getAttribute('viewBox')
+    const viewBox = this.element.getAttribute('viewBox')
+    let nodeTransform
     if (viewBox) {
-      var bounds = parseFloats(viewBox)
+      let bounds = parseFloats(viewBox)
       bounds[0] = bounds[1] = 0 // for some reason vbX anc vbY seem to be ignored for markers
-      var nodeTransform = computeViewBoxTransform(
+      nodeTransform = computeViewBoxTransform(
         this.element,
         bounds,
         0,
@@ -52,7 +62,7 @@ export default class MarkerNST extends NodeStructureTree {
         nodeTransform
       )
     } else {
-      var nodeTransform = new context._pdf.Matrix(1, 0, 0, 1, -x, -y)
+      nodeTransform = new context._pdf.Matrix(1, 0, 0, 1, -x, -y)
     }
     return nodeTransform
   }

@@ -1,6 +1,6 @@
-import ReferencesHandler from './referenceshandler'
-import AttributeState from './attributestate'
-import TextMeasure from './textmeasure'
+import { ReferencesHandler } from './referenceshandler'
+import { AttributeState } from './attributestate'
+import { TextMeasure } from './textmeasure'
 
 /**
  *
@@ -13,7 +13,7 @@ import TextMeasure from './textmeasure'
  * @property {jspdf.Matrix} transform The current transformation matrix
  * @property {boolean} withinClipPath
  */
-export default class Context {
+export class Context {
   _pdf: any
   attributeState: AttributeState
   refsHandler: ReferencesHandler
@@ -36,7 +36,7 @@ export default class Context {
 
   clone(values?: { [key: string]: any }) {
     values = values || {}
-    var clone = new Context(this._pdf)
+    let clone = new Context(this._pdf)
 
     clone.attributeState = values.attributeState
       ? values.attributeState.clone()

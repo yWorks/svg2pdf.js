@@ -1,14 +1,14 @@
-import RGBColor from './rgbcolor'
+import { RGBColor } from './rgbcolor'
 
-import AttributeState from '../context/attributestate'
-import Context from '../context/context'
+import { AttributeState } from '../context/attributestate'
+import { Context } from '../context/context'
 
 import { parseFloats, mirrorPoint } from './math'
 import { iriReference, alignmentBaselineMap, fontAliases } from './constants'
-import parse from './parse'
 import { nodeIs, getAttribute } from './node'
 import { PatternOrGradient } from './patterngradient'
 import { parseTransform } from './transform'
+import { SvgNode } from '../nodes/svgnode'
 
 /**
  * Convert em, px and bare number attributes to pixel values
@@ -16,7 +16,7 @@ import { parseTransform } from './transform'
  * @param {number} pdfFontSize
  */
 export function toPixels(value: string, pdfFontSize: number) {
-  var match
+  let match
 
   // em
   match = value && value.toString().match(/^([\-0-9.]+)em$/)
@@ -34,11 +34,11 @@ export function toPixels(value: string, pdfFontSize: number) {
 
 // parses the "points" string used by polygons and returns an array of points
 export function parsePointsString(string: string) {
-  var floats = parseFloats(string)
-  var result = []
-  for (var i = 0; i < floats.length - 1; i += 2) {
-    var x = floats[i]
-    var y = floats[i + 1]
+  const floats = parseFloats(string)
+  const result = []
+  for (let i = 0; i < floats.length - 1; i += 2) {
+    const x = floats[i]
+    const y = floats[i + 1]
     result.push([x, y])
   }
   return result
@@ -56,8 +56,8 @@ export function getControlPointFromPrevious(
   prevX: number,
   prevY: number
 ) {
-  var prev = list.getItem(i - 1)
-  var p2
+  const prev = list.getItem(i - 1)
+  let p2
   if (i > 0 && (prev.pathSegTypeAsLetter === 'C' || prev.pathSegTypeAsLetter === 'S')) {
     p2 = mirrorPoint([prev.x2, prev.y2], from)
   } else if (i > 0 && (prev.pathSegTypeAsLetter === 'c' || prev.pathSegTypeAsLetter === 's')) {
@@ -78,7 +78,7 @@ export function findFirstAvailableFontFamily(
   fontFamilies: string[],
   context: Context
 ) {
-  var fontType = ''
+  let fontType = ''
   if (attributeState.fontWeight === 'bold') {
     fontType = 'bold'
   }
@@ -89,10 +89,10 @@ export function findFirstAvailableFontFamily(
     fontType = 'normal'
   }
 
-  var availableFonts = context._pdf.getFontList()
-  var firstAvailable = ''
-  var fontIsAvailable = fontFamilies.some(function(font) {
-    var availableStyles = availableFonts[font]
+  const availableFonts = context._pdf.getFontList()
+  let firstAvailable = ''
+  const fontIsAvailable = fontFamilies.some((font) => {
+    const availableStyles = availableFonts[font]
     if (availableStyles && availableStyles.indexOf(fontType) >= 0) {
       firstAvailable = font
       return true
@@ -117,15 +117,15 @@ export function findFirstAvailableFontFamily(
 // extends RGBColor by rgba colors as RGBColor is not capable of it
 export function parseColor(colorString: string) {
   if (colorString === 'transparent') {
-    var transparent = new RGBColor('rgb(0,0,0)')
+    const transparent = new RGBColor('rgb(0,0,0)')
     transparent.a = 0
     return transparent
   }
 
-  var match = /\s*rgba\(((?:[^,\)]*,){3}[^,\)]*)\)\s*/.exec(colorString)
+  const match = /\s*rgba\(((?:[^,\)]*,){3}[^,\)]*)\)\s*/.exec(colorString)
   if (match) {
-    var floats = parseFloats(match[1])
-    var color = new RGBColor('rgb(' + floats.slice(0, 3).join(',') + ')')
+    const floats = parseFloats(match[1])
+    const color = new RGBColor('rgb(' + floats.slice(0, 3).join(',') + ')')
     color.a = floats[3]
     return color
   } else {
@@ -133,33 +133,33 @@ export function parseColor(colorString: string) {
   }
 }
 
-export function getFill(fillColor: string, context: Context, element: HTMLElement): any {
-  var fillRGB = null,
+export function getFill(fillColor: string, context: Context, svgnode:SvgNode): any {
+  let fillRGB:any = null,
     patternOrGradient: PatternOrGradient = undefined,
     bBox
-  var url = iriReference.exec(fillColor)
+  const url = iriReference.exec(fillColor)
   if (url) {
     // probably a gradient or pattern (or something unsupported)
-    var fillUrl = url[1]
-    var fillNode = context.refsHandler.getRendered(fillUrl, context)
-    if (fillNode && nodeIs(fillNode, 'lineargradient,radialgradient')) {
+    const fillUrl = url[1]
+    const fillNode = context.refsHandler.getRendered(fillUrl, context)
+    if (fillNode && nodeIs(fillNode.element, 'lineargradient,radialgradient')) {
       // matrix to convert between gradient space and user space
       // for "userSpaceOnUse" this is the current transformation: tfMatrix
       // for "objectBoundingBox" or default, the gradient gets scaled and transformed to the bounding box
-      var gradientUnitsMatrix
+      let gradientUnitsMatrix
       if (
-        !fillNode.hasAttribute('gradientUnits') ||
-        fillNode.getAttribute('gradientUnits').toLowerCase() === 'objectboundingbox'
+        !fillNode.element.hasAttribute('gradientUnits') ||
+        fillNode.element.getAttribute('gradientUnits').toLowerCase() === 'objectboundingbox'
       ) {
-        bBox || (bBox = parse(element).getBBox(context))
+        bBox || (bBox = svgnode.getBBox(context))
         gradientUnitsMatrix = new context._pdf.Matrix(bBox[2], 0, 0, bBox[3], bBox[0], bBox[1])
       } else {
         gradientUnitsMatrix = context._pdf.unitMatrix
       }
 
       // matrix that is applied to the gradient before any other transformations
-      var gradientTransform = parseTransform(
-        getAttribute(fillNode, 'gradientTransform', 'transform'),
+      const gradientTransform = parseTransform(
+        getAttribute(fillNode.element, 'gradientTransform', 'transform'),
         context
       )
 
@@ -169,20 +169,20 @@ export function getFill(fillColor: string, context: Context, element: HTMLElemen
       }
 
       return patternOrGradient
-    } else if (fillNode && nodeIs(fillNode, 'pattern')) {
-      var fillBBox, y, width, height, x
+    } else if (fillNode && nodeIs(fillNode.element, 'pattern')) {
+      let fillBBox, y, width, height, x
       patternOrGradient = { key: fillUrl }
 
-      var patternUnitsMatrix = context._pdf.unitMatrix
+      let patternUnitsMatrix = context._pdf.unitMatrix
       if (
-        !fillNode.hasAttribute('patternUnits') ||
-        fillNode.getAttribute('patternUnits').toLowerCase() === 'objectboundingbox'
+        !fillNode.element.hasAttribute('patternUnits') ||
+        fillNode.element.getAttribute('patternUnits').toLowerCase() === 'objectboundingbox'
       ) {
-        bBox || (bBox = parse(element).getBBox(context))
+        bBox || (bBox = svgnode.getBBox(context))
         patternUnitsMatrix = new context._pdf.Matrix(1, 0, 0, 1, bBox[0], bBox[1])
 
         // TODO: slightly inaccurate (rounding errors? line width bBoxes?)
-        fillBBox = parse(fillNode).getBBox(context)
+        fillBBox = fillNode.getBBox(context)
         x = fillBBox[0] * bBox[0]
         y = fillBBox[1] * bBox[1]
         width = fillBBox[2] * bBox[2]
@@ -192,15 +192,15 @@ export function getFill(fillColor: string, context: Context, element: HTMLElemen
         patternOrGradient.yStep = height
       }
 
-      var patternContentUnitsMatrix = context._pdf.unitMatrix
+      let patternContentUnitsMatrix = context._pdf.unitMatrix
       if (
-        fillNode.hasAttribute('patternContentUnits') &&
-        fillNode.getAttribute('patternContentUnits').toLowerCase() === 'objectboundingbox'
+        fillNode.element.hasAttribute('patternContentUnits') &&
+        fillNode.element.getAttribute('patternContentUnits').toLowerCase() === 'objectboundingbox'
       ) {
-        bBox || (bBox = parse(element).getBBox(context))
+        bBox || (bBox = svgnode.getBBox(context))
         patternContentUnitsMatrix = new context._pdf.Matrix(bBox[2], 0, 0, bBox[3], 0, 0)
 
-        fillBBox = patternOrGradient.boundingBox || parse(fillNode).getBBox(context)
+        fillBBox = patternOrGradient.boundingBox || fillNode.getBBox(context)
         x = fillBBox[0] / bBox[0]
         y = fillBBox[1] / bBox[1]
         width = fillBBox[2] / bBox[2]
@@ -210,15 +210,15 @@ export function getFill(fillColor: string, context: Context, element: HTMLElemen
         patternOrGradient.yStep = height
       }
 
-      var patternTransformMatrix = context._pdf.unitMatrix
-      if (fillNode.hasAttribute('patternTransform')) {
+      let patternTransformMatrix = context._pdf.unitMatrix
+      if (fillNode.element.hasAttribute('patternTransform')) {
         patternTransformMatrix = parseTransform(
-          getAttribute(fillNode, 'patternTransform', 'transform'),
+          getAttribute(fillNode.element, 'patternTransform', 'transform'),
           context
         )
       }
 
-      var matrix = patternContentUnitsMatrix
+      let matrix = patternContentUnitsMatrix
       matrix = context._pdf.matrixMult(matrix, patternUnitsMatrix)
       matrix = context._pdf.matrixMult(matrix, patternTransformMatrix)
       matrix = context._pdf.matrixMult(matrix, context.transform)

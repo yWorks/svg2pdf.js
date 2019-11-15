@@ -1,15 +1,15 @@
-import NodeStructureTree from './nst'
-import Context from '../context/context'
+import { SvgNode } from './svgnode'
+import { Context } from '../context/context'
 import { defaultBoundingBox, addLineWidth } from '../utils/bbox'
 import { getAttribute } from '../utils/node'
 
-export default class Rect extends NodeStructureTree {
+export class Rect extends SvgNode {
   renderCore(context: Context): void {
     if (!context.withinClipPath) {
       context._pdf.setCurrentTransformationMatrix(context.transform)
     }
-    var width = parseFloat(getAttribute(this.element, 'width'))
-    var height = parseFloat(getAttribute(this.element, 'height'))
+    const width = parseFloat(getAttribute(this.element, 'width'))
+    const height = parseFloat(getAttribute(this.element, 'height'))
     if (!isFinite(width) || width <= 0 || !isFinite(height) || height <= 0) {
       return
     }

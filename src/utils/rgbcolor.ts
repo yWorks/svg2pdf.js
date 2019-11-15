@@ -4,7 +4,7 @@
  * @link   http://www.phpied.com/rgb-color-parser-in-javascript/
  * @license Use it if you like it
  */
-export default class RGBColor {
+export class RGBColor {
   public ok: boolean
 
   public a: number
@@ -181,7 +181,7 @@ export default class RGBColor {
       yellow: 'ffff00',
       yellowgreen: '9acd32'
     }
-    for (var key in this.simple_colors) {
+    for (const key in this.simple_colors) {
       if (color_string == key) {
         color_string = this.simple_colors[key]
       }
@@ -218,12 +218,12 @@ export default class RGBColor {
     ]
 
     // search through the definitions to find a match
-    for (var i = 0; i < this.color_defs.length; i++) {
-      var re = this.color_defs[i].re
-      var processor = this.color_defs[i].process
-      var bits = re.exec(color_string)
+    for (let i = 0; i < this.color_defs.length; i++) {
+      const re = this.color_defs[i].re
+      const processor = this.color_defs[i].process
+      const bits = re.exec(color_string)
       if (bits) {
-        var channels = processor(bits)
+        const channels = processor(bits)
         this.r = channels[0]
         this.g = channels[1]
         this.b = channels[2]
@@ -241,9 +241,9 @@ export default class RGBColor {
     return 'rgb(' + this.r + ', ' + this.g + ', ' + this.b + ')'
   }
   toHex() {
-    var r = this.r.toString(16)
-    var g = this.g.toString(16)
-    var b = this.b.toString(16)
+    let r = this.r.toString(16)
+    let g = this.g.toString(16)
+    let b = this.b.toString(16)
     if (r.length == 1) r = '0' + r
     if (g.length == 1) g = '0' + g
     if (b.length == 1) b = '0' + b
@@ -252,26 +252,26 @@ export default class RGBColor {
 
   // help
   getHelpXML() {
-    var examples = new Array()
+    const examples = new Array()
     // add regexps
-    for (var i = 0; i < this.color_defs.length; i++) {
-      var example = this.color_defs[i].example
-      for (var j = 0; j < example.length; j++) {
+    for (let i = 0; i < this.color_defs.length; i++) {
+      const example = this.color_defs[i].example
+      for (let j = 0; j < example.length; j++) {
         examples[examples.length] = example[j]
       }
     }
     // add type-in colors
-    for (var sc in this.simple_colors) {
+    for (const sc in this.simple_colors) {
       examples[examples.length] = sc
     }
 
-    var xml = document.createElement('ul')
+    const xml = document.createElement('ul')
     xml.setAttribute('id', 'rgbcolor-examples')
-    for (var i = 0; i < examples.length; i++) {
+    for (let i = 0; i < examples.length; i++) {
       try {
-        var list_item = document.createElement('li')
-        var list_color = new RGBColor(examples[i])
-        var example_div = document.createElement('div')
+        const list_item = document.createElement('li')
+        const list_color = new RGBColor(examples[i])
+        const example_div = document.createElement('div')
         example_div.style.cssText =
           'margin: 3px; ' +
           'border: 1px solid black; ' +
@@ -281,7 +281,7 @@ export default class RGBColor {
           'color:' +
           list_color.toHex()
         example_div.appendChild(document.createTextNode('test'))
-        var list_item_value = document.createTextNode(
+        const list_item_value = document.createTextNode(
           ' ' + examples[i] + ' -> ' + list_color.toRGB() + ' -> ' + list_color.toHex()
         )
         list_item.appendChild(example_div)

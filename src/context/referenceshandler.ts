@@ -1,10 +1,8 @@
 import cssEsc from 'cssesc'
-
-import AttributeState from './attributestate'
-import Context from './context'
-import parse from '../utils/parse'
+import { PassiveNode } from '../nodes/passivenode'
+import { SvgNode } from '../nodes/svgnode'
 import { nodeIs } from '../utils/node'
-import { pattern, putGradient } from '../utils/patterngradient'
+import { Context } from './context'
 
 /**
  * @constructor
@@ -12,80 +10,40 @@ import { pattern, putGradient } from '../utils/patterngradient'
  * @property {Object.<String,Element>} renderedElements
  * @property {Element} rootSvg
  */
-export default class ReferencesHandler {
+export class ReferencesHandler {
   private renderedElements: any
-  private rootSvg: HTMLElement
+  private idMap: { [id: string]: SvgNode }
 
-  constructor(rootSvg: HTMLElement) {
+  constructor(idMap: { [id: string]: SvgNode }) {
     this.renderedElements = {}
-    this.rootSvg = rootSvg
+    this.idMap = idMap
   }
 
   /**
    * @param {string} id
    * @return {*}
    */
-  getRendered(id: string, context: Context) {
+  getRendered(id: string, context: Context): SvgNode {
     if (this.renderedElements.hasOwnProperty(id)) {
       return this.renderedElements[id]
     }
 
-    var node: HTMLElement = this.rootSvg.querySelector('#' + cssEsc(id, { isIdentifier: true }))
-    var nst = parse(node)
+    const svgnode: SvgNode = this.idMap[cssEsc(id, { isIdentifier: true })]
 
-    if (nodeIs(node, 'lineargradient')) {
-      putGradient(
-        node,
-        'axial',
-        [
-          node.getAttribute('x1') || 0,
-          node.getAttribute('y1') || 0,
-          node.getAttribute('x2') || 1,
-          node.getAttribute('y2') || 0
-        ],
-        context
-      )
-    } else if (nodeIs(node, 'radialgradient')) {
-      putGradient(
-        node,
-        'radial',
-        [
-          node.getAttribute('fx') || node.getAttribute('cx') || 0.5,
-          node.getAttribute('fy') || node.getAttribute('cy') || 0.5,
-          0,
-          node.getAttribute('cx') || 0.5,
-          node.getAttribute('cy') || 0.5,
-          node.getAttribute('r') || 0.5
-        ],
-        context
-      )
-    } else if (nodeIs(node, 'pattern')) {
-      pattern(node, this, AttributeState.default(), context)
-    } else if (nodeIs(node, 'marker')) {
+    if (svgnode instanceof PassiveNode) {
+      svgnode.renderPassive(context)
+    } else if (!nodeIs(svgnode.element, 'clippath')) {
       // the transformations directly at the node are written to the pdf form object transformation matrix
-      var tfMatrix = nst.computeNodeTransform(context)
-      var bBox = nst.getBBox(context)
+      let childContext = new Context(context._pdf, { refsHandler: this })
+      const tfMatrix = svgnode.computeNodeTransform(childContext)
+      const bBox = svgnode.getBBox(context)
 
       context._pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], tfMatrix)
-      nst.render(
-        new Context(context._pdf, {
-          refsHandler: this,
-          transform: tfMatrix
-        })
-      )
-      context._pdf.endFormObject(node.getAttribute('id'))
-    } else if (!nodeIs(node, 'clippath')) {
-      // the transformations directly at the node are written to the pdf form object transformation matrix
-      var childContext = new Context(context._pdf, { refsHandler: this })
-      var tfMatrix = nst.computeNodeTransform(childContext)
-      var bBox = nst.getBBox(context)
-
-      context._pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], tfMatrix)
-      nst.render(childContext)
-      context._pdf.endFormObject(node.getAttribute('id'))
+      svgnode.render(childContext)
+      context._pdf.endFormObject(svgnode.element.getAttribute('id'))
     }
 
-    this.renderedElements[id] = node
-    return node
+    this.renderedElements[id] = svgnode
+    return svgnode
   }
 }

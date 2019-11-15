@@ -1,4 +1,4 @@
-import Context from '../context/context'
+import { Context } from '../context/context'
 import { nodeIs, getAttribute } from './node'
 import { parseFloats } from './math'
 
@@ -11,18 +11,18 @@ export function computeViewBoxTransform(
   eHeight: number,
   context: Context
 ) {
-  var vbX = viewBox[0]
-  var vbY = viewBox[1]
-  var vbWidth = viewBox[2]
-  var vbHeight = viewBox[3]
+  const vbX = viewBox[0]
+  const vbY = viewBox[1]
+  const vbWidth = viewBox[2]
+  const vbHeight = viewBox[3]
 
-  var scaleX = eWidth / vbWidth
-  var scaleY = eHeight / vbHeight
+  let scaleX = eWidth / vbWidth
+  let scaleY = eHeight / vbHeight
 
-  var align, meetOrSlice
-  var preserveAspectRatio = node.getAttribute('preserveAspectRatio')
+  let align, meetOrSlice
+  const preserveAspectRatio = node.getAttribute('preserveAspectRatio')
   if (preserveAspectRatio) {
-    var alignAndMeetOrSlice = preserveAspectRatio.split(' ')
+    let alignAndMeetOrSlice = preserveAspectRatio.split(' ')
     if (alignAndMeetOrSlice[0] === 'defer') {
       alignAndMeetOrSlice = alignAndMeetOrSlice.slice(1)
     }
@@ -44,8 +44,8 @@ export function computeViewBoxTransform(
     }
   }
 
-  var translateX = eX - vbX * scaleX
-  var translateY = eY - vbY * scaleY
+  let translateX = eX - vbX * scaleX
+  let translateY = eY - vbY * scaleY
 
   if (align.indexOf('xMid') >= 0) {
     translateX += (eWidth - vbWidth * scaleX) / 2
@@ -59,8 +59,8 @@ export function computeViewBoxTransform(
     translateY += eHeight - vbHeight * scaleY
   }
 
-  var translate = new context._pdf.Matrix(1, 0, 0, 1, translateX, translateY)
-  var scale = new context._pdf.Matrix(scaleX, 0, 0, scaleY, 0, 0)
+  const translate = new context._pdf.Matrix(1, 0, 0, 1, translateX, translateY)
+  const scale = new context._pdf.Matrix(scaleX, 0, 0, scaleY, 0, 0)
 
   return context._pdf.matrixMult(scale, translate)
 }
@@ -69,21 +69,21 @@ export function computeViewBoxTransform(
 export function parseTransform(transformString: string, context: Context) {
   if (!transformString || transformString === 'none') return context._pdf.unitMatrix
 
-  var mRegex = /^[\s,]*matrix\(([^\)]+)\)\s*/,
+  const mRegex = /^[\s,]*matrix\(([^\)]+)\)\s*/,
     tRegex = /^[\s,]*translate\(([^\)]+)\)\s*/,
     rRegex = /^[\s,]*rotate\(([^\)]+)\)\s*/,
     sRegex = /^[\s,]*scale\(([^\)]+)\)\s*/,
     sXRegex = /^[\s,]*skewX\(([^\)]+)\)\s*/,
     sYRegex = /^[\s,]*skewY\(([^\)]+)\)\s*/
 
-  var resultMatrix = context._pdf.unitMatrix,
-    m
+    let resultMatrix = context._pdf.unitMatrix
+  let  m
 
-  var tSLength
+    let tSLength
   while (transformString.length > 0 && transformString.length !== tSLength) {
     tSLength = transformString.length
 
-    var match = mRegex.exec(transformString)
+    let match = mRegex.exec(transformString)
     if (match) {
       m = parseFloats(match[1])
       resultMatrix = context._pdf.matrixMult(
@@ -95,14 +95,14 @@ export function parseTransform(transformString: string, context: Context) {
     match = rRegex.exec(transformString)
     if (match) {
       m = parseFloats(match[1])
-      var a = (Math.PI * m[0]) / 180
+      const a = (Math.PI * m[0]) / 180
       resultMatrix = context._pdf.matrixMult(
         new context._pdf.Matrix(Math.cos(a), Math.sin(a), -Math.sin(a), Math.cos(a), 0, 0),
         resultMatrix
       )
       if (m[1] && m[2]) {
-        var t1 = new context._pdf.Matrix(1, 0, 0, 1, m[1], m[2])
-        var t2 = new context._pdf.Matrix(1, 0, 0, 1, -m[1], -m[2])
+        const t1 = new context._pdf.Matrix(1, 0, 0, 1, m[1], m[2])
+        const t2 = new context._pdf.Matrix(1, 0, 0, 1, -m[1], -m[2])
         resultMatrix = context._pdf.matrixMult(t2, context._pdf.matrixMult(resultMatrix, t1))
       }
       transformString = transformString.substr(match[0].length)

@@ -1,5 +1,5 @@
-import NodeStructureTree from './nst'
-import Context from '../context/context'
+import { SvgNode } from './svgnode'
+import { Context } from '../context/context'
 import { defaultBoundingBox, addLineWidth } from '../utils/bbox'
 import {
   transformXmlSpace,
@@ -11,36 +11,35 @@ import {
   trimRight,
   consolidateSpaces
 } from '../utils/text'
-import TextChunk from '../textchunk'
+import { TextChunk } from '../textchunk'
 import { nodeIs, getAttribute } from '../utils/node'
 import { toPixels, mapAlignmentBaseline } from '../utils/misc'
 
-export default class TextAst extends NodeStructureTree {
+export class TextNode extends SvgNode {
   renderCore(context: Context): void {
     context._pdf.saveGraphicsState()
 
-    var dx,
-      dy,
+    let 
       xOffset = 0
 
-    var pdfFontSize = context._pdf.getFontSize()
-    var textX = toPixels(this.element.getAttribute('x'), pdfFontSize)
-    var textY = toPixels(this.element.getAttribute('y'), pdfFontSize)
+    const pdfFontSize = context._pdf.getFontSize()
+    const textX = toPixels(this.element.getAttribute('x'), pdfFontSize)
+    const textY = toPixels(this.element.getAttribute('y'), pdfFontSize)
 
-    dx = toPixels(this.element.getAttribute('dx'), pdfFontSize)
-    dy = toPixels(this.element.getAttribute('dy'), pdfFontSize)
+    const dx = toPixels(this.element.getAttribute('dx'), pdfFontSize)
+    const dy = toPixels(this.element.getAttribute('dy'), pdfFontSize)
 
-    var visibility = context.attributeState.visibility
+    const visibility = context.attributeState.visibility
     // when there are no tspans draw the text directly
-    var tSpanCount = this.element.childElementCount
+    const tSpanCount = this.element.childElementCount
     if (tSpanCount === 0) {
-      var trimmedText = transformXmlSpace(this.element.textContent, context.attributeState)
-      var transformedText = transformText(this.element, trimmedText)
+      const trimmedText = transformXmlSpace(this.element.textContent, context.attributeState)
+      const transformedText = transformText(this.element, trimmedText)
       xOffset = context.textMeasure.getTextOffset(transformedText, context.attributeState)
 
       if (visibility === 'visible') {
-        var alignmentBaseline = context.attributeState.alignmentBaseline
-        var textRenderingMode = getTextRenderingMode(context.attributeState)
+        const alignmentBaseline = context.attributeState.alignmentBaseline
+        const textRenderingMode = getTextRenderingMode(context.attributeState)
         context._pdf.text(transformedText, textX + dx - xOffset, textY + dy, {
           baseline: mapAlignmentBaseline(alignmentBaseline),
           angle: context.transform,
@@ -49,42 +48,42 @@ export default class TextAst extends NodeStructureTree {
       }
     } else {
       // otherwise loop over tspans and position each relative to the previous one
-      var currentTextSegment = new TextChunk(
+      let currentTextSegment = new TextChunk(
         context.attributeState.textAnchor,
         textX + dx,
         textY + dy
       )
 
-      for (var i = 0; i < this.element.childNodes.length; i++) {
-        var textNode = this.element.childNodes[i] as HTMLElement
+      for (let i = 0; i < this.element.childNodes.length; i++) {
+        const textNode = this.element.childNodes[i] as HTMLElement
         if (!textNode.textContent) {
           continue
         }
 
-        var xmlSpace = context.attributeState.xmlSpace
-        var textContent = textNode.textContent
+        let xmlSpace = context.attributeState.xmlSpace
+        let textContent = textNode.textContent
 
         if (textNode.nodeName === '#text') {
         } else if (nodeIs(textNode, 'title')) {
           continue
         } else if (nodeIs(textNode, 'tspan')) {
-          var tSpan = textNode
+          const tSpan = textNode
 
           if (tSpan.childElementCount > 0) {
             // filter <title> elements...
             textContent = ''
-            for (var j = 0; j < tSpan.childNodes.length; j++) {
+            for (let j = 0; j < tSpan.childNodes.length; j++) {
               if (tSpan.childNodes[j].nodeName === '#text') {
                 textContent += tSpan.childNodes[j].textContent
               }
             }
           }
 
-          var lastPositions
+          let lastPositions
 
-          var tSpanAbsX = tSpan.getAttribute('x')
+          const tSpanAbsX = tSpan.getAttribute('x')
           if (tSpanAbsX !== null) {
-            var x = toPixels(tSpanAbsX, pdfFontSize)
+            const x = toPixels(tSpanAbsX, pdfFontSize)
 
             lastPositions = currentTextSegment.put(context)
             currentTextSegment = new TextChunk(
@@ -94,9 +93,9 @@ export default class TextAst extends NodeStructureTree {
             )
           }
 
-          var tSpanAbsY = tSpan.getAttribute('y')
+          const tSpanAbsY = tSpan.getAttribute('y')
           if (tSpanAbsY !== null) {
-            var y = toPixels(tSpanAbsY, pdfFontSize)
+            const y = toPixels(tSpanAbsY, pdfFontSize)
 
             lastPositions = currentTextSegment.put(context)
             currentTextSegment = new TextChunk(
@@ -106,13 +105,13 @@ export default class TextAst extends NodeStructureTree {
             )
           }
 
-          var tSpanXmlSpace = tSpan.getAttribute('xml:space')
+          const tSpanXmlSpace = tSpan.getAttribute('xml:space')
           if (tSpanXmlSpace) {
             xmlSpace = tSpanXmlSpace
           }
         }
 
-        trimmedText = removeNewlines(textContent)
+        let trimmedText = removeNewlines(textContent)
         trimmedText = replaceTabsBySpace(trimmedText)
 
         if (xmlSpace === 'default') {
@@ -126,7 +125,7 @@ export default class TextAst extends NodeStructureTree {
           trimmedText = consolidateSpaces(trimmedText)
         }
 
-        transformedText = transformText(this.element, trimmedText)
+        const transformedText = transformText(this.element, trimmedText)
         currentTextSegment.add(textNode, transformedText)
       }
 
