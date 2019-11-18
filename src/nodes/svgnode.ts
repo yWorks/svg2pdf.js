@@ -33,11 +33,6 @@ export abstract class SvgNode {
 
   protected abstract renderCore(context: Context): void
   render(parentContext: Context) {
-    if (nodeIs(this.element, 'defs,clippath,pattern,lineargradient,radialgradient,marker')) {
-      // we will only render them on demand
-      return
-    }
-
     if (!this.isVisible(parentContext.attributeState.visibility === 'hidden')) {
       return
     }
