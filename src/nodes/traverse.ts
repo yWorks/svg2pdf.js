@@ -8,6 +8,13 @@ import { addVectors, getDirectionVector } from '../utils/math'
 import { addLineWidth } from '../utils/bbox'
 
 export abstract class Traverse extends SvgNode {
+  closed: boolean
+
+  constructor(node: HTMLElement, children: SvgNode[], closed: boolean) {
+    super(node, children)
+    this.closed = closed
+  }
+
   renderCore(context: Context) {
     if (!context.withinClipPath) {
       context._pdf.setCurrentTransformationMatrix(context.transform)
@@ -23,7 +30,7 @@ export abstract class Traverse extends SvgNode {
       lines.push({ op: 'l', c: points[i] })
     }
 
-    this.addclose(lines)
+    this.closed && lines.push({ op: 'h' })
 
     context._pdf.path(lines)
 
@@ -75,8 +82,6 @@ export abstract class Traverse extends SvgNode {
 
     this.fillOrStroke(context)
   }
-
-  abstract addclose(lines: any[]): any[]
 
   visibleCore(visible: boolean) {
     return visible

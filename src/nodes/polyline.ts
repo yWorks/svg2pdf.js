@@ -1,7 +1,8 @@
 import { Traverse } from './traverse'
+import { SvgNode } from './svgnode'
 
 export class Polyline extends Traverse {
-  addclose(lines: any[]) {
-    return lines
+  constructor(node: HTMLElement, children: SvgNode[]) {
+    super(node, children, false)
   }
 }
