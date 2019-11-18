@@ -19,8 +19,7 @@ export class TextNode extends SvgNode {
   renderCore(context: Context): void {
     context._pdf.saveGraphicsState()
 
-    let 
-      xOffset = 0
+    let xOffset = 0
 
     const pdfFontSize = context._pdf.getFontSize()
     const textX = toPixels(this.element.getAttribute('x'), pdfFontSize)
@@ -49,6 +48,7 @@ export class TextNode extends SvgNode {
     } else {
       // otherwise loop over tspans and position each relative to the previous one
       let currentTextSegment = new TextChunk(
+        this,
         context.attributeState.textAnchor,
         textX + dx,
         textY + dy
@@ -87,6 +87,7 @@ export class TextNode extends SvgNode {
 
             lastPositions = currentTextSegment.put(context)
             currentTextSegment = new TextChunk(
+              this,
               getAttribute(tSpan, 'text-anchor') || context.attributeState.textAnchor,
               x,
               lastPositions[1]
@@ -99,6 +100,7 @@ export class TextNode extends SvgNode {
 
             lastPositions = currentTextSegment.put(context)
             currentTextSegment = new TextChunk(
+              this,
               getAttribute(tSpan, 'text-anchor') || context.attributeState.textAnchor,
               lastPositions[0],
               y
@@ -133,6 +135,10 @@ export class TextNode extends SvgNode {
     }
 
     context._pdf.restoreGraphicsState()
+  }
+
+  visibleCore(visible: boolean) {
+    return this.childrenVisible(visible)
   }
 
   getBoundingBoxCore(context: Context): number[] {

@@ -47,4 +47,8 @@ export class Line extends SvgNode {
   computeNodeTransformCore(context: Context): any {
     return context._pdf.unitMatrix
   }
+
+  visibleCore(visible: boolean) {
+    return visible
+  }
 }

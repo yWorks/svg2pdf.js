@@ -66,4 +66,7 @@ export class MarkerNode extends PassiveNode {
     }
     return nodeTransform
   }
+  visibleCore(visible: boolean) {
+    return this.childrenVisible(visible)
+  }
 }

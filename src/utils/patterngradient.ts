@@ -59,4 +59,3 @@ export function parseGradientOffset(value: string) {
   }
   return parsedValue
 }
-

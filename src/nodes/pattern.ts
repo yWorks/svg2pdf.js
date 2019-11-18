@@ -3,9 +3,9 @@ import { defaultBoundingBox } from '../utils/bbox'
 import { PassiveNode } from './passivenode'
 
 export class Pattern extends PassiveNode {
-  renderPassive(context:Context): void {
+  renderPassive(context: Context): void {
     const id = this.element.getAttribute('id')
-  
+
     // the transformations directly at the node are written to the pattern transformation matrix
     const bBox = this.getBBox(context)
     const pattern = new context._pdf.TilingPattern(
@@ -15,10 +15,10 @@ export class Pattern extends PassiveNode {
       null,
       context._pdf.unitMatrix /* Utils parameter is ignored !*/
     )
-  
+
     context._pdf.beginTilingPattern(pattern)
     // continue without transformation
-  
+
     this.children.forEach(child =>
       child.render(
         new Context(context._pdf, {
@@ -35,5 +35,8 @@ export class Pattern extends PassiveNode {
   }
   computeNodeTransformCore(context: Context): any {
     return context._pdf.unitMatrix
+  }
+  visibleCore(visible: boolean) {
+    return this.childrenVisible(visible)
   }
 }

@@ -72,9 +72,15 @@ export abstract class Traverse extends SvgNode {
       }
       markers.draw(context.clone({ transform: context._pdf.unitMatrix }))
     }
+
+    this.fillOrStroke(context)
   }
 
   abstract addclose(lines: any[]): any[]
+
+  visibleCore(visible: boolean) {
+    return visible
+  }
 
   getBoundingBoxCore(context: Context): number[] {
     const points = parsePointsString(this.element.getAttribute('points'))

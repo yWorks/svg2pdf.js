@@ -37,6 +37,10 @@ export class Use extends SvgNode {
     return addLineWidth(defaultBoundingBox(this.element, context), this.element)
   }
 
+  visibleCore(visible: boolean) {
+    return visible
+  }
+
   computeNodeTransformCore(context: Context): any {
     return context._pdf.unitMatrix
   }

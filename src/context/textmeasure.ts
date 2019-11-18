@@ -116,7 +116,13 @@ export class TextMeasure {
         const fontSize = '16px'
         const fontStyle = 'normal'
         const fontWeight = 'normal'
-        const canvasWidth = canvasTextMeasure(testString, fontFamily, fontSize, fontStyle, fontWeight)
+        const canvasWidth = canvasTextMeasure(
+          testString,
+          fontFamily,
+          fontSize,
+          fontStyle,
+          fontWeight
+        )
         const svgWidth = svgTextMeasure(testString, fontFamily, fontSize, fontStyle, fontWeight)
 
         method = Math.abs(canvasWidth - svgWidth) < epsilon ? canvasTextMeasure : svgTextMeasure

@@ -17,7 +17,7 @@ export function addLineWidth(bBox: number[], element: HTMLElement): number[] {
   ]
 }
 
-export function getBoundingBoxByChildren(context: Context, svgnode:SvgNode): number[] {
+export function getBoundingBoxByChildren(context: Context, svgnode: SvgNode): number[] {
   if (getAttribute(svgnode.element, 'display') === 'none') {
     return [0, 0, 0, 0]
   }

@@ -91,7 +91,7 @@ export function findFirstAvailableFontFamily(
 
   const availableFonts = context._pdf.getFontList()
   let firstAvailable = ''
-  const fontIsAvailable = fontFamilies.some((font) => {
+  const fontIsAvailable = fontFamilies.some(font => {
     const availableStyles = availableFonts[font]
     if (availableStyles && availableStyles.indexOf(fontType) >= 0) {
       firstAvailable = font
@@ -133,8 +133,8 @@ export function parseColor(colorString: string) {
   }
 }
 
-export function getFill(fillColor: string, context: Context, svgnode:SvgNode): any {
-  let fillRGB:any = null,
+export function getFill(fillColor: string, context: Context, svgnode: SvgNode): any {
+  let fillRGB: any = null,
     patternOrGradient: PatternOrGradient = undefined,
     bBox
   const url = iriReference.exec(fillColor)

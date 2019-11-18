@@ -18,8 +18,9 @@ import { Polyline } from './nodes/polyline'
 import { Svg } from './nodes/svg'
 import { Group } from './nodes/group'
 import cssesc from 'cssesc'
+import { ClipPath } from './nodes/clippath'
 
-export function parse(node: HTMLElement, idMap?: {[id:string]:SvgNode}): SvgNode {
+export function parse(node: HTMLElement, idMap?: { [id: string]: SvgNode }): SvgNode {
   let svgnode: SvgNode
   const children: SvgNode[] = []
   const existsIdMap = idMap || idMap === {}
@@ -37,6 +38,9 @@ export function parse(node: HTMLElement, idMap?: {[id:string]:SvgNode}): SvgNode
       break
     case 'circle':
       svgnode = new Circle(node, children)
+      break
+    case 'clippath':
+      svgnode = new ClipPath(node, children)
       break
     case 'ellipse':
       svgnode = new Ellipse(node, children)
@@ -88,7 +92,7 @@ export function parse(node: HTMLElement, idMap?: {[id:string]:SvgNode}): SvgNode
   svgnode.children.forEach(child => (child.parent = svgnode))
 
   if (existsIdMap && svgnode.element.hasAttribute('id')) {
-    const id = cssesc(svgnode.element.id, {isIdentifier: true})
+    const id = cssesc(svgnode.element.id, { isIdentifier: true })
     idMap[id] = idMap[id] || svgnode
   }
 

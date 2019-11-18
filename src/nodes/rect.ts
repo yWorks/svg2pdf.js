@@ -21,6 +21,8 @@ export class Rect extends SvgNode {
       parseFloat(getAttribute(this.element, 'rx')) || 0,
       parseFloat(getAttribute(this.element, 'ry')) || 0
     )
+
+    this.fillOrStroke(context)
   }
 
   getBoundingBoxCore(context: Context): number[] {
@@ -29,5 +31,9 @@ export class Rect extends SvgNode {
 
   computeNodeTransformCore(context: Context): any {
     return context._pdf.unitMatrix
+  }
+
+  visibleCore(visible: boolean) {
+    return visible
   }
 }

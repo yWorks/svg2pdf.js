@@ -7,4 +7,8 @@ export class Circle extends Ellipse {
     super(node, children)
     this.rx = this.ry = parseFloat(getAttribute(this.element, 'r'))
   }
+
+  visibleCore(visible: boolean) {
+    return visible
+  }
 }

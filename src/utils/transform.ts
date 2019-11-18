@@ -76,10 +76,10 @@ export function parseTransform(transformString: string, context: Context) {
     sXRegex = /^[\s,]*skewX\(([^\)]+)\)\s*/,
     sYRegex = /^[\s,]*skewY\(([^\)]+)\)\s*/
 
-    let resultMatrix = context._pdf.unitMatrix
-  let  m
+  let resultMatrix = context._pdf.unitMatrix
+  let m
 
-    let tSLength
+  let tSLength
   while (transformString.length > 0 && transformString.length !== tSLength) {
     tSLength = transformString.length
 

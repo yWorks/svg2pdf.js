@@ -230,6 +230,8 @@ export class Path extends SvgNode {
     if (markerEnd || markerStart || markerMid) {
       lines.markers.draw(context.clone({ transform: context._pdf.unitMatrix }))
     }
+
+    this.fillOrStroke(context)
   }
 
   getBoundingBoxCore(context: Context): number[] {
@@ -339,5 +341,8 @@ export class Path extends SvgNode {
 
   computeNodeTransformCore(context: Context): any {
     return context._pdf.unitMatrix
+  }
+  visibleCore(visible: boolean) {
+    return visible
   }
 }

@@ -1,8 +1,8 @@
 import cssEsc from 'cssesc'
 import { PassiveNode } from '../nodes/passivenode'
 import { SvgNode } from '../nodes/svgnode'
-import { nodeIs } from '../utils/node'
 import { Context } from './context'
+import { ClipPath } from '../nodes/clippath'
 
 /**
  * @constructor
@@ -24,15 +24,15 @@ export class ReferencesHandler {
    * @return {*}
    */
   getRendered(id: string, context: Context): SvgNode {
-    if (this.renderedElements.hasOwnProperty(id)) {
+    const svgnode: SvgNode = this.get(id)
+
+    if (this.renderedElements.hasOwnProperty(id) && !(svgnode instanceof ClipPath)) {
       return this.renderedElements[id]
     }
 
-    const svgnode: SvgNode = this.idMap[cssEsc(id, { isIdentifier: true })]
-
     if (svgnode instanceof PassiveNode) {
       svgnode.renderPassive(context)
-    } else if (!nodeIs(svgnode.element, 'clippath')) {
+    } else {
       // the transformations directly at the node are written to the pdf form object transformation matrix
       let childContext = new Context(context._pdf, { refsHandler: this })
       const tfMatrix = svgnode.computeNodeTransform(childContext)
@@ -45,5 +45,9 @@ export class ReferencesHandler {
 
     this.renderedElements[id] = svgnode
     return svgnode
+  }
+
+  get(id: string) {
+    return this.idMap[cssEsc(id, { isIdentifier: true })]
   }
 }

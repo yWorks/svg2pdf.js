@@ -1,9 +1,11 @@
 import { RGBColor } from './utils/rgbcolor'
 
 import { Context } from './context/context'
-import { putTextProperties, getTextRenderingMode, setTextProperties } from './utils/text'
+import { getTextRenderingMode } from './utils/text'
 import { getAttribute } from './utils/node'
 import { toPixels, mapAlignmentBaseline } from './utils/misc'
+import { parseAttributes, applyAttributes } from './applyparseattributes'
+import { SvgNode } from './nodes/svgnode'
 
 /**
  * @param {string} textAnchor
@@ -12,13 +14,15 @@ import { toPixels, mapAlignmentBaseline } from './utils/misc'
  * @constructor
  */
 export class TextChunk {
+  parent: SvgNode
   private texts: string[]
   private textNodes: HTMLElement[]
   private textAnchor: string
   private originX: number
   private originY: number
 
-  constructor(textAnchor: string, originX: number, originY: number) {
+  constructor(parent: SvgNode, textAnchor: string, originX: number, originY: number) {
+    this.parent = parent
     this.texts = []
     this.textNodes = []
     this.textAnchor = textAnchor
@@ -37,10 +41,10 @@ export class TextChunk {
     let strokeRGB: any
     const xs = [],
       ys = [],
-      attributeStates = []
+      textNodeContexts = []
     let currentTextX = this.originX,
       currentTextY = this.originY
-      let minX = currentTextX,
+    let minX = currentTextX,
       maxX = currentTextX
     for (i = 0; i < this.textNodes.length; i++) {
       textNode = this.textNodes[i]
@@ -51,9 +55,8 @@ export class TextChunk {
       if (textNode.nodeName === '#text') {
         textNodeContext = context
       } else {
-        textNodeContext = context.clone()
-        const tSpanColor = getAttribute(textNode, 'fill')
-        setTextProperties(textNode, tSpanColor && new RGBColor(tSpanColor), textNodeContext)
+        textNodeContext = parseAttributes(context.clone(), this.parent, textNode)
+
         const tSpanStrokeColor = getAttribute(textNode, 'stroke')
         if (tSpanStrokeColor) {
           strokeRGB = new RGBColor(tSpanStrokeColor)
@@ -77,7 +80,7 @@ export class TextChunk {
         }
       }
 
-      attributeStates[i] = textNodeContext.attributeState
+      textNodeContexts[i] = textNodeContext
 
       xs[i] = x
       ys[i] = y
@@ -116,24 +119,10 @@ export class TextChunk {
       }
 
       context._pdf.saveGraphicsState()
-      putTextProperties(attributeStates[i], context.attributeState, context)
-      if (
-        attributeStates[i].stroke &&
-        attributeStates[i].stroke !== context.attributeState.stroke &&
-        attributeStates[i].stroke.ok
-      ) {
-        const strokeRGB = attributeStates[i].stroke
-        context._pdf.setDrawColor(strokeRGB.r, strokeRGB.g, strokeRGB.b)
-      }
-      if (
-        attributeStates[i].strokeWidth !== null &&
-        attributeStates[i].strokeWidth !== context.attributeState.strokeWidth
-      ) {
-        context._pdf.setLineWidth(attributeStates[i].strokeWidth)
-      }
+      applyAttributes(textNodeContexts[i], context, textNode)
 
-      const alignmentBaseline = attributeStates[i].alignmentBaseline
-      const textRenderingMode = getTextRenderingMode(attributeStates[i])
+      const alignmentBaseline = textNodeContexts[i].attributeState.alignmentBaseline
+      const textRenderingMode = getTextRenderingMode(textNodeContexts[i].attributeState)
       context._pdf.text(this.texts[i], xs[i] - textOffset, ys[i], {
         baseline: mapAlignmentBaseline(alignmentBaseline),
         angle: context.transform,

@@ -28,6 +28,8 @@ export class Ellipse extends SvgNode {
       this.rx,
       this.ry
     )
+
+    this.fillOrStroke(context)
   }
   getBoundingBoxCore(context: Context): number[] {
     return addLineWidth(defaultBoundingBox(this.element, context), this.element)
@@ -35,5 +37,9 @@ export class Ellipse extends SvgNode {
 
   computeNodeTransformCore(context: Context): any {
     return context._pdf.unitMatrix
+  }
+
+  visibleCore(visible: boolean) {
+    return visible
   }
 }

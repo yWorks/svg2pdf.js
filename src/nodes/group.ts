@@ -7,5 +7,7 @@ export class Group extends Groups {
     return getBoundingBoxByChildren(context, this)
   }
 
-  
+  visibleCore(visible: boolean) {
+    return this.childrenVisible(visible)
+  }
 }

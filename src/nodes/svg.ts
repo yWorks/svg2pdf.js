@@ -17,4 +17,7 @@ export class Svg extends Groups {
       parseFloat(getAttribute(this.element, 'height')) || (vb && vb[3]) || 0
     ]
   }
+  visibleCore(visible: boolean) {
+    return this.childrenVisible(visible)
+  }
 }

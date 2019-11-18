@@ -63,7 +63,7 @@ function svg2pdf(element: HTMLElement, pdf: any, options: any) {
     _pdf.setFontSize(context.attributeState.fontSize * _pdf.internal.scaleFactor)
 
     const clonedSvg = element.cloneNode(true) as HTMLElement
-    let idMap:{[id:string]:SvgNode} = {}
+    let idMap: { [id: string]: SvgNode } = {}
     const svgnode = parse(clonedSvg, idMap)
     context.refsHandler = new ReferencesHandler(idMap)
     context.transform = svgnode.computeNodeTransform(context)

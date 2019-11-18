@@ -1,3 +1,6 @@
+import { Context } from '../context/context'
+import { iriReference } from './constants'
+
 export function nodeIs(node: HTMLElement, tagsString: string) {
   return tagsString.split(',').indexOf(node.tagName.toLowerCase()) >= 0
 }
@@ -25,32 +28,4 @@ export function getAttribute(node: HTMLElement, propertyNode: string, propertyCs
   } else {
     return void 0
   }
-}
-
-export function isPartlyVisible(node: HTMLElement, parentHidden?: boolean) {
-  if (getAttribute(node, 'display') === 'none') {
-    return false
-  }
-
-  let visible = !parentHidden
-
-  const visibility = getAttribute(node, 'visibility')
-  if (visibility) {
-    visible = visibility !== 'hidden'
-  }
-
-  if (nodeIs(node, 'svg,g,marker,a,pattern,defs,text,clippath')) {
-    let hasChildren = false
-    forEachChild(node, (i, child) =>{
-      hasChildren = true
-      if (isPartlyVisible(child, !visible)) {
-        visible = true
-      }
-    })
-    if (!hasChildren) {
-      return false
-    }
-  }
-
-  return visible
 }

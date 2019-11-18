@@ -52,8 +52,8 @@ export class ImageNode extends SvgNode {
       svgElement.setAttribute('width', String(width))
       svgElement.setAttribute('height', String(height))
 
-      let idMap: {[id:string]: SvgNode}={}
-      const svgnode = parse(svgElement,idMap)
+      let idMap: { [id: string]: SvgNode } = {}
+      const svgnode = parse(svgElement, idMap)
       svgnode.render(
         new Context(context._pdf, {
           refsHandler: new ReferencesHandler(idMap),
@@ -86,5 +86,9 @@ export class ImageNode extends SvgNode {
 
   computeNodeTransformCore(context: Context): any {
     return context._pdf.unitMatrix
+  }
+
+  visibleCore(visible: boolean) {
+    return visible
   }
 }
