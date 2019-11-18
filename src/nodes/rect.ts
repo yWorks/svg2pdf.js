@@ -1,7 +1,7 @@
 import { SvgNode } from './svgnode'
 import { Context } from '../context/context'
 import { defaultBoundingBox, addLineWidth } from '../utils/bbox'
-import { getAttribute } from '../utils/node'
+import { getAttribute, svgNodeIsVisible } from '../utils/node'
 
 export class Rect extends SvgNode {
   renderCore(context: Context): void {
@@ -33,7 +33,7 @@ export class Rect extends SvgNode {
     return context._pdf.unitMatrix
   }
 
-  visibleCore(visible: boolean) {
-    return visible
+  isVisible(parentVisible: boolean): boolean {
+    return svgNodeIsVisible(this, parentVisible)
   }
 }

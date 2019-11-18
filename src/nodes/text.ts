@@ -12,7 +12,7 @@ import {
   consolidateSpaces
 } from '../utils/text'
 import { TextChunk } from '../textchunk'
-import { nodeIs, getAttribute } from '../utils/node'
+import { nodeIs, getAttribute, svgNodeAndChildrenVisible } from '../utils/node'
 import { toPixels, mapAlignmentBaseline } from '../utils/misc'
 
 export class TextNode extends SvgNode {
@@ -137,8 +137,8 @@ export class TextNode extends SvgNode {
     context._pdf.restoreGraphicsState()
   }
 
-  visibleCore(visible: boolean) {
-    return this.childrenVisible(visible)
+  isVisible(parentVisible: boolean): boolean {
+    return svgNodeAndChildrenVisible(this, parentVisible)
   }
 
   getBoundingBoxCore(context: Context): number[] {

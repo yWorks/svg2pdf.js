@@ -1,5 +1,6 @@
 import { Context } from '../context/context'
 import { iriReference } from './constants'
+import { SvgNode } from '../nodes/svgnode'
 
 export function nodeIs(node: HTMLElement, tagsString: string) {
   return tagsString.split(',').indexOf(node.tagName.toLowerCase()) >= 0
@@ -28,4 +29,33 @@ export function getAttribute(node: HTMLElement, propertyNode: string, propertyCs
   } else {
     return void 0
   }
+}
+
+export function svgNodeIsVisible(svgNode: SvgNode, parentVisible: boolean) {
+  if (getAttribute(svgNode.element, 'display') === 'none') {
+    return false
+  }
+
+  let visible = parentVisible
+
+  const visibility = getAttribute(svgNode.element, 'visibility')
+  if (visibility) {
+    visible = visibility !== 'hidden'
+  }
+
+  return visible
+}
+
+export function svgNodeAndChildrenVisible(svgNode: SvgNode, parentVisible: boolean) {
+  let visible = svgNodeIsVisible(svgNode, parentVisible)
+  if (svgNode.element.childNodes.length === 0) {
+    return false
+  }
+  svgNode.children.forEach(child => {
+    if (child.isVisible(visible)) {
+      visible = true
+    }
+  })
+
+  return visible
 }

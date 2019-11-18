@@ -1,7 +1,7 @@
 import { SvgNode } from './svgnode'
 import { Context } from '../context/context'
 import { defaultBoundingBox, addLineWidth } from '../utils/bbox'
-import { getAttribute } from '../utils/node'
+import { getAttribute, svgNodeIsVisible } from '../utils/node'
 
 // draws the element referenced by a use node, makes use of pdf's XObjects/FormObjects so nodes are only written once
 // to the pdf document. This highly reduces the file size and computation time.
@@ -37,8 +37,8 @@ export class Use extends SvgNode {
     return addLineWidth(defaultBoundingBox(this.element, context), this.element)
   }
 
-  visibleCore(visible: boolean) {
-    return visible
+  isVisible(parentVisible: boolean): boolean {
+    return svgNodeIsVisible(this, parentVisible)
   }
 
   computeNodeTransformCore(context: Context): any {

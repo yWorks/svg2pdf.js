@@ -1,7 +1,7 @@
 import { SvgNode } from './svgnode'
 import { Context } from '../context/context'
 import { parsePointsString } from '../utils/misc'
-import { getAttribute } from '../utils/node'
+import { getAttribute, svgNodeIsVisible } from '../utils/node'
 import { MarkerList, Marker } from '../markerlist'
 import { iriReference } from '../utils/constants'
 import { addVectors, getDirectionVector } from '../utils/math'
@@ -83,8 +83,8 @@ export abstract class Traverse extends SvgNode {
     this.fillOrStroke(context)
   }
 
-  visibleCore(visible: boolean) {
-    return visible
+  isVisible(parentVisible: boolean): boolean {
+    return svgNodeIsVisible(this, parentVisible)
   }
 
   getBoundingBoxCore(context: Context): number[] {

@@ -33,13 +33,13 @@ export abstract class SvgNode {
 
   protected abstract renderCore(context: Context): void
   render(parentContext: Context) {
-    if (!this.isVisible(parentContext.attributeState.visibility === 'hidden')) {
+    if (!this.isVisible(parentContext.attributeState.visibility !== 'hidden')) {
       return
     }
 
     let context = parseAttributes(parentContext.clone(), this)
 
-    const clipPath = this.hasClipPath(context)
+    const clipPath = this.getClipPath(context)
     if (clipPath !== null) {
       if (clipPath) {
         context._pdf.saveGraphicsState()
@@ -80,49 +80,20 @@ export abstract class SvgNode {
     outerContext.refsHandler.getRendered(clipPath, clipContext)
   }
 
-  hasClipPath(context: Context) {
+  getClipPath(context: Context) {
     if (
       this.element.hasAttribute('clip-path') &&
       getAttribute(this.element, 'clip-path') !== 'none'
     ) {
       const clipPathId = iriReference.exec(getAttribute(this.element, 'clip-path'))[1]
       const clipNode = context.refsHandler.get(clipPathId)
-      return clipNode && clipNode.isVisible() ? clipPathId : null
+      return clipNode && clipNode.isVisible(true) ? clipPathId : null
     } else {
-      return false
+      return undefined
     }
   }
 
-  isVisible(parentHidden?: boolean) {
-    if (getAttribute(this.element, 'display') === 'none') {
-      return false
-    }
-
-    let visible = !parentHidden
-
-    const visibility = getAttribute(this.element, 'visibility')
-    if (visibility) {
-      visible = visibility !== 'hidden'
-    }
-
-    const res = this.visibleCore(visible)
-    visible = res === null ? false : res || visible
-
-    return visible
-  }
-  childrenVisible(visible: boolean) {
-    if (this.element.childNodes.length === 0) {
-      return null
-    }
-    this.children.forEach(child => {
-      if (child.isVisible(!visible)) {
-        visible = true
-      }
-    })
-    return visible
-  }
-
-  abstract visibleCore(visible: boolean): boolean
+ abstract isVisible(parentHidden: boolean):boolean
 
   protected fillOrStroke(childContext: Context) {
     if (!childContext.withinClipPath) {

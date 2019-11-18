@@ -4,7 +4,7 @@ import { defaultBoundingBox, addLineWidth } from '../utils/bbox'
 import { dataUrlRegex } from '../utils/constants'
 import { ReferencesHandler } from '../context/referenceshandler'
 import { parse } from '../parse'
-import { getAttribute } from '../utils/node'
+import { getAttribute, svgNodeIsVisible } from '../utils/node'
 
 export class ImageNode extends SvgNode {
   renderCore(context: Context): void {
@@ -88,7 +88,7 @@ export class ImageNode extends SvgNode {
     return context._pdf.unitMatrix
   }
 
-  visibleCore(visible: boolean) {
-    return visible
+  isVisible(parentVisible: boolean): boolean {
+    return svgNodeIsVisible(this, parentVisible)
   }
 }

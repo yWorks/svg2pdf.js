@@ -1,6 +1,6 @@
 import { Context } from '../context/context'
 import { parseFloats } from '../utils/math'
-import { getAttribute } from '../utils/node'
+import { getAttribute, svgNodeAndChildrenVisible } from '../utils/node'
 import { Groups } from './groups'
 
 export class Svg extends Groups {
@@ -17,7 +17,7 @@ export class Svg extends Groups {
       parseFloat(getAttribute(this.element, 'height')) || (vb && vb[3]) || 0
     ]
   }
-  visibleCore(visible: boolean) {
-    return this.childrenVisible(visible)
+  isVisible(parentVisible: boolean): boolean {
+    return svgNodeAndChildrenVisible(this, parentVisible)
   }
 }

@@ -1,6 +1,7 @@
 import { Context } from '../context/context'
 import { defaultBoundingBox } from '../utils/bbox'
 import { PassiveNode } from './passivenode'
+import { svgNodeAndChildrenVisible } from '../utils/node'
 
 export class Pattern extends PassiveNode {
   renderPassive(context: Context): void {
@@ -36,7 +37,7 @@ export class Pattern extends PassiveNode {
   computeNodeTransformCore(context: Context): any {
     return context._pdf.unitMatrix
   }
-  visibleCore(visible: boolean) {
-    return this.childrenVisible(visible)
+  isVisible(parentVisible: boolean): boolean {
+    return svgNodeAndChildrenVisible(this, parentVisible)
   }
 }

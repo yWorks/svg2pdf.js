@@ -1,5 +1,6 @@
 import { SvgNode } from './svgnode'
 import { Context } from '../context/context'
+import { svgNodeIsVisible } from '../utils/node'
 
 export class VoidNode extends SvgNode {
   render(): void {}
@@ -10,7 +11,7 @@ export class VoidNode extends SvgNode {
   computeNodeTransformCore(context: Context): any {
     return context._pdf.unitMatrix
   }
-  visibleCore(visible: boolean) {
-    return visible
+  isVisible(parentVisible: boolean): boolean {
+    return svgNodeIsVisible(this, parentVisible)
   }
 }

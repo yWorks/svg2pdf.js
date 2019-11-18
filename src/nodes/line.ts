@@ -3,7 +3,7 @@ import { Context } from '../context/context'
 import { MarkerList, Marker } from '../markerlist'
 import { getAngle } from '../utils/math'
 import { defaultBoundingBox, addLineWidth } from '../utils/bbox'
-import { getAttribute } from '../utils/node'
+import { getAttribute, svgNodeIsVisible } from '../utils/node'
 import { iriReference } from '../utils/constants'
 
 export class Line extends SvgNode {
@@ -48,7 +48,7 @@ export class Line extends SvgNode {
     return context._pdf.unitMatrix
   }
 
-  visibleCore(visible: boolean) {
-    return visible
+  isVisible(parentVisible: boolean): boolean {
+    return svgNodeIsVisible(this, parentVisible)
   }
 }

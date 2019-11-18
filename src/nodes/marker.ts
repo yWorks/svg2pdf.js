@@ -2,6 +2,7 @@ import { Context } from '../context/context'
 import { parseFloats } from '../utils/math'
 import { computeViewBoxTransform } from '../utils/transform'
 import { PassiveNode } from './passivenode'
+import { svgNodeAndChildrenVisible } from '../utils/node'
 
 export class MarkerNode extends PassiveNode {
   renderPassive(contextIn: Context): void {
@@ -66,7 +67,7 @@ export class MarkerNode extends PassiveNode {
     }
     return nodeTransform
   }
-  visibleCore(visible: boolean) {
-    return this.childrenVisible(visible)
+  isVisible(parentVisible: boolean): boolean {
+    return svgNodeAndChildrenVisible(this, parentVisible)
   }
 }

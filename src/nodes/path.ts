@@ -12,7 +12,7 @@ import {
 } from '../utils/math'
 import { iriReference } from '../utils/constants'
 import { MarkerList, Marker } from '../markerlist'
-import { getAttribute } from '../utils/node'
+import { getAttribute, svgNodeIsVisible } from '../utils/node'
 import { getControlPointFromPrevious } from '../utils/misc'
 
 export class Path extends SvgNode {
@@ -342,7 +342,7 @@ export class Path extends SvgNode {
   computeNodeTransformCore(context: Context): any {
     return context._pdf.unitMatrix
   }
-  visibleCore(visible: boolean) {
-    return visible
+  isVisible(parentVisible: boolean): boolean {
+        return svgNodeIsVisible(this, parentVisible)
   }
 }

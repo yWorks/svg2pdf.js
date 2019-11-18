@@ -1,10 +1,11 @@
 import { Context } from '../context/context'
 import { PassiveNode } from './passivenode'
 import { getBoundingBoxByChildren } from '../utils/bbox'
+import { svgNodeAndChildrenVisible } from '../utils/node'
 
 export class ClipPath extends PassiveNode {
   renderPassive(context: Context) {
-    if (!this.isVisible()) {
+    if (!this.isVisible(true)) {
       return
     }
 
@@ -40,7 +41,7 @@ export class ClipPath extends PassiveNode {
     return getBoundingBoxByChildren(context, this)
   }
 
-  visibleCore(visible: boolean) {
-    return this.childrenVisible(visible)
+  isVisible(parentVisible: boolean):boolean {
+    return svgNodeAndChildrenVisible(this, parentVisible)
   }
 }
