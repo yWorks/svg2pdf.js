@@ -4,7 +4,7 @@ import { Use } from './nodes/use'
 import { Rect } from './nodes/rect'
 import { Ellipse } from './nodes/ellipse'
 import { TextNode } from './nodes/text'
-import { Path } from './nodes/path'
+import { PathNode } from './nodes/path'
 import { ImageNode } from './nodes/image'
 import { Polygon } from './nodes/polygon'
 import { forEachChild } from './utils/node'
@@ -58,7 +58,7 @@ export function parse(node: HTMLElement, idMap?: { [id: string]: SvgNode }): Svg
       svgnode = new MarkerNode(node, children)
       break
     case 'path':
-      svgnode = new Path(node, children)
+      svgnode = new PathNode(node, children)
       break
     case 'pattern':
       svgnode = new Pattern(node, children)

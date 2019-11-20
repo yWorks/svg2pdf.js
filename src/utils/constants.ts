@@ -35,3 +35,14 @@ export const cToQ = 2 / 3 // ratio to convert quadratic bezier curves to cubic o
 export const dataUrlRegex = /^\s*data:(([^/,;]+\/[^/,;]+)(?:;([^,;=]+=[^,;=]+))?)?(?:;(base64))?,(.*\s*)$/i
 
 export const svgNamespaceURI = 'http://www.w3.org/2000/svg'
+
+export const pathCommandCoordinatesMap: { [type: string]: string[] } = {
+  M: ['x', 'y'],
+
+  L: ['x', 'y'],
+  H: ['x'],
+  V: ['y'],
+
+  C: ['x1', 'y1', 'x2', 'y2', 'x', 'y'],
+  Q: ['x1', 'y1', 'x', 'y']
+}

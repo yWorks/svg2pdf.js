@@ -41,7 +41,7 @@ export class ClipPath extends PassiveNode {
     return getBoundingBoxByChildren(context, this)
   }
 
-  isVisible(parentVisible: boolean):boolean {
+  isVisible(parentVisible: boolean): boolean {
     return svgNodeAndChildrenVisible(this, parentVisible)
   }
 }

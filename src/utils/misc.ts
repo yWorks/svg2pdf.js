@@ -9,6 +9,7 @@ import { nodeIs, getAttribute } from './node'
 import { PatternOrGradient } from './patterngradient'
 import { parseTransform } from './transform'
 import { SvgNode } from '../nodes/svgnode'
+import { PathSeg } from './path'
 
 /**
  * Convert em, px and bare number attributes to pixel values
@@ -46,26 +47,6 @@ export function parsePointsString(string: string) {
 
 export function mapAlignmentBaseline(value: string): string {
   return alignmentBaselineMap[value] || 'alphabetic'
-}
-
-// extracts a control point from a previous path segment (for t,T,s,S segments)
-export function getControlPointFromPrevious(
-  i: number,
-  from: number[],
-  list: any,
-  prevX: number,
-  prevY: number
-) {
-  const prev = list.getItem(i - 1)
-  let p2
-  if (i > 0 && (prev.pathSegTypeAsLetter === 'C' || prev.pathSegTypeAsLetter === 'S')) {
-    p2 = mirrorPoint([prev.x2, prev.y2], from)
-  } else if (i > 0 && (prev.pathSegTypeAsLetter === 'c' || prev.pathSegTypeAsLetter === 's')) {
-    p2 = mirrorPoint([prev.x2 + prevX, prev.y2 + prevY], from)
-  } else {
-    p2 = [from[0], from[1]]
-  }
-  return p2
 }
 
 /**

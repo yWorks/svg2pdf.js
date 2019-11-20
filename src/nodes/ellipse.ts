@@ -39,7 +39,7 @@ export class Ellipse extends SvgNode {
     return context._pdf.unitMatrix
   }
 
-  isVisible(parentVisible: boolean):boolean {
+  isVisible(parentVisible: boolean): boolean {
     return svgNodeIsVisible(this, parentVisible)
   }
 }

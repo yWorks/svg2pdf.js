@@ -93,7 +93,7 @@ export abstract class SvgNode {
     }
   }
 
- abstract isVisible(parentHidden: boolean):boolean
+  abstract isVisible(parentHidden: boolean): boolean
 
   protected fillOrStroke(childContext: Context) {
     if (!childContext.withinClipPath) {
