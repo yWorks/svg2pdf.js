@@ -3,6 +3,7 @@ import { Context } from '../context/context'
 import { parseAttributes, applyAttributes } from '../applyparseattributes'
 import { getAttribute } from '../utils/node'
 import { iriReference } from '../utils/constants'
+import { ClipPath } from './clippath'
 
 export abstract class RenderedNode extends SvgNode {
   render(parentContext: Context) {
@@ -12,15 +13,15 @@ export abstract class RenderedNode extends SvgNode {
 
     let context = parseAttributes(parentContext.clone(), this)
 
-    const clipPath = this.getClipPath(context)
-    if (clipPath !== null) {
-      if (clipPath) {
-        context._pdf.saveGraphicsState()
-        this.clip(context, clipPath)
-      }
-    } else {
+    const clipNode = this.getClipPathNode(context)
+    if (clipNode === undefined) {
       return
     }
+    if (clipNode) {
+      context._pdf.saveGraphicsState()
+      this.clip(context, clipNode)
+    }
+
     if (!context.withinClipPath) {
       context._pdf.saveGraphicsState()
     }
@@ -32,14 +33,13 @@ export abstract class RenderedNode extends SvgNode {
       context._pdf.restoreGraphicsState()
     }
 
-    if (clipPath) {
+    if (clipNode) {
       context._pdf.restoreGraphicsState()
     }
   }
   protected abstract renderCore(context: Context): void
 
-  protected clip(outerContext: Context, clipPath: string) {
-    const clipPathNode = outerContext.refsHandler.get(clipPath)
+  protected clip(outerContext: Context, clipPathNode: ClipPath) {
     const clipContext = outerContext.clone()
     if (
       clipPathNode.element.hasAttribute('clipPathUnits') &&
@@ -51,19 +51,21 @@ export abstract class RenderedNode extends SvgNode {
         outerContext.transform
       )
     }
-    outerContext.refsHandler.getRendered(clipPath, clipContext)
+    clipPathNode.apply(clipContext)
   }
 
-  protected getClipPath(context: Context) {
+  protected getClipPathNode(context: Context) {
     if (
       this.element.hasAttribute('clip-path') &&
       getAttribute(this.element, 'clip-path') !== 'none'
     ) {
       const clipPathId = iriReference.exec(getAttribute(this.element, 'clip-path'))[1]
       const clipNode = context.refsHandler.get(clipPathId)
-      return clipNode && clipNode.isVisible(true) ? clipPathId : null
+      return clipNode && clipNode instanceof ClipPath && clipNode.isVisible(true)
+        ? clipNode
+        : undefined
     } else {
-      return undefined
+      return null
     }
   }
 }
