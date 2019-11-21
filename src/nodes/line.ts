@@ -1,6 +1,5 @@
 import { Context } from '../context/context'
 import { Path } from '../path'
-import { addLineWidth, defaultBoundingBox } from '../utils/bbox'
 import { svgNodeIsVisible } from '../utils/node'
 import { GeometryNode } from './geometrynode'
 import { SvgNode } from './svgnode'
@@ -23,10 +22,6 @@ export class Line extends GeometryNode {
       }
     }
     return null
-  }
-
-  protected getBoundingBoxCore(context: Context): number[] {
-    return addLineWidth(defaultBoundingBox(this.element, context), this.element)
   }
 
   protected computeNodeTransformCore(context: Context): any {

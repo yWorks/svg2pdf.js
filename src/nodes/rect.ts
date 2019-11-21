@@ -1,6 +1,5 @@
 import { Context } from '../context/context'
 import { Path } from '../path'
-import { addLineWidth, defaultBoundingBox } from '../utils/bbox'
 import { getAttribute, svgNodeIsVisible } from '../utils/node'
 import { GeometryNode } from './geometrynode'
 
@@ -28,10 +27,6 @@ export class Rect extends GeometryNode {
       .lineTo(x, (y += -h + 2 * ry))
       .curveTo(x, y - ry * MyArc, x + rx * MyArc, y - ry, (x += rx), (y -= ry))
       .close()
-  }
-
-  protected getBoundingBoxCore(context: Context): number[] {
-    return addLineWidth(defaultBoundingBox(this.element, context), this.element)
   }
 
   protected computeNodeTransformCore(context: Context): any {

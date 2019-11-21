@@ -6,6 +6,7 @@ import { addVectors, getAngle, getDirectionVector, normalize } from '../utils/ma
 import { getAttribute } from '../utils/node'
 import { SvgMoveTo } from '../utils/svgpathadapter'
 import { GraphicsNode } from './graphicsnode'
+import { addLineWidth } from '../utils/bbox'
 
 export abstract class GeometryNode extends GraphicsNode {
   hasMarker:boolean
@@ -54,6 +55,35 @@ export abstract class GeometryNode extends GraphicsNode {
         context._pdf.discardPath()
       }
     }
+  }
+
+  protected getBoundingBoxCore(context: Context): number[] {
+    const path = this.getPath(context)
+    let minX = Number.POSITIVE_INFINITY
+    let minY = Number.POSITIVE_INFINITY
+    let maxX = Number.NEGATIVE_INFINITY
+    let maxY = Number.NEGATIVE_INFINITY
+    let x = 0,
+      y = 0
+    for (let i = 0; i < path.segments.length; i++) {
+      const seg = path.segments[i]
+      if (seg instanceof MoveTo || seg instanceof LineTo || seg instanceof CurveTo) {
+        x = seg.x
+        y = seg.y
+      }
+      if (seg instanceof CurveTo) {
+        minX = Math.min(minX, x, seg.x1, seg.x2, seg.x)
+        maxX = Math.max(maxX, x, seg.x1, seg.x2, seg.x)
+        minY = Math.min(minY, y, seg.y1, seg.y2, seg.y)
+        maxY = Math.max(maxY, y, seg.y1, seg.y2, seg.y)
+      } else {
+        minX = Math.min(minX, x)
+        maxX = Math.max(maxX, x)
+        minY = Math.min(minY, y)
+        maxY = Math.max(maxY, y)
+      }
+    }
+    return addLineWidth([minX, minY, maxX - minX, maxY - minY], this.element)
   }
 
   protected getMarkers(path: Path): MarkerList {

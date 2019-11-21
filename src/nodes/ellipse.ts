@@ -1,6 +1,5 @@
 import { Context } from '../context/context'
 import { Path } from '../path'
-import { addLineWidth, defaultBoundingBox } from '../utils/bbox'
 import { getAttribute, svgNodeIsVisible } from '../utils/node'
 import { GeometryNode } from './geometrynode'
 import { SvgNode } from './svgnode'
@@ -31,10 +30,6 @@ export class Ellipse extends GeometryNode {
       .curveTo(x - lx, y - this.ry, x - this.rx, y - ly, x - this.rx, y)
       .curveTo(x - this.rx, y + ly, x - lx, y + this.ry, x, y + this.ry)
       .curveTo(x + lx, y + this.ry, x + this.rx, y + ly, x + this.rx, y)
-  }
-
-  protected getBoundingBoxCore(context: Context): number[] {
-    return addLineWidth(defaultBoundingBox(this.element, context), this.element)
   }
 
   protected computeNodeTransformCore(context: Context): any {
