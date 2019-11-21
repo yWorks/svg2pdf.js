@@ -3,7 +3,7 @@ import { Context } from '../context/context'
 import { putGradient } from '../utils/patterngradient'
 
 export class RadialGradient extends Gradient {
-  renderPassive(context: Context) {
+  apply(context: Context) {
     putGradient(
       this.element,
       'radial',

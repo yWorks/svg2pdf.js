@@ -1,10 +1,10 @@
 import { Context } from '../context/context'
 import { defaultBoundingBox } from '../utils/bbox'
-import { PassiveNode } from './passivenode'
+import { NonRenderedNode } from './nonrenderednode'
 import { svgNodeAndChildrenVisible } from '../utils/node'
 
-export class Pattern extends PassiveNode {
-  renderPassive(context: Context): void {
+export class Pattern extends NonRenderedNode {
+  apply(context: Context): void {
     const id = this.element.getAttribute('id')
 
     // the transformations directly at the node are written to the pattern transformation matrix

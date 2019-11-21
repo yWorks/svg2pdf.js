@@ -1,21 +1,21 @@
-import { SvgNode } from './svgnode'
 import { Context } from '../context/context'
-import { defaultBoundingBox, addLineWidth } from '../utils/bbox'
+import { TextChunk } from '../textchunk'
+import { addLineWidth, defaultBoundingBox } from '../utils/bbox'
+import { mapAlignmentBaseline, toPixels } from '../utils/misc'
+import { getAttribute, nodeIs, svgNodeAndChildrenVisible } from '../utils/node'
 import {
-  transformXmlSpace,
-  transformText,
+  consolidateSpaces,
   getTextRenderingMode,
   removeNewlines,
   replaceTabsBySpace,
+  transformText,
+  transformXmlSpace,
   trimLeft,
-  trimRight,
-  consolidateSpaces
+  trimRight
 } from '../utils/text'
-import { TextChunk } from '../textchunk'
-import { nodeIs, getAttribute, svgNodeAndChildrenVisible } from '../utils/node'
-import { toPixels, mapAlignmentBaseline } from '../utils/misc'
+import { GraphicsNode } from './graphicsnode'
 
-export class TextNode extends SvgNode {
+export class TextNode extends GraphicsNode {
   renderCore(context: Context): void {
     context._pdf.saveGraphicsState()
 

@@ -1,11 +1,11 @@
 import { Context } from '../context/context'
 import { parseFloats } from '../utils/math'
 import { computeViewBoxTransform } from '../utils/transform'
-import { PassiveNode } from './passivenode'
+import { NonRenderedNode } from './nonrenderednode'
 import { svgNodeAndChildrenVisible } from '../utils/node'
 
-export class MarkerNode extends PassiveNode {
-  renderPassive(contextIn: Context): void {
+export class MarkerNode extends NonRenderedNode {
+  apply(contextIn: Context): void {
     // the transformations directly at the node are written to the pdf form object transformation matrix
     const tfMatrix = this.computeNodeTransform(contextIn)
     const bBox = this.getBBox(contextIn)

@@ -9,7 +9,7 @@ import { nodeIs, getAttribute } from './node'
 import { PatternOrGradient } from './patterngradient'
 import { parseTransform } from './transform'
 import { SvgNode } from '../nodes/svgnode'
-import { PathSeg } from './path'
+import { SvgPathSeg } from './svgpathadapter'
 
 /**
  * Convert em, px and bare number attributes to pixel values

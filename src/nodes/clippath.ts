@@ -1,10 +1,10 @@
 import { Context } from '../context/context'
-import { PassiveNode } from './passivenode'
+import { NonRenderedNode } from './nonrenderednode'
 import { getBoundingBoxByChildren } from '../utils/bbox'
 import { svgNodeAndChildrenVisible } from '../utils/node'
 
-export class ClipPath extends PassiveNode {
-  renderPassive(context: Context) {
+export class ClipPath extends NonRenderedNode {
+  apply(context: Context) {
     if (!this.isVisible(true)) {
       return
     }

@@ -5,8 +5,9 @@ import { dataUrlRegex } from '../utils/constants'
 import { ReferencesHandler } from '../context/referenceshandler'
 import { parse } from '../parse'
 import { getAttribute, svgNodeIsVisible } from '../utils/node'
+import { GraphicsNode } from './graphicsnode'
 
-export class ImageNode extends SvgNode {
+export class ImageNode extends GraphicsNode {
   renderCore(context: Context): void {
     context._pdf.setCurrentTransformationMatrix(context.transform)
     const width = parseFloat(getAttribute(this.element, 'width')),

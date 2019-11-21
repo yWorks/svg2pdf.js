@@ -1,13 +1,15 @@
-import { SvgNode } from './svgnode'
 import { Context } from '../context/context'
-import { parsePointsString } from '../utils/misc'
-import { getAttribute, svgNodeIsVisible } from '../utils/node'
-import { MarkerList, Marker } from '../markerlist'
+import { Marker, MarkerList } from '../markerlist'
+import { addLineWidth } from '../utils/bbox'
 import { iriReference } from '../utils/constants'
 import { addVectors, getDirectionVector } from '../utils/math'
-import { addLineWidth } from '../utils/bbox'
+import { parsePointsString } from '../utils/misc'
+import { getAttribute, svgNodeIsVisible } from '../utils/node'
+import { GeometryNode } from './geometrynode'
+import { SvgNode } from './svgnode'
+import { Path, MoveTo, Close, LineTo, CurveTo } from '../path'
 
-export abstract class Traverse extends SvgNode {
+export abstract class Traverse extends GeometryNode {
   closed: boolean
 
   constructor(node: HTMLElement, children: SvgNode[], closed: boolean) {
@@ -15,72 +17,84 @@ export abstract class Traverse extends SvgNode {
     this.closed = closed
   }
 
-  renderCore(context: Context) {
-    if (!context.withinClipPath) {
-      context._pdf.setCurrentTransformationMatrix(context.transform)
-    }
-
+  getPath(context: Context) {
     if (!this.element.hasAttribute('points') || this.element.getAttribute('points') === '') {
-      return
+      return null
     }
 
     const points = parsePointsString(this.element.getAttribute('points'))
-    const lines = [{ op: 'm', c: points[0] } as any]
+
+    const path = new Path().moveTo(points[0][0], points[0][1])
     for (let i = 1; i < points.length; i++) {
-      lines.push({ op: 'l', c: points[i] })
+      path.lineTo(points[i][0], points[i][1])
     }
 
-    this.closed && lines.push({ op: 'h' })
+    this.closed && path.close()
 
-    context._pdf.path(lines)
-
+    return path
+  }
+  drawMarker(context: Context, path: Path) {
     let angle, i
     let markerEnd = getAttribute(this.element, 'marker-end'),
       markerStart = getAttribute(this.element, 'marker-start'),
       markerMid = getAttribute(this.element, 'marker-mid')
-
-    if (markerStart || markerMid || markerEnd) {
-      const length = lines.length
+    const length = path.segments.length
+    const from = path.segments[0],
+      first = path.segments[1],
+      to = path.segments[length - 2]
+    if (
+      (markerStart || markerMid || markerEnd) &&
+      from instanceof MoveTo &&
+      (first instanceof MoveTo || first instanceof LineTo || first instanceof CurveTo) &&
+      (to instanceof MoveTo || to instanceof LineTo || to instanceof CurveTo)
+    ) {
       const markers = new MarkerList()
+
       if (markerStart) {
         markerStart = iriReference.exec(markerStart)[1]
+
         angle = addVectors(
-          getDirectionVector(lines[0].c, lines[1].c),
-          getDirectionVector(lines[length - 2].c, lines[0].c)
+          getDirectionVector([from.x, from.y], [first.x, first.y]),
+          getDirectionVector([to.x, to.y], [from.x, from.y])
         )
-        markers.addMarker(new Marker(markerStart, lines[0].c, Math.atan2(angle[1], angle[0])))
+        markers.addMarker(new Marker(markerStart, [from.x, from.y], Math.atan2(angle[1], angle[0])))
       }
 
       if (markerMid) {
         markerMid = iriReference.exec(markerMid)[1]
-        let prevAngle = getDirectionVector(lines[0].c, lines[1].c)
+        let prevAngle = getDirectionVector([from.x, from.y], [first.x, first.y])
         let curAngle
-        for (i = 1; i < lines.length - 2; i++) {
-          curAngle = getDirectionVector(lines[i].c, lines[i + 1].c)
-          angle = addVectors(prevAngle, curAngle)
-          markers.addMarker(new Marker(markerMid, lines[i].c, Math.atan2(angle[1], angle[0])))
-          prevAngle = curAngle
+        for (i = 1; i < length - 2; i++) {
+          const curr = path.segments[i],
+            next = path.segments[i + 1]
+          if (
+            (curr instanceof MoveTo || curr instanceof LineTo || curr instanceof CurveTo) &&
+            (next instanceof MoveTo || next instanceof LineTo || next instanceof CurveTo)
+          ) {
+            curAngle = getDirectionVector([curr.x, curr.y], [next.x, next.y])
+            angle = addVectors(prevAngle, curAngle)
+            markers.addMarker(
+              new Marker(markerMid, [curr.x, curr.y], Math.atan2(angle[1], angle[0]))
+            )
+            prevAngle = curAngle
+          }
         }
 
-        curAngle = getDirectionVector(lines[length - 2].c, lines[0].c)
+        curAngle = getDirectionVector([to.x, to.y], [from.x, from.y])
         angle = addVectors(prevAngle, curAngle)
-        markers.addMarker(
-          new Marker(markerMid, lines[length - 2].c, Math.atan2(angle[1], angle[0]))
-        )
+        markers.addMarker(new Marker(markerMid, [to.x, to.y], Math.atan2(angle[1], angle[0])))
       }
 
       if (markerEnd) {
         markerEnd = iriReference.exec(markerEnd)[1]
         angle = addVectors(
-          getDirectionVector(lines[0].c, lines[1].c),
-          getDirectionVector(lines[length - 2].c, lines[0].c)
+          getDirectionVector([from.x, from.y], [first.x, first.y]),
+          getDirectionVector([to.x, to.y], [from.x, from.y])
         )
-        markers.addMarker(new Marker(markerEnd, lines[0].c, Math.atan2(angle[1], angle[0])))
+        markers.addMarker(new Marker(markerEnd, [from.x, from.y], Math.atan2(angle[1], angle[0])))
       }
       markers.draw(context.clone({ transform: context._pdf.unitMatrix }))
     }
-
-    this.fillOrStroke(context)
   }
 
   isVisible(parentVisible: boolean): boolean {

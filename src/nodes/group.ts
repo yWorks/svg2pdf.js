@@ -1,9 +1,9 @@
 import { Context } from '../context/context'
 import { getBoundingBoxByChildren } from '../utils/bbox'
-import { Groups } from './groups'
+import { ContainerNode } from './containernode'
 import { svgNodeAndChildrenVisible } from '../utils/node'
 
-export class Group extends Groups {
+export class Group extends ContainerNode {
   getBoundingBoxCore(context: Context): number[] {
     return getBoundingBoxByChildren(context, this)
   }

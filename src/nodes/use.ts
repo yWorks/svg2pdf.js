@@ -1,11 +1,11 @@
-import { SvgNode } from './svgnode'
 import { Context } from '../context/context'
-import { defaultBoundingBox, addLineWidth } from '../utils/bbox'
+import { addLineWidth, defaultBoundingBox } from '../utils/bbox'
 import { getAttribute, svgNodeIsVisible } from '../utils/node'
+import { GraphicsNode } from './graphicsnode'
 
 // draws the element referenced by a use node, makes use of pdf's XObjects/FormObjects so nodes are only written once
 // to the pdf document. This highly reduces the file size and computation time.
-export class Use extends SvgNode {
+export class Use extends GraphicsNode {
   renderCore(context: Context) {
     const url = this.element.getAttribute('href') || this.element.getAttribute('xlink:href')
     // just in case someone has the idea to use empty use-tags, wtf???

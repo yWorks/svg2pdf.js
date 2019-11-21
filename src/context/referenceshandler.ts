@@ -1,5 +1,5 @@
 import cssEsc from 'cssesc'
-import { PassiveNode } from '../nodes/passivenode'
+import { NonRenderedNode } from '../nodes/nonrenderednode'
 import { SvgNode } from '../nodes/svgnode'
 import { Context } from './context'
 import { ClipPath } from '../nodes/clippath'
@@ -30,8 +30,8 @@ export class ReferencesHandler {
       return this.renderedElements[id]
     }
 
-    if (svgnode instanceof PassiveNode) {
-      svgnode.renderPassive(context)
+    if (svgnode instanceof NonRenderedNode) {
+      svgnode.apply(context)
     } else {
       // the transformations directly at the node are written to the pdf form object transformation matrix
       let childContext = new Context(context._pdf, { refsHandler: this })

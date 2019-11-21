@@ -2,8 +2,10 @@ import { SvgNode } from './svgnode'
 import { Context } from '../context/context'
 import { defaultBoundingBox, addLineWidth } from '../utils/bbox'
 import { getAttribute, svgNodeIsVisible } from '../utils/node'
+import { GeometryNode } from './geometrynode'
+import { Path } from '../path'
 
-export class Ellipse extends SvgNode {
+export class Ellipse extends GeometryNode {
   rx: number
   ry: number
 
@@ -13,24 +15,24 @@ export class Ellipse extends SvgNode {
     this.ry = parseFloat(getAttribute(this.element, 'ry'))
   }
 
-  renderCore(context: Context): void {
-    if (!context.withinClipPath) {
-      context._pdf.setCurrentTransformationMatrix(context.transform)
-    }
-
+  getPath(context: Context) {
     if (!isFinite(this.rx) || this.rx <= 0 || !isFinite(this.ry) || this.ry <= 0) {
-      return
+      return null
     }
 
-    context._pdf.ellipse(
-      parseFloat(getAttribute(this.element, 'cx')) || 0,
-      parseFloat(getAttribute(this.element, 'cy')) || 0,
-      this.rx,
-      this.ry
-    )
+    const x = parseFloat(getAttribute(this.element, 'cx')) || 0,
+      y = parseFloat(getAttribute(this.element, 'cy')) || 0
 
-    this.fillOrStroke(context)
+    const lx = (4 / 3) * (Math.SQRT2 - 1) * this.rx,
+      ly = (4 / 3) * (Math.SQRT2 - 1) * this.ry
+    return new Path()
+      .moveTo(x + this.rx, y)
+      .curveTo(x + this.rx, y - ly, x + lx, y - this.ry, x, y - this.ry)
+      .curveTo(x - lx, y - this.ry, x - this.rx, y - ly, x - this.rx, y)
+      .curveTo(x - this.rx, y + ly, x - lx, y + this.ry, x, y + this.ry)
+      .curveTo(x + lx, y + this.ry, x + this.rx, y + ly, x + this.rx, y)
   }
+  drawMarker(context: Context) {}
   getBoundingBoxCore(context: Context): number[] {
     return addLineWidth(defaultBoundingBox(this.element, context), this.element)
   }

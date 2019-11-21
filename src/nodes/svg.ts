@@ -1,9 +1,9 @@
 import { Context } from '../context/context'
 import { parseFloats } from '../utils/math'
 import { getAttribute, svgNodeAndChildrenVisible } from '../utils/node'
-import { Groups } from './groups'
+import { ContainerNode } from './containernode'
 
-export class Svg extends Groups {
+export class Svg extends ContainerNode {
   getBoundingBoxCore(context: Context) {
     const viewBox = this.element.getAttribute('viewBox')
     let vb

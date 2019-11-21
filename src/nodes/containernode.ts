@@ -4,7 +4,7 @@ import { getAttribute } from '../utils/node'
 import { parseFloats } from '../utils/math'
 import { computeViewBoxTransform } from '../utils/transform'
 
-export abstract class Groups extends SvgNode {
+export abstract class ContainerNode extends SvgNode {
   renderCore(context: Context): void {
     let clonedContext = context.clone({ withinClipPath: false })
     this.children.forEach(child => {
