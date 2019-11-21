@@ -1,13 +1,10 @@
 import { Context } from '../context/context'
-import { Marker, MarkerList } from '../markerlist'
+import { Path } from '../path'
 import { addLineWidth } from '../utils/bbox'
-import { iriReference } from '../utils/constants'
-import { addVectors, getDirectionVector } from '../utils/math'
 import { parsePointsString } from '../utils/misc'
-import { getAttribute, svgNodeIsVisible } from '../utils/node'
+import { svgNodeIsVisible } from '../utils/node'
 import { GeometryNode } from './geometrynode'
 import { SvgNode } from './svgnode'
-import { Path, MoveTo, Close, LineTo, CurveTo } from '../path'
 
 export abstract class Traverse extends GeometryNode {
   closed: boolean
@@ -33,74 +30,12 @@ export abstract class Traverse extends GeometryNode {
 
     return path
   }
-  protected getMarkers(context: Context, path: Path) {
-    let angle, i
-    let markerEnd = getAttribute(this.element, 'marker-end'),
-      markerStart = getAttribute(this.element, 'marker-start'),
-      markerMid = getAttribute(this.element, 'marker-mid')
-    const length = path.segments.length
-    const from = path.segments[0],
-      first = path.segments[1],
-      to = path.segments[length - 2]
-    const markers = new MarkerList()
-    if (
-      (markerStart || markerMid || markerEnd) &&
-      from instanceof MoveTo &&
-      (first instanceof MoveTo || first instanceof LineTo || first instanceof CurveTo) &&
-      (to instanceof MoveTo || to instanceof LineTo || to instanceof CurveTo)
-    ) {
-      if (markerStart) {
-        markerStart = iriReference.exec(markerStart)[1]
-
-        angle = addVectors(
-          getDirectionVector([from.x, from.y], [first.x, first.y]),
-          getDirectionVector([to.x, to.y], [from.x, from.y])
-        )
-        markers.addMarker(new Marker(markerStart, [from.x, from.y], Math.atan2(angle[1], angle[0])))
-      }
-
-      if (markerMid) {
-        markerMid = iriReference.exec(markerMid)[1]
-        let prevAngle = getDirectionVector([from.x, from.y], [first.x, first.y])
-        let curAngle
-        for (i = 1; i < length - 2; i++) {
-          const curr = path.segments[i],
-            next = path.segments[i + 1]
-          if (
-            (curr instanceof MoveTo || curr instanceof LineTo || curr instanceof CurveTo) &&
-            (next instanceof MoveTo || next instanceof LineTo || next instanceof CurveTo)
-          ) {
-            curAngle = getDirectionVector([curr.x, curr.y], [next.x, next.y])
-            angle = addVectors(prevAngle, curAngle)
-            markers.addMarker(
-              new Marker(markerMid, [curr.x, curr.y], Math.atan2(angle[1], angle[0]))
-            )
-            prevAngle = curAngle
-          }
-        }
-
-        curAngle = getDirectionVector([to.x, to.y], [from.x, from.y])
-        angle = addVectors(prevAngle, curAngle)
-        markers.addMarker(new Marker(markerMid, [to.x, to.y], Math.atan2(angle[1], angle[0])))
-      }
-
-      if (markerEnd) {
-        markerEnd = iriReference.exec(markerEnd)[1]
-        angle = addVectors(
-          getDirectionVector([from.x, from.y], [first.x, first.y]),
-          getDirectionVector([to.x, to.y], [from.x, from.y])
-        )
-        markers.addMarker(new Marker(markerEnd, [from.x, from.y], Math.atan2(angle[1], angle[0])))
-      }
-    }
-    return markers
-  }
 
   isVisible(parentVisible: boolean): boolean {
     return svgNodeIsVisible(this, parentVisible)
   }
 
-  getBoundingBoxCore(context: Context): number[] {
+  protected getBoundingBoxCore(context: Context): number[] {
     const points = parsePointsString(this.element.getAttribute('points'))
     let minX = Number.POSITIVE_INFINITY
     let minY = Number.POSITIVE_INFINITY
@@ -116,7 +51,7 @@ export abstract class Traverse extends GeometryNode {
     return addLineWidth([minX, minY, maxX - minX, maxY - minY], this.element)
   }
 
-  computeNodeTransformCore(context: Context): any {
+  protected computeNodeTransformCore(context: Context): any {
     return context._pdf.unitMatrix
   }
 }

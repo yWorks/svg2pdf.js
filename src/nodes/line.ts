@@ -1,10 +1,7 @@
 import { Context } from '../context/context'
-import { Marker, MarkerList } from '../markerlist'
-import { LineTo, MoveTo, Path } from '../path'
+import { Path } from '../path'
 import { addLineWidth, defaultBoundingBox } from '../utils/bbox'
-import { iriReference } from '../utils/constants'
-import { getAngle } from '../utils/math'
-import { getAttribute, svgNodeIsVisible } from '../utils/node'
+import { svgNodeIsVisible } from '../utils/node'
 import { GeometryNode } from './geometrynode'
 
 export class Line extends GeometryNode {
@@ -21,27 +18,6 @@ export class Line extends GeometryNode {
       }
     }
     return null
-  }
-
-  protected getMarkers(context: Context, path: Path) {
-    const markerStart = getAttribute(this.element, 'marker-start'),
-      markerEnd = getAttribute(this.element, 'marker-end')
-
-    let markers = new MarkerList()
-    if (markerStart || markerEnd) {
-      const from = path.segments[0],
-        to = path.segments[1]
-      if (from instanceof MoveTo && to instanceof LineTo) {
-        const angle = getAngle([from.x, from.y], [to.x, to.y])
-        if (markerStart) {
-          markers.addMarker(new Marker(iriReference.exec(markerStart)[1], [from.x, from.y], angle))
-        }
-        if (markerEnd) {
-          markers.addMarker(new Marker(iriReference.exec(markerEnd)[1], [to.x, to.y], angle))
-        }
-      }
-    }
-    return markers
   }
 
   protected getBoundingBoxCore(context: Context): number[] {

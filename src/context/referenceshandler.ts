@@ -24,11 +24,11 @@ export class ReferencesHandler {
    * @return {*}
    */
   getRendered(id: string, context: Context): SvgNode {
-    const svgnode: SvgNode = this.get(id)
-
-    if (this.renderedElements.hasOwnProperty(id) && !(svgnode instanceof ClipPath)) {
+    if (this.renderedElements.hasOwnProperty(id)) {
       return this.renderedElements[id]
     }
+    
+    const svgnode: SvgNode = this.get(id)
 
     if (svgnode instanceof NonRenderedNode) {
       svgnode.apply(context)

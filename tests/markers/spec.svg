@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="500px" height="400px" viewBox="0 0 500 400">
+<svg xmlns="http://www.w3.org/2000/svg" width="500px" height="500px" viewBox="0 0 500 400">
     <defs>
         <marker id="mid" markerWidth="20" markerHeight="20" refX="0" refY="0" orient="auto" viewBox="-11 -11 22 22">
             <circle fill="none" r="10" stroke="#000000"></circle>
@@ -26,4 +26,10 @@
 
     <polygon points="0,0 30,10 40,40 10,30" fill="none" stroke="black" transform="translate(20 320) rotate(25)"
              marker-start="url(#mid)" marker-mid="url(#mid)"></polygon>
+
+    <polyline points="0,0 30,10 40,40 10,30" fill="none" stroke="black" transform="translate(100 280) "
+             marker-end="url(#mid)" marker-mid="url(#mid)"></polyline>
+
+    <polyline points="0,0 30,10 40,40 10,30" fill="none" stroke="black" transform="translate(100 320) rotate(25)"
+             marker-start="url(#mid)" marker-mid="url(#mid)"></polyline>
 </svg>
