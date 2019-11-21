@@ -9,6 +9,7 @@ import { SvgNode } from './svgnode'
 export class PathNode extends GeometryNode {
   constructor(node: HTMLElement, children: SvgNode[]) {
     super(node, children)
+    this.hasMarker = true
   }
 
   protected getBoundingBoxCore(context: Context): number[] {

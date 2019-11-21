@@ -12,6 +12,7 @@ export abstract class Traverse extends GeometryNode {
   constructor(node: HTMLElement, children: SvgNode[], closed: boolean) {
     super(node, children)
     this.closed = closed
+    this.hasMarker = true
   }
 
   protected getPath(context: Context) {

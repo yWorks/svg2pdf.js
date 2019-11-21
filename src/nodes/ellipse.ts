@@ -1,10 +1,9 @@
-import { SvgNode } from './svgnode'
 import { Context } from '../context/context'
-import { defaultBoundingBox, addLineWidth } from '../utils/bbox'
+import { Path } from '../path'
+import { addLineWidth, defaultBoundingBox } from '../utils/bbox'
 import { getAttribute, svgNodeIsVisible } from '../utils/node'
 import { GeometryNode } from './geometrynode'
-import { Path } from '../path'
-import { MarkerList } from '../markerlist'
+import { SvgNode } from './svgnode'
 
 export class Ellipse extends GeometryNode {
   rx: number
@@ -32,10 +31,6 @@ export class Ellipse extends GeometryNode {
       .curveTo(x - lx, y - this.ry, x - this.rx, y - ly, x - this.rx, y)
       .curveTo(x - this.rx, y + ly, x - lx, y + this.ry, x, y + this.ry)
       .curveTo(x + lx, y + this.ry, x + this.rx, y + ly, x + this.rx, y)
-  }
-
-  protected getMarkers() {
-    return new MarkerList()
   }
 
   protected getBoundingBoxCore(context: Context): number[] {

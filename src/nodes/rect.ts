@@ -3,7 +3,6 @@ import { Path } from '../path'
 import { addLineWidth, defaultBoundingBox } from '../utils/bbox'
 import { getAttribute, svgNodeIsVisible } from '../utils/node'
 import { GeometryNode } from './geometrynode'
-import { MarkerList } from '../markerlist'
 
 export class Rect extends GeometryNode {
   protected getPath(context: Context) {
@@ -29,10 +28,6 @@ export class Rect extends GeometryNode {
       .lineTo(x, (y += -h + 2 * ry))
       .curveTo(x, y - ry * MyArc, x + rx * MyArc, y - ry, (x += rx), (y -= ry))
       .close()
-  }
-
-  protected getMarkers() {
-    return new MarkerList()
   }
 
   protected getBoundingBoxCore(context: Context): number[] {

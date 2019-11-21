@@ -3,8 +3,13 @@ import { Path } from '../path'
 import { addLineWidth, defaultBoundingBox } from '../utils/bbox'
 import { svgNodeIsVisible } from '../utils/node'
 import { GeometryNode } from './geometrynode'
+import { SvgNode } from './svgnode'
 
 export class Line extends GeometryNode {
+  constructor(node: HTMLElement, children: SvgNode[]) {
+    super(node, children)
+    this.hasMarker = true
+  }
   protected getPath(context: Context) {
     if (!context.withinClipPath) {
       const x1 = parseFloat(this.element.getAttribute('x1')) || 0,

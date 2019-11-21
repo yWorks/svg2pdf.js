@@ -8,6 +8,7 @@ import { SvgMoveTo } from '../utils/svgpathadapter'
 import { GraphicsNode } from './graphicsnode'
 
 export abstract class GeometryNode extends GraphicsNode {
+  hasMarker:boolean
   protected renderCore(context: Context) {
     const path = this.getPath(context)
     if (path === null) {
@@ -18,7 +19,7 @@ export abstract class GeometryNode extends GraphicsNode {
     }
     path.drawJsPdfPath(context)
     this.fillOrStroke(context)
-    this.drawMarker(context, path)
+    this.hasMarker && this.drawMarker(context, path)
   }
 
   protected abstract getPath(context: Context): Path
