@@ -8,7 +8,7 @@ import { getAttribute, svgNodeIsVisible } from '../utils/node'
 import { GraphicsNode } from './graphicsnode'
 
 export class ImageNode extends GraphicsNode {
-  renderCore(context: Context): void {
+  protected renderCore(context: Context): void {
     context._pdf.setCurrentTransformationMatrix(context.transform)
     const width = parseFloat(getAttribute(this.element, 'width')),
       height = parseFloat(getAttribute(this.element, 'height')),

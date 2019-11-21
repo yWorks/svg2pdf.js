@@ -1,11 +1,11 @@
-import { SvgNode } from './svgnode'
 import { Context } from '../context/context'
-import { getAttribute } from '../utils/node'
 import { parseFloats } from '../utils/math'
+import { getAttribute } from '../utils/node'
 import { computeViewBoxTransform } from '../utils/transform'
+import { RenderedNode } from './renderednode'
 
-export abstract class ContainerNode extends SvgNode {
-  renderCore(context: Context): void {
+export abstract class ContainerNode extends RenderedNode {
+  protected renderCore(context: Context): void {
     let clonedContext = context.clone({ withinClipPath: false })
     this.children.forEach(child => {
       clonedContext.transform = context._pdf.matrixMult(
@@ -15,7 +15,7 @@ export abstract class ContainerNode extends SvgNode {
       child.render(clonedContext)
     })
   }
-  computeNodeTransformCore(context: Context): any {
+  protected computeNodeTransformCore(context: Context): any {
     const x = parseFloat(getAttribute(this.element, 'x')) || 0
     const y = parseFloat(getAttribute(this.element, 'y')) || 0
 

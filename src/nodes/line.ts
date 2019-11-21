@@ -8,7 +8,7 @@ import { getAttribute, svgNodeIsVisible } from '../utils/node'
 import { GeometryNode } from './geometrynode'
 
 export class Line extends GeometryNode {
-  getPath(context: Context) {
+  protected getPath(context: Context) {
     if (!context.withinClipPath) {
       const x1 = parseFloat(this.element.getAttribute('x1')) || 0,
         y1 = parseFloat(this.element.getAttribute('y1')) || 0
@@ -22,12 +22,13 @@ export class Line extends GeometryNode {
     }
     return null
   }
-  drawMarker(context: Context, path: Path) {
+
+  protected getMarkers(context: Context, path: Path) {
     const markerStart = getAttribute(this.element, 'marker-start'),
       markerEnd = getAttribute(this.element, 'marker-end')
 
+    let markers = new MarkerList()
     if (markerStart || markerEnd) {
-      let markers = new MarkerList()
       const from = path.segments[0],
         to = path.segments[1]
       if (from instanceof MoveTo && to instanceof LineTo) {
@@ -38,16 +39,16 @@ export class Line extends GeometryNode {
         if (markerEnd) {
           markers.addMarker(new Marker(iriReference.exec(markerEnd)[1], [to.x, to.y], angle))
         }
-        markers.draw(context.clone({ transform: context._pdf.unitMatrix }))
       }
     }
+    return markers
   }
 
-  getBoundingBoxCore(context: Context): number[] {
+  protected getBoundingBoxCore(context: Context): number[] {
     return addLineWidth(defaultBoundingBox(this.element, context), this.element)
   }
 
-  computeNodeTransformCore(context: Context): any {
+  protected computeNodeTransformCore(context: Context): any {
     return context._pdf.unitMatrix
   }
 
@@ -55,7 +56,7 @@ export class Line extends GeometryNode {
     return svgNodeIsVisible(this, parentVisible)
   }
 
-  fillOrStroke(context: Context) {
+  protected fillOrStroke(context: Context) {
     context.attributeState.fill = null
     super.fillOrStroke(context)
   }

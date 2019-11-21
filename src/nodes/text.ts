@@ -16,7 +16,7 @@ import {
 import { GraphicsNode } from './graphicsnode'
 
 export class TextNode extends GraphicsNode {
-  renderCore(context: Context): void {
+  protected renderCore(context: Context): void {
     context._pdf.saveGraphicsState()
 
     let xOffset = 0
@@ -141,11 +141,11 @@ export class TextNode extends GraphicsNode {
     return svgNodeAndChildrenVisible(this, parentVisible)
   }
 
-  getBoundingBoxCore(context: Context): number[] {
+  protected getBoundingBoxCore(context: Context): number[] {
     return addLineWidth(defaultBoundingBox(this.element, context), this.element)
   }
 
-  computeNodeTransformCore(context: Context): any {
+  protected computeNodeTransformCore(context: Context): any {
     return context._pdf.unitMatrix
   }
 }

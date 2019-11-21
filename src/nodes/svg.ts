@@ -4,7 +4,7 @@ import { getAttribute, svgNodeAndChildrenVisible } from '../utils/node'
 import { ContainerNode } from './containernode'
 
 export class Svg extends ContainerNode {
-  getBoundingBoxCore(context: Context) {
+  protected getBoundingBoxCore(context: Context) {
     const viewBox = this.element.getAttribute('viewBox')
     let vb
     if (viewBox) {

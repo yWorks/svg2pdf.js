@@ -53,7 +53,7 @@ export class SvgPathAdapter {
     this.unshort()
   }
 
-  createSegment(s: any) {
+  private createSegment(s: any) {
     return s
       ? s[0] === 'M'
         ? new SvgMoveTo(s)
@@ -120,7 +120,7 @@ export class SvgPathAdapter {
     )
   }
 
-  unshort() {
+  private unshort() {
     this.iterate((chainStack: any, i: number) => {
       let seg = chainStack.current
       if (seg && !(seg instanceof SvgPathSeg)) {

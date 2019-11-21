@@ -11,8 +11,14 @@ export class MarkerList {
     this.markers = []
   }
 
-  addMarker(marker: Marker) {
-    this.markers.push(marker)
+  addMarker(markers: Marker | Marker[]) {
+    if (Array.isArray(markers)) {
+      markers.forEach(m => {
+        this.markers.push(m)
+      })
+    } else {
+      this.markers.push(markers)
+    }
   }
 
   draw(context: Context) {

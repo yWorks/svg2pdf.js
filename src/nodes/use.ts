@@ -6,7 +6,7 @@ import { GraphicsNode } from './graphicsnode'
 // draws the element referenced by a use node, makes use of pdf's XObjects/FormObjects so nodes are only written once
 // to the pdf document. This highly reduces the file size and computation time.
 export class Use extends GraphicsNode {
-  renderCore(context: Context) {
+  protected renderCore(context: Context) {
     const url = this.element.getAttribute('href') || this.element.getAttribute('xlink:href')
     // just in case someone has the idea to use empty use-tags, wtf???
     if (!url) return
@@ -33,7 +33,7 @@ export class Use extends GraphicsNode {
     context._pdf.doFormObject(id, t)
   }
 
-  getBoundingBoxCore(context: Context): number[] {
+  protected getBoundingBoxCore(context: Context): number[] {
     return addLineWidth(defaultBoundingBox(this.element, context), this.element)
   }
 
@@ -41,7 +41,7 @@ export class Use extends GraphicsNode {
     return svgNodeIsVisible(this, parentVisible)
   }
 
-  computeNodeTransformCore(context: Context): any {
+  protected computeNodeTransformCore(context: Context): any {
     return context._pdf.unitMatrix
   }
 }

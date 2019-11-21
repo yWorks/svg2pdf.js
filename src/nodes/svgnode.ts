@@ -1,8 +1,7 @@
-import { applyAttributes, parseAttributes } from '../applyparseattributes'
 import { Context } from '../context/context'
-import { getAttribute, nodeIs } from '../utils/node'
-import { parseTransform } from '../utils/transform'
 import { iriReference } from '../utils/constants'
+import { getAttribute } from '../utils/node'
+import { parseTransform } from '../utils/transform'
 
 export abstract class SvgNode {
   element: HTMLElement
@@ -31,96 +30,7 @@ export abstract class SvgNode {
     else return context._pdf.matrixMult(nodeTransform, parseTransform(transformString, context))
   }
 
-  protected abstract renderCore(context: Context): void
-  render(parentContext: Context) {
-    if (!this.isVisible(parentContext.attributeState.visibility !== 'hidden')) {
-      return
-    }
-
-    let context = parseAttributes(parentContext.clone(), this)
-
-    const clipPath = this.getClipPath(context)
-    if (clipPath !== null) {
-      if (clipPath) {
-        context._pdf.saveGraphicsState()
-        this.clip(context, clipPath)
-      }
-    } else {
-      return
-    }
-    if (!context.withinClipPath) {
-      context._pdf.saveGraphicsState()
-    }
-    applyAttributes(context, parentContext, this.element)
-
-    this.renderCore(context)
-
-    if (!context.withinClipPath) {
-      context._pdf.restoreGraphicsState()
-    }
-
-    if (clipPath) {
-      context._pdf.restoreGraphicsState()
-    }
-  }
-
-  clip(outerContext: Context, clipPath: string) {
-    const clipPathNode = outerContext.refsHandler.get(clipPath)
-    const clipContext = outerContext.clone()
-    if (
-      clipPathNode.element.hasAttribute('clipPathUnits') &&
-      clipPathNode.element.getAttribute('clipPathUnits').toLowerCase() === 'objectboundingbox'
-    ) {
-      const bBox = this.getBBox(outerContext)
-      clipContext.transform = outerContext._pdf.matrixMult(
-        new outerContext._pdf.Matrix(bBox[2], 0, 0, bBox[3], bBox[0], bBox[1]),
-        outerContext.transform
-      )
-    }
-    outerContext.refsHandler.getRendered(clipPath, clipContext)
-  }
-
-  getClipPath(context: Context) {
-    if (
-      this.element.hasAttribute('clip-path') &&
-      getAttribute(this.element, 'clip-path') !== 'none'
-    ) {
-      const clipPathId = iriReference.exec(getAttribute(this.element, 'clip-path'))[1]
-      const clipNode = context.refsHandler.get(clipPathId)
-      return clipNode && clipNode.isVisible(true) ? clipPathId : null
-    } else {
-      return undefined
-    }
-  }
+  abstract render(parentContext: Context): void
 
   abstract isVisible(parentHidden: boolean): boolean
-
-  protected fillOrStroke(context: Context) {
-    if (!context.withinClipPath) {
-      const fill = context.attributeState.fill
-      // pdf spec states: "A line width of 0 denotes the thinnest line that can be rendered at device resolution:
-      // 1 device pixel wide". SVG, however, does not draw zero width lines.
-      const stroke = context.attributeState.stroke && context.attributeState.strokeWidth !== 0
-
-      const patternOrGradient = fill && fill.key ? fill : undefined
-      const isNodeFillRuleEvenOdd = getAttribute(this.element, 'fill-rule') === 'evenodd'
-      if (fill && stroke) {
-        if (isNodeFillRuleEvenOdd) {
-          context._pdf.fillStrokeEvenOdd(patternOrGradient)
-        } else {
-          context._pdf.fillStroke(patternOrGradient)
-        }
-      } else if (fill) {
-        if (isNodeFillRuleEvenOdd) {
-          context._pdf.fillEvenOdd(patternOrGradient)
-        } else {
-          context._pdf.fill(patternOrGradient)
-        }
-      } else if (stroke) {
-        context._pdf.stroke()
-      } else {
-        context._pdf.discardPath()
-      }
-    }
-  }
 }

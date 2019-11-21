@@ -10,15 +10,14 @@ import { SvgNode } from './svgnode'
 import { addLineWidth } from '../utils/bbox'
 
 export class PathNode extends GeometryNode {
-  path: Path
-  lines: {}[]
-  markers: MarkerList
+  private path: Path
+  private markers: MarkerList
 
   constructor(node: HTMLElement, children: SvgNode[]) {
     super(node, children)
   }
 
-  getPath(context: Context) {
+  protected getPath(context: Context) {
     this.getPathAndMarkersFromSvgPath(context)
     if (this.path.segments.length === 0) {
       return null
@@ -27,7 +26,7 @@ export class PathNode extends GeometryNode {
     }
   }
 
-  drawMarker(context: Context) {
+  protected getMarkers(context: Context, path: Path) {
     let markerEnd = getAttribute(this.element, 'marker-end'),
       markerStart = getAttribute(this.element, 'marker-start'),
       markerMid = getAttribute(this.element, 'marker-mid')
@@ -36,12 +35,10 @@ export class PathNode extends GeometryNode {
     markerStart && (marker.start = iriReference.exec(markerStart)[1])
     markerMid && (marker.mid = iriReference.exec(markerMid)[1])
     this.getPathAndMarkersFromSvgPath(context, marker)
-    if (markerEnd || markerStart || markerMid) {
-      this.markers.draw(context.clone({ transform: context._pdf.unitMatrix }))
-    }
+    return this.markers
   }
 
-  getBoundingBoxCore(context: Context): number[] {
+  protected getBoundingBoxCore(context: Context): number[] {
     this.getPathAndMarkersFromSvgPath(context)
     let minX = Number.POSITIVE_INFINITY
     let minY = Number.POSITIVE_INFINITY
@@ -70,7 +67,7 @@ export class PathNode extends GeometryNode {
     return addLineWidth([minX, minY, maxX - minX, maxY - minY], this.element)
   }
 
-  computeNodeTransformCore(context: Context): any {
+  protected computeNodeTransformCore(context: Context): any {
     return context._pdf.unitMatrix
   }
   isVisible(parentVisible: boolean): boolean {

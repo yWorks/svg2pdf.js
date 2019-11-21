@@ -31,10 +31,10 @@ export class Pattern extends NonRenderedNode {
     )
     context._pdf.endTilingPattern(id, pattern)
   }
-  getBoundingBoxCore(context: Context): number[] {
+  protected getBoundingBoxCore(context: Context): number[] {
     return defaultBoundingBox(this.element, context)
   }
-  computeNodeTransformCore(context: Context): any {
+  protected computeNodeTransformCore(context: Context): any {
     return context._pdf.unitMatrix
   }
   isVisible(parentVisible: boolean): boolean {

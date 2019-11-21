@@ -1,3 +1,5 @@
+import { Context } from './context/context'
+
 export class Path {
   segments: Segment[]
 
@@ -21,20 +23,18 @@ export class Path {
     this.segments.push(new Close())
     return this
   }
-  toPdfPath() {
-    const out: any[] = []
+
+  drawJsPdfPath(context: Context) {
+    const p = context._pdf
     this.segments.forEach(s => {
-      out.push(
-        s instanceof MoveTo
-          ? { op: 'm', c: [s.x, s.y] }
-          : s instanceof LineTo
-          ? { op: 'l', c: [s.x, s.y] }
-          : s instanceof CurveTo
-          ? { op: 'c', c: [s.x1, s.y1, s.x2, s.y2, s.x, s.y] }
-          : { op: 'h' }
-      )
+      s instanceof MoveTo
+        ? p.moveTo(s.x, s.y)
+        : s instanceof LineTo
+        ? p.lineTo(s.x, s.y)
+        : s instanceof CurveTo
+        ? p.curveTo(s.x1, s.y1, s.x2, s.y2, s.x, s.y)
+        : p.close()
     })
-    return out
   }
 }
 

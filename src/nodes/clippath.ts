@@ -37,7 +37,7 @@ export class ClipPath extends NonRenderedNode {
     context._pdf.setCurrentTransformationMatrix(clipPathMatrix.inversed())
   }
 
-  getBoundingBoxCore(context: Context): number[] {
+  protected getBoundingBoxCore(context: Context): number[] {
     return getBoundingBoxByChildren(context, this)
   }
 

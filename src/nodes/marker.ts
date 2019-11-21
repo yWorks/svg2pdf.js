@@ -26,7 +26,7 @@ export class MarkerNode extends NonRenderedNode {
     context._pdf.endFormObject(this.element.getAttribute('id'))
   }
 
-  getBoundingBoxCore(context: Context): number[] {
+  protected getBoundingBoxCore(context: Context): number[] {
     const viewBox = this.element.getAttribute('viewBox')
     let vb
     if (viewBox) {
@@ -40,7 +40,7 @@ export class MarkerNode extends NonRenderedNode {
     ]
   }
 
-  computeNodeTransformCore(context: Context): any {
+  protected computeNodeTransformCore(context: Context): any {
     const x = parseFloat(this.element.getAttribute('refX')) || 0
     const y = parseFloat(this.element.getAttribute('refY')) || 0
 

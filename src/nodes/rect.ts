@@ -3,9 +3,10 @@ import { Path } from '../path'
 import { addLineWidth, defaultBoundingBox } from '../utils/bbox'
 import { getAttribute, svgNodeIsVisible } from '../utils/node'
 import { GeometryNode } from './geometrynode'
+import { MarkerList } from '../markerlist'
 
 export class Rect extends GeometryNode {
-  getPath(context: Context) {
+  protected getPath(context: Context) {
     const w = parseFloat(getAttribute(this.element, 'width'))
     const h = parseFloat(getAttribute(this.element, 'height'))
     if (!isFinite(w) || w <= 0 || !isFinite(h) || h <= 0) {
@@ -30,13 +31,15 @@ export class Rect extends GeometryNode {
       .close()
   }
 
-  drawMarker() {}
+  protected getMarkers() {
+    return new MarkerList()
+  }
 
-  getBoundingBoxCore(context: Context): number[] {
+  protected getBoundingBoxCore(context: Context): number[] {
     return addLineWidth(defaultBoundingBox(this.element, context), this.element)
   }
 
-  computeNodeTransformCore(context: Context): any {
+  protected computeNodeTransformCore(context: Context): any {
     return context._pdf.unitMatrix
   }
 

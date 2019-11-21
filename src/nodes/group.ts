@@ -4,7 +4,7 @@ import { ContainerNode } from './containernode'
 import { svgNodeAndChildrenVisible } from '../utils/node'
 
 export class Group extends ContainerNode {
-  getBoundingBoxCore(context: Context): number[] {
+  protected getBoundingBoxCore(context: Context): number[] {
     return getBoundingBoxByChildren(context, this)
   }
 

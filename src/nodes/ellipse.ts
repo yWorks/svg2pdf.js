@@ -4,6 +4,7 @@ import { defaultBoundingBox, addLineWidth } from '../utils/bbox'
 import { getAttribute, svgNodeIsVisible } from '../utils/node'
 import { GeometryNode } from './geometrynode'
 import { Path } from '../path'
+import { MarkerList } from '../markerlist'
 
 export class Ellipse extends GeometryNode {
   rx: number
@@ -15,7 +16,7 @@ export class Ellipse extends GeometryNode {
     this.ry = parseFloat(getAttribute(this.element, 'ry'))
   }
 
-  getPath(context: Context) {
+  protected getPath(context: Context) {
     if (!isFinite(this.rx) || this.rx <= 0 || !isFinite(this.ry) || this.ry <= 0) {
       return null
     }
@@ -32,12 +33,16 @@ export class Ellipse extends GeometryNode {
       .curveTo(x - this.rx, y + ly, x - lx, y + this.ry, x, y + this.ry)
       .curveTo(x + lx, y + this.ry, x + this.rx, y + ly, x + this.rx, y)
   }
-  drawMarker(context: Context) {}
-  getBoundingBoxCore(context: Context): number[] {
+
+  protected getMarkers() {
+    return new MarkerList()
+  }
+
+  protected getBoundingBoxCore(context: Context): number[] {
     return addLineWidth(defaultBoundingBox(this.element, context), this.element)
   }
 
-  computeNodeTransformCore(context: Context): any {
+  protected computeNodeTransformCore(context: Context): any {
     return context._pdf.unitMatrix
   }
 

@@ -17,7 +17,7 @@ export abstract class Traverse extends GeometryNode {
     this.closed = closed
   }
 
-  getPath(context: Context) {
+  protected getPath(context: Context) {
     if (!this.element.hasAttribute('points') || this.element.getAttribute('points') === '') {
       return null
     }
@@ -33,7 +33,7 @@ export abstract class Traverse extends GeometryNode {
 
     return path
   }
-  drawMarker(context: Context, path: Path) {
+  protected getMarkers(context: Context, path: Path) {
     let angle, i
     let markerEnd = getAttribute(this.element, 'marker-end'),
       markerStart = getAttribute(this.element, 'marker-start'),
@@ -42,14 +42,13 @@ export abstract class Traverse extends GeometryNode {
     const from = path.segments[0],
       first = path.segments[1],
       to = path.segments[length - 2]
+    const markers = new MarkerList()
     if (
       (markerStart || markerMid || markerEnd) &&
       from instanceof MoveTo &&
       (first instanceof MoveTo || first instanceof LineTo || first instanceof CurveTo) &&
       (to instanceof MoveTo || to instanceof LineTo || to instanceof CurveTo)
     ) {
-      const markers = new MarkerList()
-
       if (markerStart) {
         markerStart = iriReference.exec(markerStart)[1]
 
@@ -93,8 +92,8 @@ export abstract class Traverse extends GeometryNode {
         )
         markers.addMarker(new Marker(markerEnd, [from.x, from.y], Math.atan2(angle[1], angle[0])))
       }
-      markers.draw(context.clone({ transform: context._pdf.unitMatrix }))
     }
+    return markers
   }
 
   isVisible(parentVisible: boolean): boolean {
