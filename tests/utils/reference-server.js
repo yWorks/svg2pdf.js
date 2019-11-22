@@ -49,7 +49,7 @@ const server = http.createServer((request, response) => {
   })
   request.on('end', () => {
     wstream.end()
-    console.log(logUtils.timestamp + ' ' + logUtils.ok(`Created reference '${request.url}'`))
+    console.log(logUtils.timestamp + ' ' + logUtils.ok(`Created reference '.${request.url}'`))
   })
   response.writeHead(200, {
     'Access-Control-Allow-Origin': '*'
