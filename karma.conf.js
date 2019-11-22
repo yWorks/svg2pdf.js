@@ -11,7 +11,7 @@ module.exports = (config) => {
   if (testCoverage) {
     preprocessors['dist/svg2pdf.js'] = 'coverage'
   } else {
-    preprocessors['src/*.js'] = 'browserify'
+    preprocessors['tests/runTests.js'] = 'webpack'
   }
 
   config.set({
@@ -21,30 +21,39 @@ module.exports = (config) => {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['mocha', 'chai'].concat(testCoverage ? [] : ['browserify']),
+    frameworks: ['mocha', 'chai']/* .concat(testCoverage ? [] : ['']) */,
+
+    webpack: require('./webpack.config.js'),
 
     // list of files / patterns to load in the browser
     files: [
-        'node_modules/jspdf-yworks/dist/jspdf.min.js',
+      'node_modules/jspdf-yworks/dist/jspdf.min.js',
 
-        'tests/utils/compare.js',
-        'tests/runTests.js',
+      'tests/utils/compare.js',
 
-        {
-          pattern: 'tests/**/spec.svg',
-          included: false,
-          served: true
-        }, {
-          pattern: 'tests/**/reference.pdf',
-          included: false,
-          watched: false,
-          served: true
-        }, {
-          pattern: 'tests/**/*.css',
-          included: false,
-          served: true
-        }
-    ].concat(testCoverage ? 'dist/svg2pdf.js' : 'src/*.js'),
+      {
+        pattern: 'tests/runTests.js',
+        included: true,
+        served: true,
+        watched: true,
+        type: "module"
+      },
+
+      {
+        pattern: 'tests/**/spec.svg',
+        included: false,
+        served: true
+      }, {
+        pattern: 'tests/**/reference.pdf',
+        included: false,
+        watched: false,
+        served: true
+      }, {
+        pattern: 'tests/**/*.css',
+        included: false,
+        served: true
+      }
+    ],
 
     // list of files to exclude
     exclude: [],
@@ -93,19 +102,6 @@ module.exports = (config) => {
           type: 'text'
         }
       ]
-    },
-    babelPreprocessor: {
-      options: {
-        presets: ['env'],
-        sourceMap: 'inline'
-      }
-    },
-
-    browserify: {
-      debug: true,
-      extensions: ['.js'],
-      standalone: "svg2pdf"
     }
-
   })
 }
