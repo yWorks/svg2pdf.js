@@ -12,12 +12,15 @@
   "scripts": {
     "browserify:svgpath": "browserify node_modules/svgpath/index.js -s SvgPath -o src/SvgPath.js",
     "browserify": "browserify src/svg2pdf.js --debug -p licensify -s svg2pdf -o dist/svg2pdf.js",
+    "webpack": "webpack --mode development",
     "exorcist:svg2pdf": "browserify src/svg2pdf.js --debug -p licensify -s svg2pdf | exorcist dist/svg2pdf.js.map > dist/svg2pdf.js",
     "uglify:dist": "uglifyjs -m -c --source-map \"includeSources,content='dist/svg2pdf.js.map',url='svg2pdf.min.js.map' dist/svg2pdf.min.js.map\" --comments /@license/ -o dist/svg2pdf.min.js dist/svg2pdf.js",
-    "build": "yarpm run browserify && yarpm run exorcist:svg2pdf && yarpm run uglify:dist",
+    "production": "webpack --mode production",
+    "build": "webpack --mode development",
     "test": "karma start",
-    "test:coverage": "yarpm run browserify && karma start --coverage",
-    "createreferences": "node tests/utils/reference-server.js"
+    "test:coverage": "yarpm run webpack && karma start --coverage",
+    "createreferences": "node tests/utils/reference-server.js",
+    "prettier": "prettier --write {src,tests,typings}/**/*.{ts,js} "
   },
   "repository": {
     "type": "git",
@@ -39,14 +42,15 @@
   },
   "homepage": "https://github.com/yWorks/svg2pdf.js#readme",
   "dependencies": {
-    "jspdf-yworks": "^2.1.1"
+    "jspdf-yworks": "^2.1.1",
+    "tsc": "^1.20150623.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-preset-env": "^1.7.0",
     "browserify": "^16.2.3",
-    "chalk": "^2.4.2",
     "chai": "^4.2.0",
+    "chalk": "^2.4.2",
     "cssesc": "^3.0.0",
     "exorcist": "^1.0.1",
     "font-family-papandreou": "^0.2.0-patch1",
@@ -59,13 +63,19 @@
     "karma-firefox-launcher": "^1.1.0",
     "karma-mocha": "^1.3.0",
     "karma-mocha-reporter": "^2.2.5",
-    "mocha": "^6.2.0",
+    "karma-webpack": "^4.0.2",
     "licensify": "^3.1.3",
     "log-utils": "^1.0.0",
+    "mocha": "^6.2.0",
+    "prettier": "^1.18.2",
     "requirejs": "^2.3.6",
     "svgpath": "^2.2.2",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.2",
     "uglify-js": "^3.6.0",
     "watchify": "^3.11.1",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10",
     "yarpm": "^0.2.1"
   }
 }
