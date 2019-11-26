@@ -61,6 +61,30 @@
   </symbol>
 
 
+  <symbol id="nested1" stroke="purple" stroke-width="2px">
+    <g fill="none" stroke="none">
+      <circle cx="25" cy="25" r="25"/>
+      <circle fill="red" stroke-width="2px" stroke="purple" cx="75" cy="25" r="25"/>
+    </g>
+    <g fill="red" stroke="purple" stroke-width="2px">
+      <circle cx="25" cy="75" r="25"/>
+      <circle fill="none" cx="75" cy="75" r="25"/>
+    </g>
+  </symbol>
+
+  <symbol id="nested2" fill="none">
+    <g fill="none" stroke="none">
+      <circle cx="25" cy="25" r="25"/>
+      <circle fill="red" stroke-width="2px" stroke="purple" cx="75" cy="25" r="25"/>
+    </g>
+    <g fill="red" stroke="purple" stroke-width="2px">
+      <circle cx="25" cy="75" r="25"/>
+      <circle fill="none" cx="75" cy="75" r="25"/>
+    </g>
+  </symbol>
+
+
+
   <use href="#myDot" x="200"/>
 
   <g fill="blue">
@@ -118,4 +142,7 @@
   <use href="#myDotFSFoSoN" x="400" y="300" />
   <use href="#myDotFSN" x="400" y="350" />    
   <use href="#myDot-N" x="450" y="300" />
+
+  <use href="#nested1" x="300" y="400" />
+  <use href="#nested2" x="400" y="400" />
 </svg>

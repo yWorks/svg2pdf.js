@@ -190,7 +190,10 @@ export function applyAttributes(childContext: Context, parentContext: Context, n
     childContext._pdf.setLineWidth(childContext.attributeState.strokeWidth)
   }
 
-  if (childContext.attributeState.stroke !== parentContext.attributeState.stroke) {
+  if (
+    childContext.attributeState.stroke &&
+    childContext.attributeState.stroke !== parentContext.attributeState.stroke
+  ) {
     childContext._pdf.setDrawColor(
       childContext.attributeState.stroke.r,
       childContext.attributeState.stroke.g,
