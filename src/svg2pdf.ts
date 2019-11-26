@@ -30,20 +30,20 @@ import { parse } from './parse'
 /**
  * Renders an svg element to a jsPDF document.
  * For accurate results a DOM document is required (mainly used for text size measurement and image format conversion)
- * @param element {HTMLElement} The svg element, which will be cloned, so the original stays unchanged.
- * @param pdf {jsPDF} The jsPDF object.
- * @param options {object} An object that may contain render options. Currently supported are:
+ * @param element The svg element, which will be cloned, so the original stays unchanged.
+ * @param pdf The jsPDF object.
+ * @param options An object that may contain render options. Currently supported are:
  *                         scale: The global factor by which everything is scaled.
  *                         xOffset, yOffset: Offsets that are added to every coordinate AFTER scaling (They are not
  *                            influenced by the scale attribute).
  */
 
 // the actual svgToPdf function (see above)
-function svg2pdf(element: HTMLElement, pdf: any, options: any) {
+function svg2pdf(element: HTMLElement, pdf: any, options: Svg2PdfOptions = {}): void {
   const _pdf = pdf
 
   //  create context object
-  let context = new Context(_pdf)
+  const context = new Context(_pdf)
 
   const k = options.scale || 1.0,
     xOffset = options.xOffset || 0.0,
@@ -63,7 +63,7 @@ function svg2pdf(element: HTMLElement, pdf: any, options: any) {
     _pdf.setFontSize(context.attributeState.fontSize * _pdf.internal.scaleFactor)
 
     const clonedSvg = element.cloneNode(true) as HTMLElement
-    let idMap: { [id: string]: SvgNode } = {}
+    const idMap: { [id: string]: SvgNode } = {}
     const svgnode = parse(clonedSvg, idMap)
     context.refsHandler = new ReferencesHandler(idMap)
     context.transform = svgnode.computeNodeTransform(context)
@@ -75,6 +75,12 @@ function svg2pdf(element: HTMLElement, pdf: any, options: any) {
   context.textMeasure.cleanupTextMeasuring()
 
   return _pdf
+}
+
+export interface Svg2PdfOptions {
+  scale?: number
+  xOffset?: number
+  yOffset?: number
 }
 
 export default svg2pdf

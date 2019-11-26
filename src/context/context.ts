@@ -4,39 +4,39 @@ import { TextMeasure } from './textmeasure'
 
 /**
  *
- * @param {object} values
+ * @package
+ * @param values
  * @constructor
- * @property {jspdf} _pdf
- * @property {AttributeState} attributeState  Keeps track of parent attributes that are inherited automatically
- * @property {ReferencesHandler} refsHandler  The handler that will render references on demand
- * @property {TextMeasure} textMeasure
- * @property {jspdf.Matrix} transform The current transformation matrix
- * @property {boolean} withinClipPath
+ * @property _pdf
+ * @property attributeState  Keeps track of parent attributes that are inherited automatically
+ * @property refsHandler  The handler that will render references on demand
+ * @property textMeasure
+ * @property transform The current transformation matrix
+ * @property withinClipPath
  */
 export class Context {
-  _pdf: any
+  pdf: any
   attributeState: AttributeState
   refsHandler: ReferencesHandler
   textMeasure: TextMeasure
   transform: any
   withinClipPath: boolean
 
-  constructor(pdf: any, values?: { [key: string]: any }) {
-    values = values || {}
-    this._pdf = pdf
+  constructor(pdf: any, values: IContextOptions = {}) {
+    this.pdf = pdf
 
     this.attributeState = values.attributeState
       ? values.attributeState.clone()
       : AttributeState.default()
     this.refsHandler = values.refsHandler || null
     this.textMeasure = values.textMeasure || new TextMeasure()
-    this.transform = values.transform || this._pdf.unitMatrix
+    this.transform = values.transform || this.pdf.unitMatrix
     this.withinClipPath = values.withinClipPath || false
   }
 
-  clone(values?: { [key: string]: any }) {
+  clone(values: IContextOptions = {}) {
     values = values || {}
-    let clone = new Context(this._pdf)
+    const clone = new Context(this.pdf)
 
     clone.attributeState = values.attributeState
       ? values.attributeState.clone()
@@ -48,4 +48,13 @@ export class Context {
 
     return clone
   }
+}
+
+export interface IContextOptions {
+  pdf?: any
+  attributeState?: AttributeState
+  refsHandler?: ReferencesHandler
+  textMeasure?: TextMeasure
+  transform?: any
+  withinClipPath?: boolean
 }

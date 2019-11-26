@@ -1,7 +1,7 @@
 import { Context } from '../context/context'
 import { getAttribute } from './node'
-import { multVecMatrix } from './math'
 import { SvgNode } from '../nodes/svgnode'
+import { Rect } from './geometry'
 
 export function addLineWidth(bBox: number[], element: HTMLElement): number[] {
   // add line-width
@@ -36,7 +36,7 @@ export function getBoundingBoxByChildren(context: Context, svgnode: SvgNode): nu
   return boundingBox
 }
 
-export function defaultBoundingBox(element: HTMLElement, context: Context): number[] {
+export function defaultBoundingBox(element: HTMLElement): Rect {
   const pf = parseFloat
   // TODO: check if there are other possible coordinate attributes
   const x1 =
@@ -65,19 +65,4 @@ export function defaultBoundingBox(element: HTMLElement, context: Context): numb
     Math.max(x1, x2) - Math.min(x1, x2),
     Math.max(y1, y2) - Math.min(y1, y2)
   ]
-}
-
-// transforms a bounding box and returns a new rect that contains it
-export function transformBBox(box: number[], matrix: any) {
-  const bl = multVecMatrix([box[0], box[1]], matrix)
-  const br = multVecMatrix([box[0] + box[2], box[1]], matrix)
-  const tl = multVecMatrix([box[0], box[1] + box[3]], matrix)
-  const tr = multVecMatrix([box[0] + box[2], box[1] + box[3]], matrix)
-
-  const bottom = Math.min(bl[1], br[1], tl[1], tr[1])
-  const left = Math.min(bl[0], br[0], tl[0], tr[0])
-  const top = Math.max(bl[1], br[1], tl[1], tr[1])
-  const right = Math.max(bl[0], br[0], tl[0], tr[0])
-
-  return [left, bottom, right - left, top - bottom]
 }

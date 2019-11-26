@@ -1,10 +1,15 @@
 import { Context } from '../context/context'
-import { Path } from '../path'
+import { Path } from '../utils/path'
 import { getAttribute, svgNodeIsVisible } from '../utils/node'
 import { GeometryNode } from './geometrynode'
+import { SvgNode } from './svgnode'
 
 export class Rect extends GeometryNode {
-  protected getPath(context: Context) {
+  constructor(element: HTMLElement, children: SvgNode[]) {
+    super(false, element, children)
+  }
+
+  protected getPath(context: Context): Path {
     const w = parseFloat(getAttribute(this.element, 'width'))
     const h = parseFloat(getAttribute(this.element, 'height'))
     if (!isFinite(w) || w <= 0 || !isFinite(h) || h <= 0) {
@@ -30,7 +35,7 @@ export class Rect extends GeometryNode {
   }
 
   protected computeNodeTransformCore(context: Context): any {
-    return context._pdf.unitMatrix
+    return context.pdf.unitMatrix
   }
 
   isVisible(parentVisible: boolean): boolean {

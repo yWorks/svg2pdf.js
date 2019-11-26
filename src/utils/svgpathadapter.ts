@@ -1,6 +1,6 @@
 import * as SvgPath from 'svgpath'
 import { getAttribute } from './node'
-import { toCubic } from './math'
+import { toCubic } from './geometry'
 
 export abstract class SvgPathSeg {}
 export class SvgMoveTo implements SvgPathSeg {
@@ -68,9 +68,9 @@ export class SvgPathAdapter {
   }
 
   getSegments(transformString?: string): SvgPathSeg[] {
-    let list = this.list || []
+    const list = this.list || []
     this.transform(transformString).iterate((s: any, i: any) => {
-      let seg = this.createSegment(s)
+      const seg = this.createSegment(s)
       list.length > i ? list[i] !== seg && (list[i] = seg) : list.push(seg)
     })
     return list
@@ -122,7 +122,7 @@ export class SvgPathAdapter {
 
   private unshort() {
     this.iterate((chainStack: any, i: number) => {
-      let seg = chainStack.current
+      const seg = chainStack.current
       if (seg && !(seg instanceof SvgPathSeg)) {
         if (seg[0] === 'H') {
           return (this.path.segments[i] = ['L', seg[1], chainStack.previous.y])

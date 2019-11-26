@@ -1,61 +1,33 @@
 import { RGBColor } from '../utils/rgbcolor'
 
 export class AttributeState {
-  public xmlSpace: string
-  public color: any
-  public fill: any
-  public fillOpacity: number
-  // public fillRule: string
-  public fontFamily: string
-  public fontSize: any
-  public fontStyle: string
+  public xmlSpace: string = null
+  public fill: any = null
+  public fillOpacity = 1.0
+  // public fillRule: string = null
+  public fontFamily: string = null
+  public fontSize = 16
+  public fontStyle: string = null
   // public fontVariant: string
-  public fontWeight: string
-  public opacity: number
-  public stroke: any
-  public strokeDasharray: []
-  public strokeDashoffset: number
-  public strokeLinecap: string
-  public strokeLinejoin: string
-  public strokeMiterlimit: number
-  public strokeOpacity: number
-  public strokeWidth: number
+  public fontWeight: string = null
+  public opacity = 1.0
+  public stroke: any = null
+  public strokeDasharray: [] = null
+  public strokeDashoffset = 0
+  public strokeLinecap: string = null
+  public strokeLinejoin: string = null
+  public strokeMiterlimit = 4.0
+  public strokeOpacity = 1.0
+  public strokeWidth = 1.0
   // public textAlign: string
-  public alignmentBaseline: string
-  public textAnchor: string
-  public visibility: string
-
-  constructor() {
-    this.xmlSpace = null
-    this.color = null
-    this.fill = null
-    this.fillOpacity = 1.0
-    // this.fillRule = null;
-    this.fontFamily = null
-    this.fontSize = 16
-    this.fontStyle = null
-    // this.fontVariant = null;
-    this.fontWeight = null
-    this.opacity = 1.0
-    this.stroke = null
-    this.strokeDasharray = null
-    this.strokeDashoffset = null
-    this.strokeLinecap = null
-    this.strokeLinejoin = null
-    this.strokeMiterlimit = 4.0
-    this.strokeOpacity = 1.0
-    this.strokeWidth = 1.0
-    // this.textAlign = null;
-    this.alignmentBaseline = null
-    this.textAnchor = null
-    this.visibility = null
-  }
+  public alignmentBaseline: string = null
+  public textAnchor: string = null
+  public visibility: string = null
 
   clone() {
-    let clone = new AttributeState()
+    const clone = new AttributeState()
 
     clone.xmlSpace = this.xmlSpace
-    clone.color = this.color
     clone.fill = this.fill
     clone.fillOpacity = this.fillOpacity
     // clone.fillRule = this.fillRule;
@@ -82,7 +54,7 @@ export class AttributeState {
   }
 
   static default() {
-    let attributeState = new AttributeState()
+    const attributeState = new AttributeState()
 
     attributeState.xmlSpace = 'default'
     attributeState.fill = new RGBColor('rgb(0, 0, 0)')

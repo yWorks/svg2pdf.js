@@ -6,66 +6,60 @@ import { iriReference } from '../utils/constants'
 import { ClipPath } from './clippath'
 
 export abstract class RenderedNode extends SvgNode {
-  render(parentContext: Context) {
+  render(parentContext: Context): void {
     if (!this.isVisible(parentContext.attributeState.visibility !== 'hidden')) {
       return
     }
 
-    let context = parseAttributes(parentContext.clone(), this)
+    const context = parseAttributes(parentContext.clone(), this)
 
-    const clipNode = this.getClipPathNode(context)
-    if (clipNode === undefined) {
-      return
-    }
-    if (clipNode) {
-      context._pdf.saveGraphicsState()
-      this.clip(context, clipNode)
+    const hasClipPath =
+      this.element.hasAttribute('clip-path') && getAttribute(this.element, 'clip-path') !== 'none'
+
+    if (hasClipPath) {
+      const clipNode = this.getClipPathNode(context)
+      if (clipNode && clipNode.isVisible(true)) {
+        context.pdf.saveGraphicsState()
+        this.clip(context, clipNode)
+      } else {
+        return
+      }
     }
 
     if (!context.withinClipPath) {
-      context._pdf.saveGraphicsState()
+      context.pdf.saveGraphicsState()
     }
     applyAttributes(context, parentContext, this.element)
-
     this.renderCore(context)
-
     if (!context.withinClipPath) {
-      context._pdf.restoreGraphicsState()
+      context.pdf.restoreGraphicsState()
     }
 
-    if (clipNode) {
-      context._pdf.restoreGraphicsState()
+    if (hasClipPath) {
+      context.pdf.restoreGraphicsState()
     }
   }
+
   protected abstract renderCore(context: Context): void
 
-  protected clip(outerContext: Context, clipPathNode: ClipPath) {
+  private getClipPathNode(context: Context): ClipPath | undefined {
+    const clipPathId = iriReference.exec(getAttribute(this.element, 'clip-path'))[1]
+    const clipNode = context.refsHandler.get(clipPathId)
+    return (clipNode as ClipPath) || undefined
+  }
+
+  private clip(outerContext: Context, clipPathNode: ClipPath): void {
     const clipContext = outerContext.clone()
     if (
       clipPathNode.element.hasAttribute('clipPathUnits') &&
       clipPathNode.element.getAttribute('clipPathUnits').toLowerCase() === 'objectboundingbox'
     ) {
       const bBox = this.getBBox(outerContext)
-      clipContext.transform = outerContext._pdf.matrixMult(
-        new outerContext._pdf.Matrix(bBox[2], 0, 0, bBox[3], bBox[0], bBox[1]),
+      clipContext.transform = outerContext.pdf.matrixMult(
+        new outerContext.pdf.Matrix(bBox[2], 0, 0, bBox[3], bBox[0], bBox[1]),
         outerContext.transform
       )
     }
     clipPathNode.apply(clipContext)
-  }
-
-  protected getClipPathNode(context: Context) {
-    if (
-      this.element.hasAttribute('clip-path') &&
-      getAttribute(this.element, 'clip-path') !== 'none'
-    ) {
-      const clipPathId = iriReference.exec(getAttribute(this.element, 'clip-path'))[1]
-      const clipNode = context.refsHandler.get(clipPathId)
-      return clipNode && clipNode instanceof ClipPath && clipNode.isVisible(true)
-        ? clipNode
-        : undefined
-    } else {
-      return null
-    }
   }
 }

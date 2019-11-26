@@ -50,7 +50,7 @@ const tests = [
   'zero-width-strokes'
 ]
 
-for (let name of tests) {
+for (const name of tests) {
   describe(name, function() {
     const svgText = loadSvg(`/base/tests/${name}/spec.svg`)
     const parser = new DOMParser()

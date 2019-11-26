@@ -1,14 +1,14 @@
 import { Context } from './context/context'
 import { getAttribute, nodeIs } from './utils/node'
-import { getFill, findFirstAvailableFontFamily } from './utils/misc'
+import { getFill } from './utils/misc'
 import { RGBColor } from './utils/rgbcolor'
-import { parseFloats } from './utils/math'
+import { parseFloats } from './utils/parsing'
 import FontFamily from 'font-family-papandreou'
-import { fontAliases } from './utils/constants'
 import { SvgNode } from './nodes/svgnode'
+import { findFirstAvailableFontFamily, fontAliases } from './utils/fonts'
 
-export function parseAttributes(context: Context, svgnode: SvgNode, node?: HTMLElement): Context {
-  const domNode = node || svgnode.element
+export function parseAttributes(context: Context, svgNode: SvgNode, node?: HTMLElement): Context {
+  const domNode = node || svgNode.element
   const visibility = getAttribute(domNode, 'visibility')
   if (visibility) {
     context.attributeState.visibility = visibility
@@ -16,7 +16,7 @@ export function parseAttributes(context: Context, svgnode: SvgNode, node?: HTMLE
   // fill mode
   const fillColor = getAttribute(domNode, 'fill')
   if (fillColor) {
-    context.attributeState.fill = getFill(fillColor, context, svgnode)
+    context.attributeState.fill = getFill(fillColor, context, svgNode)
   }
 
   // opacity is realized via a pdf graphics state
@@ -124,7 +124,11 @@ export function parseAttributes(context: Context, svgnode: SvgNode, node?: HTMLE
   return context
 }
 
-export function applyAttributes(childContext: Context, parentContext: Context, node: HTMLElement) {
+export function applyAttributes(
+  childContext: Context,
+  parentContext: Context,
+  node: HTMLElement
+): void {
   let fillOpacity = 1.0,
     strokeOpacity = 1.0
 
@@ -149,10 +153,10 @@ export function applyAttributes(childContext: Context, parentContext: Context, n
   const hasFillOpacity = fillOpacity < 1.0
   const hasStrokeOpacity = strokeOpacity < 1.0
   if (hasFillOpacity || hasStrokeOpacity) {
-    let gState: any = {}
+    const gState: any = {}
     hasFillOpacity && (gState['opacity'] = fillOpacity)
     hasStrokeOpacity && (gState['stroke-opacity'] = strokeOpacity)
-    childContext._pdf.setGState(new childContext._pdf.GState(gState))
+    childContext.pdf.setGState(new childContext.pdf.GState(gState))
   }
 
   if (
@@ -161,7 +165,7 @@ export function applyAttributes(childContext: Context, parentContext: Context, n
     !nodeIs(node, 'text')
   ) {
     // text fill color will be applied through setTextColor()
-    childContext._pdf.setFillColor(
+    childContext.pdf.setFillColor(
       childContext.attributeState.fill.r,
       childContext.attributeState.fill.g,
       childContext.attributeState.fill.b
@@ -169,11 +173,11 @@ export function applyAttributes(childContext: Context, parentContext: Context, n
   }
 
   if (childContext.attributeState.strokeWidth !== parentContext.attributeState.strokeWidth) {
-    childContext._pdf.setLineWidth(childContext.attributeState.strokeWidth)
+    childContext.pdf.setLineWidth(childContext.attributeState.strokeWidth)
   }
 
   if (childContext.attributeState.stroke !== parentContext.attributeState.stroke) {
-    childContext._pdf.setDrawColor(
+    childContext.pdf.setDrawColor(
       childContext.attributeState.stroke.r,
       childContext.attributeState.stroke.g,
       childContext.attributeState.stroke.b
@@ -183,18 +187,18 @@ export function applyAttributes(childContext: Context, parentContext: Context, n
   }
 
   if (childContext.attributeState.strokeLinecap !== parentContext.attributeState.strokeLinecap) {
-    childContext._pdf.setLineCap(childContext.attributeState.strokeLinecap)
+    childContext.pdf.setLineCap(childContext.attributeState.strokeLinecap)
   }
 
   if (childContext.attributeState.strokeLinejoin !== parentContext.attributeState.strokeLinejoin) {
-    childContext._pdf.setLineJoin(childContext.attributeState.strokeLinejoin)
+    childContext.pdf.setLineJoin(childContext.attributeState.strokeLinejoin)
   }
 
   if (
     childContext.attributeState.strokeDasharray !== parentContext.attributeState.strokeDasharray ||
     childContext.attributeState.strokeDashoffset !== parentContext.attributeState.strokeDashoffset
   ) {
-    childContext._pdf.setLineDashPattern(
+    childContext.pdf.setLineDashPattern(
       childContext.attributeState.strokeDasharray,
       childContext.attributeState.strokeDashoffset
     )
@@ -203,14 +207,14 @@ export function applyAttributes(childContext: Context, parentContext: Context, n
   if (
     childContext.attributeState.strokeMiterlimit !== parentContext.attributeState.strokeMiterlimit
   ) {
-    childContext._pdf.setLineMiterLimit(childContext.attributeState.strokeMiterlimit)
+    childContext.pdf.setLineMiterLimit(childContext.attributeState.strokeMiterlimit)
   }
 
   if (childContext.attributeState.fontFamily !== parentContext.attributeState.fontFamily) {
     if (fontAliases.hasOwnProperty(childContext.attributeState.fontFamily)) {
-      childContext._pdf.setFont(fontAliases[childContext.attributeState.fontFamily])
+      childContext.pdf.setFont(fontAliases[childContext.attributeState.fontFamily])
     } else {
-      childContext._pdf.setFont(childContext.attributeState.fontFamily)
+      childContext.pdf.setFont(childContext.attributeState.fontFamily)
     }
   }
 
@@ -220,7 +224,7 @@ export function applyAttributes(childContext: Context, parentContext: Context, n
     childContext.attributeState.fill.ok
   ) {
     const fillRGB = childContext.attributeState.fill
-    childContext._pdf.setTextColor(fillRGB.r, fillRGB.g, fillRGB.b)
+    childContext.pdf.setTextColor(fillRGB.r, fillRGB.g, fillRGB.b)
   }
 
   if (
@@ -239,13 +243,13 @@ export function applyAttributes(childContext: Context, parentContext: Context, n
       fontType = 'normal'
     }
 
-    childContext._pdf.setFontType(fontType)
+    childContext.pdf.setFontType(fontType)
   }
 
   if (childContext.attributeState.fontSize !== parentContext.attributeState.fontSize) {
     // correct for a jsPDF-instance measurement unit that differs from `pt`
-    childContext._pdf.setFontSize(
-      childContext.attributeState.fontSize * childContext._pdf.internal.scaleFactor
+    childContext.pdf.setFontSize(
+      childContext.attributeState.fontSize * childContext.pdf.internal.scaleFactor
     )
   }
 }

@@ -1,5 +1,5 @@
 import { Context } from '../context/context'
-import { Path } from '../path'
+import { Path } from '../utils/path'
 import { svgNodeIsVisible } from '../utils/node'
 import { SvgClose, SvgCurveTo, SvgLineTo, SvgMoveTo, SvgPathAdapter } from '../utils/svgpathadapter'
 import { GeometryNode } from './geometrynode'
@@ -7,13 +7,13 @@ import { SvgNode } from './svgnode'
 
 export class PathNode extends GeometryNode {
   constructor(node: HTMLElement, children: SvgNode[]) {
-    super(node, children)
-    this.hasMarker = true
+    super(true, node, children)
   }
 
   protected computeNodeTransformCore(context: Context): any {
-    return context._pdf.unitMatrix
+    return context.pdf.unitMatrix
   }
+
   isVisible(parentVisible: boolean): boolean {
     return svgNodeIsVisible(this, parentVisible)
   }

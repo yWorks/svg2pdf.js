@@ -1,20 +1,21 @@
 import { Context } from '../context/context'
-import { iriReference } from '../utils/constants'
 import { getAttribute } from '../utils/node'
 import { parseTransform } from '../utils/transform'
+import { Rect } from '../utils/geometry'
 
 export abstract class SvgNode {
-  element: HTMLElement
-  parent: SvgNode
-  children: SvgNode[]
+  readonly element: HTMLElement
+  readonly children: SvgNode[]
 
   constructor(element: HTMLElement, children: SvgNode[]) {
     this.element = element
     this.children = children
-    this.parent = null
   }
 
-  protected abstract getBoundingBoxCore(context: Context): number[]
+  abstract render(parentContext: Context): void
+
+  abstract isVisible(parentHidden: boolean): boolean
+
   getBBox(context: Context): number[] {
     if (getAttribute(this.element, 'display') === 'none') {
       return [0, 0, 0, 0]
@@ -22,15 +23,14 @@ export abstract class SvgNode {
     return this.getBoundingBoxCore(context)
   }
 
-  protected abstract computeNodeTransformCore(context: Context): any
+  protected abstract getBoundingBoxCore(context: Context): Rect
+
   computeNodeTransform(context: Context): any {
     const nodeTransform = this.computeNodeTransformCore(context)
     const transformString = getAttribute(this.element, 'transform')
     if (!transformString) return nodeTransform
-    else return context._pdf.matrixMult(nodeTransform, parseTransform(transformString, context))
+    else return context.pdf.matrixMult(nodeTransform, parseTransform(transformString, context))
   }
 
-  abstract render(parentContext: Context): void
-
-  abstract isVisible(parentHidden: boolean): boolean
+  protected abstract computeNodeTransformCore(context: Context): any
 }

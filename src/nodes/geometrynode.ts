@@ -1,34 +1,43 @@
 import { Context } from '../context/context'
 import { Marker, MarkerList } from '../markerlist'
-import { CurveTo, LineTo, MoveTo, Path, Close, Segment } from '../path'
+import { Close, CurveTo, LineTo, MoveTo, Path } from '../utils/path'
 import { iriReference } from '../utils/constants'
-import { addVectors, getAngle, getDirectionVector, normalize } from '../utils/math'
+import { addVectors, getAngle, getDirectionVector, normalize } from '../utils/geometry'
 import { getAttribute } from '../utils/node'
 import { SvgMoveTo } from '../utils/svgpathadapter'
 import { GraphicsNode } from './graphicsnode'
 import { addLineWidth } from '../utils/bbox'
+import { SvgNode } from './svgnode'
+import { Rect } from '../utils/geometry'
 
 export abstract class GeometryNode extends GraphicsNode {
-  hasMarker:boolean
-  protected renderCore(context: Context) {
+  private readonly hasMarkers: boolean
+
+  protected constructor(hasMarkers: boolean, element: HTMLElement, children: SvgNode[]) {
+    super(element, children)
+    this.hasMarkers = hasMarkers
+  }
+
+  protected renderCore(context: Context): void {
     const path = this.getPath(context)
     if (path === null) {
       return
     }
     if (!context.withinClipPath) {
-      context._pdf.setCurrentTransformationMatrix(context.transform)
+      context.pdf.setCurrentTransformationMatrix(context.transform)
     }
-    path.drawJsPdfPath(context)
+    path.draw(context)
     this.fillOrStroke(context)
-    this.hasMarker && this.drawMarker(context, path)
+    this.hasMarkers && this.drawMarkers(context, path)
   }
 
   protected abstract getPath(context: Context): Path
-  drawMarker(context: Context, path: Path) {
-    this.getMarkers(path).draw(context.clone({ transform: context._pdf.unitMatrix }))
+
+  private drawMarkers(context: Context, path: Path): void {
+    this.getMarkers(path).draw(context.clone({ transform: context.pdf.unitMatrix }))
   }
 
-  protected fillOrStroke(context: Context) {
+  protected fillOrStroke(context: Context): void {
     if (!context.withinClipPath) {
       const fill = context.attributeState.fill
       // pdf spec states: "A line width of 0 denotes the thinnest line that can be rendered at device resolution:
@@ -39,25 +48,25 @@ export abstract class GeometryNode extends GraphicsNode {
       const isNodeFillRuleEvenOdd = getAttribute(this.element, 'fill-rule') === 'evenodd'
       if (fill && stroke) {
         if (isNodeFillRuleEvenOdd) {
-          context._pdf.fillStrokeEvenOdd(patternOrGradient)
+          context.pdf.fillStrokeEvenOdd(patternOrGradient)
         } else {
-          context._pdf.fillStroke(patternOrGradient)
+          context.pdf.fillStroke(patternOrGradient)
         }
       } else if (fill) {
         if (isNodeFillRuleEvenOdd) {
-          context._pdf.fillEvenOdd(patternOrGradient)
+          context.pdf.fillEvenOdd(patternOrGradient)
         } else {
-          context._pdf.fill(patternOrGradient)
+          context.pdf.fill(patternOrGradient)
         }
       } else if (stroke) {
-        context._pdf.stroke()
+        context.pdf.stroke()
       } else {
-        context._pdf.discardPath()
+        context.pdf.discardPath()
       }
     }
   }
 
-  protected getBoundingBoxCore(context: Context): number[] {
+  protected getBoundingBoxCore(context: Context): Rect {
     const path = this.getPath(context)
     let minX = Number.POSITIVE_INFINITY
     let minY = Number.POSITIVE_INFINITY
@@ -87,7 +96,7 @@ export abstract class GeometryNode extends GraphicsNode {
   }
 
   protected getMarkers(path: Path): MarkerList {
-    let marker = {
+    const marker = {
       start: getAttribute(this.element, 'marker-start'),
       mid: getAttribute(this.element, 'marker-mid'),
       end: getAttribute(this.element, 'marker-end')
@@ -162,7 +171,7 @@ export abstract class GeometryNode extends GraphicsNode {
                 new Marker(marker.end, [curr.x, curr.y], Math.atan2(curAngle[1], curAngle[0]))
               )
             if (hasMidMarker) {
-              let angle =
+              const angle =
                 curr instanceof MoveTo
                   ? prevAngle
                   : prev instanceof MoveTo
@@ -176,14 +185,14 @@ export abstract class GeometryNode extends GraphicsNode {
           } else if (curr instanceof Close) {
             curAngle = getDirectionVector([prev.x, prev.y], [first.x, first.y])
             if (hasMidMarker) {
-              let angle =
+              const angle =
                 prev instanceof MoveTo ? curAngle : normalize(addVectors(prevAngle, curAngle))
               markers.addMarker(
                 new Marker(marker.mid, [prev.x, prev.y], Math.atan2(angle[1], angle[0]))
               )
             }
             if (hasEndMarker) {
-              let angle = normalize(addVectors(curAngle, firstAngle))
+              const angle = normalize(addVectors(curAngle, firstAngle))
               markers.addMarker(
                 new Marker(marker.end, [first.x, first.y], Math.atan2(angle[1], angle[0]))
               )
@@ -192,7 +201,7 @@ export abstract class GeometryNode extends GraphicsNode {
           }
         } else {
           first = curr instanceof MoveTo && curr
-          let next = list[i + 1]
+          const next = list[i + 1]
           if (next instanceof MoveTo || next instanceof LineTo || next instanceof CurveTo) {
             firstAngle = getDirectionVector([first.x, first.y], [next.x, next.y])
           }

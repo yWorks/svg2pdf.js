@@ -1,12 +1,10 @@
-import { Context } from '../context/context'
-import { iriReference } from './constants'
 import { SvgNode } from '../nodes/svgnode'
 
-export function nodeIs(node: HTMLElement, tagsString: string) {
+export function nodeIs(node: HTMLElement, tagsString: string): boolean {
   return tagsString.split(',').indexOf(node.tagName.toLowerCase()) >= 0
 }
 
-export function forEachChild(node: HTMLElement, fn: (n: number, e: HTMLElement) => void) {
+export function forEachChild(node: HTMLElement, fn: (n: number, e: HTMLElement) => void): void {
   // copy list of children, as the original might be modified
   const children = []
   for (let i = 0; i < node.childNodes.length; i++) {
@@ -19,7 +17,11 @@ export function forEachChild(node: HTMLElement, fn: (n: number, e: HTMLElement) 
 }
 
 // returns an attribute of a node, either from the node directly or from css
-export function getAttribute(node: HTMLElement, propertyNode: string, propertyCss?: string) {
+export function getAttribute(
+  node: HTMLElement,
+  propertyNode: string,
+  propertyCss?: string
+): string {
   propertyCss = propertyCss || propertyNode
   const attribute = node.style.getPropertyValue(propertyCss)
   if (attribute) {
@@ -31,7 +33,7 @@ export function getAttribute(node: HTMLElement, propertyNode: string, propertyCs
   }
 }
 
-export function svgNodeIsVisible(svgNode: SvgNode, parentVisible: boolean) {
+export function svgNodeIsVisible(svgNode: SvgNode, parentVisible: boolean): boolean {
   if (getAttribute(svgNode.element, 'display') === 'none') {
     return false
   }
@@ -46,7 +48,7 @@ export function svgNodeIsVisible(svgNode: SvgNode, parentVisible: boolean) {
   return visible
 }
 
-export function svgNodeAndChildrenVisible(svgNode: SvgNode, parentVisible: boolean) {
+export function svgNodeAndChildrenVisible(svgNode: SvgNode, parentVisible: boolean): boolean {
   let visible = svgNodeIsVisible(svgNode, parentVisible)
   if (svgNode.element.childNodes.length === 0) {
     return false

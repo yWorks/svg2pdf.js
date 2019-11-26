@@ -1,14 +1,15 @@
 import { SvgNode } from './svgnode'
 import { Context } from '../context/context'
 import { svgNodeIsVisible } from '../utils/node'
+import { Rect } from '../utils/geometry'
 
 export class VoidNode extends SvgNode {
   render(): void {}
-  protected getBoundingBoxCore(context: Context): number[] {
+  protected getBoundingBoxCore(context: Context): Rect {
     return [0, 0, 0, 0]
   }
   protected computeNodeTransformCore(context: Context): any {
-    return context._pdf.unitMatrix
+    return context.pdf.unitMatrix
   }
   isVisible(parentVisible: boolean): boolean {
     return svgNodeIsVisible(this, parentVisible)

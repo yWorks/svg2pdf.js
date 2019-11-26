@@ -1,7 +1,7 @@
 import { AttributeState } from '../context/attributestate'
 import { getAttribute } from './node'
 
-export function getTextRenderingMode(attributeState: AttributeState) {
+export function getTextRenderingMode(attributeState: AttributeState): string {
   let renderingMode = 'invisible'
   if (attributeState.fill && attributeState.stroke) {
     renderingMode = 'fillThenStroke'
@@ -13,14 +13,7 @@ export function getTextRenderingMode(attributeState: AttributeState) {
   return renderingMode
 }
 
-/**
- * Outputs the chunk to pdf.
- * @param {jsPDF.Matrix} transform
- * @param {AttributeState} attributeState
- * @returns {[number, number]} The last current text position.
- */
-
-export function transformXmlSpace(trimmedText: string, attributeState: AttributeState) {
+export function transformXmlSpace(trimmedText: string, attributeState: AttributeState): string {
   trimmedText = removeNewlines(trimmedText)
   trimmedText = replaceTabsBySpace(trimmedText)
 
@@ -32,20 +25,20 @@ export function transformXmlSpace(trimmedText: string, attributeState: Attribute
   return trimmedText
 }
 
-export function removeNewlines(str: string) {
+export function removeNewlines(str: string): string {
   return str.replace(/[\n\r]/g, '')
 }
 
-export function replaceTabsBySpace(str: string) {
+export function replaceTabsBySpace(str: string): string {
   return str.replace(/[\t]/g, ' ')
 }
 
-export function consolidateSpaces(str: string) {
+export function consolidateSpaces(str: string): string {
   return str.replace(/ +/g, ' ')
 }
 
 // applies text transformations to a text node
-export function transformText(node: HTMLElement, text: string) {
+export function transformText(node: HTMLElement, text: string): string {
   const textTransform = getAttribute(node, 'text-transform')
   switch (textTransform) {
     case 'uppercase':
@@ -58,10 +51,10 @@ export function transformText(node: HTMLElement, text: string) {
   }
 }
 
-export function trimLeft(str: string) {
+export function trimLeft(str: string): string {
   return str.replace(/^\s+/, '')
 }
 
-export function trimRight(str: string) {
+export function trimRight(str: string): string {
   return str.replace(/\s+$/, '')
 }

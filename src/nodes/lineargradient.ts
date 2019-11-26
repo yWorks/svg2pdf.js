@@ -3,7 +3,7 @@ import { Context } from '../context/context'
 import { putGradient } from '../utils/patterngradient'
 
 export class LinearGradient extends Gradient {
-  apply(context: Context) {
+  apply(context: Context): void {
     putGradient(
       this.element,
       'axial',

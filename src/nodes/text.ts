@@ -14,14 +14,15 @@ import {
   trimRight
 } from '../utils/text'
 import { GraphicsNode } from './graphicsnode'
+import { Rect } from '../utils/geometry'
 
 export class TextNode extends GraphicsNode {
   protected renderCore(context: Context): void {
-    context._pdf.saveGraphicsState()
+    context.pdf.saveGraphicsState()
 
     let xOffset = 0
 
-    const pdfFontSize = context._pdf.getFontSize()
+    const pdfFontSize = context.pdf.getFontSize()
     const textX = toPixels(this.element.getAttribute('x'), pdfFontSize)
     const textY = toPixels(this.element.getAttribute('y'), pdfFontSize)
 
@@ -39,7 +40,7 @@ export class TextNode extends GraphicsNode {
       if (visibility === 'visible') {
         const alignmentBaseline = context.attributeState.alignmentBaseline
         const textRenderingMode = getTextRenderingMode(context.attributeState)
-        context._pdf.text(transformedText, textX + dx - xOffset, textY + dy, {
+        context.pdf.text(transformedText, textX + dx - xOffset, textY + dy, {
           baseline: mapAlignmentBaseline(alignmentBaseline),
           angle: context.transform,
           renderingMode: textRenderingMode === 'fill' ? void 0 : textRenderingMode
@@ -134,18 +135,18 @@ export class TextNode extends GraphicsNode {
       currentTextSegment.put(context)
     }
 
-    context._pdf.restoreGraphicsState()
+    context.pdf.restoreGraphicsState()
   }
 
   isVisible(parentVisible: boolean): boolean {
     return svgNodeAndChildrenVisible(this, parentVisible)
   }
 
-  protected getBoundingBoxCore(context: Context): number[] {
-    return addLineWidth(defaultBoundingBox(this.element, context), this.element)
+  protected getBoundingBoxCore(context: Context): Rect {
+    return addLineWidth(defaultBoundingBox(this.element), this.element)
   }
 
   protected computeNodeTransformCore(context: Context): any {
-    return context._pdf.unitMatrix
+    return context.pdf.unitMatrix
   }
 }

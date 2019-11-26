@@ -1,32 +1,35 @@
 import { Context } from '../context/context'
-import { Path } from '../path'
-import { parsePointsString } from '../utils/misc'
+import { Path } from '../utils/path'
 import { svgNodeIsVisible } from '../utils/node'
 import { GeometryNode } from './geometrynode'
 import { SvgNode } from './svgnode'
+import { parsePointsString } from '../utils/parsing'
 
 export abstract class Traverse extends GeometryNode {
-  closed: boolean
+  private readonly closed: boolean
 
-  constructor(node: HTMLElement, children: SvgNode[], closed: boolean) {
-    super(node, children)
+  protected constructor(closed: boolean, node: HTMLElement, children: SvgNode[]) {
+    super(true, node, children)
     this.closed = closed
-    this.hasMarker = true
   }
 
-  protected getPath(context: Context) {
+  protected getPath(context: Context): Path {
     if (!this.element.hasAttribute('points') || this.element.getAttribute('points') === '') {
       return null
     }
 
     const points = parsePointsString(this.element.getAttribute('points'))
 
-    const path = new Path().moveTo(points[0][0], points[0][1])
+    const path = new Path()
+    path.moveTo(points[0][0], points[0][1])
+
     for (let i = 1; i < points.length; i++) {
       path.lineTo(points[i][0], points[i][1])
     }
 
-    this.closed && path.close()
+    if (this.closed) {
+      path.close()
+    }
 
     return path
   }
@@ -36,6 +39,6 @@ export abstract class Traverse extends GeometryNode {
   }
 
   protected computeNodeTransformCore(context: Context): any {
-    return context._pdf.unitMatrix
+    return context.pdf.unitMatrix
   }
 }

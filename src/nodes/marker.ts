@@ -1,32 +1,33 @@
 import { Context } from '../context/context'
-import { parseFloats } from '../utils/math'
+import { parseFloats } from '../utils/parsing'
 import { computeViewBoxTransform } from '../utils/transform'
 import { NonRenderedNode } from './nonrenderednode'
 import { svgNodeAndChildrenVisible } from '../utils/node'
+import { Rect } from '../utils/geometry'
 
 export class MarkerNode extends NonRenderedNode {
   apply(contextIn: Context): void {
     // the transformations directly at the node are written to the pdf form object transformation matrix
     const tfMatrix = this.computeNodeTransform(contextIn)
     const bBox = this.getBBox(contextIn)
-    let context = new Context(contextIn._pdf, {
+    const context = new Context(contextIn.pdf, {
       refsHandler: contextIn.refsHandler,
       transform: tfMatrix
     })
 
-    context._pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], tfMatrix)
+    context.pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], tfMatrix)
     this.children.forEach(child =>
       child.render(
-        new Context(context._pdf, {
+        new Context(context.pdf, {
           refsHandler: context.refsHandler,
           transform: child.computeNodeTransform(context)
         })
       )
     )
-    context._pdf.endFormObject(this.element.getAttribute('id'))
+    context.pdf.endFormObject(this.element.getAttribute('id'))
   }
 
-  protected getBoundingBoxCore(context: Context): number[] {
+  protected getBoundingBoxCore(context: Context): Rect {
     const viewBox = this.element.getAttribute('viewBox')
     let vb
     if (viewBox) {
@@ -41,13 +42,13 @@ export class MarkerNode extends NonRenderedNode {
   }
 
   protected computeNodeTransformCore(context: Context): any {
-    const x = parseFloat(this.element.getAttribute('refX')) || 0
-    const y = parseFloat(this.element.getAttribute('refY')) || 0
+    const refX = parseFloat(this.element.getAttribute('refX')) || 0
+    const refY = parseFloat(this.element.getAttribute('refY')) || 0
 
     const viewBox = this.element.getAttribute('viewBox')
     let nodeTransform
     if (viewBox) {
-      let bounds = parseFloats(viewBox)
+      const bounds = parseFloats(viewBox)
       bounds[0] = bounds[1] = 0 // for some reason vbX anc vbY seem to be ignored for markers
       nodeTransform = computeViewBoxTransform(
         this.element,
@@ -58,15 +59,16 @@ export class MarkerNode extends NonRenderedNode {
         parseFloat(this.element.getAttribute('markerHeight')) || 3,
         context
       )
-      nodeTransform = context._pdf.matrixMult(
-        new context._pdf.Matrix(1, 0, 0, 1, -x, -y),
+      nodeTransform = context.pdf.matrixMult(
+        new context.pdf.Matrix(1, 0, 0, 1, -refX, -refY),
         nodeTransform
       )
     } else {
-      nodeTransform = new context._pdf.Matrix(1, 0, 0, 1, -x, -y)
+      nodeTransform = new context.pdf.Matrix(1, 0, 0, 1, -refX, -refY)
     }
     return nodeTransform
   }
+
   isVisible(parentVisible: boolean): boolean {
     return svgNodeAndChildrenVisible(this, parentVisible)
   }

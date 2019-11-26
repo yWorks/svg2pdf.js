@@ -1,4 +1,4 @@
-import { Context } from './context/context'
+import { Context } from '../context/context'
 
 export class Path {
   segments: Segment[]
@@ -7,33 +7,35 @@ export class Path {
     this.segments = []
   }
 
-  moveTo(x: number, y: number) {
+  moveTo(x: number, y: number): Path {
     this.segments.push(new MoveTo(x, y))
     return this
   }
-  lineTo(x: number, y: number) {
+  lineTo(x: number, y: number): Path {
     this.segments.push(new LineTo(x, y))
     return this
   }
-  curveTo(x1: number, y1: number, x2: number, y2: number, x: number, y: number) {
+  curveTo(x1: number, y1: number, x2: number, y2: number, x: number, y: number): Path {
     this.segments.push(new CurveTo(x1, y1, x2, y2, x, y))
     return this
   }
-  close() {
+  close(): Path {
     this.segments.push(new Close())
     return this
   }
 
-  drawJsPdfPath(context: Context) {
-    const p = context._pdf
+  draw(context: Context): void {
+    const p = context.pdf
     this.segments.forEach(s => {
-      s instanceof MoveTo
-        ? p.moveTo(s.x, s.y)
-        : s instanceof LineTo
-        ? p.lineTo(s.x, s.y)
-        : s instanceof CurveTo
-        ? p.curveTo(s.x1, s.y1, s.x2, s.y2, s.x, s.y)
-        : p.close()
+      if (s instanceof MoveTo) {
+        p.moveTo(s.x, s.y)
+      } else if (s instanceof LineTo) {
+        p.lineTo(s.x, s.y)
+      } else if (s instanceof CurveTo) {
+        p.curveTo(s.x1, s.y1, s.x2, s.y2, s.x, s.y)
+      } else {
+        p.close()
+      }
     })
   }
 }

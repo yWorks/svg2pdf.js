@@ -12,7 +12,7 @@ export class RGBColor {
   public g: number
   public b: number
 
-  private simple_colors: { [key: string]: string }
+  private readonly simple_colors: { [key: string]: string }
   private color_defs: { re: RegExp; example: string[]; process: Function }[]
 
   constructor(color_string: string) {
@@ -252,7 +252,7 @@ export class RGBColor {
 
   // help
   getHelpXML() {
-    const examples = new Array()
+    const examples = []
     // add regexps
     for (let i = 0; i < this.color_defs.length; i++) {
       const example = this.color_defs[i].example

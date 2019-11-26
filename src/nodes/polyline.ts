@@ -3,6 +3,6 @@ import { SvgNode } from './svgnode'
 
 export class Polyline extends Traverse {
   constructor(node: HTMLElement, children: SvgNode[]) {
-    super(node, children, false)
+    super(false, node, children)
   }
 }

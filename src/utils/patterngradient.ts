@@ -18,7 +18,7 @@ export function putGradient(
   type: string,
   coords: (string | number)[],
   context: Context
-) {
+): void {
   const colors = [] as any
   let opacitySum = 0
   let hasOpacity = false
@@ -40,19 +40,19 @@ export function putGradient(
   })
 
   if (hasOpacity) {
-    gState = new context._pdf.GState({ opacity: opacitySum / colors.length })
+    gState = new context.pdf.GState({ opacity: opacitySum / colors.length })
   }
 
-  const pattern = new context._pdf.ShadingPattern(type, coords, colors, gState)
+  const pattern = new context.pdf.ShadingPattern(type, coords, colors, gState)
   const id = node.getAttribute('id')
-  context._pdf.addShadingPattern(id, pattern)
+  context.pdf.addShadingPattern(id, pattern)
 }
 
 /**
  * Convert percentage to decimal
- * @param {string} value
+ * @param value
  */
-export function parseGradientOffset(value: string) {
+function parseGradientOffset(value: string): number {
   const parsedValue = parseFloat(value)
   if (!isNaN(parsedValue) && value.indexOf('%') >= 0) {
     return parsedValue / 100

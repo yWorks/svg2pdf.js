@@ -1,15 +1,18 @@
 import { SvgNode } from './svgnode'
 import { Context } from '../context/context'
 import { defaultBoundingBox, addLineWidth } from '../utils/bbox'
-import { dataUrlRegex } from '../utils/constants'
 import { ReferencesHandler } from '../context/referenceshandler'
 import { parse } from '../parse'
 import { getAttribute, svgNodeIsVisible } from '../utils/node'
 import { GraphicsNode } from './graphicsnode'
+import { Rect } from '../utils/geometry'
+
+// groups: 1: mime-type (+ charset), 2: mime-type (w/o charset), 3: charset, 4: base64?, 5: body
+export const dataUriRegex = /^\s*data:(([^/,;]+\/[^/,;]+)(?:;([^,;=]+=[^,;=]+))?)?(?:;(base64))?,(.*\s*)$/i
 
 export class ImageNode extends GraphicsNode {
   protected renderCore(context: Context): void {
-    context._pdf.setCurrentTransformationMatrix(context.transform)
+    context.pdf.setCurrentTransformationMatrix(context.transform)
     const width = parseFloat(getAttribute(this.element, 'width')),
       height = parseFloat(getAttribute(this.element, 'height')),
       x = parseFloat(getAttribute(this.element, 'x')) || 0,
@@ -25,7 +28,7 @@ export class ImageNode extends GraphicsNode {
       return
     }
 
-    const dataUrl = imageUrl.match(dataUrlRegex)
+    const dataUrl = imageUrl.match(dataUriRegex)
     if (dataUrl && dataUrl[2] === 'image/svg+xml') {
       let svgText = dataUrl[5]
       if (dataUrl[4] === 'base64') {
@@ -35,7 +38,7 @@ export class ImageNode extends GraphicsNode {
       }
 
       const parser = new DOMParser()
-      let svgElement = parser.parseFromString(svgText, 'image/svg+xml')
+      const svgElement = parser.parseFromString(svgText, 'image/svg+xml')
         .firstElementChild as HTMLElement
 
       // unless preserveAspectRatio starts with "defer", the preserveAspectRatio attribute of the svg is ignored
@@ -53,10 +56,10 @@ export class ImageNode extends GraphicsNode {
       svgElement.setAttribute('width', String(width))
       svgElement.setAttribute('height', String(height))
 
-      let idMap: { [id: string]: SvgNode } = {}
+      const idMap: { [id: string]: SvgNode } = {}
       const svgnode = parse(svgElement, idMap)
       svgnode.render(
-        new Context(context._pdf, {
+        new Context(context.pdf, {
           refsHandler: new ReferencesHandler(idMap),
           transform: svgnode.computeNodeTransform(context)
         })
@@ -65,7 +68,7 @@ export class ImageNode extends GraphicsNode {
     }
 
     try {
-      context._pdf.addImage(
+      context.pdf.addImage(
         imageUrl,
         '', // will be ignored anyways if imageUrl is a data url
         x,
@@ -81,12 +84,12 @@ export class ImageNode extends GraphicsNode {
         )
     }
   }
-  getBoundingBoxCore(context: Context): number[] {
-    return addLineWidth(defaultBoundingBox(this.element, context), this.element)
+  protected getBoundingBoxCore(context: Context): Rect {
+    return addLineWidth(defaultBoundingBox(this.element), this.element)
   }
 
   computeNodeTransformCore(context: Context): any {
-    return context._pdf.unitMatrix
+    return context.pdf.unitMatrix
   }
 
   isVisible(parentVisible: boolean): boolean {

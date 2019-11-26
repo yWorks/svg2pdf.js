@@ -2,6 +2,7 @@ import { Context } from '../context/context'
 import { defaultBoundingBox } from '../utils/bbox'
 import { NonRenderedNode } from './nonrenderednode'
 import { svgNodeAndChildrenVisible } from '../utils/node'
+import { Rect } from '../utils/geometry'
 
 export class Pattern extends NonRenderedNode {
   apply(context: Context): void {
@@ -9,33 +10,33 @@ export class Pattern extends NonRenderedNode {
 
     // the transformations directly at the node are written to the pattern transformation matrix
     const bBox = this.getBBox(context)
-    const pattern = new context._pdf.TilingPattern(
+    const pattern = new context.pdf.TilingPattern(
       [bBox[0], bBox[1], bBox[0] + bBox[2], bBox[1] + bBox[3]],
       bBox[2],
       bBox[3],
       null,
-      context._pdf.unitMatrix /* Utils parameter is ignored !*/
+      context.pdf.unitMatrix /* transform parameter is ignored !*/
     )
 
-    context._pdf.beginTilingPattern(pattern)
+    context.pdf.beginTilingPattern(pattern)
     // continue without transformation
 
     this.children.forEach(child =>
       child.render(
-        new Context(context._pdf, {
+        new Context(context.pdf, {
           attributeState: context.attributeState,
           refsHandler: context.refsHandler,
           transform: child.computeNodeTransform(context)
         })
       )
     )
-    context._pdf.endTilingPattern(id, pattern)
+    context.pdf.endTilingPattern(id, pattern)
   }
-  protected getBoundingBoxCore(context: Context): number[] {
-    return defaultBoundingBox(this.element, context)
+  protected getBoundingBoxCore(context: Context): Rect {
+    return defaultBoundingBox(this.element)
   }
   protected computeNodeTransformCore(context: Context): any {
-    return context._pdf.unitMatrix
+    return context.pdf.unitMatrix
   }
   isVisible(parentVisible: boolean): boolean {
     return svgNodeAndChildrenVisible(this, parentVisible)
