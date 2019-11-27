@@ -26,6 +26,7 @@ import { SvgNode } from './nodes/svgnode'
 import { Context } from './context/context'
 import { ReferencesHandler } from './context/referenceshandler'
 import { parse } from './parse'
+import { ColorFill } from './fill/ColorFill'
 
 /**
  * Renders an svg element to a jsPDF document.
@@ -54,7 +55,7 @@ function svg2pdf(element: HTMLElement, pdf: any, options: Svg2PdfOptions = {}): 
 
     // set default values that differ from pdf defaults
     pdf.setLineWidth(context.attributeState.strokeWidth)
-    const fill = context.attributeState.fill
+    const fill = (context.attributeState.fill as ColorFill).color
     pdf.setFillColor(fill.r, fill.g, fill.b)
     pdf.setFont(context.attributeState.fontFamily)
     // correct for a jsPDF-instance measurement unit that differs from `pt`

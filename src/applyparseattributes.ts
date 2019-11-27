@@ -1,11 +1,12 @@
 import { Context } from './context/context'
 import { getAttribute, nodeIs } from './utils/node'
-import { getFill } from './utils/misc'
 import { RGBColor } from './utils/rgbcolor'
 import { parseFloats } from './utils/parsing'
 import FontFamily from 'font-family-papandreou'
 import { SvgNode } from './nodes/svgnode'
 import { findFirstAvailableFontFamily, fontAliases } from './utils/fonts'
+import { parseFill } from './fill/parseFill'
+import { ColorFill } from './fill/ColorFill'
 
 export function parseAttributes(context: Context, svgNode: SvgNode, node?: HTMLElement): void {
   const domNode = node || svgNode.element
@@ -14,9 +15,9 @@ export function parseAttributes(context: Context, svgNode: SvgNode, node?: HTMLE
     context.attributeState.visibility = visibility
   }
   // fill mode
-  const fillColor = getAttribute(domNode, 'fill')
-  if (fillColor) {
-    context.attributeState.fill = getFill(fillColor, context, svgNode)
+  const fill = getAttribute(domNode, 'fill')
+  if (fill) {
+    context.attributeState.fill = parseFill(fill, context)
   }
 
   // opacity is realized via a pdf graphics state
@@ -43,14 +44,15 @@ export function parseAttributes(context: Context, svgNode: SvgNode, node?: HTMLE
     strokeWidth = context.attributeState.strokeWidth
   }
 
-  const strokeColor = getAttribute(domNode, 'stroke')
-  if (strokeColor) {
-    if (strokeColor === 'none') {
+  const stroke = getAttribute(domNode, 'stroke')
+  if (stroke) {
+    if (stroke === 'none') {
       context.attributeState.stroke = null
     } else {
-      const strokeRGB = new RGBColor(strokeColor)
+      // gradients, patterns not supported for strokes ...
+      const strokeRGB = new RGBColor(stroke)
       if (strokeRGB.ok) {
-        context.attributeState.stroke = strokeRGB
+        context.attributeState.stroke = new ColorFill(strokeRGB)
       }
     }
   }
@@ -132,19 +134,19 @@ export function applyAttributes(
 
   fillOpacity *= childContext.attributeState.fillOpacity
   if (
-    childContext.attributeState.fill instanceof RGBColor &&
-    typeof childContext.attributeState.fill.a === 'number'
+    childContext.attributeState.fill instanceof ColorFill &&
+    typeof childContext.attributeState.fill.color.a === 'number'
   ) {
-    fillOpacity *= childContext.attributeState.fill.a
+    fillOpacity *= childContext.attributeState.fill.color.a
   }
   fillOpacity *= childContext.attributeState.opacity
 
   strokeOpacity *= childContext.attributeState.strokeOpacity
   if (
-    childContext.attributeState.stroke instanceof RGBColor &&
-    typeof childContext.attributeState.stroke.a === 'number'
+    childContext.attributeState.stroke instanceof ColorFill &&
+    typeof childContext.attributeState.stroke.color.a === 'number'
   ) {
-    strokeOpacity *= childContext.attributeState.stroke.a
+    strokeOpacity *= childContext.attributeState.stroke.color.a
   }
   strokeOpacity *= childContext.attributeState.opacity
 
@@ -158,15 +160,17 @@ export function applyAttributes(
   }
 
   if (
-    childContext.attributeState.fill instanceof RGBColor &&
+    childContext.attributeState.fill &&
     childContext.attributeState.fill !== parentContext.attributeState.fill &&
+    childContext.attributeState.fill instanceof ColorFill &&
+    childContext.attributeState.fill.color.ok &&
     !nodeIs(node, 'text')
   ) {
     // text fill color will be applied through setTextColor()
     childContext.pdf.setFillColor(
-      childContext.attributeState.fill.r,
-      childContext.attributeState.fill.g,
-      childContext.attributeState.fill.b
+      childContext.attributeState.fill.color.r,
+      childContext.attributeState.fill.color.g,
+      childContext.attributeState.fill.color.b
     )
   }
 
@@ -174,14 +178,15 @@ export function applyAttributes(
     childContext.pdf.setLineWidth(childContext.attributeState.strokeWidth)
   }
 
-  if (childContext.attributeState.stroke !== parentContext.attributeState.stroke) {
+  if (
+    childContext.attributeState.stroke !== parentContext.attributeState.stroke &&
+    childContext.attributeState.stroke instanceof ColorFill
+  ) {
     childContext.pdf.setDrawColor(
-      childContext.attributeState.stroke.r,
-      childContext.attributeState.stroke.g,
-      childContext.attributeState.stroke.b
+      childContext.attributeState.stroke.color.r,
+      childContext.attributeState.stroke.color.g,
+      childContext.attributeState.stroke.color.b
     )
-  } else if (childContext.attributeState.stroke === 'inherit') {
-    childContext.attributeState.stroke = parentContext.attributeState.stroke
   }
 
   if (childContext.attributeState.strokeLinecap !== parentContext.attributeState.strokeLinecap) {
@@ -219,10 +224,11 @@ export function applyAttributes(
   if (
     childContext.attributeState.fill &&
     childContext.attributeState.fill !== parentContext.attributeState.fill &&
-    childContext.attributeState.fill.ok
+    childContext.attributeState.fill instanceof ColorFill &&
+    childContext.attributeState.fill.color.ok
   ) {
-    const fillRGB = childContext.attributeState.fill
-    childContext.pdf.setTextColor(fillRGB.r, fillRGB.g, fillRGB.b)
+    const fillColor = childContext.attributeState.fill.color
+    childContext.pdf.setTextColor(fillColor.r, fillColor.g, fillColor.b)
   }
 
   if (

@@ -38,31 +38,29 @@ export abstract class GeometryNode extends GraphicsNode {
   }
 
   protected fillOrStroke(context: Context): void {
-    if (!context.withinClipPath) {
-      const fill = context.attributeState.fill
-      // pdf spec states: "A line width of 0 denotes the thinnest line that can be rendered at device resolution:
-      // 1 device pixel wide". SVG, however, does not draw zero width lines.
-      const stroke = context.attributeState.stroke && context.attributeState.strokeWidth !== 0
-
-      const patternOrGradient = fill && fill.key ? fill : undefined
-      const isNodeFillRuleEvenOdd = getAttribute(this.element, 'fill-rule') === 'evenodd'
-      if (fill && stroke) {
-        if (isNodeFillRuleEvenOdd) {
-          context.pdf.fillStrokeEvenOdd(patternOrGradient)
-        } else {
-          context.pdf.fillStroke(patternOrGradient)
-        }
-      } else if (fill) {
-        if (isNodeFillRuleEvenOdd) {
-          context.pdf.fillEvenOdd(patternOrGradient)
-        } else {
-          context.pdf.fill(patternOrGradient)
-        }
-      } else if (stroke) {
-        context.pdf.stroke()
+    if (context.withinClipPath) {
+      return
+    }
+    const fill = context.attributeState.fill
+    const stroke = context.attributeState.stroke && context.attributeState.strokeWidth !== 0
+    const fillData = fill && fill.getFillData(this, context)
+    const isNodeFillRuleEvenOdd = getAttribute(this.element, 'fill-rule') === 'evenodd'
+    if (fill && stroke) {
+      if (isNodeFillRuleEvenOdd) {
+        context.pdf.fillStrokeEvenOdd(fillData)
       } else {
-        context.pdf.discardPath()
+        context.pdf.fillStroke(fillData)
       }
+    } else if (fill) {
+      if (isNodeFillRuleEvenOdd) {
+        context.pdf.fillEvenOdd(fillData)
+      } else {
+        context.pdf.fill(fillData)
+      }
+    } else if (stroke) {
+      context.pdf.stroke()
+    } else {
+      context.pdf.discardPath()
     }
   }
 

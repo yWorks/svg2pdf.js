@@ -7,6 +7,7 @@ import { mapAlignmentBaseline, toPixels } from './utils/misc'
 import { applyAttributes, parseAttributes } from './applyparseattributes'
 import { TextNode } from './nodes/text'
 import { Point } from './utils/geometry'
+import { ColorFill } from './fill/ColorFill'
 
 /**
  * @param {string} textAnchor
@@ -63,7 +64,7 @@ export class TextChunk {
         if (tSpanStrokeColor) {
           strokeRGB = new RGBColor(tSpanStrokeColor)
           if (strokeRGB.ok) {
-            textNodeContext.attributeState.stroke = strokeRGB
+            textNodeContext.attributeState.stroke = new ColorFill(strokeRGB)
           }
         }
         const strokeWidth = getAttribute(textNode, 'stroke-width')

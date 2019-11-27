@@ -1,8 +1,10 @@
 import { RGBColor } from '../utils/rgbcolor'
+import { Fill } from '../fill/Fill'
+import { ColorFill } from '../fill/ColorFill'
 
 export class AttributeState {
   public xmlSpace: string = null
-  public fill: any = null
+  public fill: Fill = null
   public fillOpacity = 1.0
   // public fillRule: string = null
   public fontFamily: string = null
@@ -11,7 +13,7 @@ export class AttributeState {
   // public fontVariant: string
   public fontWeight: string = null
   public opacity = 1.0
-  public stroke: any = null
+  public stroke: Fill = null
   public strokeDasharray: [] = null
   public strokeDashoffset = 0
   public strokeLinecap: string = null
@@ -24,7 +26,7 @@ export class AttributeState {
   public textAnchor: string = null
   public visibility: string = null
 
-  clone() {
+  clone(): AttributeState {
     const clone = new AttributeState()
 
     clone.xmlSpace = this.xmlSpace
@@ -53,11 +55,11 @@ export class AttributeState {
     return clone
   }
 
-  static default() {
+  static default(): AttributeState {
     const attributeState = new AttributeState()
 
     attributeState.xmlSpace = 'default'
-    attributeState.fill = new RGBColor('rgb(0, 0, 0)')
+    attributeState.fill = new ColorFill(new RGBColor('rgb(0, 0, 0)'))
     attributeState.fillOpacity = 1.0
     // attributeState.fillRule = "nonzero";
     attributeState.fontFamily = 'times'
