@@ -39,9 +39,6 @@ export function parseAttributes(context: Context, svgNode: SvgNode, node?: HTMLE
   if (strokeWidth !== void 0 && strokeWidth !== '') {
     strokeWidth = Math.abs(parseFloat(strokeWidth))
     context.attributeState.strokeWidth = strokeWidth
-  } else {
-    // needed for inherited zero width strokes
-    strokeWidth = context.attributeState.strokeWidth
   }
 
   const stroke = getAttribute(domNode, 'stroke')

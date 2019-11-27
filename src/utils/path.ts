@@ -1,4 +1,5 @@
 import { Context } from '../context/context'
+import { multVecMatrix } from './geometry'
 
 export class Path {
   segments: Segment[]
@@ -22,6 +23,28 @@ export class Path {
   close(): Path {
     this.segments.push(new Close())
     return this
+  }
+
+  /**
+   * Transforms the path in place
+   */
+  transform(matrix: any): void {
+    this.segments.forEach(seg => {
+      if (seg instanceof MoveTo || seg instanceof LineTo || seg instanceof CurveTo) {
+        const p = multVecMatrix([seg.x, seg.y], matrix)
+        seg.x = p[0]
+        seg.y = p[1]
+      }
+
+      if (seg instanceof CurveTo) {
+        const p1 = multVecMatrix([seg.x1, seg.y1], matrix)
+        const p2 = multVecMatrix([seg.x2, seg.y2], matrix)
+        seg.x1 = p1[0]
+        seg.y1 = p1[1]
+        seg.x2 = p2[0]
+        seg.y2 = p2[1]
+      }
+    })
   }
 
   draw(context: Context): void {

@@ -11,7 +11,10 @@
   <ellipse rx="0"/>
   <ellipse ry="0"/>
   <path/>
+  <path d="   "/>
   <polygon/>
+  <polygon points="  "/>
   <polyline/>
+  <polyline points="   "/>
   <text fill="black" x="10" y="30" font-size="16px">This document should be empty</text>
 </svg>

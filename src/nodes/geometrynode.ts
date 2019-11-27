@@ -4,7 +4,6 @@ import { Close, CurveTo, LineTo, MoveTo, Path } from '../utils/path'
 import { iriReference } from '../utils/constants'
 import { addVectors, getAngle, getDirectionVector, normalize } from '../utils/geometry'
 import { getAttribute } from '../utils/node'
-import { SvgMoveTo } from '../utils/svgpathadapter'
 import { GraphicsNode } from './graphicsnode'
 import { addLineWidth } from '../utils/bbox'
 import { SvgNode } from './svgnode'
@@ -12,6 +11,7 @@ import { Rect } from '../utils/geometry'
 
 export abstract class GeometryNode extends GraphicsNode {
   private readonly hasMarkers: boolean
+  private cachedPath?: Path
 
   protected constructor(hasMarkers: boolean, element: HTMLElement, children: SvgNode[]) {
     super(element, children)
@@ -19,11 +19,13 @@ export abstract class GeometryNode extends GraphicsNode {
   }
 
   protected renderCore(context: Context): void {
-    const path = this.getPath(context)
-    if (path === null) {
+    const path = this.getCachedPath(context)
+    if (path === null || path.segments.length === 0) {
       return
     }
-    if (!context.withinClipPath) {
+    if (context.withinClipPath) {
+      path.transform(context.transform)
+    } else {
       context.pdf.setCurrentTransformationMatrix(context.transform)
     }
     path.draw(context)
@@ -32,6 +34,10 @@ export abstract class GeometryNode extends GraphicsNode {
   }
 
   protected abstract getPath(context: Context): Path
+
+  private getCachedPath(context: Context): Path {
+    return this.cachedPath || (this.cachedPath = this.getPath(context))
+  }
 
   private drawMarkers(context: Context, path: Path): void {
     this.getMarkers(path).draw(context.clone({ transform: context.pdf.unitMatrix }))
@@ -65,7 +71,7 @@ export abstract class GeometryNode extends GraphicsNode {
   }
 
   protected getBoundingBoxCore(context: Context): Rect {
-    const path = this.getPath(context)
+    const path = this.getCachedPath(context)
     let minX = Number.POSITIVE_INFINITY
     let minY = Number.POSITIVE_INFINITY
     let maxX = Number.NEGATIVE_INFINITY
@@ -149,7 +155,7 @@ export abstract class GeometryNode extends GraphicsNode {
             if (hasMidMarker) {
               curAngle = getDirectionVector([prev.x, prev.y], [curr.x1, curr.y1])
               curAngle =
-                prev instanceof SvgMoveTo ? curAngle : normalize(addVectors(prevAngle, curAngle))
+                prev instanceof MoveTo ? curAngle : normalize(addVectors(prevAngle, curAngle))
               markers.addMarker(
                 new Marker(marker.mid, [prev.x, prev.y], Math.atan2(curAngle[1], curAngle[0]))
               )
