@@ -1,4 +1,4 @@
-import { Fill } from './Fill'
+import { Fill, FillData } from './Fill'
 import { Context } from '../context/context'
 import { parseTransform } from '../utils/transform'
 import { getAttribute } from '../utils/node'
@@ -14,7 +14,7 @@ export class GradientFill implements Fill {
     this.gradient = gradient
   }
 
-  getFillData(forNode: GraphicsNode, context: Context): object | undefined {
+  getFillData(forNode: GraphicsNode, context: Context): FillData | undefined {
     // matrix to convert between gradient space and user space
     // for "userSpaceOnUse" this is the current transformation: tfMatrix
     // for "objectBoundingBox" or default, the gradient gets scaled and transformed to the bounding box

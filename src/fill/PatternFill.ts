@@ -1,4 +1,4 @@
-import { Fill } from './Fill'
+import { Fill, FillData } from './Fill'
 import { Context } from '../context/context'
 import { parseTransform } from '../utils/transform'
 import { getAttribute } from '../utils/node'
@@ -15,7 +15,7 @@ export class PatternFill implements Fill {
     this.pattern = pattern
   }
 
-  getFillData(forNode: GraphicsNode, context: Context): object | undefined {
+  getFillData(forNode: GraphicsNode, context: Context): FillData | undefined {
     const patternOrGradient: PatternData = {
       key: this.key,
       boundingBox: undefined,
