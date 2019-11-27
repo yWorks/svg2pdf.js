@@ -56,7 +56,8 @@ export class TextChunk {
       if (textNode.nodeName === '#text') {
         textNodeContext = context
       } else {
-        textNodeContext = parseAttributes(context.clone(), this.textNode, textNode)
+        textNodeContext = context.clone()
+        parseAttributes(textNodeContext, this.textNode, textNode)
 
         const tSpanStrokeColor = getAttribute(textNode, 'stroke')
         if (tSpanStrokeColor) {

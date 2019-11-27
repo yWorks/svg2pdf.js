@@ -7,7 +7,7 @@ import FontFamily from 'font-family-papandreou'
 import { SvgNode } from './nodes/svgnode'
 import { findFirstAvailableFontFamily, fontAliases } from './utils/fonts'
 
-export function parseAttributes(context: Context, svgNode: SvgNode, node?: HTMLElement): Context {
+export function parseAttributes(context: Context, svgNode: SvgNode, node?: HTMLElement): void {
   const domNode = node || svgNode.element
   const visibility = getAttribute(domNode, 'visibility')
   if (visibility) {
@@ -120,8 +120,6 @@ export function parseAttributes(context: Context, svgNode: SvgNode, node?: HTMLE
   if (textAnchor) {
     context.attributeState.textAnchor = textAnchor
   }
-
-  return context
 }
 
 export function applyAttributes(

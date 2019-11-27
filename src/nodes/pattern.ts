@@ -25,8 +25,7 @@ export class Pattern extends NonRenderedNode {
       child.render(
         new Context(context.pdf, {
           attributeState: context.attributeState,
-          refsHandler: context.refsHandler,
-          transform: child.computeNodeTransform(context)
+          refsHandler: context.refsHandler
         })
       )
     )

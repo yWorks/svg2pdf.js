@@ -19,8 +19,7 @@ export class MarkerNode extends NonRenderedNode {
     this.children.forEach(child =>
       child.render(
         new Context(context.pdf, {
-          refsHandler: context.refsHandler,
-          transform: child.computeNodeTransform(context)
+          refsHandler: context.refsHandler
         })
       )
     )

@@ -28,13 +28,9 @@ export class ReferencesHandler {
     if (svgNode instanceof NonRenderedNode) {
       svgNode.apply(context)
     } else {
-      // the transformations directly at the node are written to the pdf form object transformation matrix
-      const childContext = new Context(context.pdf, { refsHandler: this })
-      const tfMatrix = svgNode.computeNodeTransform(childContext)
       const bBox = svgNode.getBBox(context)
-
-      context.pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], tfMatrix)
-      svgNode.render(childContext)
+      context.pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], context.pdf.unitMatrix)
+      svgNode.render(new Context(context.pdf, { refsHandler: this }))
       context.pdf.endFormObject(svgNode.element.getAttribute('id'))
     }
 

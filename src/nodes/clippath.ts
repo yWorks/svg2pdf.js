@@ -26,7 +26,6 @@ export class ClipPath extends NonRenderedNode {
       child.render(
         new Context(context.pdf, {
           refsHandler: context.refsHandler,
-          transform: child.computeNodeTransform(context),
           withinClipPath: true
         })
       )

@@ -11,7 +11,13 @@ export abstract class RenderedNode extends SvgNode {
       return
     }
 
-    const context = parseAttributes(parentContext.clone(), this)
+    const context = parentContext.clone()
+    context.transform = context.pdf.matrixMult(
+      this.computeNodeTransform(context),
+      parentContext.transform
+    )
+
+    parseAttributes(context, this)
 
     const hasClipPath =
       this.element.hasAttribute('clip-path') && getAttribute(this.element, 'clip-path') !== 'none'

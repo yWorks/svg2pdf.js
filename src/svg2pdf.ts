@@ -40,41 +40,38 @@ import { parse } from './parse'
 
 // the actual svgToPdf function (see above)
 function svg2pdf(element: HTMLElement, pdf: any, options: Svg2PdfOptions = {}): void {
-  const _pdf = pdf
-
   //  create context object
-  const context = new Context(_pdf)
+  const context = new Context(pdf)
 
   const k = options.scale || 1.0,
     xOffset = options.xOffset || 0.0,
     yOffset = options.yOffset || 0.0
 
-  _pdf.advancedAPI(() => {
+  pdf.advancedAPI(() => {
     // set offsets and scale everything by k
-    _pdf.saveGraphicsState()
-    _pdf.setCurrentTransformationMatrix(new _pdf.Matrix(k, 0, 0, k, xOffset, yOffset))
+    pdf.saveGraphicsState()
+    pdf.setCurrentTransformationMatrix(new pdf.Matrix(k, 0, 0, k, xOffset, yOffset))
 
     // set default values that differ from pdf defaults
-    _pdf.setLineWidth(context.attributeState.strokeWidth)
+    pdf.setLineWidth(context.attributeState.strokeWidth)
     const fill = context.attributeState.fill
-    _pdf.setFillColor(fill.r, fill.g, fill.b)
-    _pdf.setFont(context.attributeState.fontFamily)
+    pdf.setFillColor(fill.r, fill.g, fill.b)
+    pdf.setFont(context.attributeState.fontFamily)
     // correct for a jsPDF-instance measurement unit that differs from `pt`
-    _pdf.setFontSize(context.attributeState.fontSize * _pdf.internal.scaleFactor)
+    pdf.setFontSize(context.attributeState.fontSize * pdf.internal.scaleFactor)
 
     const clonedSvg = element.cloneNode(true) as HTMLElement
     const idMap: { [id: string]: SvgNode } = {}
     const svgnode = parse(clonedSvg, idMap)
     context.refsHandler = new ReferencesHandler(idMap)
-    context.transform = svgnode.computeNodeTransform(context)
     svgnode.render(context)
 
-    _pdf.restoreGraphicsState()
+    pdf.restoreGraphicsState()
   })
 
   context.textMeasure.cleanupTextMeasuring()
 
-  return _pdf
+  return pdf
 }
 
 export interface Svg2PdfOptions {

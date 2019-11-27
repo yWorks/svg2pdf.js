@@ -51,7 +51,6 @@ export class Context {
 }
 
 export interface IContextOptions {
-  pdf?: any
   attributeState?: AttributeState
   refsHandler?: ReferencesHandler
   textMeasure?: TextMeasure
