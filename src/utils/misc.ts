@@ -3,10 +3,13 @@ import { Context } from '../context/context'
 
 import { parseColor } from './parsing'
 import { alignmentBaselineMap, iriReference } from './constants'
-import { getAttribute, nodeIs } from './node'
+import { getAttribute } from './node'
 import { PatternOrGradient } from './patterngradient'
 import { parseTransform } from './transform'
 import { SvgNode } from '../nodes/svgnode'
+import { LinearGradient } from '../nodes/lineargradient'
+import { RadialGradient } from '../nodes/radialgradient'
+import { Pattern } from '../nodes/pattern'
 
 /**
  * Convert em, px and bare number attributes to pixel values
@@ -43,7 +46,7 @@ export function getFill(fillColor: string, context: Context, svgnode: SvgNode): 
     // probably a gradient or pattern (or something unsupported)
     const fillUrl = url[1]
     const fillNode = context.refsHandler.getRendered(fillUrl, context)
-    if (fillNode && nodeIs(fillNode.element, 'lineargradient,radialgradient')) {
+    if (fillNode && (fillNode instanceof LinearGradient || fillNode instanceof RadialGradient)) {
       // matrix to convert between gradient space and user space
       // for "userSpaceOnUse" this is the current transformation: tfMatrix
       // for "objectBoundingBox" or default, the gradient gets scaled and transformed to the bounding box
@@ -70,7 +73,7 @@ export function getFill(fillColor: string, context: Context, svgnode: SvgNode): 
       }
 
       return patternOrGradient
-    } else if (fillNode && nodeIs(fillNode.element, 'pattern')) {
+    } else if (fillNode && fillNode instanceof Pattern) {
       let fillBBox, y, width, height, x
       patternOrGradient = { key: fillUrl }
 
