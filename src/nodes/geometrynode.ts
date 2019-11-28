@@ -18,7 +18,7 @@ export abstract class GeometryNode extends GraphicsNode {
     this.hasMarkers = hasMarkers
   }
 
-  protected renderCore(context: Context): void {
+  protected async renderCore(context: Context): Promise<void> {
     const path = this.getCachedPath(context)
     if (path === null || path.segments.length === 0) {
       return
@@ -29,8 +29,10 @@ export abstract class GeometryNode extends GraphicsNode {
       context.pdf.setCurrentTransformationMatrix(context.transform)
     }
     path.draw(context)
-    this.fillOrStroke(context)
-    this.hasMarkers && this.drawMarkers(context, path)
+    await this.fillOrStroke(context)
+    if (this.hasMarkers) {
+      await this.drawMarkers(context, path)
+    }
   }
 
   protected abstract getPath(context: Context): Path
@@ -39,17 +41,18 @@ export abstract class GeometryNode extends GraphicsNode {
     return this.cachedPath || (this.cachedPath = this.getPath(context))
   }
 
-  private drawMarkers(context: Context, path: Path): void {
-    this.getMarkers(path).draw(context.clone({ transform: context.pdf.unitMatrix }))
+  private async drawMarkers(context: Context, path: Path): Promise<void> {
+    const markers = this.getMarkers(path)
+    await markers.draw(context.clone({ transform: context.pdf.unitMatrix }))
   }
 
-  protected fillOrStroke(context: Context): void {
+  protected async fillOrStroke(context: Context): Promise<void> {
     if (context.withinClipPath) {
       return
     }
     const fill = context.attributeState.fill
     const stroke = context.attributeState.stroke && context.attributeState.strokeWidth !== 0
-    const fillData = fill && fill.getFillData(this, context)
+    const fillData = fill && (await fill.getFillData(this, context))
     const isNodeFillRuleEvenOdd = getAttribute(this.element, 'fill-rule') === 'evenodd'
     if (fill && stroke) {
       if (isNodeFillRuleEvenOdd) {

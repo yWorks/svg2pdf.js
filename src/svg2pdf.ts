@@ -40,7 +40,7 @@ import { ColorFill } from './fill/ColorFill'
  */
 
 // the actual svgToPdf function (see above)
-function svg2pdf(element: HTMLElement, pdf: any, options: Svg2PdfOptions = {}): void {
+async function svg2pdf(element: HTMLElement, pdf: any, options: Svg2PdfOptions = {}): Promise<any> {
   //  create context object
   const context = new Context(pdf)
 
@@ -48,27 +48,28 @@ function svg2pdf(element: HTMLElement, pdf: any, options: Svg2PdfOptions = {}): 
     xOffset = options.xOffset || 0.0,
     yOffset = options.yOffset || 0.0
 
-  pdf.advancedAPI(() => {
-    // set offsets and scale everything by k
-    pdf.saveGraphicsState()
-    pdf.setCurrentTransformationMatrix(new pdf.Matrix(k, 0, 0, k, xOffset, yOffset))
+  pdf.advancedAPI()
+  // set offsets and scale everything by k
+  pdf.saveGraphicsState()
+  pdf.setCurrentTransformationMatrix(new pdf.Matrix(k, 0, 0, k, xOffset, yOffset))
 
-    // set default values that differ from pdf defaults
-    pdf.setLineWidth(context.attributeState.strokeWidth)
-    const fill = (context.attributeState.fill as ColorFill).color
-    pdf.setFillColor(fill.r, fill.g, fill.b)
-    pdf.setFont(context.attributeState.fontFamily)
-    // correct for a jsPDF-instance measurement unit that differs from `pt`
-    pdf.setFontSize(context.attributeState.fontSize * pdf.internal.scaleFactor)
+  // set default values that differ from pdf defaults
+  pdf.setLineWidth(context.attributeState.strokeWidth)
+  const fill = (context.attributeState.fill as ColorFill).color
+  pdf.setFillColor(fill.r, fill.g, fill.b)
+  pdf.setFont(context.attributeState.fontFamily)
+  // correct for a jsPDF-instance measurement unit that differs from `pt`
+  pdf.setFontSize(context.attributeState.fontSize * pdf.internal.scaleFactor)
 
-    const clonedSvg = element.cloneNode(true) as HTMLElement
-    const idMap: { [id: string]: SvgNode } = {}
-    const svgnode = parse(clonedSvg, idMap)
-    context.refsHandler = new ReferencesHandler(idMap)
-    svgnode.render(context)
+  const clonedSvg = element.cloneNode(true) as HTMLElement
+  const idMap: { [id: string]: SvgNode } = {}
+  const node = parse(clonedSvg, idMap)
+  context.refsHandler = new ReferencesHandler(idMap)
+  await node.render(context)
 
-    pdf.restoreGraphicsState()
-  })
+  pdf.restoreGraphicsState()
+
+  pdf.compatAPI()
 
   context.textMeasure.cleanupTextMeasuring()
 

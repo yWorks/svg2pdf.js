@@ -3,7 +3,6 @@
  * the single floats in an array
  */
 import { RGBColor } from './rgbcolor'
-import { Point } from './geometry'
 
 export function parseFloats(str: string): number[] {
   const floats = []
@@ -13,18 +12,6 @@ export function parseFloats(str: string): number[] {
     floats.push(parseFloat(match[0]))
   }
   return floats
-}
-
-// parses the "points" string used by polygons and returns an array of points
-export function parsePointsString(string: string): Point[] {
-  const floats = parseFloats(string)
-  const result = []
-  for (let i = 0; i < floats.length - 1; i += 2) {
-    const x = floats[i]
-    const y = floats[i + 1]
-    result.push([x, y])
-  }
-  return result
 }
 
 // extends RGBColor by rgba colors as RGBColor is not capable of it

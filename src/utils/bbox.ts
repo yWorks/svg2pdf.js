@@ -23,7 +23,7 @@ export function getBoundingBoxByChildren(context: Context, svgnode: SvgNode): nu
   }
   let boundingBox = [0, 0, 0, 0]
   svgnode.children.forEach(child => {
-    const nodeBox = child.getBBox(context)
+    const nodeBox = child.getBoundingBox(context)
     boundingBox = [
       Math.min(boundingBox[0], nodeBox[0]),
       Math.min(boundingBox[1], nodeBox[1]),

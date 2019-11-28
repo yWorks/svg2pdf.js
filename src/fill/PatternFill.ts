@@ -15,7 +15,15 @@ export class PatternFill implements Fill {
     this.pattern = pattern
   }
 
-  getFillData(forNode: GraphicsNode, context: Context): FillData | undefined {
+  async getFillData(forNode: GraphicsNode, context: Context): Promise<FillData | undefined> {
+    await context.refsHandler.getRendered(
+      this.key,
+      new Context(context.pdf, {
+        refsHandler: context.refsHandler,
+        textMeasure: context.textMeasure
+      })
+    )
+
     const patternOrGradient: PatternData = {
       key: this.key,
       boundingBox: undefined,
@@ -30,11 +38,11 @@ export class PatternFill implements Fill {
       !this.pattern.element.hasAttribute('patternUnits') ||
       this.pattern.element.getAttribute('patternUnits').toLowerCase() === 'objectboundingbox'
     ) {
-      bBox = forNode.getBBox(context)
+      bBox = forNode.getBoundingBox(context)
       patternUnitsMatrix = new context.pdf.Matrix(1, 0, 0, 1, bBox[0], bBox[1])
 
       // TODO: slightly inaccurate (rounding errors? line width bBoxes?)
-      const fillBBox = this.pattern.getBBox(context)
+      const fillBBox = this.pattern.getBoundingBox(context)
       const x = fillBBox[0] * bBox[0]
       const y = fillBBox[1] * bBox[1]
       const width = fillBBox[2] * bBox[2]
@@ -49,10 +57,10 @@ export class PatternFill implements Fill {
       this.pattern.element.hasAttribute('patternContentUnits') &&
       this.pattern.element.getAttribute('patternContentUnits').toLowerCase() === 'objectboundingbox'
     ) {
-      bBox || (bBox = forNode.getBBox(context))
+      bBox || (bBox = forNode.getBoundingBox(context))
       patternContentUnitsMatrix = new context.pdf.Matrix(bBox[2], 0, 0, bBox[3], 0, 0)
 
-      const fillBBox = patternOrGradient.boundingBox || this.pattern.getBBox(context)
+      const fillBBox = patternOrGradient.boundingBox || this.pattern.getBoundingBox(context)
       const x = fillBBox[0] / bBox[0]
       const y = fillBBox[1] / bBox[1]
       const width = fillBBox[2] / bBox[2]

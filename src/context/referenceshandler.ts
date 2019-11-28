@@ -18,7 +18,7 @@ export class ReferencesHandler {
     this.idMap = idMap
   }
 
-  public getRendered(id: string, context: Context): SvgNode {
+  public async getRendered(id: string, context: Context): Promise<SvgNode> {
     if (this.renderedElements.hasOwnProperty(id)) {
       return this.renderedElements[id]
     }
@@ -26,11 +26,11 @@ export class ReferencesHandler {
     const svgNode: SvgNode = this.get(id)
 
     if (svgNode instanceof NonRenderedNode) {
-      svgNode.apply(context)
+      await svgNode.apply(context)
     } else {
-      const bBox = svgNode.getBBox(context)
+      const bBox = svgNode.getBoundingBox(context)
       context.pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], context.pdf.unitMatrix)
-      svgNode.render(new Context(context.pdf, { refsHandler: this }))
+      await svgNode.render(new Context(context.pdf, { refsHandler: this }))
       context.pdf.endFormObject(svgNode.element.getAttribute('id'))
     }
 

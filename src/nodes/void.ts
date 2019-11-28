@@ -4,7 +4,9 @@ import { svgNodeIsVisible } from '../utils/node'
 import { Rect } from '../utils/geometry'
 
 export class VoidNode extends SvgNode {
-  render(): void {}
+  render(parentContext: Context): Promise<void> {
+    return
+  }
   protected getBoundingBoxCore(context: Context): Rect {
     return [0, 0, 0, 0]
   }

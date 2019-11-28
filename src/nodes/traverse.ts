@@ -3,7 +3,8 @@ import { Path } from '../utils/path'
 import { svgNodeIsVisible } from '../utils/node'
 import { GeometryNode } from './geometrynode'
 import { SvgNode } from './svgnode'
-import { parsePointsString } from '../utils/parsing'
+import { parseFloats } from '../utils/parsing'
+import { Point } from '../utils/geometry'
 
 export abstract class Traverse extends GeometryNode {
   private readonly closed: boolean
@@ -18,7 +19,7 @@ export abstract class Traverse extends GeometryNode {
       return null
     }
 
-    const points = parsePointsString(this.element.getAttribute('points'))
+    const points = Traverse.parsePointsString(this.element.getAttribute('points'))
 
     const path = new Path()
 
@@ -45,5 +46,16 @@ export abstract class Traverse extends GeometryNode {
 
   protected computeNodeTransformCore(context: Context): any {
     return context.pdf.unitMatrix
+  }
+
+  static parsePointsString(string: string): Point[] {
+    const floats = parseFloats(string)
+    const result = []
+    for (let i = 0; i < floats.length - 1; i += 2) {
+      const x = floats[i]
+      const y = floats[i + 1]
+      result.push([x, y])
+    }
+    return result
   }
 }

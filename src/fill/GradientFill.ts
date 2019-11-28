@@ -14,7 +14,15 @@ export class GradientFill implements Fill {
     this.gradient = gradient
   }
 
-  getFillData(forNode: GraphicsNode, context: Context): FillData | undefined {
+  async getFillData(forNode: GraphicsNode, context: Context): Promise<FillData | undefined> {
+    await context.refsHandler.getRendered(
+      this.key,
+      new Context(context.pdf, {
+        refsHandler: context.refsHandler,
+        textMeasure: context.textMeasure
+      })
+    )
+
     // matrix to convert between gradient space and user space
     // for "userSpaceOnUse" this is the current transformation: tfMatrix
     // for "objectBoundingBox" or default, the gradient gets scaled and transformed to the bounding box
@@ -23,7 +31,7 @@ export class GradientFill implements Fill {
       !this.gradient.element.hasAttribute('gradientUnits') ||
       this.gradient.element.getAttribute('gradientUnits').toLowerCase() === 'objectboundingbox'
     ) {
-      const bBox = forNode.getBBox(context)
+      const bBox = forNode.getBoundingBox(context)
       gradientUnitsMatrix = new context.pdf.Matrix(bBox[2], 0, 0, bBox[3], bBox[0], bBox[1])
     } else {
       gradientUnitsMatrix = context.pdf.unitMatrix

@@ -34,8 +34,8 @@ export class Line extends GeometryNode {
     return svgNodeIsVisible(this, parentVisible)
   }
 
-  protected fillOrStroke(context: Context): void {
+  protected async fillOrStroke(context: Context): Promise<void> {
     context.attributeState.fill = null
-    super.fillOrStroke(context)
+    await super.fillOrStroke(context)
   }
 }

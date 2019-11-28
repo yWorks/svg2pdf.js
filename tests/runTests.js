@@ -56,12 +56,12 @@ for (const name of tests) {
     const parser = new DOMParser()
     const svgElement = parser.parseFromString(svgText, 'image/svg+xml').firstElementChild
 
-    it(`testing ${name}`, function() {
+    it(`testing ${name}`, async function() {
       const width = svgElement.width.baseVal.value
       const height = svgElement.height.baseVal.value
       const pdf = new jsPDF(width > height ? 'l' : 'p', 'pt', [width, height])
 
-      svg2pdf(svgElement, pdf, {})
+      await svg2pdf(svgElement, pdf, {})
 
       comparePdf(pdf.output(), `/tests/${name}/reference.pdf`, debug)
     })

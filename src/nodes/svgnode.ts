@@ -12,11 +12,11 @@ export abstract class SvgNode {
     this.children = children
   }
 
-  abstract render(parentContext: Context): void
+  abstract render(parentContext: Context): Promise<void>
 
   abstract isVisible(parentHidden: boolean): boolean
 
-  getBBox(context: Context): number[] {
+  getBoundingBox(context: Context): number[] {
     if (getAttribute(this.element, 'display') === 'none') {
       return [0, 0, 0, 0]
     }

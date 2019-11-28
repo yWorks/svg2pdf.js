@@ -11,7 +11,7 @@ import { Rect } from '../utils/geometry'
 export const dataUriRegex = /^\s*data:(([^/,;]+\/[^/,;]+)(?:;([^,;=]+=[^,;=]+))?)?(?:;(base64))?,(.*\s*)$/i
 
 export class ImageNode extends GraphicsNode {
-  protected renderCore(context: Context): void {
+  protected async renderCore(context: Context): Promise<void> {
     context.pdf.setCurrentTransformationMatrix(context.transform)
     const width = parseFloat(getAttribute(this.element, 'width')),
       height = parseFloat(getAttribute(this.element, 'height')),
@@ -58,7 +58,7 @@ export class ImageNode extends GraphicsNode {
 
       const idMap: { [id: string]: SvgNode } = {}
       const svgnode = parse(svgElement, idMap)
-      svgnode.render(
+      await svgnode.render(
         new Context(context.pdf, {
           refsHandler: new ReferencesHandler(idMap)
         })

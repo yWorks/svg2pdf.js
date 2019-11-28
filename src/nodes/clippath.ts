@@ -5,7 +5,7 @@ import { svgNodeAndChildrenVisible } from '../utils/node'
 import { Rect } from '../utils/geometry'
 
 export class ClipPath extends NonRenderedNode {
-  apply(context: Context): void {
+  async apply(context: Context): Promise<void> {
     if (!this.isVisible(true)) {
       return
     }
@@ -22,14 +22,14 @@ export class ClipPath extends NonRenderedNode {
 
     context.pdf.setCurrentTransformationMatrix(clipPathMatrix)
 
-    this.children.forEach(child =>
-      child.render(
+    for (const child of this.children) {
+      await child.render(
         new Context(context.pdf, {
           refsHandler: context.refsHandler,
           withinClipPath: true
         })
       )
-    )
+    }
     context.pdf.clip().discardPath()
 
     // as we cannot use restoreGraphicsState() to reset the transform (this would reset the clipping path, as well),

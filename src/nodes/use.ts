@@ -9,14 +9,14 @@ import { Rect } from '../utils/geometry'
  * to the pdf document. This highly reduces the file size and computation time.
  */
 export class Use extends GraphicsNode {
-  protected renderCore(context: Context): void {
+  protected async renderCore(context: Context): Promise<void> {
     const url = this.element.getAttribute('href') || this.element.getAttribute('xlink:href')
     // just in case someone has the idea to use empty use-tags, wtf???
     if (!url) return
 
     // get the size of the referenced form object (to apply the correct scaling)
     const id = url.substring(1)
-    context.refsHandler.getRendered(id, context)
+    await context.refsHandler.getRendered(id, context)
     const formObject = context.pdf.getFormObject(id)
 
     // scale and position it right

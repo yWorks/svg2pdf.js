@@ -17,7 +17,7 @@ import { GraphicsNode } from './graphicsnode'
 import { Rect } from '../utils/geometry'
 
 export class TextNode extends GraphicsNode {
-  protected renderCore(context: Context): void {
+  protected async renderCore(context: Context): Promise<void> {
     context.pdf.saveGraphicsState()
 
     let xOffset = 0

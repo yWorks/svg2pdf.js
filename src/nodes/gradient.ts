@@ -14,7 +14,7 @@ export abstract class Gradient extends NonRenderedNode {
     this.pdfGradientType = pdfGradientType
   }
 
-  apply(context: Context): void {
+  async apply(context: Context): Promise<void> {
     const colors: StopData[] = []
     let opacitySum = 0
     let hasOpacity = false

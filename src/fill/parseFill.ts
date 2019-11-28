@@ -14,7 +14,7 @@ export function parseFill(fill: string, context: Context): Fill {
   const url = iriReference.exec(fill)
   if (url) {
     const fillUrl = url[1]
-    const fillNode = context.refsHandler.getRendered(fillUrl, context)
+    const fillNode = context.refsHandler.get(fillUrl)
     if (fillNode && (fillNode instanceof LinearGradient || fillNode instanceof RadialGradient)) {
       return new GradientFill(fillUrl, fillNode)
     } else if (fillNode && fillNode instanceof Pattern) {

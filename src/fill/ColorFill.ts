@@ -10,7 +10,7 @@ export class ColorFill implements Fill {
     this.color = color
   }
 
-  getFillData(forNode: GraphicsNode, context: Context): FillData | undefined {
+  async getFillData(forNode: GraphicsNode, context: Context): Promise<FillData | undefined> {
     return undefined
   }
 }

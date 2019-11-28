@@ -15,7 +15,7 @@ export class MarkerList {
     this.markers.push(markers)
   }
 
-  draw(context: Context): void {
+  async draw(context: Context): Promise<void> {
     for (let i = 0; i < this.markers.length; i++) {
       const marker = this.markers[i]
 
@@ -44,7 +44,7 @@ export class MarkerList {
       // as the marker is already scaled by the current line width we must not apply the line width twice!
       context.pdf.saveGraphicsState()
       context.pdf.setLineWidth(1.0)
-      context.refsHandler.getRendered(marker.id, context)
+      await context.refsHandler.getRendered(marker.id, context)
       context.pdf.doFormObject(marker.id, tf)
       context.pdf.restoreGraphicsState()
     }

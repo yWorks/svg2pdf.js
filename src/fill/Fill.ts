@@ -2,7 +2,7 @@ import { Context } from '../context/context'
 import { GraphicsNode } from '../nodes/graphicsnode'
 
 export interface Fill {
-  getFillData(forNode: GraphicsNode, context: Context): FillData | undefined
+  getFillData(forNode: GraphicsNode, context: Context): Promise<FillData | undefined>
 }
 
 export interface FillData {

@@ -6,23 +6,23 @@ import { svgNodeAndChildrenVisible } from '../utils/node'
 import { Rect } from '../utils/geometry'
 
 export class MarkerNode extends NonRenderedNode {
-  apply(contextIn: Context): void {
+  async apply(parentContext: Context): Promise<void> {
     // the transformations directly at the node are written to the pdf form object transformation matrix
-    const tfMatrix = this.computeNodeTransform(contextIn)
-    const bBox = this.getBBox(contextIn)
-    const context = new Context(contextIn.pdf, {
-      refsHandler: contextIn.refsHandler,
+    const tfMatrix = this.computeNodeTransform(parentContext)
+    const bBox = this.getBoundingBox(parentContext)
+    const context = new Context(parentContext.pdf, {
+      refsHandler: parentContext.refsHandler,
       transform: tfMatrix
     })
 
     context.pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], tfMatrix)
-    this.children.forEach(child =>
-      child.render(
+    for (const child of this.children) {
+      await child.render(
         new Context(context.pdf, {
           refsHandler: context.refsHandler
         })
       )
-    )
+    }
     context.pdf.endFormObject(this.element.getAttribute('id'))
   }
 
