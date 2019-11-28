@@ -617,7 +617,7 @@ SOFTWARE.
         m = parseFloats(match[1]);
         var a = Math.PI * m[0] / 180;
         resultMatrix = _pdf.matrixMult(new _pdf.Matrix(Math.cos(a), Math.sin(a), -Math.sin(a), Math.cos(a), 0, 0), resultMatrix);
-        if (m[1] && m[2]) {
+        if (m[1] || m[2]) {
           var t1 = new _pdf.Matrix(1, 0, 0, 1, m[1], m[2]);
           var t2 = new _pdf.Matrix(1, 0, 0, 1, -m[1], -m[2]);
           resultMatrix = _pdf.matrixMult(t2, _pdf.matrixMult(resultMatrix, t1));
