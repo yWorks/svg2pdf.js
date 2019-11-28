@@ -11,7 +11,24 @@ import { Rect } from '../utils/geometry'
 export const dataUriRegex = /^\s*data:(([^/,;]+\/[^/,;]+)(?:;([^,;=]+=[^,;=]+))?)?(?:;(base64))?,(.*\s*)$/i
 
 export class ImageNode extends GraphicsNode {
+  private readonly imageLoadingPromise: Promise<{ data: string; format: string }>
+  private readonly imageUrl: string
+
+  constructor(element: HTMLElement, children: SvgNode[]) {
+    super(element, children)
+    this.imageUrl = this.element.getAttribute('xlink:href') || this.element.getAttribute('href')
+
+    if (this.imageUrl) {
+      // start loading the image as early as possible
+      this.imageLoadingPromise = ImageNode.fetchImageData(this.imageUrl)
+    }
+  }
+
   protected async renderCore(context: Context): Promise<void> {
+    if (!this.imageLoadingPromise) {
+      return
+    }
+
     context.pdf.setCurrentTransformationMatrix(context.transform)
     const width = parseFloat(getAttribute(this.element, 'width')),
       height = parseFloat(getAttribute(this.element, 'height')),
@@ -22,23 +39,11 @@ export class ImageNode extends GraphicsNode {
       return
     }
 
-    const imageUrl = this.element.getAttribute('xlink:href') || this.element.getAttribute('href')
+    const { data, format } = await this.imageLoadingPromise
 
-    if (!imageUrl) {
-      return
-    }
-
-    const dataUrl = imageUrl.match(dataUriRegex)
-    if (dataUrl && dataUrl[2] === 'image/svg+xml') {
-      let svgText = dataUrl[5]
-      if (dataUrl[4] === 'base64') {
-        svgText = atob(svgText)
-      } else {
-        svgText = decodeURIComponent(svgText)
-      }
-
+    if (format.startsWith('svg')) {
       const parser = new DOMParser()
-      const svgElement = parser.parseFromString(svgText, 'image/svg+xml')
+      const svgElement = parser.parseFromString(data, 'image/svg+xml')
         .firstElementChild as HTMLElement
 
       // unless preserveAspectRatio starts with "defer", the preserveAspectRatio attribute of the svg is ignored
@@ -64,25 +69,25 @@ export class ImageNode extends GraphicsNode {
         })
       )
       return
-    }
-
-    try {
-      context.pdf.addImage(
-        imageUrl,
-        '', // will be ignored anyways if imageUrl is a data url
-        x,
-        y,
-        width,
-        height
-      )
-    } catch (e) {
-      typeof console === 'object' &&
-        console.warn &&
-        console.warn(
-          'svg2pdfjs: Images with external resource link are not supported! ("' + imageUrl + '")'
+    } else {
+      const dataUri = `data:image/${format};base64,${btoa(data)}`
+      try {
+        context.pdf.addImage(
+          dataUri,
+          '', // will be ignored anyways if imageUrl is a data url
+          x,
+          y,
+          width,
+          height
         )
+      } catch (e) {
+        typeof console === 'object' &&
+          console.warn &&
+          console.warn(`Could not load image ${this.imageUrl}.\n${e}`)
+      }
     }
   }
+
   protected getBoundingBoxCore(context: Context): Rect {
     return addLineWidth(defaultBoundingBox(this.element), this.element)
   }
@@ -93,5 +98,71 @@ export class ImageNode extends GraphicsNode {
 
   isVisible(parentVisible: boolean): boolean {
     return svgNodeIsVisible(this, parentVisible)
+  }
+
+  static async fetchImageData(imageUrl: string): Promise<{ data: string; format: string }> {
+    let data, format
+
+    const match = imageUrl.match(dataUriRegex)
+    if (match) {
+      const mimeType = match[2]
+      const mimeTypeParts = mimeType.split('/')
+      if (mimeTypeParts[0] !== 'image') {
+        throw new Error(`Unsupported image URL: ${imageUrl}`)
+      }
+
+      format = mimeTypeParts[1]
+
+      data = match[5]
+      if (match[4] === 'base64') {
+        data = atob(data)
+      } else {
+        data = decodeURIComponent(data)
+      }
+    } else {
+      data = await ImageNode.fetchImage(imageUrl)
+      format = imageUrl.substring(imageUrl.lastIndexOf('.') + 1)
+    }
+
+    return {
+      data,
+      format
+    }
+  }
+
+  static fetchImage(imageUrl: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest()
+      xhr.open('GET', imageUrl, true)
+      xhr.responseType = 'arraybuffer'
+
+      xhr.onload = (): void => {
+        if (xhr.status !== 200) {
+          throw new Error(`Error ${xhr.status}: Failed to load image '${imageUrl}'`)
+        }
+
+        const bytes = new Uint8Array(xhr.response)
+        let data = ''
+        for (let i = 0; i < bytes.length; i++) {
+          data += String.fromCharCode(bytes[i])
+        }
+        resolve(data)
+      }
+      xhr.onerror = reject
+      xhr.onabort = reject
+
+      xhr.send(null)
+    })
+  }
+
+  static getMimeType(format: string): string {
+    format = format.toLowerCase()
+    switch (format) {
+      case 'jpg':
+      case 'jpeg':
+        return 'image/jpeg'
+      default:
+        return `image/${format}`
+    }
   }
 }

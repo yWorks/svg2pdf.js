@@ -1,10 +1,10 @@
 // Karma configuration
 'use strict'
-module.exports = (config) => {
+module.exports = config => {
   const testCoverage = process.argv.indexOf('--coverage') >= 0
   const preprocessors = {
     'tests/tests.js': 'babel'
-  };
+  }
 
   // currently it is not possible to have both coverage and browserify, so a coverage run needs to have the files
   // pre-bundled in dist/ (as the npm script does)
@@ -15,40 +15,45 @@ module.exports = (config) => {
   }
 
   config.set({
-
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['mocha', 'chai']/* .concat(testCoverage ? [] : ['']) */,
+    frameworks: ['mocha', 'chai'] /* .concat(testCoverage ? [] : ['']) */,
 
     webpack: require('./webpack.config.js'),
 
     // list of files / patterns to load in the browser
     files: [
-        'node_modules/jspdf-yworks/dist/jspdf.debug.js',
+      'node_modules/jspdf-yworks/dist/jspdf.debug.js',
 
-        'tests/utils/compare.js',
+      'tests/utils/compare.js',
 
-        {
-          pattern: 'tests/runTests.js',
-          included: true,
-          served: true,
-          watched: true,
-          type: "module"
-        },
+      {
+        pattern: 'tests/runTests.js',
+        included: true,
+        served: true,
+        watched: true,
+        type: 'module'
+      },
 
-        {
-          pattern: 'tests/**/spec.svg',
-          included: false,
-          served: true
-        }, {
-          pattern: 'tests/**/reference.pdf',
-          included: false,
-          watched: false,
-          served: true
-        }
+      {
+        pattern: 'tests/**/spec.svg',
+        included: false,
+        served: true
+      },
+      {
+        pattern: 'tests/**/*.{svg,png,jpg,jpeg}',
+        included: false,
+        served: true
+      },
+      {
+        pattern: 'tests/**/reference.pdf',
+        included: false,
+        watched: false,
+        served: true
+      }
     ],
 
     // list of files to exclude
