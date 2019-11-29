@@ -1,4 +1,4 @@
-const debug = false;
+const debug = true;
 
 const tests = [
   "attribute-style-precedence",
