@@ -40,7 +40,7 @@ export class TextChunk {
   put(context: Context): Point {
     let i, textNode
 
-    let strokeRGB: any
+    let strokeRGB: RGBColor
     const xs = [],
       ys = [],
       textNodeContexts = []

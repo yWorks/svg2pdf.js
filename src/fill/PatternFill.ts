@@ -5,6 +5,7 @@ import { getAttribute } from '../utils/node'
 import { Pattern } from '../nodes/pattern'
 import { Rect } from '../utils/geometry'
 import { GraphicsNode } from '../nodes/graphicsnode'
+import { Matrix } from 'jspdf-yworks'
 
 export class PatternFill implements Fill {
   private readonly key: string
@@ -39,7 +40,7 @@ export class PatternFill implements Fill {
       this.pattern.element.getAttribute('patternUnits').toLowerCase() === 'objectboundingbox'
     ) {
       bBox = forNode.getBoundingBox(context)
-      patternUnitsMatrix = new context.pdf.Matrix(1, 0, 0, 1, bBox[0], bBox[1])
+      patternUnitsMatrix = context.pdf.Matrix(1, 0, 0, 1, bBox[0], bBox[1])
 
       // TODO: slightly inaccurate (rounding errors? line width bBoxes?)
       const fillBBox = this.pattern.getBoundingBox(context)
@@ -58,7 +59,7 @@ export class PatternFill implements Fill {
       this.pattern.element.getAttribute('patternContentUnits').toLowerCase() === 'objectboundingbox'
     ) {
       bBox || (bBox = forNode.getBoundingBox(context))
-      patternContentUnitsMatrix = new context.pdf.Matrix(bBox[2], 0, 0, bBox[3], 0, 0)
+      patternContentUnitsMatrix = context.pdf.Matrix(bBox[2], 0, 0, bBox[3], 0, 0)
 
       const fillBBox = patternOrGradient.boundingBox || this.pattern.getBoundingBox(context)
       const x = fillBBox[0] / bBox[0]
@@ -94,5 +95,5 @@ interface PatternData {
   boundingBox: Rect
   xStep: number
   yStep: number
-  matrix: any
+  matrix: Matrix
 }

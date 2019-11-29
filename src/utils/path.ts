@@ -1,5 +1,6 @@
 import { Context } from '../context/context'
 import { multVecMatrix } from './geometry'
+import { Matrix } from 'jspdf-yworks'
 
 export class Path {
   segments: Segment[]
@@ -28,7 +29,7 @@ export class Path {
   /**
    * Transforms the path in place
    */
-  transform(matrix: any): void {
+  transform(matrix: Matrix): void {
     this.segments.forEach(seg => {
       if (seg instanceof MoveTo || seg instanceof LineTo || seg instanceof CurveTo) {
         const p = multVecMatrix([seg.x, seg.y], matrix)

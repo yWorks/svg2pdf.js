@@ -1,7 +1,9 @@
+import { Matrix } from 'jspdf-yworks'
+
 export type Point = number[]
 export type Rect = number[]
 
-export function getAngle(from: number[], to: number[]): number {
+export function getAngle(from: Point, to: Point): number {
   return Math.atan2(to[1] - from[1], to[0] - from[0])
 }
 
@@ -26,7 +28,7 @@ export function addVectors(v1: Point, v2: Point): Point {
 }
 
 // multiplies a vector with a matrix: vec' = vec * matrix
-export function multVecMatrix(vec: Point, matrix: any): Point {
+export function multVecMatrix(vec: Point, matrix: Matrix): Point {
   const x = vec[0]
   const y = vec[1]
   return [matrix.a * x + matrix.c * y + matrix.e, matrix.b * x + matrix.d * y + matrix.f]

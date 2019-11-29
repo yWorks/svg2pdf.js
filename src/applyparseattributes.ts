@@ -7,6 +7,7 @@ import { SvgNode } from './nodes/svgnode'
 import { findFirstAvailableFontFamily, fontAliases } from './utils/fonts'
 import { parseFill } from './fill/parseFill'
 import { ColorFill } from './fill/ColorFill'
+import { GState } from 'jspdf-yworks'
 
 export function parseAttributes(context: Context, svgNode: SvgNode, node?: HTMLElement): void {
   const domNode = node || svgNode.element
@@ -150,10 +151,10 @@ export function applyAttributes(
   const hasFillOpacity = fillOpacity < 1.0
   const hasStrokeOpacity = strokeOpacity < 1.0
   if (hasFillOpacity || hasStrokeOpacity) {
-    const gState: any = {}
+    const gState: GState = {}
     hasFillOpacity && (gState['opacity'] = fillOpacity)
     hasStrokeOpacity && (gState['stroke-opacity'] = strokeOpacity)
-    childContext.pdf.setGState(new childContext.pdf.GState(gState))
+    childContext.pdf.setGState(childContext.pdf.GState(gState))
   }
 
   if (

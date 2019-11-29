@@ -3,6 +3,7 @@ import { Path } from '../utils/path'
 import { svgNodeIsVisible } from '../utils/node'
 import { GeometryNode } from './geometrynode'
 import { SvgNode } from './svgnode'
+import { Matrix } from 'jspdf-yworks'
 
 export class Line extends GeometryNode {
   constructor(node: HTMLElement, children: SvgNode[]) {
@@ -26,7 +27,7 @@ export class Line extends GeometryNode {
     return new Path().moveTo(x1, y1).lineTo(x2, y2)
   }
 
-  protected computeNodeTransformCore(context: Context): any {
+  protected computeNodeTransformCore(context: Context): Matrix {
     return context.pdf.unitMatrix
   }
 

@@ -25,10 +25,10 @@ export class MarkerList {
       const cos = Math.cos(angle)
       const sin = Math.sin(angle)
       // position at and rotate around anchor
-      tf = new context.pdf.Matrix(cos, sin, -sin, cos, anchor[0], anchor[1])
+      tf = context.pdf.Matrix(cos, sin, -sin, cos, anchor[0], anchor[1])
       // scale with stroke-width
       tf = context.pdf.matrixMult(
-        new context.pdf.Matrix(
+        context.pdf.Matrix(
           context.attributeState.strokeWidth,
           0,
           0,

@@ -74,7 +74,7 @@ export class TextMeasure {
   private canvasTextMeasure(
     text: string,
     fontFamily: string,
-    fontSize: any,
+    fontSize: string,
     fontStyle: string,
     fontWeight: string
   ): number {
@@ -88,7 +88,7 @@ export class TextMeasure {
   private svgTextMeasure(
     text: string,
     fontFamily: string,
-    fontSize: any,
+    fontSize: string,
     fontStyle: string,
     fontWeight: string,
     measurementTextNode: SVGTextElement = this.getMeasurementTextNode()

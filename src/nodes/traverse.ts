@@ -5,6 +5,7 @@ import { GeometryNode } from './geometrynode'
 import { SvgNode } from './svgnode'
 import { parseFloats } from '../utils/parsing'
 import { Point } from '../utils/geometry'
+import { Matrix } from 'jspdf-yworks'
 
 export abstract class Traverse extends GeometryNode {
   private readonly closed: boolean
@@ -44,7 +45,7 @@ export abstract class Traverse extends GeometryNode {
     return svgNodeIsVisible(this, parentVisible)
   }
 
-  protected computeNodeTransformCore(context: Context): any {
+  protected computeNodeTransformCore(context: Context): Matrix {
     return context.pdf.unitMatrix
   }
 

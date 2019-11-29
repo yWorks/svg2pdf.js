@@ -3,6 +3,7 @@ import { getAttribute, svgNodeIsVisible } from '../utils/node'
 import { Context } from '../context/context'
 import { Path } from '../utils/path'
 import { SvgNode } from './svgnode'
+import { Matrix } from 'jspdf-yworks'
 
 export abstract class EllipseBase extends GeometryNode {
   abstract get rx(): number
@@ -30,7 +31,7 @@ export abstract class EllipseBase extends GeometryNode {
       .curveTo(x + lx, y + this.ry, x + this.rx, y + ly, x + this.rx, y)
   }
 
-  protected computeNodeTransformCore(context: Context): any {
+  protected computeNodeTransformCore(context: Context): Matrix {
     return context.pdf.unitMatrix
   }
 

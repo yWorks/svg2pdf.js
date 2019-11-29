@@ -1,8 +1,13 @@
 import { AttributeState } from '../context/attributestate'
 import { getAttribute } from './node'
+import { TextOptionsLight } from 'jspdf-yworks'
 
-export function getTextRenderingMode(attributeState: AttributeState): string {
-  let renderingMode = 'invisible'
+// capture type...
+let tol: TextOptionsLight
+type TextRenderingMode = typeof tol.renderingMode
+
+export function getTextRenderingMode(attributeState: AttributeState): TextRenderingMode {
+  let renderingMode: TextRenderingMode = 'invisible'
   if (attributeState.fill && attributeState.stroke) {
     renderingMode = 'fillThenStroke'
   } else if (attributeState.fill) {

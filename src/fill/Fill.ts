@@ -1,5 +1,6 @@
 import { Context } from '../context/context'
 import { GraphicsNode } from '../nodes/graphicsnode'
+import { Matrix } from 'jspdf-yworks'
 
 export interface Fill {
   getFillData(forNode: GraphicsNode, context: Context): Promise<FillData | undefined>
@@ -7,7 +8,7 @@ export interface Fill {
 
 export interface FillData {
   key: string
-  matrix?: any
+  matrix?: Matrix
   boundingBox?: number[]
   xStep?: number
   yStep?: number

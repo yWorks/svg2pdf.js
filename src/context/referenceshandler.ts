@@ -10,7 +10,7 @@ import { Context } from './context'
  * @property rootSvg
  */
 export class ReferencesHandler {
-  private readonly renderedElements: any
+  private readonly renderedElements: { [key: string]: SvgNode }
   private readonly idMap: { [id: string]: SvgNode }
 
   constructor(idMap: { [id: string]: SvgNode }) {

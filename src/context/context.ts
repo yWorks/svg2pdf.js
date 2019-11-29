@@ -1,6 +1,7 @@
 import { ReferencesHandler } from './referenceshandler'
 import { AttributeState } from './attributestate'
 import { TextMeasure } from './textmeasure'
+import { jsPDF, Matrix } from 'jspdf-yworks'
 
 /**
  *
@@ -15,14 +16,14 @@ import { TextMeasure } from './textmeasure'
  * @property withinClipPath
  */
 export class Context {
-  pdf: any
+  pdf: jsPDF
   attributeState: AttributeState
   refsHandler: ReferencesHandler
   textMeasure: TextMeasure
-  transform: any
+  transform: Matrix
   withinClipPath: boolean
 
-  constructor(pdf: any, values: IContextOptions = {}) {
+  constructor(pdf: jsPDF, values: ContextOptions = {}) {
     this.pdf = pdf
 
     this.attributeState = values.attributeState
@@ -34,7 +35,7 @@ export class Context {
     this.withinClipPath = values.withinClipPath || false
   }
 
-  clone(values: IContextOptions = {}) {
+  clone(values: ContextOptions = {}): Context {
     values = values || {}
     const clone = new Context(this.pdf)
 
@@ -50,10 +51,10 @@ export class Context {
   }
 }
 
-export interface IContextOptions {
+export interface ContextOptions {
   attributeState?: AttributeState
   refsHandler?: ReferencesHandler
   textMeasure?: TextMeasure
-  transform?: any
+  transform?: Matrix
   withinClipPath?: boolean
 }

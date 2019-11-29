@@ -3,6 +3,7 @@ import { defaultBoundingBox } from '../utils/bbox'
 import { NonRenderedNode } from './nonrenderednode'
 import { svgNodeAndChildrenVisible } from '../utils/node'
 import { Rect } from '../utils/geometry'
+import { Matrix } from 'jspdf-yworks'
 
 export class Pattern extends NonRenderedNode {
   async apply(context: Context): Promise<void> {
@@ -10,7 +11,7 @@ export class Pattern extends NonRenderedNode {
 
     // the transformations directly at the node are written to the pattern transformation matrix
     const bBox = this.getBoundingBox(context)
-    const pattern = new context.pdf.TilingPattern(
+    const pattern = context.pdf.TilingPattern(
       [bBox[0], bBox[1], bBox[0] + bBox[2], bBox[1] + bBox[3]],
       bBox[2],
       bBox[3],
@@ -36,7 +37,7 @@ export class Pattern extends NonRenderedNode {
     return defaultBoundingBox(this.element)
   }
 
-  protected computeNodeTransformCore(context: Context): any {
+  protected computeNodeTransformCore(context: Context): Matrix {
     return context.pdf.unitMatrix
   }
 

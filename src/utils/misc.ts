@@ -1,4 +1,5 @@
 import { alignmentBaselineMap } from './constants'
+import { TextOptionsLight } from 'jspdf-yworks'
 
 /**
  * Convert em, px and bare number attributes to pixel values
@@ -22,6 +23,10 @@ export function toPixels(value: string, pdfFontSize: number): number {
   return 0
 }
 
-export function mapAlignmentBaseline(value: string): string {
+// capture type...
+let tol: TextOptionsLight
+export type TextBaseLine = typeof tol.baseline
+
+export function mapAlignmentBaseline(value: string): TextBaseLine {
   return alignmentBaselineMap[value] || 'alphabetic'
 }

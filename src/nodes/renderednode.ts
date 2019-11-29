@@ -62,7 +62,7 @@ export abstract class RenderedNode extends SvgNode {
     ) {
       const bBox = this.getBoundingBox(outerContext)
       clipContext.transform = outerContext.pdf.matrixMult(
-        new outerContext.pdf.Matrix(bBox[2], 0, 0, bBox[3], bBox[0], bBox[1]),
+        outerContext.pdf.Matrix(bBox[2], 0, 0, bBox[3], bBox[0], bBox[1]),
         outerContext.transform
       )
     }

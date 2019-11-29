@@ -4,6 +4,7 @@ import { getAttribute, svgNodeAndChildrenVisible } from '../utils/node'
 import { ContainerNode } from './containernode'
 import { computeViewBoxTransform } from '../utils/transform'
 import { Rect } from '../utils/geometry'
+import { Matrix } from 'jspdf-yworks'
 
 export class Svg extends ContainerNode {
   protected getBoundingBoxCore(context: Context): Rect {
@@ -24,7 +25,7 @@ export class Svg extends ContainerNode {
     return svgNodeAndChildrenVisible(this, parentVisible)
   }
 
-  protected computeNodeTransformCore(context: Context): any {
+  protected computeNodeTransformCore(context: Context): Matrix {
     const x = parseFloat(getAttribute(this.element, 'x')) || 0
     const y = parseFloat(getAttribute(this.element, 'y')) || 0
 
@@ -36,7 +37,7 @@ export class Svg extends ContainerNode {
       const height = parseFloat(getAttribute(this.element, 'height')) || box[3]
       nodeTransform = computeViewBoxTransform(this.element, box, x, y, width, height, context)
     } else {
-      nodeTransform = new context.pdf.Matrix(1, 0, 0, 1, x, y)
+      nodeTransform = context.pdf.Matrix(1, 0, 0, 1, x, y)
     }
     return nodeTransform
   }

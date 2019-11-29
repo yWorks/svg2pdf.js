@@ -4,6 +4,7 @@ import { computeViewBoxTransform } from '../utils/transform'
 import { NonRenderedNode } from './nonrenderednode'
 import { svgNodeAndChildrenVisible } from '../utils/node'
 import { Rect } from '../utils/geometry'
+import { Matrix } from 'jspdf-yworks'
 
 export class MarkerNode extends NonRenderedNode {
   async apply(parentContext: Context): Promise<void> {
@@ -40,7 +41,7 @@ export class MarkerNode extends NonRenderedNode {
     ]
   }
 
-  protected computeNodeTransformCore(context: Context): any {
+  protected computeNodeTransformCore(context: Context): Matrix {
     const refX = parseFloat(this.element.getAttribute('refX')) || 0
     const refY = parseFloat(this.element.getAttribute('refY')) || 0
 
@@ -59,11 +60,11 @@ export class MarkerNode extends NonRenderedNode {
         context
       )
       nodeTransform = context.pdf.matrixMult(
-        new context.pdf.Matrix(1, 0, 0, 1, -refX, -refY),
+        context.pdf.Matrix(1, 0, 0, 1, -refX, -refY),
         nodeTransform
       )
     } else {
-      nodeTransform = new context.pdf.Matrix(1, 0, 0, 1, -refX, -refY)
+      nodeTransform = context.pdf.Matrix(1, 0, 0, 1, -refX, -refY)
     }
     return nodeTransform
   }

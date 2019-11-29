@@ -27,6 +27,7 @@ import { Context } from './context/context'
 import { ReferencesHandler } from './context/referenceshandler'
 import { parse } from './parse'
 import { ColorFill } from './fill/ColorFill'
+import jsPDFAPI, { jsPDF } from 'jspdf-yworks'
 
 /**
  * Renders an svg element to a jsPDF document.
@@ -40,7 +41,11 @@ import { ColorFill } from './fill/ColorFill'
  */
 
 // the actual svgToPdf function (see above)
-async function svg2pdf(element: HTMLElement, pdf: any, options: Svg2PdfOptions = {}): Promise<any> {
+export async function svg2pdf(
+  element: HTMLElement,
+  pdf: jsPDF,
+  options: Svg2PdfOptions = {}
+): Promise<jsPDF> {
   //  create context object
   const context = new Context(pdf)
 
@@ -51,7 +56,7 @@ async function svg2pdf(element: HTMLElement, pdf: any, options: Svg2PdfOptions =
   pdf.advancedAPI()
   // set offsets and scale everything by k
   pdf.saveGraphicsState()
-  pdf.setCurrentTransformationMatrix(new pdf.Matrix(k, 0, 0, k, xOffset, yOffset))
+  pdf.setCurrentTransformationMatrix(pdf.Matrix(k, 0, 0, k, xOffset, yOffset))
 
   // set default values that differ from pdf defaults
   pdf.setLineWidth(context.attributeState.strokeWidth)
@@ -76,10 +81,15 @@ async function svg2pdf(element: HTMLElement, pdf: any, options: Svg2PdfOptions =
   return pdf
 }
 
+jsPDFAPI.API.svg = function(
+  element: HTMLElement,
+  options: Svg2PdfOptions = {}
+): ReturnType<typeof svg2pdf> {
+  return svg2pdf(element, this, options)
+}
+
 export interface Svg2PdfOptions {
   scale?: number
   xOffset?: number
   yOffset?: number
 }
-
-export default svg2pdf

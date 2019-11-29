@@ -3,6 +3,7 @@ import { addLineWidth, defaultBoundingBox } from '../utils/bbox'
 import { getAttribute, svgNodeIsVisible } from '../utils/node'
 import { GraphicsNode } from './graphicsnode'
 import { Rect } from '../utils/geometry'
+import { Matrix } from 'jspdf-yworks'
 
 /**
  * Draws the element referenced by a use node, makes use of pdf's XObjects/FormObjects so nodes are only written once
@@ -20,11 +21,11 @@ export class Use extends GraphicsNode {
     const formObject = context.pdf.getFormObject(id)
 
     // scale and position it right
-    const x = getAttribute(this.element, 'x') || 0
-    const y = getAttribute(this.element, 'y') || 0
+    const x = parseFloat(getAttribute(this.element, 'x') || '0')
+    const y = parseFloat(getAttribute(this.element, 'y') || '0')
     const width = getAttribute(this.element, 'width') || formObject.width
     const height = getAttribute(this.element, 'height') || formObject.height
-    let t = new context.pdf.Matrix(
+    let t = context.pdf.Matrix(
       width / formObject.width || 0,
       0,
       0,
@@ -44,7 +45,7 @@ export class Use extends GraphicsNode {
     return svgNodeIsVisible(this, parentVisible)
   }
 
-  protected computeNodeTransformCore(context: Context): any {
+  protected computeNodeTransformCore(context: Context): Matrix {
     return context.pdf.unitMatrix
   }
 }

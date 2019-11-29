@@ -1,4 +1,4 @@
-import svg2pdf from '../src/svg2pdf'
+import { svg2pdf } from '../src/svg2pdf'
 
 const debug = false
 
@@ -61,7 +61,8 @@ for (const name of tests) {
       const height = svgElement.height.baseVal.value
       const pdf = new jsPDF(width > height ? 'l' : 'p', 'pt', [width, height])
 
-      await svg2pdf(svgElement, pdf, {})
+      await pdf.svg(svgElement)
+      // await svg2pdf(svgElement, pdf, {})
 
       comparePdf(pdf.output(), `/tests/${name}/reference.pdf`, debug)
     })

@@ -5,11 +5,16 @@ import { getAttribute, svgNodeAndChildrenVisible } from '../utils/node'
 import { Rect } from '../utils/geometry'
 import { RGBColor } from '../utils/rgbcolor'
 import { SvgNode } from './svgnode'
+import { Matrix, ShadingPatternType } from 'jspdf-yworks'
 
 export abstract class Gradient extends NonRenderedNode {
-  private readonly pdfGradientType: string
+  private readonly pdfGradientType: ShadingPatternType
 
-  protected constructor(pdfGradientType: string, element: HTMLElement, children: SvgNode[]) {
+  protected constructor(
+    pdfGradientType: ShadingPatternType,
+    element: HTMLElement,
+    children: SvgNode[]
+  ) {
     super(element, children)
     this.pdfGradientType = pdfGradientType
   }
@@ -36,10 +41,10 @@ export abstract class Gradient extends NonRenderedNode {
     })
 
     if (hasOpacity) {
-      gState = new context.pdf.GState({ opacity: opacitySum / colors.length })
+      gState = context.pdf.GState({ opacity: opacitySum / colors.length })
     }
 
-    const pattern = new context.pdf.ShadingPattern(
+    const pattern = context.pdf.ShadingPattern(
       this.pdfGradientType,
       this.getCoordinates(),
       colors,
@@ -54,7 +59,7 @@ export abstract class Gradient extends NonRenderedNode {
   protected getBoundingBoxCore(context: Context): Rect {
     return defaultBoundingBox(this.element)
   }
-  protected computeNodeTransformCore(context: Context): any {
+  protected computeNodeTransformCore(context: Context): Matrix {
     return context.pdf.unitMatrix
   }
   isVisible(parentVisible: boolean): boolean {

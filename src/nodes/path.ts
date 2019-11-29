@@ -5,13 +5,14 @@ import { GeometryNode } from './geometrynode'
 import { SvgNode } from './svgnode'
 import * as SvgPath from 'svgpath'
 import { toCubic } from '../utils/geometry'
+import { Matrix } from 'jspdf-yworks'
 
 export class PathNode extends GeometryNode {
   constructor(node: HTMLElement, children: SvgNode[]) {
     super(true, node, children)
   }
 
-  protected computeNodeTransformCore(context: Context): any {
+  protected computeNodeTransformCore(context: Context): Matrix {
     return context.pdf.unitMatrix
   }
 

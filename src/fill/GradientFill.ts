@@ -32,7 +32,7 @@ export class GradientFill implements Fill {
       this.gradient.element.getAttribute('gradientUnits').toLowerCase() === 'objectboundingbox'
     ) {
       const bBox = forNode.getBoundingBox(context)
-      gradientUnitsMatrix = new context.pdf.Matrix(bBox[2], 0, 0, bBox[3], bBox[0], bBox[1])
+      gradientUnitsMatrix = context.pdf.Matrix(bBox[2], 0, 0, bBox[3], bBox[0], bBox[1])
     } else {
       gradientUnitsMatrix = context.pdf.unitMatrix
     }

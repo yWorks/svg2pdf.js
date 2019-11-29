@@ -15,6 +15,7 @@ import {
 } from '../utils/text'
 import { GraphicsNode } from './graphicsnode'
 import { Rect } from '../utils/geometry'
+import { Matrix } from 'jspdf-yworks'
 
 export class TextNode extends GraphicsNode {
   protected async renderCore(context: Context): Promise<void> {
@@ -146,7 +147,7 @@ export class TextNode extends GraphicsNode {
     return addLineWidth(defaultBoundingBox(this.element), this.element)
   }
 
-  protected computeNodeTransformCore(context: Context): any {
+  protected computeNodeTransformCore(context: Context): Matrix {
     return context.pdf.unitMatrix
   }
 }

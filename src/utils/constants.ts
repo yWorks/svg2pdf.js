@@ -1,6 +1,8 @@
+import { TextBaseLine } from './misc'
+
 export const iriReference = /url\(["']?#([^"']+)["']?\)/
 
-export const alignmentBaselineMap: { [key: string]: string } = {
+export const alignmentBaselineMap: { [key: string]: TextBaseLine } = {
   bottom: 'bottom',
   'text-bottom': 'bottom',
   top: 'top',
