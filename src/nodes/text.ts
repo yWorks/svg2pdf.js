@@ -34,7 +34,7 @@ export class TextNode extends GraphicsNode {
     // when there are no tspans draw the text directly
     const tSpanCount = this.element.childElementCount
     if (tSpanCount === 0) {
-      const trimmedText = transformXmlSpace(this.element.textContent, context.attributeState)
+      const trimmedText = transformXmlSpace(this.element.textContent || '', context.attributeState)
       const transformedText = transformText(this.element, trimmedText)
       xOffset = context.textMeasure.getTextOffset(transformedText, context.attributeState)
 

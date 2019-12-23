@@ -66,7 +66,10 @@ export function computeViewBoxTransform(
 }
 
 // parses the "transform" string
-export function parseTransform(transformString: string, context: Context): Matrix {
+export function parseTransform(
+  transformString: string | undefined | null,
+  context: Context
+): Matrix {
   if (!transformString || transformString === 'none') return context.pdf.unitMatrix
 
   const mRegex = /^[\s,]*matrix\(([^\)]+)\)\s*/,

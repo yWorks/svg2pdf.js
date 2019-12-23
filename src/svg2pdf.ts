@@ -1,7 +1,7 @@
-/*
+/**
 The MIT License (MIT)
 
-Copyright (c) 2015-2017 yWorks GmbH
+Copyright (c) 2015-2019 yWorks GmbH
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+@license
 */
 
 import { SvgNode } from './nodes/svgnode'
@@ -27,7 +28,10 @@ import { Context } from './context/context'
 import { ReferencesHandler } from './context/referenceshandler'
 import { parse } from './parse'
 import { ColorFill } from './fill/ColorFill'
-import jsPDFAPI, { jsPDF } from 'jspdf-yworks'
+import jsPDFType from 'jspdf-yworks'
+// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+// @ts-ignore
+import jsPDF from 'jspdf-yworks/dist/jspdf.node.debug'
 
 /**
  * Renders an svg element to a jsPDF document.
@@ -43,9 +47,9 @@ import jsPDFAPI, { jsPDF } from 'jspdf-yworks'
 // the actual svgToPdf function (see above)
 export async function svg2pdf(
   element: HTMLElement,
-  pdf: jsPDF,
+  pdf: jsPDFType,
   options: Svg2PdfOptions = {}
-): Promise<jsPDF> {
+): Promise<jsPDFType> {
   //  create context object
   const context = new Context(pdf)
 
@@ -81,7 +85,7 @@ export async function svg2pdf(
   return pdf
 }
 
-jsPDFAPI.API.svg = function(
+jsPDF.API.svg = function(
   element: HTMLElement,
   options: Svg2PdfOptions = {}
 ): ReturnType<typeof svg2pdf> {

@@ -3,28 +3,28 @@ import { Fill } from '../fill/Fill'
 import { ColorFill } from '../fill/ColorFill'
 
 export class AttributeState {
-  public xmlSpace: string = null
-  public fill: Fill = null
+  public xmlSpace = ''
+  public fill: Fill | null = null
   public fillOpacity = 1.0
   // public fillRule: string = null
-  public fontFamily: string = null
+  public fontFamily = ''
   public fontSize = 16
-  public fontStyle: string = null
+  public fontStyle = ''
   // public fontVariant: string
-  public fontWeight: string = null
+  public fontWeight = ''
   public opacity = 1.0
-  public stroke: Fill = null
-  public strokeDasharray: [] = null
+  public stroke: Fill | null = null
+  public strokeDasharray: [] | null = null
   public strokeDashoffset = 0
-  public strokeLinecap: string = null
-  public strokeLinejoin: string = null
+  public strokeLinecap = ''
+  public strokeLinejoin = ''
   public strokeMiterlimit = 4.0
   public strokeOpacity = 1.0
   public strokeWidth = 1.0
   // public textAlign: string
-  public alignmentBaseline: string = null
-  public textAnchor: string = null
-  public visibility: string = null
+  public alignmentBaseline = ''
+  public textAnchor = ''
+  public visibility = ''
 
   clone(): AttributeState {
     const clone = new AttributeState()
@@ -70,7 +70,7 @@ export class AttributeState {
     attributeState.opacity = 1.0
     attributeState.stroke = null
     attributeState.strokeDasharray = null
-    attributeState.strokeDashoffset = null
+    attributeState.strokeDashoffset = 0
     attributeState.strokeLinecap = 'butt'
     attributeState.strokeLinejoin = 'miter'
     attributeState.strokeMiterlimit = 4.0

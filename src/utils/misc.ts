@@ -6,7 +6,7 @@ import { TextOptionsLight } from 'jspdf-yworks'
  * @param {string} value
  * @param {number} pdfFontSize
  */
-export function toPixels(value: string, pdfFontSize: number): number {
+export function toPixels(value: string | null, pdfFontSize: number): number {
   let match
 
   // em

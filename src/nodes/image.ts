@@ -12,8 +12,8 @@ import { Matrix } from 'jspdf-yworks'
 export const dataUriRegex = /^\s*data:(([^/,;]+\/[^/,;]+)(?:;([^,;=]+=[^,;=]+))?)?(?:;(base64))?,(.*\s*)$/i
 
 export class ImageNode extends GraphicsNode {
-  private readonly imageLoadingPromise: Promise<{ data: string; format: string }>
-  private readonly imageUrl: string
+  private readonly imageLoadingPromise: Promise<{ data: string; format: string }> | null = null
+  private readonly imageUrl: string | null
 
   constructor(element: HTMLElement, children: SvgNode[]) {
     super(element, children)
@@ -31,10 +31,10 @@ export class ImageNode extends GraphicsNode {
     }
 
     context.pdf.setCurrentTransformationMatrix(context.transform)
-    const width = parseFloat(getAttribute(this.element, 'width')),
-      height = parseFloat(getAttribute(this.element, 'height')),
-      x = parseFloat(getAttribute(this.element, 'x')) || 0,
-      y = parseFloat(getAttribute(this.element, 'y')) || 0
+    const width = parseFloat(getAttribute(this.element, 'width') || '0'),
+      height = parseFloat(getAttribute(this.element, 'height') || '0'),
+      x = parseFloat(getAttribute(this.element, 'x') || '0'),
+      y = parseFloat(getAttribute(this.element, 'y') || '0')
 
     if (!isFinite(width) || width <= 0 || !isFinite(height) || height <= 0) {
       return
@@ -54,7 +54,7 @@ export class ImageNode extends GraphicsNode {
         preserveAspectRatio.indexOf('defer') < 0 ||
         !svgElement.getAttribute('preserveAspectRatio')
       ) {
-        svgElement.setAttribute('preserveAspectRatio', preserveAspectRatio)
+        svgElement.setAttribute('preserveAspectRatio', preserveAspectRatio || '')
       }
 
       svgElement.setAttribute('x', String(x))

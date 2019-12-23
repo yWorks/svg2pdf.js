@@ -37,6 +37,8 @@ export class PatternFill implements Fill {
     let patternUnitsMatrix = context.pdf.unitMatrix
     if (
       !this.pattern.element.hasAttribute('patternUnits') ||
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore
       this.pattern.element.getAttribute('patternUnits').toLowerCase() === 'objectboundingbox'
     ) {
       bBox = forNode.getBoundingBox(context)
@@ -56,6 +58,8 @@ export class PatternFill implements Fill {
     let patternContentUnitsMatrix = context.pdf.unitMatrix
     if (
       this.pattern.element.hasAttribute('patternContentUnits') &&
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore
       this.pattern.element.getAttribute('patternContentUnits').toLowerCase() === 'objectboundingbox'
     ) {
       bBox || (bBox = forNode.getBoundingBox(context))
@@ -92,8 +96,8 @@ export class PatternFill implements Fill {
 
 interface PatternData {
   key: string
-  boundingBox: Rect
+  boundingBox?: Rect
   xStep: number
   yStep: number
-  matrix: Matrix
+  matrix?: Matrix
 }

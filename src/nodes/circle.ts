@@ -14,6 +14,6 @@ export class Circle extends EllipseBase {
 
   constructor(node: HTMLElement, children: SvgNode[]) {
     super(node, children)
-    this.r = parseFloat(getAttribute(this.element, 'r'))
+    this.r = parseFloat(getAttribute(this.element, 'r') || '0')
   }
 }

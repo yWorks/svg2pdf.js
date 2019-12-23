@@ -97,7 +97,7 @@ export class TextChunk {
       maxX = Math.max(maxX, currentTextX)
     }
 
-    let textOffset
+    let textOffset = 0
     switch (this.textAnchor) {
       case 'start':
         textOffset = 0

@@ -10,7 +10,7 @@ import { ColorFill } from './ColorFill'
 import { RGBColor } from '../utils/rgbcolor'
 import { parseColor } from '../utils/parsing'
 
-export function parseFill(fill: string, context: Context): Fill {
+export function parseFill(fill: string, context: Context): Fill | null {
   const url = iriReference.exec(fill)
   if (url) {
     const fillUrl = url[1]
@@ -29,6 +29,8 @@ export function parseFill(fill: string, context: Context): Fill {
     if (fillColor.ok) {
       return new ColorFill(fillColor)
     } else if (fill === 'none') {
+      return null
+    } else {
       return null
     }
   }

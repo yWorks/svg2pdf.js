@@ -8,9 +8,9 @@ export class Ellipse extends EllipseBase {
   }
 
   get rx(): number {
-    return parseFloat(getAttribute(this.element, 'rx'))
+    return parseFloat(getAttribute(this.element, 'rx') || '0')
   }
   get ry(): number {
-    return parseFloat(getAttribute(this.element, 'ry'))
+    return parseFloat(getAttribute(this.element, 'ry') || '0')
   }
 }

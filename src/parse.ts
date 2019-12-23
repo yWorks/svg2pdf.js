@@ -23,7 +23,6 @@ import { ClipPath } from './nodes/clippath'
 export function parse(node: HTMLElement, idMap?: { [id: string]: SvgNode }): SvgNode {
   let svgnode: SvgNode
   const children: SvgNode[] = []
-  const existsIdMap = idMap
 
   forEachChild(node, (i, n) => children.push(parse(n, idMap)))
 
@@ -85,7 +84,7 @@ export function parse(node: HTMLElement, idMap?: { [id: string]: SvgNode }): Svg
       break
   }
 
-  if (existsIdMap && svgnode.element.hasAttribute('id')) {
+  if (idMap != undefined && svgnode.element.hasAttribute('id')) {
     const id = cssesc(svgnode.element.id, { isIdentifier: true })
     idMap[id] = idMap[id] || svgnode
   }

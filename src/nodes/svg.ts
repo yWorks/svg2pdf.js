@@ -14,10 +14,10 @@ export class Svg extends ContainerNode {
       vb = parseFloats(viewBox)
     }
     return [
-      parseFloat(getAttribute(this.element, 'x')) || (vb && vb[0]) || 0,
-      parseFloat(getAttribute(this.element, 'y')) || (vb && vb[1]) || 0,
-      parseFloat(getAttribute(this.element, 'width')) || (vb && vb[2]) || 0,
-      parseFloat(getAttribute(this.element, 'height')) || (vb && vb[3]) || 0
+      parseFloat(getAttribute(this.element, 'x') || '0') || (vb && vb[0]) || 0,
+      parseFloat(getAttribute(this.element, 'y') || '0') || (vb && vb[1]) || 0,
+      parseFloat(getAttribute(this.element, 'width') || '0') || (vb && vb[2]) || 0,
+      parseFloat(getAttribute(this.element, 'height') || '0') || (vb && vb[3]) || 0
     ]
   }
 
@@ -26,15 +26,15 @@ export class Svg extends ContainerNode {
   }
 
   protected computeNodeTransformCore(context: Context): Matrix {
-    const x = parseFloat(getAttribute(this.element, 'x')) || 0
-    const y = parseFloat(getAttribute(this.element, 'y')) || 0
+    const x = parseFloat(getAttribute(this.element, 'x') || '0')
+    const y = parseFloat(getAttribute(this.element, 'y') || '0')
 
     const viewBox = this.element.getAttribute('viewBox')
     let nodeTransform
     if (viewBox) {
       const box = parseFloats(viewBox)
-      const width = parseFloat(getAttribute(this.element, 'width')) || box[2]
-      const height = parseFloat(getAttribute(this.element, 'height')) || box[3]
+      const width = parseFloat(getAttribute(this.element, 'width') || '0') || box[2]
+      const height = parseFloat(getAttribute(this.element, 'height') || '0') || box[3]
       nodeTransform = computeViewBoxTransform(this.element, box, x, y, width, height, context)
     } else {
       nodeTransform = context.pdf.Matrix(1, 0, 0, 1, x, y)

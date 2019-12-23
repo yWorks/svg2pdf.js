@@ -6,7 +6,7 @@ import { Matrix } from 'jspdf-yworks'
 
 export class VoidNode extends SvgNode {
   render(parentContext: Context): Promise<void> {
-    return
+    return Promise.resolve()
   }
   protected getBoundingBoxCore(context: Context): Rect {
     return [0, 0, 0, 0]

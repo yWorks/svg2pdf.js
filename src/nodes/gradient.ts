@@ -20,6 +20,11 @@ export abstract class Gradient extends NonRenderedNode {
   }
 
   async apply(context: Context): Promise<void> {
+    const id = this.element.getAttribute('id')
+    if (!id) {
+      return
+    }
+
     const colors: StopData[] = []
     let opacitySum = 0
     let hasOpacity = false
@@ -29,7 +34,7 @@ export abstract class Gradient extends NonRenderedNode {
       if (stop.element.tagName.toLowerCase() === 'stop') {
         const color = new RGBColor(getAttribute(stop.element, 'stop-color'))
         colors.push({
-          offset: Gradient.parseGradientOffset(stop.element.getAttribute('offset')),
+          offset: Gradient.parseGradientOffset(stop.element.getAttribute('offset') || '0'),
           color: [color.r, color.g, color.b]
         })
         const opacity = getAttribute(stop.element, 'stop-opacity')
@@ -50,7 +55,6 @@ export abstract class Gradient extends NonRenderedNode {
       colors,
       gState
     )
-    const id = this.element.getAttribute('id')
     context.pdf.addShadingPattern(id, pattern)
   }
 

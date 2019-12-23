@@ -13,13 +13,13 @@ export abstract class EllipseBase extends GeometryNode {
     super(false, element, children)
   }
 
-  protected getPath(context: Context): Path {
+  protected getPath(context: Context): Path | null {
     if (!isFinite(this.rx) || this.rx <= 0 || !isFinite(this.ry) || this.ry <= 0) {
       return null
     }
 
-    const x = parseFloat(getAttribute(this.element, 'cx')) || 0,
-      y = parseFloat(getAttribute(this.element, 'cy')) || 0
+    const x = parseFloat(getAttribute(this.element, 'cx') || '0'),
+      y = parseFloat(getAttribute(this.element, 'cy') || '0')
 
     const lx = (4 / 3) * (Math.SQRT2 - 1) * this.rx,
       ly = (4 / 3) * (Math.SQRT2 - 1) * this.ry

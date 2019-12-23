@@ -29,6 +29,8 @@ export class Context {
     this.attributeState = values.attributeState
       ? values.attributeState.clone()
       : AttributeState.default()
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
     this.refsHandler = values.refsHandler || null
     this.textMeasure = values.textMeasure || new TextMeasure()
     this.transform = values.transform || this.pdf.unitMatrix

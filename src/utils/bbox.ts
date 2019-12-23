@@ -5,7 +5,7 @@ import { Rect } from './geometry'
 
 export function addLineWidth(bBox: number[], element: HTMLElement): number[] {
   // add line-width
-  let lineWidth = parseFloat(getAttribute(element, 'stroke-width')) || 1
+  let lineWidth = parseFloat(getAttribute(element, 'stroke-width') || '1')
   const miterLimit = getAttribute(element, 'stroke-miterlimit')
   // miterLength / lineWidth = 1 / sin(phi / 2)
   miterLimit && (lineWidth *= 0.5 / Math.sin(Math.PI / 12))
@@ -37,7 +37,7 @@ export function getBoundingBoxByChildren(context: Context, svgnode: SvgNode): nu
 }
 
 export function defaultBoundingBox(element: HTMLElement): Rect {
-  const pf = parseFloat
+  const pf: any = parseFloat
   // TODO: check if there are other possible coordinate attributes
   const x1 =
     pf(element.getAttribute('x1')) ||

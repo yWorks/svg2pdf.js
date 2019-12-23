@@ -3,7 +3,7 @@ import { Path } from '../utils/path'
 import { getAttribute, svgNodeIsVisible } from '../utils/node'
 import { GeometryNode } from './geometrynode'
 import { SvgNode } from './svgnode'
-import * as SvgPath from 'svgpath'
+import SvgPath from 'svgpath'
 import { toCubic } from '../utils/geometry'
 import { Matrix } from 'jspdf-yworks'
 
@@ -20,8 +20,8 @@ export class PathNode extends GeometryNode {
     return svgNodeIsVisible(this, parentVisible)
   }
 
-  protected getPath(context: Context): Path {
-    const svgPath = SvgPath(getAttribute(this.element, 'd') || '')
+  protected getPath(context: Context): Path | null {
+    const svgPath = new SvgPath(getAttribute(this.element, 'd') || '')
       .unshort()
       .unarc()
       .abs()

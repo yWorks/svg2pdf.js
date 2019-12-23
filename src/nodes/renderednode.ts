@@ -49,6 +49,8 @@ export abstract class RenderedNode extends SvgNode {
   protected abstract async renderCore(context: Context): Promise<void>
 
   private getClipPathNode(context: Context): ClipPath | undefined {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
     const clipPathId = iriReference.exec(getAttribute(this.element, 'clip-path'))[1]
     const clipNode = context.refsHandler.get(clipPathId)
     return (clipNode as ClipPath) || undefined
@@ -58,6 +60,8 @@ export abstract class RenderedNode extends SvgNode {
     const clipContext = outerContext.clone()
     if (
       clipPathNode.element.hasAttribute('clipPathUnits') &&
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore
       clipPathNode.element.getAttribute('clipPathUnits').toLowerCase() === 'objectboundingbox'
     ) {
       const bBox = this.getBoundingBox(outerContext)

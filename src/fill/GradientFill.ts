@@ -29,6 +29,8 @@ export class GradientFill implements Fill {
     let gradientUnitsMatrix
     if (
       !this.gradient.element.hasAttribute('gradientUnits') ||
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore
       this.gradient.element.getAttribute('gradientUnits').toLowerCase() === 'objectboundingbox'
     ) {
       const bBox = forNode.getBoundingBox(context)

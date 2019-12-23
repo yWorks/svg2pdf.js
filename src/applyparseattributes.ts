@@ -66,7 +66,7 @@ export function parseAttributes(context: Context, svgNode: SvgNode, node?: HTMLE
   let dashArray: any = getAttribute(domNode, 'stroke-dasharray')
   if (dashArray) {
     dashArray = parseFloats(dashArray)
-    const dashOffset = parseInt(getAttribute(domNode, 'stroke-dashoffset')) || 0
+    const dashOffset = parseInt(getAttribute(domNode, 'stroke-dashoffset') || '0')
     context.attributeState.strokeDasharray = dashArray
     context.attributeState.strokeDashoffset = dashOffset
   }
@@ -196,8 +196,10 @@ export function applyAttributes(
   }
 
   if (
-    childContext.attributeState.strokeDasharray !== parentContext.attributeState.strokeDasharray ||
-    childContext.attributeState.strokeDashoffset !== parentContext.attributeState.strokeDashoffset
+    (childContext.attributeState.strokeDasharray !== parentContext.attributeState.strokeDasharray ||
+      childContext.attributeState.strokeDashoffset !==
+        parentContext.attributeState.strokeDashoffset) &&
+    childContext.attributeState.strokeDasharray
   ) {
     childContext.pdf.setLineDashPattern(
       childContext.attributeState.strokeDasharray,

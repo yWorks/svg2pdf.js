@@ -8,15 +8,16 @@ import { Matrix } from 'jspdf-yworks'
 export class Pattern extends NonRenderedNode {
   async apply(context: Context): Promise<void> {
     const id = this.element.getAttribute('id')
+    if (!id) {
+      return
+    }
 
     // the transformations directly at the node are written to the pattern transformation matrix
     const bBox = this.getBoundingBox(context)
     const pattern = context.pdf.TilingPattern(
       [bBox[0], bBox[1], bBox[0] + bBox[2], bBox[1] + bBox[3]],
       bBox[2],
-      bBox[3],
-      null,
-      context.pdf.unitMatrix /* transform parameter is ignored !*/
+      bBox[3]
     )
 
     context.pdf.beginTilingPattern(pattern)

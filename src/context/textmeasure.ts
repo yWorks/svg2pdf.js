@@ -10,7 +10,7 @@ type TextMeasureFunction = (
 ) => number
 
 export class TextMeasure {
-  private textMeasuringTextElement: SVGTextElement = null
+  private textMeasuringTextElement?: SVGTextElement
   private measureMethods: { [key: string]: TextMeasureFunction } = {}
 
   private static readonly testString =
@@ -81,8 +81,12 @@ export class TextMeasure {
     const canvas = document.createElement('canvas')
     const context = canvas.getContext('2d')
 
-    context.font = [fontStyle, fontWeight, fontSize, fontFamily].join(' ')
-    return context.measureText(text).width
+    if (context != null) {
+      context.font = [fontStyle, fontWeight, fontSize, fontFamily].join(' ')
+      return context.measureText(text).width
+    }
+
+    return 0
   }
 
   private svgTextMeasure(
@@ -142,8 +146,11 @@ export class TextMeasure {
 
   cleanupTextMeasuring(): void {
     if (this.textMeasuringTextElement) {
-      document.body.removeChild(this.textMeasuringTextElement.parentNode)
-      this.textMeasuringTextElement = null
+      const parentNode = this.textMeasuringTextElement.parentNode
+      if (parentNode) {
+        document.body.removeChild(parentNode)
+      }
+      this.textMeasuringTextElement = undefined
     }
   }
 }

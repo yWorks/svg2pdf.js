@@ -15,11 +15,13 @@ export abstract class Traverse extends GeometryNode {
     this.closed = closed
   }
 
-  protected getPath(context: Context): Path {
+  protected getPath(context: Context): Path | null {
     if (!this.element.hasAttribute('points') || this.element.getAttribute('points') === '') {
       return null
     }
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
     const points = Traverse.parsePointsString(this.element.getAttribute('points'))
 
     const path = new Path()

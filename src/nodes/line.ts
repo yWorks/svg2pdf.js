@@ -10,16 +10,16 @@ export class Line extends GeometryNode {
     super(true, node, children)
   }
 
-  protected getPath(context: Context): Path {
+  protected getPath(context: Context): Path | null {
     if (context.withinClipPath || context.attributeState.stroke === null) {
       return null
     }
 
-    const x1 = parseFloat(this.element.getAttribute('x1')) || 0,
-      y1 = parseFloat(this.element.getAttribute('y1')) || 0
+    const x1 = parseFloat(this.element.getAttribute('x1') || '0'),
+      y1 = parseFloat(this.element.getAttribute('y1') || '0')
 
-    const x2 = parseFloat(this.element.getAttribute('x2')) || 0,
-      y2 = parseFloat(this.element.getAttribute('y2')) || 0
+    const x2 = parseFloat(this.element.getAttribute('x2') || '0'),
+      y2 = parseFloat(this.element.getAttribute('y2') || '0')
 
     if (!(x1 || x2 || y1 || y2)) {
       return null

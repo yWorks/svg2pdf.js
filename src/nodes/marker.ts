@@ -36,14 +36,14 @@ export class MarkerNode extends NonRenderedNode {
     return [
       (vb && vb[0]) || 0,
       (vb && vb[1]) || 0,
-      (vb && vb[2]) || parseFloat(this.element.getAttribute('marker-width')) || 0,
-      (vb && vb[3]) || parseFloat(this.element.getAttribute('marker-height')) || 0
+      (vb && vb[2]) || parseFloat(this.element.getAttribute('marker-width') || '0'),
+      (vb && vb[3]) || parseFloat(this.element.getAttribute('marker-height') || '0')
     ]
   }
 
   protected computeNodeTransformCore(context: Context): Matrix {
-    const refX = parseFloat(this.element.getAttribute('refX')) || 0
-    const refY = parseFloat(this.element.getAttribute('refY')) || 0
+    const refX = parseFloat(this.element.getAttribute('refX') || '0')
+    const refY = parseFloat(this.element.getAttribute('refY') || '0')
 
     const viewBox = this.element.getAttribute('viewBox')
     let nodeTransform
@@ -55,8 +55,8 @@ export class MarkerNode extends NonRenderedNode {
         bounds,
         0,
         0,
-        parseFloat(this.element.getAttribute('markerWidth')) || 3,
-        parseFloat(this.element.getAttribute('markerHeight')) || 3,
+        parseFloat(this.element.getAttribute('markerWidth') || '3'),
+        parseFloat(this.element.getAttribute('markerHeight') || '3'),
         context
       )
       nodeTransform = context.pdf.matrixMult(

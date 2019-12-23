@@ -21,15 +21,15 @@ export function getAttribute(
   node: HTMLElement,
   propertyNode: string,
   propertyCss?: string
-): string {
+): string | undefined {
   propertyCss = propertyCss || propertyNode
   const attribute = node.style.getPropertyValue(propertyCss)
   if (attribute) {
     return attribute
   } else if (node.hasAttribute(propertyNode)) {
-    return node.getAttribute(propertyNode)
+    return node.getAttribute(propertyNode) || undefined
   } else {
-    return void 0
+    return undefined
   }
 }
 
