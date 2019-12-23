@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Missing Label Test</title>
+
+  <!-- TODO include the actual pdf export libraries -->
+  <script src="../../../jsPDF/dist/jspdf.debug.js"></script><!--TODO use correct path to jsPDF (commit 2f18d0fff6df54acc046cc6e54e96f707bf7d5f6)-->
+  <!--<script src="../node_modules/jspdf/dist/jspdf.debug.js"></script>-->
+  <script src="../../dist/svg2pdf.js"></script><!--TODO use correct path to svg2pdf (commit 1dcf2e4e926e502dc2f64a621a4b163342e8e022)-->
+  <!--<script src="../node_modules/cssesc/cssesc.js"></script>-->
+
+
+  <!-- Load custom fonts for the custom-fonts sample graph -->
+  <link href="https://fonts.googleapis.com/css?family=Prata" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/earlyaccess/roundedmplus1c.css" rel="stylesheet"/>
+  <script src="https://www.yworks.com/resources/scripts/custom-fonts-yjs5922.js"></script>
+  <!--<script src="fonts.js"></script>-->
+</head>
+<body>
+
+<svg id="svg-image" width="400" height="400">
+  <rect height="400" width="400" fill="red"/>
+</svg>
+
+<div id="pdfContainerInner" style="width:500px ;height:500px"></div>
+
+<script lang="javascript">
+  const svgElement = document.getElementById('svg-image')
+
+  // const doc = new jsPDF('l', 'pt', [310, 170])
+  // svg2pdf(svgElement, doc, {})
+
+
+  const pdfUrl = convertSvgToPdf(svgElement, {width: 400, height: 400}, {
+    top: 5,  left: 5, bottom: 5, right: 5
+  })
+
+  const pdfIframe = document.createElement('iframe')
+  pdfIframe.setAttribute('style', 'width: 99%; height: 99%')
+  pdfIframe.src = pdfUrl
+  const pdfContainerInner = document.getElementById('pdfContainerInner')
+  pdfContainerInner.innerHTML = ''
+  pdfContainerInner.appendChild(pdfIframe)
+
+  function convertSvgToPdf(svgElement, size, margins) {
+    const margin = Math.max(margins.left, margins.right, margins.top, margins.bottom);
+
+    const pdfPageWidth = 210;
+    const pdfPageHeight = 210;
+    const contentWidth = pdfPageWidth - (margin * 2);
+    const contentHeight = pdfPageHeight - (margin * 2);
+
+    svgElement.setAttribute('width', contentWidth + 'px');
+    svgElement.setAttribute('height', contentHeight + 'px');
+
+    const jsPdf = new jsPDF('l', 'pt', [pdfPageWidth, pdfPageHeight]);
+
+    for (var xOffset = 0; xOffset < size.width; xOffset += contentWidth) {
+      for (var yOffset = 0; yOffset < size.height; yOffset += contentHeight) {
+        svgElement.setAttribute('viewBox', this.getViewboxAttribute(xOffset, yOffset, contentHeight, contentWidth));
+        jsPdf.advancedAPI()
+        jsPdf.rect(margin, margin, contentWidth, contentHeight).clip().discardPath()
+        svg2pdf(svgElement, jsPdf, {
+          xOffset: margin,
+          yOffset: margin,
+          scale: 1
+        });
+        jsPdf.compatAPI()
+
+        if (xOffset + contentWidth < size.width || yOffset + contentHeight < size.height) {
+          jsPdf.addPage()
+        }
+      }
+    }
+
+    return jsPdf.output('datauristring');
+  }
+
+  function getViewboxAttribute(xOffset, yOffset, captureHeight, captureWidth) {
+    return xOffset + ' ' + yOffset + ' ' + captureWidth + ' ' + captureHeight;
+  }
+</script>
+</body>
+</html>

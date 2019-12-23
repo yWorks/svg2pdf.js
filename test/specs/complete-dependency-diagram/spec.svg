@@ -1,0 +1,240 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="905px" height="800px" viewBox="0 0 905 800"
+     style="overflow: hidden; display: block; width: 905px; height: 800px;">
+    <defs>
+        <path fill="rgb(51,102,153)" stroke="rgb(51,102,153)" d="M 0,0 L 10,-5 L 5,0 L 10,5 Z" fill-opacity="1"
+              stroke-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"
+              id="ygc7_0"/>
+        <path fill="rgb(51,102,153)" stroke="rgb(51,102,153)" d="M 0,0 L 10,-5 L 5,0 L 10,5 Z" fill-opacity="1"
+              stroke-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10"
+              id="ygc7_1"/>
+    </defs>
+    <g style="pointer-events:visiblePainted" transform="translate(-38.5 28)" image-rendering="auto"
+       shape-rendering="auto">
+        <g>
+            <path fill="none" stroke="rgb(51,102,153)" d="M 570,93 L 570,150 L 870,150 L 870,202.5" stroke-opacity="1"
+                  stroke-width="1" stroke-dasharray="5" stroke-dashoffset="0" stroke-linecap="square"
+                  stroke-linejoin="round" stroke-miterlimit="10"/>
+            <use/>
+            <use transform="matrix(0 1 -1 0 570 88)" style="pointer-events: none;"
+                 xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ygc7_0"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(51,102,153)" d="M 570,93 L 570,150 L 690,150 L 690,214" stroke-opacity="1"
+                  stroke-width="1" stroke-dasharray="5" stroke-dashoffset="0" stroke-linecap="square"
+                  stroke-linejoin="round" stroke-miterlimit="10"/>
+            <use/>
+            <use transform="matrix(0 1 -1 0 570 88)" style="pointer-events: none;"
+                 xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ygc7_0"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(51,102,153)" d="M 570,93 L 570,150 L 510,150 L 510,210" stroke-opacity="1"
+                  stroke-width="1" stroke-dasharray="5" stroke-dashoffset="0" stroke-linecap="square"
+                  stroke-linejoin="round" stroke-miterlimit="10"/>
+            <use/>
+            <use transform="matrix(0 1 -1 0 570 88)" style="pointer-events: none;"
+                 xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ygc7_0"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(51,102,153)" d="M 570,93 L 570,150 L 330,150 L 330,322.5" stroke-opacity="1"
+                  stroke-width="1" stroke-dasharray="5" stroke-dashoffset="0" stroke-linecap="square"
+                  stroke-linejoin="round" stroke-miterlimit="10"/>
+            <use/>
+            <use transform="matrix(0 1 -1 0 570 88)" style="pointer-events: none;"
+                 xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ygc7_0"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(51,102,153)" d="M 690,266 L 690,326.5" stroke-opacity="1" stroke-width="1"
+                  stroke-linecap="square" stroke-linejoin="round" stroke-miterlimit="10"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(51,102,153)" d="M 171.5,720 L 206,720" stroke-opacity="1" stroke-width="1"
+                  stroke-linecap="square" stroke-linejoin="round" stroke-miterlimit="10"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(51,102,153)" d="M 270,694 L 270,630 L 330,630 L 330,575" stroke-opacity="1"
+                  stroke-width="1" stroke-linecap="square" stroke-linejoin="round" stroke-miterlimit="10"/>
+            <use transform="matrix(0 1 -1 0 330 570)" style="pointer-events: none;"
+                 xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ygc7_1"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(51,102,153)" d="M 450,664 L 450,630 L 330,630 L 330,575" stroke-opacity="1"
+                  stroke-width="1" stroke-linecap="square" stroke-linejoin="round" stroke-miterlimit="10"/>
+            <use transform="matrix(0 1 -1 0 330 570)" style="pointer-events: none;"
+                 xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ygc7_1"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(51,102,153)" d="M 510,270 L 510,300" stroke-opacity="1" stroke-width="1"
+                  stroke-linecap="square" stroke-linejoin="round" stroke-miterlimit="10"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(51,102,153)" d="M 870,277.5 L 870,600 L 510,600 L 510,562.5"
+                  stroke-opacity="1"
+                  stroke-width="1" stroke-linecap="square" stroke-linejoin="round" stroke-miterlimit="10"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(51,102,153)" d="M 510,420 L 510,457.5" stroke-opacity="1" stroke-width="1"
+                  stroke-linecap="square" stroke-linejoin="round" stroke-miterlimit="10"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(51,102,153)" d="M 456.5,510 L 398,510" stroke-opacity="1" stroke-width="1"
+                  stroke-linecap="square" stroke-linejoin="round" stroke-miterlimit="10"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(51,102,153)" d="M 330,397.5 L 330,450" stroke-opacity="1" stroke-width="1"
+                  stroke-linecap="square" stroke-linejoin="round" stroke-miterlimit="10"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(51,102,153)" d="M 626.5,510 L 563.5,510" stroke-opacity="1" stroke-width="1"
+                  stroke-linecap="square" stroke-linejoin="round" stroke-miterlimit="10"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(51,102,153)" d="M 796.5,240 L 726.5,240" stroke-opacity="1" stroke-width="1"
+                  stroke-linecap="square" stroke-linejoin="round" stroke-miterlimit="10"/>
+        </g>
+        <g>
+            <path fill="none" stroke="rgb(51,102,153)" d="M 653.5,240 L 572,240" stroke-opacity="1" stroke-width="1"
+                  stroke-linecap="square" stroke-linejoin="round" stroke-miterlimit="10"/>
+        </g>
+        <rect rx="2" ry="2" fill="#FF8C00" stroke="#FFF" stroke-width="1px" class="uml-interface"
+              transform="translate(504.5 -28)" height="116" width="131"/>
+        <rect rx="2" ry="2" fill="#FF8C00" stroke="#FFF" stroke-width="1px" class="uml-class"
+              transform="translate(796.5 202.5)" height="75" width="147"/>
+        <rect rx="2" ry="2" fill="#FF8C00" stroke="#FFF" stroke-width="1px" class="uml-class"
+              transform="translate(448 210)" height="60" width="124"/>
+        <rect rx="2" ry="2" fill="#FF8C00" stroke="#FFF" stroke-width="1px" class="uml-class"
+              transform="translate(653.5 214)" height="52" width="73"/>
+        <rect rx="2" ry="2" fill="#FF8C00" stroke="#FFF" stroke-width="1px" class="uml-class"
+              transform="translate(263.5 322.5)" height="75" width="133"/>
+        <rect rx="2" ry="2" fill="#FF8C00" stroke="#FFF" stroke-width="1px" class="uml-class"
+              transform="translate(638 326.5)" height="67" width="104"/>
+        <rect rx="2" ry="2" fill="#FF8C00" stroke="#FFF" stroke-width="1px" class="uml-class"
+              transform="translate(456.5 457.5)" height="105" width="107"/>
+        <rect rx="2" ry="2" fill="#FF8C00" stroke="#FFF" stroke-width="1px" class="uml-class"
+              transform="translate(262 450)" height="120" width="136"/>
+        <rect rx="2" ry="2" fill="#FF8C00" stroke="#FFF" stroke-width="1px" class="uml-class"
+              transform="translate(206 694)" height="52" width="128"/>
+        <rect rx="2" ry="2" fill="#FF8C00" stroke="#FFF" stroke-width="1px" class="uml-class"
+              transform="translate(404 664)" height="52" width="92"/>
+        <rect rx="2" ry="2" fill="#FF8C00" stroke="#FFF" stroke-width="1px" class="uml-class"
+              transform="translate(38.5 667.5)" height="105" width="133"/>
+        <rect rx="2" ry="2" fill="#FF8C00" stroke="#FFF" stroke-width="1px" class="uml-class"
+              transform="translate(466 300)" height="120" width="88"/>
+        <rect rx="2" ry="2" fill="#FF8C00" stroke="#FFF" stroke-width="1px" class="uml-class"
+              transform="translate(626.5 457.5)" height="105" width="127"/>
+        <g transform="translate(522.5911154817405 -12.953125)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(50,50,50)" fill-opacity="1" transform="translate(0 0)">
+                <tspan x="0" dy="1em">Employee</tspan>
+                <tspan x="0" dy="1.5em">getName():String</tspan>
+                <tspan x="0" dy="1.5em">getTitle():String</tspan>
+                <tspan x="0" dy="1.5em">getStaffNo():Number</tspan>
+                <tspan x="0" dy="1.5em">getRoom():String</tspan>
+                <tspan x="0" dy="1.5em">getPhone()</tspan>
+            </text>
+        </g>
+        <g transform="translate(817.6007065850815 219.546875)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(50,50,50)" fill-opacity="1" transform="translate(0 0)">
+                <tspan x="0" dy="1em">Lecturer</tspan>
+                <tspan x="0" dy="1.5em">researchInterest:String</tspan>
+                <tspan x="0" dy="1.5em">isTeaching():bool</tspan>
+            </text>
+        </g>
+        <g transform="translate(465.5853608197358 227.046875)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(50,50,50)" fill-opacity="1" transform="translate(0 0)">
+                <tspan x="0" dy="1em">TutorAdmin</tspan>
+                <tspan x="0" dy="1.5em">addSubject():String</tspan>
+            </text>
+        </g>
+        <g transform="translate(666.5450781857032 227.046875)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(50,50,50)" fill-opacity="1" transform="translate(0 0)">
+                <tspan x="0" dy="1em">Tutor</tspan>
+                <tspan x="0" dy="1.5em">role:String</tspan>
+            </text>
+        </g>
+        <g transform="translate(288.5796061577312 339.546875)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(50,50,50)" fill-opacity="1" transform="translate(0 0)">
+                <tspan x="0" dy="1em">DepartmentAdmin</tspan>
+                <tspan x="0" dy="1.5em">password:String</tspan>
+                <tspan x="0" dy="1.5em">addDuty()</tspan>
+            </text>
+        </g>
+        <g transform="translate(654.5680968337218 339.546875)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(50,50,50)" fill-opacity="1" transform="translate(0 0)">
+                <tspan x="0" dy="1em">TimeSheet</tspan>
+                <tspan x="0" dy="1.5em">hours:Integer</tspan>
+                <tspan x="0" dy="1.5em">typework:String</tspan>
+            </text>
+        </g>
+        <g transform="translate(473.57001505439007 474.546875)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(50,50,50)" fill-opacity="1" transform="translate(0 0)">
+                <tspan x="0" dy="1em">Subject</tspan>
+                <tspan x="0" dy="1.5em">code:String</tspan>
+                <tspan x="0" dy="1.5em">subname:String</tspan>
+                <tspan x="0" dy="1.5em">credits:Integer</tspan>
+                <tspan x="0" dy="1.5em">count():Integer</tspan>
+            </text>
+        </g>
+        <g transform="translate(283.09015637140635 467.046875)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(50,50,50)" fill-opacity="1" transform="translate(0 0)">
+                <tspan x="0" dy="1em">Student</tspan>
+                <tspan x="0" dy="1.5em">member:String</tspan>
+                <tspan x="0" dy="1.5em">name:String</tspan>
+                <tspan x="0" dy="1.5em">address:String</tspan>
+                <tspan x="0" dy="1.5em">totalCredits():Integer</tspan>
+                <tspan x="0" dy="1.5em">enroll()</tspan>
+            </text>
+        </g>
+        <g transform="translate(224.08823815073816 707.046875)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(50,50,50)" fill-opacity="1" transform="translate(0 0)">
+                <tspan x="0" dy="1em">Honours</tspan>
+                <tspan x="0" dy="1.5em">researchArea:String</tspan>
+            </text>
+        </g>
+        <g transform="translate(419.5585057303807 677.046875)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(50,50,50)" fill-opacity="1" transform="translate(0 0)">
+                <tspan x="0" dy="1em">Pass</tspan>
+                <tspan x="0" dy="1.5em">project:String</tspan>
+            </text>
+        </g>
+        <g transform="translate(59.58727904040404 684.546875)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(50,50,50)" fill-opacity="1" transform="translate(0 0)">
+                <tspan x="0" dy="1em">Project</tspan>
+                <tspan x="0" dy="1.5em">title:String</tspan>
+                <tspan x="0" dy="1.5em">interimReport:String</tspan>
+                <tspan x="0" dy="1.5em">finalReport:String</tspan>
+                <tspan x="0" dy="1.5em">isComplete():bool</tspan>
+            </text>
+        </g>
+        <g transform="translate(480.55658750971253 317.046875)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(50,50,50)" fill-opacity="1" transform="translate(0 0)">
+                <tspan x="0" dy="1em">TimeTable</tspan>
+                <tspan x="0" dy="1.5em">group:String</tspan>
+                <tspan x="0" dy="1.5em">day:Day</tspan>
+                <tspan x="0" dy="1.5em">time:Time</tspan>
+                <tspan x="0" dy="1.5em">room:String</tspan>
+                <tspan x="0" dy="1.5em">checkClash()</tspan>
+            </text>
+        </g>
+        <g transform="translate(645.5853608197358 474.546875)">
+            <text font-family="Arial" font-size="10px" font-style="normal" font-weight="normal" text-anchor="start"
+                  fill="rgb(50,50,50)" fill-opacity="1" transform="translate(0 0)">
+                <tspan x="0" dy="1em">Exam</tspan>
+                <tspan x="0" dy="1.5em">exName:String</tspan>
+                <tspan x="0" dy="1.5em">percentage:Integer</tspan>
+                <tspan x="0" dy="1.5em">date:Day</tspan>
+                <tspan x="0" dy="1.5em">isIn():bool</tspan>
+            </text>
+        </g>
+    </g>
+</svg>

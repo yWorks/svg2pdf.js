@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="500" font-size="15px">
+  <text x="20" y="20" fill="green">
+        xml:space omitted          many spaces
+
+        and newlines
+  </text>
+
+  <text xml:space="default" x="20" y="60" fill="red">
+    xml:space="default"          many spaces
+
+    and newlines
+  </text>
+
+  <text xml:space="preserve" x="20" y="100" fill="blue">
+        xml:space="preserve"          many spaces
+
+        and newlines
+  </text>
+
+  <text x="20" y="140"  fill="green"><tspan>
+        xml:space omitted          with tSpans
+
+    and newlines, </tspan><tspan>another tSpan</tspan>
+  </text>
+
+  <text x="20" y="180" fill="red"><tspan xml:space="default">
+        xml:space="default"          with tSpans
+
+    and newlines,      </tspan><tspan>another tSpan</tspan>
+  </text>
+
+  <text x="20" y="220" fill="blue"><tspan xml:space="preserve">
+        xml:space="preserve"          with tSpans
+
+    and newlines,      </tspan><tspan>another tSpan</tspan>
+  </text>
+
+  <text xml:space="preserve" x="20" y="260" fill="orange"><tspan>Correct inheritance: </tspan><tspan>"preserve"    inherited</tspan><tspan xml:space="default">set    to       "default"</tspan></text>
+
+  <text xml:space="default" x="20" y="300" fill="red">
+    Mixed
+    <tspan>tSpans</tspan>
+    and normal text ("default")
+  </text>
+
+  <text xml:space="preserve" x="20" y="340" fill="blue">
+    Mixed
+    <tspan>tSpans</tspan>
+    and normal text ("preserve")
+  </text>
+</svg>

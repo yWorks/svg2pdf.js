@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<head>
+  <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
+
+  <script src="../../../jsPDF/dist/jspdf.debug.js"></script>
+  <script src="../../dist/svg2pdf.js" charset="utf-8"></script>
+
+</head>
+
+<body>
+<div style="float: left">
+  <h4>SVG:</h4>
+  <svg id="svgElement" height="400" version="1.1" viewBox="0 0 600 400" width="600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <rect class="highcharts-plot-background" fill="none" height="100" width="100" x="0" y="0"/>
+    <circle fill="red" cx="100" cy="100" r="50" />
+    <circle fill="blue" cx="200" cy="200" r="50" />
+  </svg>
+</div>
+<div style="float: left">
+  <h4>PDF:</h4>
+  <iframe id="pdf" style="width: 550px; height: 600px"></iframe>
+</div>
+<script>
+
+  function svgToPdf(svgElement, margin) {
+    var width = svgElement.width.baseVal.value + 2 * margin;
+    var height = svgElement.height.baseVal.value + 2 * margin;
+    var pdf = new jsPDF('p', 'pt', [width, height]);
+
+    svg2pdf(svgElement, pdf, {});
+
+    return pdf.output('datauristring');
+  }
+
+  function save() {
+    document.getElementById("pdf").src = svgToPdf(document.getElementById("svgElement"), 0);
+  }
+
+  save();
+</script>
+</body>

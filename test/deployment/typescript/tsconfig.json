@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "module": "es6",
+    "target": "es5",
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "lib": [
+      "dom",
+      "es2015"
+    ]
+  },
+  "files": [
+    "typescript.spec.ts",
+    "../../../types.d.ts"
+  ]
+}

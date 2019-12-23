@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 310 170" width="310px" height="170px">
+    <text transform="translate(30 30)" font-family="sans-serif, Prata, 'some other font'" font-size="16px">
+        Some text
+    </text>
+    <text transform="translate(30 60)" font-family='   serif ,   "Rounded  Mplus 1c"' font-size="16px">
+        Some text
+    </text>
+    <text transform="translate(30 90)" style="font-family:   courier ,   'Rounded  Mplus 1c'" font-size="16px">
+        Some text
+    </text>
+    <text transform="translate(30 120)" style="font-family: 'unavailable font', courier, serif" font-size="16px">
+        Some text
+    </text>
+    <text transform="translate(30 150)" style="font-family: 'unavailable font', serif, courier" font-size="16px">
+        Some text
+    </text>
+</svg>

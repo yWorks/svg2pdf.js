@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html class="no-js">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title></title>
+  <meta name="description" content="" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body>
+<div id="container" style="width:100vw; height:100vh;">
+  <svg width="100%" height="100%">
+    <g inkscape:label="Ebene 1" inkscape:groupmode="layer" id="layer1">
+      <rect
+              style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+              id="rect3713"
+              width="100"
+              height="100"
+              x="10"
+              y="10"
+      />
+    </g>
+  </svg>
+</div>
+<script src="../../node_modules/jspdf-yworks/dist/jspdf.debug.js"></script>
+<script src="../../dist/svg2pdf.js"></script>
+<script>
+  const pdfExport = () => {
+    const svgElement = document.querySelector("svg");
+    const width = 100 + 20;
+    const height = 100 + 20;
+    // create a new jsPDF instance
+    const pdf = new jsPDF("l", "mm", [width, height]);
+    // render the svg element
+    svg2pdf(svgElement, pdf, {
+      xOffset: 0,
+      yOffset: 0,
+      scale: 1
+    });
+    // get the data URI
+    // const uri = pdf.output("datauristring");
+    // or simply save the created pdf
+    pdf.save("myPDF.pdf");
+  };
+  document.addEventListener("DOMContentLoaded", function(event) {
+    pdfExport();
+  });
+</script>
+</body>
+</html>
