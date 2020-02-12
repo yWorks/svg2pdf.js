@@ -97,6 +97,10 @@ module.exports = (config) => {
       }
     },
 
+    mochaReporter: {
+      showDiff: true
+    },
+
     browserify: {
       debug: true,
       extensions: ['.js'],

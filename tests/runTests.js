@@ -51,6 +51,8 @@ const tests = [
 for (let name of tests) {
 
   describe(name, function () {
+    this.timeout(20000);
+
     const svgText = loadSvg(`/base/tests/${name}/spec.svg`);
     const parser = new DOMParser();
     const svgElement = parser.parseFromString(svgText, "image/svg+xml").firstElementChild;
