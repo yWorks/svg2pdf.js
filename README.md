@@ -1,6 +1,6 @@
 # svg2pdf.js
 
-[![NPM version](https://img.shields.io/npm/v/svg2pdf.js.svg?style=flat)](https://www.npmjs.org/package/svg2pdf.js)
+[![NPM version](https://img.shields.io/npm/v/svg2pdf.js.svg?style=flat)](https://www.npmjs.org/package/svg2pdf.js) ![Continous Integration for svg2pdf.js](https://github.com/yWorks/svg2pdf.js/workflows/Continous%20Integration%20for%20svg2pdf.js/badge.svg)
 
 A javascript-only SVG to PDF conversion utility that runs in the browser leveraging jsPDF.
 
@@ -54,8 +54,8 @@ const uri = pdf.output('datauristring');
 pdf.save('myPDF.pdf');
 ```
 
-## Concerning custom fonts
-If you want to use other than really basic fonts you will have to add them first before calling ```svg2pdf```:
+## Concerning custom fonts and non US-ASCII characters
+If you want to use other than really basic fonts and characters you *have to* add them first before calling ```svg2pdf```:
 ```js
 pdf.addFont('myFont.ttf', 'myFont', 'normal');
 ```
@@ -110,7 +110,7 @@ the ```tests``` array.
 
 The MIT License (MIT)
 
-Copyright (c) 2015-2019 yWorks GmbH
+Copyright (c) 2015-2020 yWorks GmbH
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
