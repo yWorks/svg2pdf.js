@@ -1,5 +1,5 @@
-import { svg2pdf } from '../../../dist/svg2pdf.esm'
-import '../../../dist/svg2pdf.esm'
+import { svg2pdf } from '../../../dist/svg2pdf.es'
+import '../../../dist/svg2pdf.es'
 import jsPDF from 'jspdf'
 
 const debug = false

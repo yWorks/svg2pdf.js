@@ -1,6 +1,6 @@
 const debug = false
 
-const jsPDF = window.jsPDF
+const jsPDF = window.jspdf.jsPDF
 const svg2pdf = window.svg2pdf
 
 describe('Globals should be available', () => {

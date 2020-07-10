@@ -10,8 +10,8 @@ module.exports = config => {
     // list of files / patterns to load in the browser
     files: [
       'node_modules/requirejs/require.js',
-      { pattern: 'node_modules/jspdf/dist/jspdf.umd*,js', included: false },
-      { pattern: 'dist/svg2pdf.js', included: false },
+      { pattern: 'node_modules/jspdf/dist/jspdf.umd*.js', included: false },
+      { pattern: 'dist/svg2pdf.umd*.js', included: false },
       'test/common/compare.js',
       'test/common/tests.js',
 

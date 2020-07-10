@@ -1,6 +1,6 @@
 import { SvgNode } from './svgnode'
 import { getAttribute } from '../utils/node'
-import { EllipseBase } from './EllipseBase'
+import { EllipseBase } from './ellipsebase'
 
 export class Circle extends EllipseBase {
   private readonly r: number

@@ -1,5 +1,5 @@
 import { getAttribute } from '../utils/node'
-import { EllipseBase } from './EllipseBase'
+import { EllipseBase } from './ellipsebase'
 import { SvgNode } from './svgnode'
 
 export class Ellipse extends EllipseBase {

@@ -3,16 +3,16 @@ const debug = false
 require.config({
   baseUrl: '/base',
   paths: {
-    svg2pdf: 'dist/svg2pdf',
-    'jspdf': 'node_modules/jspdf'
+    svg2pdf: 'dist/svg2pdf.umd',
+    jspdf: 'node_modules/jspdf/dist/jspdf.umd'
   }
 })
 
 describe('Modules should be loaded by AMD', () => {
   it('jsPDF/svg2pdf', async () => {
     await new Promise(resolve => {
-      require(['jspdf/dist/jspdf.umd', 'svg2pdf'], (jsPDF, svg2pdf) => {
-        expect(jsPDF).to.be.ok
+      require(['jspdf', 'svg2pdf'], (jspdf, svg2pdf) => {
+        expect(jspdf).to.be.ok
         expect(svg2pdf).to.be.ok
         resolve()
       })
@@ -28,10 +28,10 @@ for (const name of window.tests) {
 
     it(`testing ${name}`, async () => {
       await new Promise((resolve, reject) => {
-        require(['jspdf/dist/jspdf.umd', 'svg2pdf'], (jsPDF, svg2pdf) => {
+        require(['jspdf', 'svg2pdf'], (jspdf, svg2pdf) => {
           const width = svgElement.width.baseVal.value
           const height = svgElement.height.baseVal.value
-          const pdf = new jsPDF(width > height ? 'l' : 'p', 'pt', [width, height])
+          const pdf = new jspdf.jsPDF(width > height ? 'l' : 'p', 'pt', [width, height])
 
           // await svg2pdf(svgElement, pdf, {})
           pdf

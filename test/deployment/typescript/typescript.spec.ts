@@ -1,5 +1,5 @@
-// import { svg2pdf } from '../../../dist/svg2pdf.esm'
-import "../../../dist/svg2pdf.esm"
+// import { svg2pdf } from '../../../dist/svg2pdf.es'
+import '../../../dist/svg2pdf.es'
 import jsPDF from 'jspdf'
 
 declare global {
@@ -18,7 +18,8 @@ for (const name of window.tests) {
   describe(name, function() {
     const svgText = window.loadSvg(`/base/test/specs/${name}/spec.svg`)
     const parser = new DOMParser()
-    const svgElement = parser.parseFromString(svgText, 'image/svg+xml').firstElementChild as HTMLElement
+    const svgElement = parser.parseFromString(svgText, 'image/svg+xml')
+      .firstElementChild as HTMLElement
 
     it(`testing ${name}`, async function() {
       const width = (svgElement as any).width.baseVal.value

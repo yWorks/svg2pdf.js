@@ -42,7 +42,7 @@ export class ImageNode extends GraphicsNode {
 
     const { data, format } = await this.imageLoadingPromise
 
-    if (format.startsWith('svg')) {
+    if (format.indexOf('svg') === 0) {
       const parser = new DOMParser()
       const svgElement = parser.parseFromString(data, 'image/svg+xml')
         .firstElementChild as HTMLElement

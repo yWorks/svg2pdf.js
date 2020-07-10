@@ -10,7 +10,7 @@ module.exports = config => {
     // list of files / patterns to load in the browser
     files: [
       'node_modules/jspdf/dist/jspdf.umd.js',
-      'dist/svg2pdf.js',
+      'dist/svg2pdf.umd.js',
       'test/common/compare.js',
       'test/common/tests.js',
 
