@@ -1,6 +1,6 @@
 import { Context } from '../context/context'
 import { GraphicsNode } from '../nodes/graphicsnode'
-import { Matrix } from 'jspdf-yworks'
+import { Matrix } from 'jspdf'
 
 export interface Fill {
   getFillData(forNode: GraphicsNode, context: Context): Promise<FillData | undefined>

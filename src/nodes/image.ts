@@ -6,7 +6,7 @@ import { parse } from '../parse'
 import { getAttribute, svgNodeIsVisible } from '../utils/node'
 import { GraphicsNode } from './graphicsnode'
 import { Rect } from '../utils/geometry'
-import { Matrix } from 'jspdf-yworks'
+import { Matrix } from 'jspdf'
 
 // groups: 1: mime-type (+ charset), 2: mime-type (w/o charset), 3: charset, 4: base64?, 5: body
 export const dataUriRegex = /^\s*data:(([^/,;]+\/[^/,;]+)(?:;([^,;=]+=[^,;=]+))?)?(?:;(base64))?,(.*\s*)$/i

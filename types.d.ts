@@ -1,4 +1,4 @@
-import { jsPDF, jsPDFAPI } from 'jspdf-yworks'
+import { jsPDF } from 'jspdf'
 
 declare module 'svg2pdf.js' {
   export function svg2pdf(
@@ -8,12 +8,12 @@ declare module 'svg2pdf.js' {
   ): Promise<jsPDF>
 }
 
-declare module 'jspdf-yworks' {
+declare module 'jspdf' {
   interface jsPDF {
     svg(element: HTMLElement, options?: Svg2PdfOptions): Promise<jsPDF>
   }
   interface jsPDFAPI {
-    svg(element: HTMLElement, options?: Svg2PdfOptions): Promise<jsPDF>
+    svg(this: jsPDF, element: HTMLElement, options?: Svg2PdfOptions): Promise<jsPDF>
   }
 }
 

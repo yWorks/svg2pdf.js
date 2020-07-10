@@ -1,5 +1,5 @@
 const { svg2pdf } = require('../../../dist/svg2pdf.node')
-const jsPDF = require('jspdf-yworks/dist/jspdf.node.debug')
+const jsPDF = require('jspdf')
 
 const debug = false
 

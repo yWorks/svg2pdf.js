@@ -28,10 +28,7 @@ import { Context } from './context/context'
 import { ReferencesHandler } from './context/referenceshandler'
 import { parse } from './parse'
 import { ColorFill } from './fill/ColorFill'
-import jsPDFType from 'jspdf-yworks'
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-// @ts-ignore
-import jsPDF from 'jspdf-yworks/dist/jspdf.node.debug'
+import { jsPDF } from "jspdf"
 
 /**
  * Renders an svg element to a jsPDF document.
@@ -47,9 +44,9 @@ import jsPDF from 'jspdf-yworks/dist/jspdf.node.debug'
 // the actual svgToPdf function (see above)
 export async function svg2pdf(
   element: HTMLElement,
-  pdf: jsPDFType,
+  pdf: jsPDF,
   options: Svg2PdfOptions = {}
-): Promise<jsPDFType> {
+): Promise<jsPDF> {
   //  create context object
   const context = new Context(pdf)
 

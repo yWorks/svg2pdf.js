@@ -1,4 +1,4 @@
-import { Matrix } from 'jspdf-yworks'
+import { Matrix } from 'jspdf'
 
 export type Point = number[]
 export type Rect = number[]

@@ -1,6 +1,6 @@
 import { Context } from '../context/context'
 import { multVecMatrix } from './geometry'
-import { Matrix } from 'jspdf-yworks'
+import { Matrix } from 'jspdf'
 
 export class Path {
   segments: Segment[]

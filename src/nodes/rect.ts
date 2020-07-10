@@ -3,7 +3,7 @@ import { Path } from '../utils/path'
 import { getAttribute, svgNodeIsVisible } from '../utils/node'
 import { GeometryNode } from './geometrynode'
 import { SvgNode } from './svgnode'
-import { Matrix } from 'jspdf-yworks'
+import { Matrix } from 'jspdf'
 
 export class Rect extends GeometryNode {
   constructor(element: HTMLElement, children: SvgNode[]) {

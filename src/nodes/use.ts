@@ -3,7 +3,7 @@ import { addLineWidth, defaultBoundingBox } from '../utils/bbox'
 import { getAttribute, svgNodeIsVisible } from '../utils/node'
 import { GraphicsNode } from './graphicsnode'
 import { Rect } from '../utils/geometry'
-import { Matrix } from 'jspdf-yworks'
+import { Matrix } from 'jspdf'
 
 /**
  * Draws the element referenced by a use node, makes use of pdf's XObjects/FormObjects so nodes are only written once

@@ -27,9 +27,6 @@ export default {
   ],
   external: [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})],
   plugins: [
-    replace({
-      'jspdf-yworks/dist/jspdf.node.debug': 'jspdf-yworks'
-    }),
     typescript({
       typescript: require('typescript')
     }),
@@ -38,14 +35,9 @@ export default {
     }),
     replaceOutput([
       {
-        include: /\.min.js/,
-        search: /["']jspdf-yworks["']/g,
-        replace: '"jspdf-yworks/dist/jspdf.node.min"'
-      },
-      {
         include: /[^m][^i][^n].js/,
-        search: /["']jspdf-yworks["']/g,
-        replace: '"jspdf-yworks/dist/jspdf.node.debug"'
+        search: /["']jspdf["']/g,
+        replace: '"jspdf/dist/jspdf.node"'
       }
     ])
   ]

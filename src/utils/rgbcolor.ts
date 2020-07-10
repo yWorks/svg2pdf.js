@@ -1,7 +1,7 @@
 export class RGBColor {
   public ok: boolean
 
-  public a = 0
+  public a?: number = undefined
   public r = 0
   public g = 0
   public b = 0

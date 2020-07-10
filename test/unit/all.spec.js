@@ -1,5 +1,6 @@
 import { svg2pdf } from '../../src/svg2pdf'
-import jsPDF from 'jspdf-yworks/dist/jspdf.node.debug'
+import '../../src/svg2pdf'
+import jsPDF from 'jspdf'
 
 const debug = false
 

@@ -25,7 +25,7 @@
     "test-cjs": "karma start ./test/deployment/cjs/karma.conf.js",
     "test-esm": "karma start ./test/deployment/esm/karma.conf.js",
     "test:coverage": "yarpm run webpack && karma start --coverage",
-    "createreferences": "node tests/utils/reference-server.js",
+    "createreferences": "node test/common/reference-server.js",
     "prettier": "prettier --write {src,tests,typings}/**/*.{ts,js}",
     "lint": "eslint {src,tests,typings}/**/*.{ts,js}"
   },
@@ -49,7 +49,7 @@
   },
   "homepage": "https://github.com/yWorks/svg2pdf.js#readme",
   "peerDependencies": {
-    "jspdf-yworks": "^2.1.1"
+    "jspdf": "^1.5.3"
   },
   "dependencies": {
     "cssesc": "^3.0.0",
@@ -69,7 +69,7 @@
     "eslint-config-prettier": "^6.7.0",
     "eslint-plugin-prettier": "^3.1.1",
     "exorcist": "^1.0.1",
-    "jspdf-yworks": "../jsPDF/jspdf-yworks-v2.1.1.tgz",
+    "jspdf": "^1.5.3",
     "karma": "^4.1.0",
     "karma-babel-preprocessor": "^7.0.0",
     "karma-browserify": "^6.0.0",

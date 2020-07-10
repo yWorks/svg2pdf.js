@@ -15,7 +15,7 @@ import {
 } from '../utils/text'
 import { GraphicsNode } from './graphicsnode'
 import { Rect } from '../utils/geometry'
-import { Matrix } from 'jspdf-yworks'
+import { Matrix } from 'jspdf'
 
 export class TextNode extends GraphicsNode {
   protected async renderCore(context: Context): Promise<void> {

@@ -4,7 +4,7 @@ import { computeViewBoxTransform } from '../utils/transform'
 import { NonRenderedNode } from './nonrenderednode'
 import { svgNodeAndChildrenVisible } from '../utils/node'
 import { Rect } from '../utils/geometry'
-import { Matrix } from 'jspdf-yworks'
+import { Matrix } from 'jspdf'
 
 export class MarkerNode extends NonRenderedNode {
   async apply(parentContext: Context): Promise<void> {

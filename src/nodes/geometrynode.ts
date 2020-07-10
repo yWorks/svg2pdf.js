@@ -232,5 +232,5 @@ export abstract class GeometryNode extends GraphicsNode {
 
 function iri(attribute: string): string | undefined {
   const match = iriReference.exec(attribute)
-  return (match && match[0]) || undefined
+  return (match && match[1]) || undefined
 }

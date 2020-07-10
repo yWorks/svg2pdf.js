@@ -1,6 +1,6 @@
 import { Context } from '../context/context'
 import { parseFloats } from './parsing'
-import { Matrix } from 'jspdf-yworks'
+import { Matrix } from 'jspdf'
 
 export function computeViewBoxTransform(
   node: HTMLElement,

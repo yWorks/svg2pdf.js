@@ -1,7 +1,7 @@
 import { ReferencesHandler } from './referenceshandler'
 import { AttributeState } from './attributestate'
 import { TextMeasure } from './textmeasure'
-import { jsPDF, Matrix } from 'jspdf-yworks'
+import { jsPDF, Matrix } from 'jspdf'
 
 /**
  *

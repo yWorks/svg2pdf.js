@@ -5,7 +5,7 @@ import { GeometryNode } from './geometrynode'
 import { SvgNode } from './svgnode'
 import SvgPath from 'svgpath'
 import { toCubic } from '../utils/geometry'
-import { Matrix } from 'jspdf-yworks'
+import { Matrix } from 'jspdf'
 
 export class PathNode extends GeometryNode {
   constructor(node: HTMLElement, children: SvgNode[]) {

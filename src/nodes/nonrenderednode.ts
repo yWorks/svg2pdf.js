@@ -1,7 +1,7 @@
 import { SvgNode } from './svgnode'
 import { Context } from '../context/context'
 import { Rect } from '../utils/geometry'
-import { Matrix } from 'jspdf-yworks'
+import { Matrix } from 'jspdf'
 
 export abstract class NonRenderedNode extends SvgNode {
   render(parentContext: Context): Promise<void> {

@@ -1,6 +1,6 @@
 import { AttributeState } from '../context/attributestate'
 import { getAttribute } from './node'
-import { TextOptionsLight } from 'jspdf-yworks'
+import { TextOptionsLight } from 'jspdf'
 
 // capture type...
 let tol: TextOptionsLight

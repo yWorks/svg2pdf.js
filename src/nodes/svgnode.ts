@@ -2,7 +2,7 @@ import { Context } from '../context/context'
 import { getAttribute } from '../utils/node'
 import { parseTransform } from '../utils/transform'
 import { Rect } from '../utils/geometry'
-import { Matrix } from 'jspdf-yworks'
+import { Matrix } from 'jspdf'
 
 export abstract class SvgNode {
   readonly element: HTMLElement

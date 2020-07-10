@@ -3,7 +3,7 @@ import { getAttribute, svgNodeIsVisible } from '../utils/node'
 import { Context } from '../context/context'
 import { Path } from '../utils/path'
 import { SvgNode } from './svgnode'
-import { Matrix } from 'jspdf-yworks'
+import { Matrix } from 'jspdf'
 
 export abstract class EllipseBase extends GeometryNode {
   abstract get rx(): number

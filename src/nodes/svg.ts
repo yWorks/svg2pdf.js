@@ -4,7 +4,7 @@ import { getAttribute, svgNodeAndChildrenVisible } from '../utils/node'
 import { ContainerNode } from './containernode'
 import { computeViewBoxTransform } from '../utils/transform'
 import { Rect } from '../utils/geometry'
-import { Matrix } from 'jspdf-yworks'
+import { Matrix } from 'jspdf'
 
 export class Svg extends ContainerNode {
   protected getBoundingBoxCore(context: Context): Rect {

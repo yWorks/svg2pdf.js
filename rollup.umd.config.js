@@ -8,7 +8,7 @@ import replaceOutput from './rollup-plugin-replace-output'
 
 const globals = {
   cssesc: 'cssesc',
-  'jspdf-yworks': 'jsPDF',
+  jspdf: 'jspdf',
   svgpath: 'svgpath'
 }
 
@@ -30,9 +30,6 @@ export default {
   ],
   external: [...Object.keys(pkg.peerDependencies || {})],
   plugins: [
-    replace({
-      'jspdf-yworks/dist/jspdf.node.debug': 'jspdf-yworks'
-    }),
     typescript({
       typescript: require('typescript')
     }),
@@ -44,13 +41,13 @@ export default {
     replaceOutput([
       {
         include: /\.min.js/,
-        search: /["']jspdf-yworks["']/g,
-        replace: '"jspdf-yworks/dist/jspdf.min"'
+        search: /["']jspdf["']/g,
+        replace: '"jspdf/dist/jspdf.umd.min"'
       },
       {
         include: /[^m][^i][^n].js/,
-        search: /["']jspdf-yworks["']/g,
-        replace: '"jspdf-yworks/dist/jspdf.debug"'
+        search: /["']yworks["']/g,
+        replace: '"jspdf/dist/jspdf.umd"'
       }
     ])
   ]

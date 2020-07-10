@@ -5,7 +5,7 @@ import { getAttribute, svgNodeAndChildrenVisible } from '../utils/node'
 import { Rect } from '../utils/geometry'
 import { RGBColor } from '../utils/rgbcolor'
 import { SvgNode } from './svgnode'
-import { Matrix, ShadingPatternType } from 'jspdf-yworks'
+import { GState, Matrix, ShadingPattern, ShadingPatternType } from 'jspdf'
 
 export abstract class Gradient extends NonRenderedNode {
   private readonly pdfGradientType: ShadingPatternType
@@ -46,15 +46,10 @@ export abstract class Gradient extends NonRenderedNode {
     })
 
     if (hasOpacity) {
-      gState = context.pdf.GState({ opacity: opacitySum / colors.length })
+      gState = new GState({ opacity: opacitySum / colors.length })
     }
 
-    const pattern = context.pdf.ShadingPattern(
-      this.pdfGradientType,
-      this.getCoordinates(),
-      colors,
-      gState
-    )
+    const pattern = new ShadingPattern(this.pdfGradientType, this.getCoordinates(), colors, gState)
     context.pdf.addShadingPattern(id, pattern)
   }
 

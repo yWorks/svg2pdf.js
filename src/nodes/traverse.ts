@@ -5,7 +5,7 @@ import { GeometryNode } from './geometrynode'
 import { SvgNode } from './svgnode'
 import { parseFloats } from '../utils/parsing'
 import { Point } from '../utils/geometry'
-import { Matrix } from 'jspdf-yworks'
+import { Matrix } from 'jspdf'
 
 export abstract class Traverse extends GeometryNode {
   private readonly closed: boolean

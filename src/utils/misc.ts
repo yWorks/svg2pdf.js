@@ -1,5 +1,5 @@
 import { alignmentBaselineMap } from './constants'
-import { TextOptionsLight } from 'jspdf-yworks'
+import { TextOptionsLight } from 'jspdf'
 
 /**
  * Convert em, px and bare number attributes to pixel values

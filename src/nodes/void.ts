@@ -2,7 +2,7 @@ import { SvgNode } from './svgnode'
 import { Context } from '../context/context'
 import { svgNodeIsVisible } from '../utils/node'
 import { Rect } from '../utils/geometry'
-import { Matrix } from 'jspdf-yworks'
+import { Matrix } from 'jspdf'
 
 export class VoidNode extends SvgNode {
   render(parentContext: Context): Promise<void> {

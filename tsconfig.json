@@ -16,6 +16,7 @@
   "include": [
     "src/**/*.ts",
     "./node_modules/svgpath/index.d.ts",
-    "./typings/**/*.ts"
+    "./typings/**/*.ts",
+    "types.d.ts"
   ]
 }

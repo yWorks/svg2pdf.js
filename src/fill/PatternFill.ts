@@ -5,7 +5,7 @@ import { getAttribute } from '../utils/node'
 import { Pattern } from '../nodes/pattern'
 import { Rect } from '../utils/geometry'
 import { GraphicsNode } from '../nodes/graphicsnode'
-import { Matrix } from 'jspdf-yworks'
+import { Matrix } from 'jspdf'
 
 export class PatternFill implements Fill {
   private readonly key: string
