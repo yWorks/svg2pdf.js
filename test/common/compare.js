@@ -27,7 +27,7 @@ const pdfMimeType = 'text/plain; charset=x-user-defined'
 
 /* global XMLHttpRequest, expect */
 
-function loadBinaryResource(url, unicodeCleanUp) {
+window.loadBinaryResource = function loadBinaryResource(url, unicodeCleanUp) {
   const req = new XMLHttpRequest()
   req.open('GET', url, false)
   // XHR binary charset opt by Marcus Granado 2006 [http://mgran.blogspot.com]
@@ -114,7 +114,7 @@ window.comparePdf = (actual, filePath, alwaysCreateReferences = false) => {
 window.loadSvg = function loadSvg(url) {
   const request = new XMLHttpRequest()
   request.open('GET', url, false)
-  request.overrideMimeType('text/plain; charset=x-user-defined')
+  request.overrideMimeType('text/plain; charset=utf-8')
   request.send()
 
   if (request.status !== 200) {

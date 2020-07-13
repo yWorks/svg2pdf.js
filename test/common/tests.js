@@ -13,6 +13,7 @@ window.tests = [
   'complete-movies',
   'complete-organization-chart',
   'complete-organization-chart-new',
+  'custom-fonts',
   'display-none-and-visibility-inheritance',
   'empty-elements',
   'fill-and-stroke-inheritance',

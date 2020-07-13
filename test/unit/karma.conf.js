@@ -28,9 +28,10 @@ module.exports = config => {
         served: true
       },
       {
-        pattern: 'test/**/*.{svg,png,jpg,jpeg}',
+        pattern: 'test/**/*.+(svg|png|jpg|jpeg|ttf)',
         included: false,
-        served: true
+        served: true,
+        watched: false
       },
       {
         pattern: 'test/specs/**/reference.pdf',
