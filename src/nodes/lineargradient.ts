@@ -1,19 +1,17 @@
 import { Gradient } from './gradient'
-import { Context } from '../context/context'
-import { putGradient } from '../utils/patterngradient'
+import { SvgNode } from './svgnode'
 
 export class LinearGradient extends Gradient {
-  apply(context: Context) {
-    putGradient(
-      this.element,
-      'axial',
-      [
-        this.element.getAttribute('x1') || 0,
-        this.element.getAttribute('y1') || 0,
-        this.element.getAttribute('x2') || 1,
-        this.element.getAttribute('y2') || 0
-      ],
-      context
-    )
+  constructor(element: HTMLElement, children: SvgNode[]) {
+    super('axial', element, children)
+  }
+
+  getCoordinates(): number[] {
+    return [
+      parseFloat(this.element.getAttribute('x1') || '0'),
+      parseFloat(this.element.getAttribute('y1') || '0'),
+      parseFloat(this.element.getAttribute('x2') || '1'),
+      parseFloat(this.element.getAttribute('y2') || '0')
+    ]
   }
 }

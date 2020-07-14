@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500">
+    <defs>
+        <clipPath id="clip1" clipPathUnits="userSpaceOnUse" transform="translate(50 0)">
+            <rect x="50" y="50" width="50" height="50"/>
+            <circle cx="150" cy="75" r="25"/>
+            <path d="M 0 0 L 50 0, 50 50, 0 50 z" transform="translate(225 50) rotate(45)"/>
+            <rect width="50" height="70" rx="5" ry="15" transform="translate(285 65) rotate(-30)"/>
+            <line x1="300" x2="400" y1="50" y2="50" stroke="black" stroke-width="50"/>
+            <!-- text is not supported, as well -->
+            <!--<text font-family="Arial" font-size="80" x="50" y="190" font-weight="bold">Text</text>-->
+        </clipPath>
+        <clipPath id="clip2" clipPathUnits="objectBoundingBox" transform="translate(.2 .2)">
+            <rect x="0.1" y="0.1" width="0.1" height="0.1"/>
+            <circle cx="0.3" cy="0.15" r="0.05"/>
+            <path d="M 0 0 L .1 0, .1 .1, 0 .1 z" transform="translate(.45 .1) rotate(45)"/>
+            <!--<text font-family="Arial" font-size="0.3" x=".1" y=".6" font-weight="bold">Text</text>-->
+        </clipPath>
+        <clipPath id="clip3">
+            <rect y="235" height="25" width="500"/>
+        </clipPath>
+    </defs>
+    <rect fill="red" opacity="0.4" stroke="black" stroke-width="3" width="500" height="200" transform="rotate(10) scale(0.8) translate(80)"/>
+    <rect fill="red" stroke="black" stroke-width="3" clip-path="url(#clip1)" width="500" height="200" transform="rotate(10) scale(0.8) translate(80)"/>
+
+    <text clip-path="url(#clip3)" font-family="Arial" font-size="50" x="50" y="260" font-weight="bold">Clipped Text</text>
+
+    <rect fill="blue" opacity="0.4" stroke="black" stroke-width="3" width="500" height="200" transform="rotate(10) scale(0.8) translate(120 300)"/>
+    <rect fill="blue" stroke="black" stroke-width="3" clip-path="url(#clip2)" width="500" height="200" transform="rotate(10) scale(0.8) translate(120 300)"/>
+</svg>

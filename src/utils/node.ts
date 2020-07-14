@@ -1,8 +1,8 @@
-import { Context } from '../context/context'
 import { SvgNode } from '../nodes/svgnode'
+import { Context } from '../context/context'
 
-export function nodeIs(node: HTMLElement, tagsString: string) {
-  return node.tagName && tagsString.split(',').indexOf(node.tagName.toLowerCase()) >= 0
+export function nodeIs(node: HTMLElement, tagsString: string): boolean {
+  return tagsString.split(',').indexOf(node.tagName.toLowerCase()) >= 0
 }
 
 export function nodeIsChildOf(node: HTMLElement, tagString: string) {
@@ -19,18 +19,18 @@ export function nodeIsChildOf(node: HTMLElement, tagString: string) {
 }
 
 export function refIsSymbol(node: HTMLElement, context: Context) {
-  var id = node.getAttribute('href') || node.getAttribute('xlink:href')
+  const id = node.getAttribute('href') || node.getAttribute('xlink:href')
   if (!id) {
     return false
   }
-  var refNode = context.refsHandler.get(id.substring(1))
+  const refNode = context.refsHandler.get(id.substring(1))
   if (!refNode) {
     return false
   }
   return nodeIs(refNode.element, 'symbol')
 }
 
-export function forEachChild(node: HTMLElement, fn: (n: number, e: HTMLElement) => void) {
+export function forEachChild(node: HTMLElement, fn: (n: number, e: HTMLElement) => void): void {
   // copy list of children, as the original might be modified
   const children = []
   for (let i = 0; i < node.childNodes.length; i++) {
@@ -43,19 +43,23 @@ export function forEachChild(node: HTMLElement, fn: (n: number, e: HTMLElement) 
 }
 
 // returns an attribute of a node, either from the node directly or from css
-export function getAttribute(node: HTMLElement, propertyNode: string, propertyCss?: string) {
+export function getAttribute(
+  node: HTMLElement,
+  propertyNode: string,
+  propertyCss?: string
+): string | undefined {
   propertyCss = propertyCss || propertyNode
   const attribute = node.style.getPropertyValue(propertyCss)
   if (attribute) {
     return attribute
   } else if (node.hasAttribute(propertyNode)) {
-    return node.getAttribute(propertyNode)
+    return node.getAttribute(propertyNode) || undefined
   } else {
-    return void 0
+    return undefined
   }
 }
 
-export function svgNodeIsVisible(svgNode: SvgNode, parentVisible: boolean) {
+export function svgNodeIsVisible(svgNode: SvgNode, parentVisible: boolean): boolean {
   if (getAttribute(svgNode.element, 'display') === 'none') {
     return false
   }
@@ -70,7 +74,7 @@ export function svgNodeIsVisible(svgNode: SvgNode, parentVisible: boolean) {
   return visible
 }
 
-export function svgNodeAndChildrenVisible(svgNode: SvgNode, parentVisible: boolean) {
+export function svgNodeAndChildrenVisible(svgNode: SvgNode, parentVisible: boolean): boolean {
   let visible = svgNodeIsVisible(svgNode, parentVisible)
   if (svgNode.element.childNodes.length === 0) {
     return false
