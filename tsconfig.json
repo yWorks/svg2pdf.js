@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "module": "es6",
+    "target": "es5",
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "lib": ["dom", "es2015"],
+    "sourceMap": true
+  },
+  "include": ["src/**/*.ts", "./node_modules/svgpath/index.d.ts", "./typings/**/*.ts", "types.d.ts"]
+}
