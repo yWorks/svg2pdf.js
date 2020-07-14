@@ -42,9 +42,8 @@ export async function svg2pdf(
   // correct for a jsPDF-instance measurement unit that differs from `pt`
   pdf.setFontSize(context.attributeState.fontSize * pdf.internal.scaleFactor)
 
-  const clonedSvg = element.cloneNode(true) as HTMLElement
   const idMap: { [id: string]: SvgNode } = {}
-  const node = parse(clonedSvg, idMap)
+  const node = parse(element, idMap)
   context.refsHandler = new ReferencesHandler(idMap)
   await node.render(context)
 
