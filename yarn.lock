@@ -2520,9 +2520,9 @@ jsonfile@^4.0.0:
   optionalDependencies:
     graceful-fs "^4.1.6"
 
-jspdf@HackbrettXXX/jsPDF#modernization:
+jspdf@HackbrettXXX/jsPDF#prebuilt:
   version "1.5.3"
-  resolved "https://codeload.github.com/HackbrettXXX/jsPDF/tar.gz/be0ae5d3077d060ce784c11d097837acc30b4638"
+  resolved "https://codeload.github.com/HackbrettXXX/jsPDF/tar.gz/a094fdd53c3509c7a3bf4a3ef036db711dfb7510"
   dependencies:
     atob "^2.1.2"
     btoa "^1.2.1"

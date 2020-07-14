@@ -18,7 +18,7 @@
     "exorcist:svg2pdf": "browserify src/svg2pdf.js --debug -p licensify -s svg2pdf | exorcist dist/svg2pdf.js.map > dist/svg2pdf.js",
     "uglify:dist": "uglifyjs -m -c --source-map \"includeSources,content='dist/svg2pdf.js.map',url='svg2pdf.min.js.map' dist/svg2pdf.min.js.map\" --comments /@license/ -o dist/svg2pdf.min.js dist/svg2pdf.js",
     "build": "rollup -c rollup.config.js",
-    "pretest": "yarpm run build && cd node_modules/jspdf && yarpm install && yarpm run build",
+    "pretest": "yarpm run build",
     "test": "yarpm run test-unit && yarpm run test-globals && yarpm run test-amd && yarpm run test-cjs && yarpm run test-esm",
     "test-unit": "karma start ./test/unit/karma.conf.js",
     "test-globals": "karma start ./test/deployment/globals/karma.conf.js",
@@ -52,7 +52,7 @@
   },
   "homepage": "https://github.com/yWorks/svg2pdf.js#readme",
   "peerDependencies": {
-    "jspdf": "HackbrettXXX/jsPDF#modernization"
+    "jspdf": "HackbrettXXX/jsPDF#prebuilt"
   },
   "dependencies": {
     "cssesc": "^3.0.0",
@@ -72,7 +72,7 @@
     "cssesc": "^3.0.0",
     "exorcist": "^1.0.1",
     "font-family-papandreou": "^0.2.0-patch1",
-    "jspdf": "HackbrettXXX/jsPDF#modernization",
+    "jspdf": "HackbrettXXX/jsPDF#prebuilt",
     "karma": "^5.1.0",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^3.1.0",
