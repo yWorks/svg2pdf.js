@@ -33,6 +33,7 @@ const umd = {
       format: 'umd',
       name: 'svg2pdf',
       exports: 'named',
+      sourcemap: true,
       globals
     },
     {
@@ -40,6 +41,7 @@ const umd = {
       format: 'umd',
       name: 'svg2pdf',
       exports: 'named',
+      sourcemap: true,
       globals,
       plugins: [terser({})]
     }
@@ -55,12 +57,14 @@ const es = {
       file: pkg.module.replace('.min', ''),
       format: 'es',
       name: 'svg2pdf',
+      sourcemap: true,
       plugins: []
     },
     {
       file: pkg.module,
       format: 'es',
       name: 'svg2pdf',
+      sourcemap: true,
       plugins: [terser({})]
     }
   ],
@@ -75,6 +79,7 @@ const node = {
       format: 'cjs',
       name: 'svg2pdf',
       exports: 'named',
+      sourcemap: true,
       plugins: []
     },
     {
@@ -82,6 +87,7 @@ const node = {
       format: 'cjs',
       name: 'svg2pdf',
       exports: 'named',
+      sourcemap: true,
       plugins: [terser({})]
     }
   ],
