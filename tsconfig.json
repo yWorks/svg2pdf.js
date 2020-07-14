@@ -7,7 +7,8 @@
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
-    "lib": ["dom", "es2015"]
+    "lib": ["dom", "es2015"],
+    "sourceMap": true
   },
   "include": ["src/**/*.ts", "./node_modules/svgpath/index.d.ts", "./typings/**/*.ts", "types.d.ts"]
 }

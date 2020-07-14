@@ -15,6 +15,7 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js']
   },
+  devtool: 'inline-source-map',
   output: {
     filename: 'svg2pdf.js',
     path: path.resolve(__dirname, 'dist'),

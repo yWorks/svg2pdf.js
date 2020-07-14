@@ -6,6 +6,7 @@ declare global {
   interface Window {
     tests: string[]
     loadSvg(url: string): string
+    loadBinaryResource(url: string): string
   }
   function describe(name: string, fn: () => any): void
   function it(name: string, fn: () => any): void
@@ -25,6 +26,13 @@ for (const name of window.tests) {
       const width = (svgElement as any).width.baseVal.value
       const height = (svgElement as any).height.baseVal.value
       const pdf = new jsPDF(width > height ? 'l' : 'p', 'pt', [width, height])
+
+      if (name === 'custom-fonts') {
+        const filename = '/base/test/specs/custom-fonts/Batang.ttf'
+        const fontData = window.loadBinaryResource(filename)
+        pdf.addFileToVFS(filename, fontData)
+        pdf.addFont(filename, 'Batang', 'normal')
+      }
 
       await pdf.svg(svgElement)
       // await svg2pdf(svgElement, pdf, {})

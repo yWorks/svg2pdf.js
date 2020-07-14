@@ -33,6 +33,13 @@ for (const name of window.tests) {
           const height = svgElement.height.baseVal.value
           const pdf = new jspdf.jsPDF(width > height ? 'l' : 'p', 'pt', [width, height])
 
+          if (name === 'custom-fonts') {
+            const filename = '/base/test/specs/custom-fonts/Batang.ttf'
+            const fontData = window.loadBinaryResource(filename)
+            pdf.addFileToVFS(filename, fontData)
+            pdf.addFont(filename, 'Batang', 'normal')
+          }
+
           // await svg2pdf(svgElement, pdf, {})
           pdf
             .svg(svgElement)
