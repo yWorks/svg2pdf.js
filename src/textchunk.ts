@@ -3,9 +3,11 @@ import { RGBColor } from './utils/rgbcolor'
 import { Context } from './context/context'
 import { getTextRenderingMode } from './utils/text'
 import { getAttribute } from './utils/node'
-import { toPixels, mapAlignmentBaseline } from './utils/misc'
-import { parseAttributes, applyAttributes } from './applyparseattributes'
-import { SvgNode } from './nodes/svgnode'
+import { mapAlignmentBaseline, toPixels } from './utils/misc'
+import { applyAttributes, parseAttributes } from './applyparseattributes'
+import { TextNode } from './nodes/text'
+import { Point } from './utils/geometry'
+import { ColorFill } from './fill/ColorFill'
 
 /**
  * @param {string} textAnchor
@@ -14,15 +16,15 @@ import { SvgNode } from './nodes/svgnode'
  * @constructor
  */
 export class TextChunk {
-  parent: SvgNode
-  private texts: string[]
-  private textNodes: HTMLElement[]
-  private textAnchor: string
-  private originX: number
-  private originY: number
+  private readonly textNode: TextNode
+  private readonly texts: string[]
+  private readonly textNodes: HTMLElement[]
+  private readonly textAnchor: string
+  private readonly originX: number
+  private readonly originY: number
 
-  constructor(parent: SvgNode, textAnchor: string, originX: number, originY: number) {
-    this.parent = parent
+  constructor(parent: TextNode, textAnchor: string, originX: number, originY: number) {
+    this.textNode = parent
     this.texts = []
     this.textNodes = []
     this.textAnchor = textAnchor
@@ -30,15 +32,15 @@ export class TextChunk {
     this.originY = originY
   }
 
-  add(tSpan: HTMLElement, text: string) {
+  add(tSpan: HTMLElement, text: string): void {
     this.texts.push(text)
     this.textNodes.push(tSpan)
   }
 
-  put(context: Context) {
+  put(context: Context): Point {
     let i, textNode
 
-    let strokeRGB: any
+    let strokeRGB: RGBColor
     const xs = [],
       ys = [],
       textNodeContexts = []
@@ -55,13 +57,14 @@ export class TextChunk {
       if (textNode.nodeName === '#text') {
         textNodeContext = context
       } else {
-        textNodeContext = parseAttributes(context.clone(), this.parent, textNode)
+        textNodeContext = context.clone()
+        parseAttributes(textNodeContext, this.textNode, textNode)
 
         const tSpanStrokeColor = getAttribute(textNode, 'stroke')
         if (tSpanStrokeColor) {
           strokeRGB = new RGBColor(tSpanStrokeColor)
           if (strokeRGB.ok) {
-            textNodeContext.attributeState.stroke = strokeRGB
+            textNodeContext.attributeState.stroke = new ColorFill(strokeRGB)
           }
         }
         const strokeWidth = getAttribute(textNode, 'stroke-width')
@@ -94,7 +97,7 @@ export class TextChunk {
       maxX = Math.max(maxX, currentTextX)
     }
 
-    let textOffset
+    let textOffset = 0
     switch (this.textAnchor) {
       case 'start':
         textOffset = 0
@@ -118,18 +121,18 @@ export class TextChunk {
         }
       }
 
-      context._pdf.saveGraphicsState()
+      context.pdf.saveGraphicsState()
       applyAttributes(textNodeContexts[i], context, textNode)
 
       const alignmentBaseline = textNodeContexts[i].attributeState.alignmentBaseline
       const textRenderingMode = getTextRenderingMode(textNodeContexts[i].attributeState)
-      context._pdf.text(this.texts[i], xs[i] - textOffset, ys[i], {
+      context.pdf.text(this.texts[i], xs[i] - textOffset, ys[i], {
         baseline: mapAlignmentBaseline(alignmentBaseline),
         angle: context.transform,
         renderingMode: textRenderingMode === 'fill' ? void 0 : textRenderingMode
       })
 
-      context._pdf.restoreGraphicsState()
+      context.pdf.restoreGraphicsState()
     }
 
     return [currentTextX, currentTextY]

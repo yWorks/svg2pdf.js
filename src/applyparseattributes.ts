@@ -1,22 +1,25 @@
 import { Context } from './context/context'
 import { getAttribute, nodeIs } from './utils/node'
-import { getFill, findFirstAvailableFontFamily, toPixels } from './utils/misc'
+import { toPixels } from './utils/misc'
 import { RGBColor } from './utils/rgbcolor'
-import { parseFloats } from './utils/math'
+import { parseFloats } from './utils/parsing'
 import FontFamily from 'font-family-papandreou'
-import { fontAliases } from './utils/constants'
 import { SvgNode } from './nodes/svgnode'
+import { findFirstAvailableFontFamily, fontAliases } from './utils/fonts'
+import { parseFill } from './fill/parseFill'
+import { ColorFill } from './fill/ColorFill'
+import { GState } from 'jspdf'
 
-export function parseAttributes(context: Context, svgnode: SvgNode, node?: HTMLElement): Context {
-  const domNode = node || svgnode.element
+export function parseAttributes(context: Context, svgNode: SvgNode, node?: HTMLElement): void {
+  const domNode = node || svgNode.element
   const visibility = getAttribute(domNode, 'visibility')
   if (visibility) {
     context.attributeState.visibility = visibility
   }
   // fill mode
-  const fillColor = getAttribute(domNode, 'fill')
-  if (fillColor) {
-    context.attributeState.fill = getFill(fillColor, context, svgnode)
+  const fill = getAttribute(domNode, 'fill')
+  if (fill) {
+    context.attributeState.fill = parseFill(fill, context)
   }
 
   // opacity is realized via a pdf graphics state
@@ -38,19 +41,17 @@ export function parseAttributes(context: Context, svgnode: SvgNode, node?: HTMLE
   if (strokeWidth !== void 0 && strokeWidth !== '') {
     strokeWidth = Math.abs(parseFloat(strokeWidth))
     context.attributeState.strokeWidth = strokeWidth
-  } else {
-    // needed for inherited zero width strokes
-    strokeWidth = context.attributeState.strokeWidth
   }
 
-  const strokeColor = getAttribute(domNode, 'stroke')
-  if (strokeColor) {
-    if (strokeColor === 'none') {
+  const stroke = getAttribute(domNode, 'stroke')
+  if (stroke) {
+    if (stroke === 'none') {
       context.attributeState.stroke = null
     } else {
-      const strokeRGB = new RGBColor(strokeColor)
+      // gradients, patterns not supported for strokes ...
+      const strokeRGB = new RGBColor(stroke)
       if (strokeRGB.ok) {
-        context.attributeState.stroke = strokeRGB
+        context.attributeState.stroke = new ColorFill(strokeRGB)
       }
     }
   }
@@ -66,7 +67,7 @@ export function parseAttributes(context: Context, svgnode: SvgNode, node?: HTMLE
   let dashArray: any = getAttribute(domNode, 'stroke-dasharray')
   if (dashArray) {
     dashArray = parseFloats(dashArray)
-    const dashOffset = parseInt(getAttribute(domNode, 'stroke-dashoffset')) || 0
+    const dashOffset = parseInt(getAttribute(domNode, 'stroke-dashoffset') || '0')
     context.attributeState.strokeDasharray = dashArray
     context.attributeState.strokeDashoffset = dashOffset
   }
@@ -102,7 +103,7 @@ export function parseAttributes(context: Context, svgnode: SvgNode, node?: HTMLE
 
   const fontSize = getAttribute(domNode, 'font-size')
   if (fontSize) {
-    const pdfFontSize = context._pdf.getFontSize();
+    const pdfFontSize = context.pdf.getFontSize()
     context.attributeState.fontSize = toPixels(fontSize, pdfFontSize)
   }
 
@@ -121,81 +122,88 @@ export function parseAttributes(context: Context, svgnode: SvgNode, node?: HTMLE
   if (textAnchor) {
     context.attributeState.textAnchor = textAnchor
   }
-
-  return context
 }
 
-export function applyAttributes(childContext: Context, parentContext: Context, node: HTMLElement) {
+export function applyAttributes(
+  childContext: Context,
+  parentContext: Context,
+  node: HTMLElement
+): void {
   let fillOpacity = 1.0,
     strokeOpacity = 1.0
 
   fillOpacity *= childContext.attributeState.fillOpacity
   if (
-    childContext.attributeState.fill instanceof RGBColor &&
-    typeof childContext.attributeState.fill.a === 'number'
+    childContext.attributeState.fill instanceof ColorFill &&
+    typeof childContext.attributeState.fill.color.a === 'number'
   ) {
-    fillOpacity *= childContext.attributeState.fill.a
+    fillOpacity *= childContext.attributeState.fill.color.a
   }
   fillOpacity *= childContext.attributeState.opacity
 
   strokeOpacity *= childContext.attributeState.strokeOpacity
   if (
-    childContext.attributeState.stroke instanceof RGBColor &&
-    typeof childContext.attributeState.stroke.a === 'number'
+    childContext.attributeState.stroke instanceof ColorFill &&
+    typeof childContext.attributeState.stroke.color.a === 'number'
   ) {
-    strokeOpacity *= childContext.attributeState.stroke.a
+    strokeOpacity *= childContext.attributeState.stroke.color.a
   }
   strokeOpacity *= childContext.attributeState.opacity
 
   const hasFillOpacity = fillOpacity < 1.0
   const hasStrokeOpacity = strokeOpacity < 1.0
   if (hasFillOpacity || hasStrokeOpacity) {
-    let gState: any = {}
+    const gState: GState = {}
     hasFillOpacity && (gState['opacity'] = fillOpacity)
     hasStrokeOpacity && (gState['stroke-opacity'] = strokeOpacity)
-    childContext._pdf.setGState(new childContext._pdf.GState(gState))
+    childContext.pdf.setGState(new GState(gState))
   }
 
   if (
-    childContext.attributeState.fill instanceof RGBColor &&
+    childContext.attributeState.fill &&
     childContext.attributeState.fill !== parentContext.attributeState.fill &&
+    childContext.attributeState.fill instanceof ColorFill &&
+    childContext.attributeState.fill.color.ok &&
     !nodeIs(node, 'text')
   ) {
     // text fill color will be applied through setTextColor()
-    childContext._pdf.setFillColor(
-      childContext.attributeState.fill.r,
-      childContext.attributeState.fill.g,
-      childContext.attributeState.fill.b
+    childContext.pdf.setFillColor(
+      childContext.attributeState.fill.color.r,
+      childContext.attributeState.fill.color.g,
+      childContext.attributeState.fill.color.b
     )
   }
 
   if (childContext.attributeState.strokeWidth !== parentContext.attributeState.strokeWidth) {
-    childContext._pdf.setLineWidth(childContext.attributeState.strokeWidth)
-  }
-
-  if (childContext.attributeState.stroke !== parentContext.attributeState.stroke) {
-    childContext._pdf.setDrawColor(
-      childContext.attributeState.stroke.r,
-      childContext.attributeState.stroke.g,
-      childContext.attributeState.stroke.b
-    )
-  } else if (childContext.attributeState.stroke === 'inherit') {
-    childContext.attributeState.stroke = parentContext.attributeState.stroke
-  }
-
-  if (childContext.attributeState.strokeLinecap !== parentContext.attributeState.strokeLinecap) {
-    childContext._pdf.setLineCap(childContext.attributeState.strokeLinecap)
-  }
-
-  if (childContext.attributeState.strokeLinejoin !== parentContext.attributeState.strokeLinejoin) {
-    childContext._pdf.setLineJoin(childContext.attributeState.strokeLinejoin)
+    childContext.pdf.setLineWidth(childContext.attributeState.strokeWidth)
   }
 
   if (
-    childContext.attributeState.strokeDasharray !== parentContext.attributeState.strokeDasharray ||
-    childContext.attributeState.strokeDashoffset !== parentContext.attributeState.strokeDashoffset
+    childContext.attributeState.stroke !== parentContext.attributeState.stroke &&
+    childContext.attributeState.stroke instanceof ColorFill
   ) {
-    childContext._pdf.setLineDashPattern(
+    childContext.pdf.setDrawColor(
+      childContext.attributeState.stroke.color.r,
+      childContext.attributeState.stroke.color.g,
+      childContext.attributeState.stroke.color.b
+    )
+  }
+
+  if (childContext.attributeState.strokeLinecap !== parentContext.attributeState.strokeLinecap) {
+    childContext.pdf.setLineCap(childContext.attributeState.strokeLinecap)
+  }
+
+  if (childContext.attributeState.strokeLinejoin !== parentContext.attributeState.strokeLinejoin) {
+    childContext.pdf.setLineJoin(childContext.attributeState.strokeLinejoin)
+  }
+
+  if (
+    (childContext.attributeState.strokeDasharray !== parentContext.attributeState.strokeDasharray ||
+      childContext.attributeState.strokeDashoffset !==
+        parentContext.attributeState.strokeDashoffset) &&
+    childContext.attributeState.strokeDasharray
+  ) {
+    childContext.pdf.setLineDashPattern(
       childContext.attributeState.strokeDasharray,
       childContext.attributeState.strokeDashoffset
     )
@@ -204,24 +212,25 @@ export function applyAttributes(childContext: Context, parentContext: Context, n
   if (
     childContext.attributeState.strokeMiterlimit !== parentContext.attributeState.strokeMiterlimit
   ) {
-    childContext._pdf.setLineMiterLimit(childContext.attributeState.strokeMiterlimit)
+    childContext.pdf.setLineMiterLimit(childContext.attributeState.strokeMiterlimit)
   }
 
   if (childContext.attributeState.fontFamily !== parentContext.attributeState.fontFamily) {
     if (fontAliases.hasOwnProperty(childContext.attributeState.fontFamily)) {
-      childContext._pdf.setFont(fontAliases[childContext.attributeState.fontFamily])
+      childContext.pdf.setFont(fontAliases[childContext.attributeState.fontFamily])
     } else {
-      childContext._pdf.setFont(childContext.attributeState.fontFamily)
+      childContext.pdf.setFont(childContext.attributeState.fontFamily)
     }
   }
 
   if (
     childContext.attributeState.fill &&
     childContext.attributeState.fill !== parentContext.attributeState.fill &&
-    childContext.attributeState.fill.ok
+    childContext.attributeState.fill instanceof ColorFill &&
+    childContext.attributeState.fill.color.ok
   ) {
-    const fillRGB = childContext.attributeState.fill
-    childContext._pdf.setTextColor(fillRGB.r, fillRGB.g, fillRGB.b)
+    const fillColor = childContext.attributeState.fill.color
+    childContext.pdf.setTextColor(fillColor.r, fillColor.g, fillColor.b)
   }
 
   if (
@@ -240,13 +249,13 @@ export function applyAttributes(childContext: Context, parentContext: Context, n
       fontType = 'normal'
     }
 
-    childContext._pdf.setFontType(fontType)
+    childContext.pdf.setFontType(fontType)
   }
 
   if (childContext.attributeState.fontSize !== parentContext.attributeState.fontSize) {
     // correct for a jsPDF-instance measurement unit that differs from `pt`
-    childContext._pdf.setFontSize(
-      childContext.attributeState.fontSize * childContext._pdf.internal.scaleFactor
+    childContext.pdf.setFontSize(
+      childContext.attributeState.fontSize * childContext.pdf.internal.scaleFactor
     )
   }
 }

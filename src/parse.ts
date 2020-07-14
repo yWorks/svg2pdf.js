@@ -23,13 +23,8 @@ import { ClipPath } from './nodes/clippath'
 export function parse(node: HTMLElement, idMap?: { [id: string]: SvgNode }): SvgNode {
   let svgnode: SvgNode
   const children: SvgNode[] = []
-  const existsIdMap = idMap || idMap === {}
 
-  if (existsIdMap) {
-    forEachChild(node, (i, n) => children.push(parse(n, idMap)))
-  } else {
-    forEachChild(node, (i, n) => children.push(parse(n)))
-  }
+  forEachChild(node, (i, n) => children.push(parse(n, idMap)))
 
   switch (node.tagName.toLowerCase()) {
     case 'a':
@@ -89,9 +84,7 @@ export function parse(node: HTMLElement, idMap?: { [id: string]: SvgNode }): Svg
       break
   }
 
-  svgnode.children.forEach(child => (child.parent = svgnode))
-
-  if (existsIdMap && svgnode.element.hasAttribute('id')) {
+  if (idMap != undefined && svgnode.element.hasAttribute('id')) {
     const id = cssesc(svgnode.element.id, { isIdentifier: true })
     idMap[id] = idMap[id] || svgnode
   }

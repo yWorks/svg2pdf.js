@@ -1,61 +1,35 @@
 import { RGBColor } from '../utils/rgbcolor'
+import { Fill } from '../fill/Fill'
+import { ColorFill } from '../fill/ColorFill'
 
 export class AttributeState {
-  public xmlSpace: string
-  public color: any
-  public fill: any
-  public fillOpacity: number
-  // public fillRule: string
-  public fontFamily: string
-  public fontSize: any
-  public fontStyle: string
+  public xmlSpace = ''
+  public fill: Fill | null = null
+  public fillOpacity = 1.0
+  // public fillRule: string = null
+  public fontFamily = ''
+  public fontSize = 16
+  public fontStyle = ''
   // public fontVariant: string
-  public fontWeight: string
-  public opacity: number
-  public stroke: any
-  public strokeDasharray: []
-  public strokeDashoffset: number
-  public strokeLinecap: string
-  public strokeLinejoin: string
-  public strokeMiterlimit: number
-  public strokeOpacity: number
-  public strokeWidth: number
+  public fontWeight = ''
+  public opacity = 1.0
+  public stroke: Fill | null = null
+  public strokeDasharray: [] | null = null
+  public strokeDashoffset = 0
+  public strokeLinecap = ''
+  public strokeLinejoin = ''
+  public strokeMiterlimit = 4.0
+  public strokeOpacity = 1.0
+  public strokeWidth = 1.0
   // public textAlign: string
-  public alignmentBaseline: string
-  public textAnchor: string
-  public visibility: string
+  public alignmentBaseline = ''
+  public textAnchor = ''
+  public visibility = ''
 
-  constructor() {
-    this.xmlSpace = null
-    this.color = null
-    this.fill = null
-    this.fillOpacity = 1.0
-    // this.fillRule = null;
-    this.fontFamily = null
-    this.fontSize = 16
-    this.fontStyle = null
-    // this.fontVariant = null;
-    this.fontWeight = null
-    this.opacity = 1.0
-    this.stroke = null
-    this.strokeDasharray = null
-    this.strokeDashoffset = null
-    this.strokeLinecap = null
-    this.strokeLinejoin = null
-    this.strokeMiterlimit = 4.0
-    this.strokeOpacity = 1.0
-    this.strokeWidth = 1.0
-    // this.textAlign = null;
-    this.alignmentBaseline = null
-    this.textAnchor = null
-    this.visibility = null
-  }
-
-  clone() {
-    let clone = new AttributeState()
+  clone(): AttributeState {
+    const clone = new AttributeState()
 
     clone.xmlSpace = this.xmlSpace
-    clone.color = this.color
     clone.fill = this.fill
     clone.fillOpacity = this.fillOpacity
     // clone.fillRule = this.fillRule;
@@ -81,11 +55,11 @@ export class AttributeState {
     return clone
   }
 
-  static default() {
-    let attributeState = new AttributeState()
+  static default(): AttributeState {
+    const attributeState = new AttributeState()
 
     attributeState.xmlSpace = 'default'
-    attributeState.fill = new RGBColor('rgb(0, 0, 0)')
+    attributeState.fill = new ColorFill(new RGBColor('rgb(0, 0, 0)'))
     attributeState.fillOpacity = 1.0
     // attributeState.fillRule = "nonzero";
     attributeState.fontFamily = 'times'
@@ -96,7 +70,7 @@ export class AttributeState {
     attributeState.opacity = 1.0
     attributeState.stroke = null
     attributeState.strokeDasharray = null
-    attributeState.strokeDashoffset = null
+    attributeState.strokeDashoffset = 0
     attributeState.strokeLinecap = 'butt'
     attributeState.strokeLinejoin = 'miter'
     attributeState.strokeMiterlimit = 4.0

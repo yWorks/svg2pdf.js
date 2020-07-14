@@ -1,6 +1,6 @@
 import { Context } from '../context/context'
-import { nodeIs, getAttribute } from './node'
-import { parseFloats } from './math'
+import { parseFloats } from './parsing'
+import { Matrix } from 'jspdf'
 
 export function computeViewBoxTransform(
   node: HTMLElement,
@@ -10,7 +10,7 @@ export function computeViewBoxTransform(
   eWidth: number,
   eHeight: number,
   context: Context
-) {
+): any {
   const vbX = viewBox[0]
   const vbY = viewBox[1]
   const vbWidth = viewBox[2]
@@ -59,15 +59,18 @@ export function computeViewBoxTransform(
     translateY += eHeight - vbHeight * scaleY
   }
 
-  const translate = new context._pdf.Matrix(1, 0, 0, 1, translateX, translateY)
-  const scale = new context._pdf.Matrix(scaleX, 0, 0, scaleY, 0, 0)
+  const translate = context.pdf.Matrix(1, 0, 0, 1, translateX, translateY)
+  const scale = context.pdf.Matrix(scaleX, 0, 0, scaleY, 0, 0)
 
-  return context._pdf.matrixMult(scale, translate)
+  return context.pdf.matrixMult(scale, translate)
 }
 
 // parses the "transform" string
-export function parseTransform(transformString: string, context: Context) {
-  if (!transformString || transformString === 'none') return context._pdf.unitMatrix
+export function parseTransform(
+  transformString: string | undefined | null,
+  context: Context
+): Matrix {
+  if (!transformString || transformString === 'none') return context.pdf.unitMatrix
 
   const mRegex = /^[\s,]*matrix\(([^\)]+)\)\s*/,
     tRegex = /^[\s,]*translate\(([^\)]+)\)\s*/,
@@ -76,7 +79,7 @@ export function parseTransform(transformString: string, context: Context) {
     sXRegex = /^[\s,]*skewX\(([^\)]+)\)\s*/,
     sYRegex = /^[\s,]*skewY\(([^\)]+)\)\s*/
 
-  let resultMatrix = context._pdf.unitMatrix
+  let resultMatrix = context.pdf.unitMatrix
   let m
 
   let tSLength
@@ -86,8 +89,8 @@ export function parseTransform(transformString: string, context: Context) {
     let match = mRegex.exec(transformString)
     if (match) {
       m = parseFloats(match[1])
-      resultMatrix = context._pdf.matrixMult(
-        new context._pdf.Matrix(m[0], m[1], m[2], m[3], m[4], m[5]),
+      resultMatrix = context.pdf.matrixMult(
+        context.pdf.Matrix(m[0], m[1], m[2], m[3], m[4], m[5]),
         resultMatrix
       )
       transformString = transformString.substr(match[0].length)
@@ -96,22 +99,22 @@ export function parseTransform(transformString: string, context: Context) {
     if (match) {
       m = parseFloats(match[1])
       const a = (Math.PI * m[0]) / 180
-      resultMatrix = context._pdf.matrixMult(
-        new context._pdf.Matrix(Math.cos(a), Math.sin(a), -Math.sin(a), Math.cos(a), 0, 0),
+      resultMatrix = context.pdf.matrixMult(
+        context.pdf.Matrix(Math.cos(a), Math.sin(a), -Math.sin(a), Math.cos(a), 0, 0),
         resultMatrix
       )
       if (m[1] && m[2]) {
-        const t1 = new context._pdf.Matrix(1, 0, 0, 1, m[1], m[2])
-        const t2 = new context._pdf.Matrix(1, 0, 0, 1, -m[1], -m[2])
-        resultMatrix = context._pdf.matrixMult(t2, context._pdf.matrixMult(resultMatrix, t1))
+        const t1 = context.pdf.Matrix(1, 0, 0, 1, m[1], m[2])
+        const t2 = context.pdf.Matrix(1, 0, 0, 1, -m[1], -m[2])
+        resultMatrix = context.pdf.matrixMult(t2, context.pdf.matrixMult(resultMatrix, t1))
       }
       transformString = transformString.substr(match[0].length)
     }
     match = tRegex.exec(transformString)
     if (match) {
       m = parseFloats(match[1])
-      resultMatrix = context._pdf.matrixMult(
-        new context._pdf.Matrix(1, 0, 0, 1, m[0], m[1] || 0),
+      resultMatrix = context.pdf.matrixMult(
+        context.pdf.Matrix(1, 0, 0, 1, m[0], m[1] || 0),
         resultMatrix
       )
       transformString = transformString.substr(match[0].length)
@@ -120,8 +123,8 @@ export function parseTransform(transformString: string, context: Context) {
     if (match) {
       m = parseFloats(match[1])
       if (!m[1]) m[1] = m[0]
-      resultMatrix = context._pdf.matrixMult(
-        new context._pdf.Matrix(m[0], 0, 0, m[1], 0, 0),
+      resultMatrix = context.pdf.matrixMult(
+        context.pdf.Matrix(m[0], 0, 0, m[1], 0, 0),
         resultMatrix
       )
       transformString = transformString.substr(match[0].length)
@@ -130,8 +133,8 @@ export function parseTransform(transformString: string, context: Context) {
     if (match) {
       m = parseFloat(match[1])
       m *= Math.PI / 180
-      resultMatrix = context._pdf.matrixMult(
-        new context._pdf.Matrix(1, 0, Math.tan(m), 1, 0, 0),
+      resultMatrix = context.pdf.matrixMult(
+        context.pdf.Matrix(1, 0, Math.tan(m), 1, 0, 0),
         resultMatrix
       )
       transformString = transformString.substr(match[0].length)
@@ -140,8 +143,8 @@ export function parseTransform(transformString: string, context: Context) {
     if (match) {
       m = parseFloat(match[1])
       m *= Math.PI / 180
-      resultMatrix = context._pdf.matrixMult(
-        new context._pdf.Matrix(1, Math.tan(m), 0, 1, 0, 0),
+      resultMatrix = context.pdf.matrixMult(
+        context.pdf.Matrix(1, Math.tan(m), 0, 1, 0, 0),
         resultMatrix
       )
       transformString = transformString.substr(match[0].length)

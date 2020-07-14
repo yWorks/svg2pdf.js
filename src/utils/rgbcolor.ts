@@ -1,35 +1,32 @@
-/**
- * A class to parse color values
- * @author Stoyan Stefanov <sstoo@gmail.com>
- * @link   http://www.phpied.com/rgb-color-parser-in-javascript/
- * @license Use it if you like it
- */
 export class RGBColor {
   public ok: boolean
 
-  public a: number
-  public r: number
-  public g: number
-  public b: number
+  public a?: number = undefined
+  public r = 0
+  public g = 0
+  public b = 0
 
-  private simple_colors: { [key: string]: string }
-  private color_defs: { re: RegExp; example: string[]; process: Function }[]
+  private readonly simpleColors: { [key: string]: string } = {}
+  private colorDefs: { re: RegExp; example: string[]; process: Function }[] = []
 
-  constructor(color_string: string) {
+  constructor(colorString?: string) {
     this.ok = false
-
-    // strip any leading #
-    if (color_string.charAt(0) == '#') {
-      // remove # if any
-      color_string = color_string.substr(1, 6)
+    if (!colorString) {
+      return
     }
 
-    color_string = color_string.replace(/ /g, '')
-    color_string = color_string.toLowerCase()
+    // strip any leading #
+    if (colorString.charAt(0) == '#') {
+      // remove # if any
+      colorString = colorString.substr(1, 6)
+    }
+
+    colorString = colorString.replace(/ /g, '')
+    colorString = colorString.toLowerCase()
 
     // before getting into regexps, try simple matches
     // and overwrite the input
-    this.simple_colors = {
+    this.simpleColors = {
       aliceblue: 'f0f8ff',
       antiquewhite: 'faebd7',
       aqua: '00ffff',
@@ -181,15 +178,15 @@ export class RGBColor {
       yellow: 'ffff00',
       yellowgreen: '9acd32'
     }
-    for (const key in this.simple_colors) {
-      if (color_string == key) {
-        color_string = this.simple_colors[key]
+    for (const key in this.simpleColors) {
+      if (colorString == key) {
+        colorString = this.simpleColors[key]
       }
     }
     // emd of simple type-in colors
 
     // array of color definition objects
-    this.color_defs = [
+    this.colorDefs = [
       {
         re: /^rgb\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})\)$/,
         example: ['rgb(123, 234, 45)', 'rgb(255,234,245)'],
@@ -218,10 +215,10 @@ export class RGBColor {
     ]
 
     // search through the definitions to find a match
-    for (let i = 0; i < this.color_defs.length; i++) {
-      const re = this.color_defs[i].re
-      const processor = this.color_defs[i].process
-      const bits = re.exec(color_string)
+    for (let i = 0; i < this.colorDefs.length; i++) {
+      const re = this.colorDefs[i].re
+      const processor = this.colorDefs[i].process
+      const bits = re.exec(colorString)
       if (bits) {
         const channels = processor(bits)
         this.r = channels[0]
@@ -252,16 +249,16 @@ export class RGBColor {
 
   // help
   getHelpXML() {
-    const examples = new Array()
+    const examples = []
     // add regexps
-    for (let i = 0; i < this.color_defs.length; i++) {
-      const example = this.color_defs[i].example
+    for (let i = 0; i < this.colorDefs.length; i++) {
+      const example = this.colorDefs[i].example
       for (let j = 0; j < example.length; j++) {
         examples[examples.length] = example[j]
       }
     }
     // add type-in colors
-    for (const sc in this.simple_colors) {
+    for (const sc in this.simpleColors) {
       examples[examples.length] = sc
     }
 
@@ -269,24 +266,24 @@ export class RGBColor {
     xml.setAttribute('id', 'rgbcolor-examples')
     for (let i = 0; i < examples.length; i++) {
       try {
-        const list_item = document.createElement('li')
-        const list_color = new RGBColor(examples[i])
-        const example_div = document.createElement('div')
-        example_div.style.cssText =
+        const listItem = document.createElement('li')
+        const listColor = new RGBColor(examples[i])
+        const exampleDiv = document.createElement('div')
+        exampleDiv.style.cssText =
           'margin: 3px; ' +
           'border: 1px solid black; ' +
           'background:' +
-          list_color.toHex() +
+          listColor.toHex() +
           '; ' +
           'color:' +
-          list_color.toHex()
-        example_div.appendChild(document.createTextNode('test'))
-        const list_item_value = document.createTextNode(
-          ' ' + examples[i] + ' -> ' + list_color.toRGB() + ' -> ' + list_color.toHex()
+          listColor.toHex()
+        exampleDiv.appendChild(document.createTextNode('test'))
+        const listItemValue = document.createTextNode(
+          ' ' + examples[i] + ' -> ' + listColor.toRGB() + ' -> ' + listColor.toHex()
         )
-        list_item.appendChild(example_div)
-        list_item.appendChild(list_item_value)
-        xml.appendChild(list_item)
+        listItem.appendChild(exampleDiv)
+        listItem.appendChild(listItemValue)
+        xml.appendChild(listItem)
       } catch (e) {}
     }
     return xml
