@@ -71,28 +71,5 @@ const es = {
   external: externals,
   plugins: [typescript(), commonjs({ extensions: ['.js', '.ts'] }), resolve(), licenseBanner()]
 }
-const node = {
-  input: 'src/svg2pdf.ts',
-  output: [
-    {
-      file: pkg.main.replace('.min', ''),
-      format: 'cjs',
-      name: 'svg2pdf',
-      exports: 'named',
-      sourcemap: true,
-      plugins: []
-    },
-    {
-      file: pkg.main,
-      format: 'cjs',
-      name: 'svg2pdf',
-      exports: 'named',
-      sourcemap: true,
-      plugins: [terser({})]
-    }
-  ],
-  external: externals,
-  plugins: [typescript(), commonjs({ extensions: ['.js', '.ts'] }), resolve(), licenseBanner()]
-}
 
-export default [umd, es, node]
+export default [umd, es]

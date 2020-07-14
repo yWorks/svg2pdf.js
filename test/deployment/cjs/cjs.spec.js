@@ -1,4 +1,4 @@
-const { svg2pdf } = require('../../../dist/svg2pdf.node')
+const { svg2pdf } = require('../../../dist/svg2pdf.umd')
 const { jsPDF } = require('jspdf')
 
 const debug = false
