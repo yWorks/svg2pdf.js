@@ -1,5 +1,6 @@
 import { Context } from './context/context'
 import { getAttribute, nodeIs } from './utils/node'
+import { toPixels } from './utils/misc'
 import { RGBColor } from './utils/rgbcolor'
 import { parseFloats } from './utils/parsing'
 import FontFamily from 'font-family-papandreou'
@@ -102,7 +103,8 @@ export function parseAttributes(context: Context, svgNode: SvgNode, node?: HTMLE
 
   const fontSize = getAttribute(domNode, 'font-size')
   if (fontSize) {
-    context.attributeState.fontSize = parseFloat(fontSize)
+    const pdfFontSize = context.pdf.getFontSize()
+    context.attributeState.fontSize = toPixels(fontSize, pdfFontSize)
   }
 
   const alignmentBaseline =
