@@ -2,7 +2,7 @@ import { SvgNode } from '../nodes/svgnode'
 import { Context } from '../context/context'
 
 export function nodeIs(node: HTMLElement, tagsString: string): boolean {
-  return tagsString.split(',').indexOf(node.tagName.toLowerCase()) >= 0
+  return tagsString.split(',').indexOf((node.nodeName || node.tagName).toLowerCase()) >= 0
 }
 
 export function nodeIsChildOf(node: HTMLElement, tagString: string) {

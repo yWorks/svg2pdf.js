@@ -2,19 +2,14 @@ import { Context } from '../context/context'
 import { getAttribute } from './node'
 import { SvgNode } from '../nodes/svgnode'
 import { Rect } from './geometry'
-import { Symbol } from '../nodes/symbol'
 
 export function addLineWidth(bBox: number[], svgnode: SvgNode): number[] {
   // add line-width
   let lineWidth
-  if (svgnode instanceof Symbol) {
-    lineWidth = 0.5 * Math.max(bBox[2] - bBox[0], bBox[3] - bBox[1])
-  } else {
-    lineWidth = parseFloat(getAttribute(svgnode.element, 'stroke-width') || '1')
-    const miterLimit = getAttribute(svgnode.element, 'stroke-miterlimit')
-    // miterLength / lineWidth = 1 / sin(phi / 2)
-    miterLimit && (lineWidth *= 0.5 / Math.sin(Math.PI / 12))
-  }
+  lineWidth = parseFloat(getAttribute(svgnode.element, 'stroke-width') || '1')
+  const miterLimit = getAttribute(svgnode.element, 'stroke-miterlimit')
+  // miterLength / lineWidth = 1 / sin(phi / 2)
+  miterLimit && (lineWidth *= 0.5 / Math.sin(Math.PI / 12))
   return [
     bBox[0] - lineWidth,
     bBox[1] - lineWidth,

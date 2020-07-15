@@ -2,7 +2,6 @@ import cssEsc from 'cssesc'
 import { NonRenderedNode } from '../nodes/nonrenderednode'
 import { SvgNode } from '../nodes/svgNode'
 import { Context } from './context'
-import { Symbol } from '../nodes/symbol'
 import { Svg } from '../nodes/svg'
 import { getBoundingBoxByChildren } from '../utils/bbox'
 
@@ -31,17 +30,10 @@ export class ReferencesHandler {
     if (svgNode instanceof NonRenderedNode) {
       await svgNode.apply(context)
     } else {
-      let bBox
-
-      // TODO:
-      if (svgNode instanceof Symbol || svgNode instanceof Svg) {
-        bBox =
-          svgNode instanceof Svg
-            ? getBoundingBoxByChildren(context, svgNode)
-            : svgNode.getBoundingBox(context)
-      } else {
-        bBox = svgNode.getBoundingBox(context)
-      }
+      const bBox =
+        svgNode instanceof Svg
+          ? getBoundingBoxByChildren(context, svgNode)
+          : svgNode.getBoundingBox(context)
       context.pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], context.pdf.unitMatrix)
       await svgNode.render(new Context(context.pdf, { refsHandler: this }))
       context.pdf.endFormObject(svgNode.element.getAttribute('id'))

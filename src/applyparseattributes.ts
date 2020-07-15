@@ -153,6 +153,10 @@ export function applyAttributes(
   let hasFillOpacity = fillOpacity < 1.0
   let hasStrokeOpacity = strokeOpacity < 1.0
 
+  // This is a workaround for symbols that are used multiple times with different
+  // fill/stroke attributes. All paths within symbols are both filled and stroked
+  // and we set the fill/stroke to transparent if the use element has
+  // fill/stroke="none".
   if (nodeIs(node, 'use') && refIsSymbol(node, childContext)) {
     hasFillOpacity || ((hasFillOpacity = !childContext.attributeState.fill) && (fillOpacity = 0.0))
     hasStrokeOpacity ||

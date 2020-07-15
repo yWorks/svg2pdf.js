@@ -1,6 +1,6 @@
 <svg id="svgElement" width="500" height="500" xmlns="http://www.w3.org/2000/svg">
   <path style="fill:none;stroke:black;stroke-width:1"
-    d="M0 0 l0 500 M50 0 l0 500 M100 0 l0 500 M150 0 l0 500 M200 0 l0 500 M250 0 l0 500 M300 0 l0 500 M350 0 l0 500 M400 0 l0 500 M450 0 l0 500 M500 0 l0 500 
+    d="M0 0 l0 500 M50 0 l0 500 M100 0 l0 500 M150 0 l0 500 M200 0 l0 500 M250 0 l0 500 M300 0 l0 500 M350 0 l0 500 M400 0 l0 500 M450 0 l0 500 M500 0 l0 500
     M0 0 l500 0 M0 50 l500 0 M0 100 l500 0 M0 150 l500 0 M0 200 l500 0 M0 250 l500 0 M0 300 l500 0 M0 350 l500 0 M0 400 l500 0 M 0 450 l500 0 M0 500 l500 0 Z"/>M550 0 l0 500 M600 0 l0 500
   <path style="fill:none;stroke:black;stroke-width:3"
     d="M0 100 l500 0 M0 200 l500 0 M0 300 l500 0 M0 400 l500 0 M200 0 l0 500 M300 0 l0 500 Z"/>
@@ -37,7 +37,7 @@
   <symbol id="myDot-" width="50" height="50" viewBox="0 0 100 100" fill="none">
     <circle cx="50" cy="50" r="50"/>
   </symbol>
-  
+
   <symbol id="myDot0N" width="50" height="50" viewBox="0 0 100 100">
     <circle cx="50" cy="50" r="50"/>
   </symbol>
@@ -83,7 +83,17 @@
     </g>
   </symbol>
 
+  <clipPath id="clip" clipPathUnits="objectBoundingBox">
+    <rect x="0.3" y="0.1" width="0.4" height="0.8"/>
+  </clipPath>
 
+  <symbol id="withClipPath" clip-path="url(#clip)">
+    <circle cx="50" cy="50" r="50"/>
+  </symbol>
+
+  <symbol id="thickStroke" stroke="red" stroke-width="25" viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="50"/>
+  </symbol>
 
   <use href="#myDot" x="200"/>
 
@@ -94,8 +104,8 @@
   <use href="#myDot" x="200" y="200" fill="red"/>
 
   <use href="#myDot" x="200" y="300" fill="none" stroke="red" stroke-width="3" />
-  
-  <use href="#myDot" x="200" y="400" style="fill:green"/>  
+
+  <use href="#myDot" x="200" y="400" style="fill:green"/>
 
 
   <use href="#myDotVB" y="-10"/>
@@ -109,14 +119,14 @@
   <g transform="rotate(-17 620 380) translate(0 764) scale(1 -1)" fill="orange" stroke="black" stroke-width="10">
     <use href="#myDotVB" y="390" width="40"/>
   </g>
-  
-  
+
+
   <use href="#myDot0" x="300" />
   <use href="#myDot0" x="350" fill-opacity="0.5" />
   <use href="#myDot0" x="300" y="50" fill="none" stroke="red" stroke-width="2" />
   <use href="#myDot0" x="350" y="50" fill="none" stroke="red" stroke-width="2" stroke-opacity="0.5" />
   <use href="#myDot0" x="400" stroke="red" stroke-width="2" fill-opacity="0.5" stroke-opacity="0.5" />
-  <use href="#myDot0" x="400" y="50" stroke="red" stroke-width="2" />    
+  <use href="#myDot0" x="400" y="50" stroke="red" stroke-width="2" />
   <use href="#myDot0" x="450" fill="none" />
 
   <g><use href="#myDot0" x="300" y="100" /></g>
@@ -132,7 +142,7 @@
   <use href="#myDotS" x="300" y="250" />
   <use href="#myDotSSo" x="350" y="250" />
   <use href="#myDotFSFoSo" x="400" y="200" />
-  <use href="#myDotFS" x="400" y="250" />    
+  <use href="#myDotFS" x="400" y="250" />
   <use href="#myDot-" x="450" y="200" />
 
   <use href="#myDot0N" x="300" y="300" />
@@ -140,9 +150,13 @@
   <use href="#myDotSN" x="300" y="350" />
   <use href="#myDotSSoN" x="350" y="350" />
   <use href="#myDotFSFoSoN" x="400" y="300" />
-  <use href="#myDotFSN" x="400" y="350" />    
+  <use href="#myDotFSN" x="400" y="350" />
   <use href="#myDot-N" x="450" y="300" />
 
   <use href="#nested1" x="300" y="400" />
   <use href="#nested2" x="400" y="400" />
+
+  <use href="#withClipPath" x="50" y="400" />
+
+  <use href="#thickStroke" x="150" y="400" width="50" height="50"/>
 </svg>

@@ -3,7 +3,7 @@ import { Marker, MarkerList } from '../markerlist'
 import { Close, CurveTo, LineTo, MoveTo, Path } from '../utils/path'
 import { iriReference } from '../utils/constants'
 import { addVectors, getAngle, getDirectionVector, normalize } from '../utils/geometry'
-import { getAttribute } from '../utils/node'
+import { getAttribute, nodeIsChildOf } from '../utils/node'
 import { GraphicsNode } from './graphicsnode'
 import { addLineWidth } from '../utils/bbox'
 import { SvgNode } from './svgnode'
@@ -54,7 +54,12 @@ export abstract class GeometryNode extends GraphicsNode {
     const stroke = context.attributeState.stroke && context.attributeState.strokeWidth !== 0
     const fillData = fill ? await fill.getFillData(this, context) : undefined
     const isNodeFillRuleEvenOdd = getAttribute(this.element, 'fill-rule') === 'evenodd'
-    if (fill && stroke) {
+
+    // This is a workaround for symbols that are used multiple times with different
+    // fill/stroke attributes. All paths within symbols are both filled and stroked
+    // and we set the fill/stroke to transparent if the use element has
+    // fill/stroke="none".
+    if ((fill && stroke) || nodeIsChildOf(this.element, 'symbol')) {
       if (isNodeFillRuleEvenOdd) {
         context.pdf.fillStrokeEvenOdd(fillData)
       } else {

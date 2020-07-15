@@ -1,11 +1,48 @@
-import { ContainerNode } from './containernode'
-import { svgNodeAndChildrenVisible, getAttribute } from '../utils/node'
+import { getAttribute, svgNodeAndChildrenVisible } from '../utils/node'
 import { Context } from '../context/context'
-import { getBoundingBoxByChildren, addLineWidth } from '../utils/bbox'
+import { addLineWidth, getBoundingBoxByChildren } from '../utils/bbox'
 import { parseFloats } from '../utils/parsing'
 import { computeViewBoxTransform } from '../utils/transform'
+import { NonRenderedNode } from './nonrenderednode'
+import { applyAttributes, parseAttributes } from '../applyparseattributes'
+import { applyClipPath, getClipPathNode } from '../utils/applyclippath'
 
-export class Symbol extends ContainerNode {
+export class Symbol extends NonRenderedNode {
+  async apply(context: Context): Promise<void> {
+    const bBox = this.getBoundingBox(context)
+    context.pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], context.pdf.unitMatrix)
+    await this.renderChildren(context)
+    context.pdf.endFormObject(this.element.getAttribute('id'))
+  }
+
+  private async renderChildren(parentContext: Context): Promise<void> {
+    if (!this.isVisible(parentContext.attributeState.visibility !== 'hidden')) {
+      return
+    }
+
+    const context = parentContext.clone()
+    context.transform = context.pdf.unitMatrix
+
+    parseAttributes(context, this)
+
+    const hasClipPath =
+      this.element.hasAttribute('clip-path') && getAttribute(this.element, 'clip-path') !== 'none'
+
+    if (hasClipPath) {
+      const clipNode = getClipPathNode(this, context)
+      if (clipNode && clipNode.isVisible(true)) {
+        await applyClipPath(this, clipNode, context)
+      } else {
+        return
+      }
+    }
+
+    applyAttributes(context, parentContext, this.element)
+    for (const child of this.children) {
+      await child.render(context)
+    }
+  }
+
   getBoundingBoxCore(context: Context): number[] {
     return addLineWidth(getBoundingBoxByChildren(context, this), this)
   }
