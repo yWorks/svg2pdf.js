@@ -1,5 +1,5 @@
 import cssEsc from 'cssesc'
-import { SvgNode } from '../nodes/svgNode'
+import { SvgNode } from '../nodes/svgnode'
 
 export class ReferencesHandler {
   private readonly renderedElements: { [key: string]: SvgNode }
