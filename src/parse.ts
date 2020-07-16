@@ -19,18 +19,13 @@ import { Svg } from './nodes/svg'
 import { Group } from './nodes/group'
 import cssesc from 'cssesc'
 import { ClipPath } from './nodes/clippath'
-import { Context } from './context/context'
+import { Symbol } from './nodes/symbol'
 
-export function parse(node: HTMLElement, context:Context, idMap?: { [id: string]: SvgNode }): SvgNode {
+export function parse(node: HTMLElement, idMap?: { [id: string]: SvgNode }): SvgNode {
   let svgnode: SvgNode
   const children: SvgNode[] = []
-  const existsIdMap = idMap || idMap === {}
 
-  if (existsIdMap) {
-    forEachChild(node, (i, n) => children.push(parse(n, context, idMap)))
-  } else {
-    forEachChild(node, (i, n) => children.push(parse(n, context)))
-  }
+  forEachChild(node, (i, n) => children.push(parse(n, idMap)))
 
   switch (node.tagName.toLowerCase()) {
     case 'a':
@@ -38,13 +33,13 @@ export function parse(node: HTMLElement, context:Context, idMap?: { [id: string]
       svgnode = new Group(node, children)
       break
     case 'circle':
-      svgnode = new Circle(node, children, context)
+      svgnode = new Circle(node, children)
       break
     case 'clippath':
       svgnode = new ClipPath(node, children)
       break
     case 'ellipse':
-      svgnode = new Ellipse(node, children, context)
+      svgnode = new Ellipse(node, children)
       break
     case 'lineargradient':
       svgnode = new LinearGradient(node, children)
@@ -79,6 +74,9 @@ export function parse(node: HTMLElement, context:Context, idMap?: { [id: string]
     case 'svg':
       svgnode = new Svg(node, children)
       break
+    case 'symbol':
+      svgnode = new Symbol(node, children)
+      break
     case 'text':
       svgnode = new TextNode(node, children)
       break
@@ -90,9 +88,7 @@ export function parse(node: HTMLElement, context:Context, idMap?: { [id: string]
       break
   }
 
-  svgnode.children.forEach(child => (child.parent = svgnode))
-
-  if (existsIdMap && svgnode.element.hasAttribute('id')) {
+  if (idMap != undefined && svgnode.element.hasAttribute('id')) {
     const id = cssesc(svgnode.element.id, { isIdentifier: true })
     idMap[id] = idMap[id] || svgnode
   }

@@ -2,42 +2,47 @@ import { Context } from '../context/context'
 import { defaultBoundingBox } from '../utils/bbox'
 import { NonRenderedNode } from './nonrenderednode'
 import { svgNodeAndChildrenVisible } from '../utils/node'
+import { Rect } from '../utils/geometry'
+import { Matrix, TilingPattern } from 'jspdf'
 
 export class Pattern extends NonRenderedNode {
-  apply(context: Context): void {
+  async apply(context: Context): Promise<void> {
     const id = this.element.getAttribute('id')
+    if (!id) {
+      return
+    }
 
     // the transformations directly at the node are written to the pattern transformation matrix
-    const bBox = this.getBBox(context)
-    const pattern = new context._pdf.TilingPattern(
+    const bBox = this.getBoundingBox(context)
+    const pattern = new TilingPattern(
       [bBox[0], bBox[1], bBox[0] + bBox[2], bBox[1] + bBox[3]],
       bBox[2],
-      bBox[3],
-      null,
-      context._pdf.unitMatrix /* Utils parameter is ignored !*/
+      bBox[3]
     )
 
-    context._pdf.beginTilingPattern(pattern)
+    context.pdf.beginTilingPattern(pattern)
     // continue without transformation
 
-    this.children.forEach(child =>
-      child.render(
-        new Context(context._pdf, {
+    for (const child of this.children) {
+      await child.render(
+        new Context(context.pdf, {
           attributeState: context.attributeState,
-          refsHandler: context.refsHandler,
-          transform: child.computeNodeTransform(context)
+          refsHandler: context.refsHandler
         })
       )
-    )
-    context._pdf.endTilingPattern(id, pattern)
+    }
+    context.pdf.endTilingPattern(id, pattern)
   }
-  protected getBoundingBoxCore(context: Context): number[] {
+
+  protected getBoundingBoxCore(context: Context): Rect {
     return defaultBoundingBox(this.element, context)
   }
-  protected computeNodeTransformCore(context: Context): any {
-    return context._pdf.unitMatrix
+
+  protected computeNodeTransformCore(context: Context): Matrix {
+    return context.pdf.unitMatrix
   }
-  isVisible(parentVisible: boolean, context:Context): boolean {
+
+  isVisible(parentVisible: boolean, context: Context): boolean {
     return svgNodeAndChildrenVisible(this, parentVisible, context)
   }
 }

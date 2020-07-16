@@ -1,6 +1,8 @@
+import { TextBaseLine } from './misc'
+
 export const iriReference = /url\(["']?#([^"']+)["']?\)/
 
-export const alignmentBaselineMap: { [key: string]: string } = {
+export const alignmentBaselineMap: { [key: string]: TextBaseLine } = {
   bottom: 'bottom',
   'text-bottom': 'bottom',
   top: 'top',
@@ -15,34 +17,4 @@ export const alignmentBaselineMap: { [key: string]: string } = {
   baseline: 'alphabetic'
 }
 
-export const fontAliases: { [key: string]: string } = {
-  'sans-serif': 'helvetica',
-  verdana: 'helvetica',
-  arial: 'helvetica',
-
-  fixed: 'courier',
-  monospace: 'courier',
-  terminal: 'courier',
-
-  serif: 'times',
-  cursive: 'times',
-  fantasy: 'times'
-}
-
-export const cToQ = 2 / 3 // ratio to convert quadratic bezier curves to cubic ones
-
-// groups: 1: mime-type (+ charset), 2: mime-type (w/o charset), 3: charset, 4: base64?, 5: body
-export const dataUrlRegex = /^\s*data:(([^/,;]+\/[^/,;]+)(?:;([^,;=]+=[^,;=]+))?)?(?:;(base64))?,(.*\s*)$/i
-
 export const svgNamespaceURI = 'http://www.w3.org/2000/svg'
-
-export const pathCommandCoordinatesMap: { [type: string]: string[] } = {
-  M: ['x', 'y'],
-
-  L: ['x', 'y'],
-  H: ['x'],
-  V: ['y'],
-
-  C: ['x1', 'y1', 'x2', 'y2', 'x', 'y'],
-  Q: ['x1', 'y1', 'x', 'y']
-}

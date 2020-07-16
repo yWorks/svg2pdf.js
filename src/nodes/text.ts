@@ -1,6 +1,6 @@
 import { Context } from '../context/context'
 import { TextChunk } from '../textchunk'
-import { addLineWidth, defaultBoundingBox } from '../utils/bbox'
+import { defaultBoundingBox } from '../utils/bbox'
 import { mapAlignmentBaseline, toPixels } from '../utils/misc'
 import { getAttribute, nodeIs, svgNodeAndChildrenVisible } from '../utils/node'
 import {
@@ -14,14 +14,16 @@ import {
   trimRight
 } from '../utils/text'
 import { GraphicsNode } from './graphicsnode'
+import { Rect } from '../utils/geometry'
+import { Matrix } from 'jspdf'
 
 export class TextNode extends GraphicsNode {
-  protected renderCore(context: Context): void {
-    context._pdf.saveGraphicsState()
+  protected async renderCore(context: Context): Promise<void> {
+    context.pdf.saveGraphicsState()
 
     let xOffset = 0
 
-    const pdfFontSize = context._pdf.getFontSize()
+    const pdfFontSize = context.pdf.getFontSize()
     const textX = toPixels(this.element.getAttribute('x'), pdfFontSize)
     const textY = toPixels(this.element.getAttribute('y'), pdfFontSize)
 
@@ -32,14 +34,14 @@ export class TextNode extends GraphicsNode {
     // when there are no tspans draw the text directly
     const tSpanCount = this.element.childElementCount
     if (tSpanCount === 0) {
-      const trimmedText = transformXmlSpace(this.element.textContent, context.attributeState)
+      const trimmedText = transformXmlSpace(this.element.textContent || '', context.attributeState)
       const transformedText = transformText(this.element, trimmedText, context)
       xOffset = context.textMeasure.getTextOffset(transformedText, context.attributeState)
 
       if (visibility === 'visible') {
         const alignmentBaseline = context.attributeState.alignmentBaseline
         const textRenderingMode = getTextRenderingMode(context.attributeState)
-        context._pdf.text(transformedText, textX + dx - xOffset, textY + dy, {
+        context.pdf.text(transformedText, textX + dx - xOffset, textY + dy, {
           baseline: mapAlignmentBaseline(alignmentBaseline),
           angle: context.transform,
           renderingMode: textRenderingMode === 'fill' ? void 0 : textRenderingMode
@@ -88,7 +90,8 @@ export class TextNode extends GraphicsNode {
             lastPositions = currentTextSegment.put(context)
             currentTextSegment = new TextChunk(
               this,
-              getAttribute(tSpan, 'text-anchor', context.styleSheets) || context.attributeState.textAnchor,
+              getAttribute(tSpan, context.styleSheets, 'text-anchor') ||
+                context.attributeState.textAnchor,
               x,
               lastPositions[1]
             )
@@ -101,7 +104,8 @@ export class TextNode extends GraphicsNode {
             lastPositions = currentTextSegment.put(context)
             currentTextSegment = new TextChunk(
               this,
-              getAttribute(tSpan, 'text-anchor', context.styleSheets) || context.attributeState.textAnchor,
+              getAttribute(tSpan, context.styleSheets, 'text-anchor') ||
+                context.attributeState.textAnchor,
               lastPositions[0],
               y
             )
@@ -134,18 +138,18 @@ export class TextNode extends GraphicsNode {
       currentTextSegment.put(context)
     }
 
-    context._pdf.restoreGraphicsState()
+    context.pdf.restoreGraphicsState()
   }
 
-  isVisible(parentVisible: boolean, context:Context): boolean {
+  isVisible(parentVisible: boolean, context: Context): boolean {
     return svgNodeAndChildrenVisible(this, parentVisible, context)
   }
 
-  protected getBoundingBoxCore(context: Context): number[] {
-    return addLineWidth(defaultBoundingBox(this.element, context), this.element, context)
+  protected getBoundingBoxCore(context: Context): Rect {
+    return defaultBoundingBox(this.element, context)
   }
 
-  protected computeNodeTransformCore(context: Context): any {
-    return context._pdf.unitMatrix
+  protected computeNodeTransformCore(context: Context): Matrix {
+    return context.pdf.unitMatrix
   }
 }

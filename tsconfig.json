@@ -1,15 +1,20 @@
 {
   "compilerOptions": {
-    "outDir": "./dist/",
+    "strict": true,
     "noImplicitAny": true,
     "module": "es6",
     "target": "es5",
     "allowJs": true,
+    "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true
+    "lib": ["dom", "es2015"],
+    "sourceMap": true
   },
   "include": [
     "src/**/*.ts",
-    "./typings/**/*.ts"
+    "./node_modules/svgpath/index.d.ts",
+    "./node_modules/css-select/index.d.ts",
+    "./typings/**/*.ts",
+    "types.d.ts"
   ]
 }

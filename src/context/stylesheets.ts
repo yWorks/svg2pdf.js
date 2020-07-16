@@ -34,14 +34,16 @@ export class StyleSheets {
         }
 
         let node: any
-        for (node of this.rootSvg.ownerDocument.childNodes as any) {
-          if (node.nodeName === 'xml-stylesheet') {
-            paths.push(
-              node.data
-                .match(/href=[\"|\'|\`|\`].*?[\"|\'|\`|\`]/)[0]
-                .split('=')[1]
-                .slice(1, -1)
-            )
+        if (this.rootSvg.ownerDocument) {
+          for (node of this.rootSvg.ownerDocument.childNodes as any) {
+            if (node.nodeName === 'xml-stylesheet') {
+              paths.push(
+                node.data
+                  .match(/href=[\"|\'|\`|\`].*?[\"|\'|\`|\`]/)[0]
+                  .split('=')[1]
+                  .slice(1, -1)
+              )
+            }
           }
         }
 

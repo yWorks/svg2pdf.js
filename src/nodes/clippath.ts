@@ -2,9 +2,10 @@ import { Context } from '../context/context'
 import { NonRenderedNode } from './nonrenderednode'
 import { getBoundingBoxByChildren } from '../utils/bbox'
 import { svgNodeAndChildrenVisible } from '../utils/node'
+import { Rect } from '../utils/geometry'
 
 export class ClipPath extends NonRenderedNode {
-  apply(context: Context) {
+  async apply(context: Context): Promise<void> {
     if (!this.isVisible(true, context)) {
       return
     }
@@ -14,30 +15,29 @@ export class ClipPath extends NonRenderedNode {
     // attribute for clipPath elements, although not explicitly explaining its behavior. This implementation follows
     // IE/Edge and considers the "transform" attribute as additional transformation within the coordinate system
     // established by the "clipPathUnits" attribute.
-    const clipPathMatrix = context._pdf.matrixMult(
+    const clipPathMatrix = context.pdf.matrixMult(
       this.computeNodeTransform(context),
       context.transform
     )
 
-    context._pdf.setCurrentTransformationMatrix(clipPathMatrix)
+    context.pdf.setCurrentTransformationMatrix(clipPathMatrix)
 
-    this.children.forEach(child =>
-      child.render(
-        new Context(context._pdf, {
+    for (const child of this.children) {
+      await child.render(
+        new Context(context.pdf, {
           refsHandler: context.refsHandler,
-          transform: child.computeNodeTransform(context),
           withinClipPath: true
         })
       )
-    )
-    context._pdf.clip().discardPath()
+    }
+    context.pdf.clip().discardPath()
 
     // as we cannot use restoreGraphicsState() to reset the transform (this would reset the clipping path, as well),
     // we must append the inverse instead
-    context._pdf.setCurrentTransformationMatrix(clipPathMatrix.inversed())
+    context.pdf.setCurrentTransformationMatrix(clipPathMatrix.inversed())
   }
 
-  protected getBoundingBoxCore(context: Context): number[] {
+  protected getBoundingBoxCore(context: Context): Rect {
     return getBoundingBoxByChildren(context, this)
   }
 
