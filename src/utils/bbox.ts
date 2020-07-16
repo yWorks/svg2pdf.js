@@ -3,21 +3,6 @@ import { getAttribute } from './node'
 import { SvgNode } from '../nodes/svgnode'
 import { Rect } from './geometry'
 
-export function addLineWidth(bBox: number[], svgnode: SvgNode): number[] {
-  // add line-width
-  let lineWidth
-  lineWidth = parseFloat(getAttribute(svgnode.element, 'stroke-width') || '1')
-  const miterLimit = getAttribute(svgnode.element, 'stroke-miterlimit')
-  // miterLength / lineWidth = 1 / sin(phi / 2)
-  miterLimit && (lineWidth *= 0.5 / Math.sin(Math.PI / 12))
-  return [
-    bBox[0] - lineWidth,
-    bBox[1] - lineWidth,
-    bBox[2] + 2 * lineWidth,
-    bBox[3] + 2 * lineWidth
-  ]
-}
-
 export function getBoundingBoxByChildren(context: Context, svgnode: SvgNode): number[] {
   if (getAttribute(svgnode.element, 'display') === 'none') {
     return [0, 0, 0, 0]

@@ -1,6 +1,6 @@
 import { getAttribute, svgNodeAndChildrenVisible } from '../utils/node'
 import { Context } from '../context/context'
-import { addLineWidth, getBoundingBoxByChildren } from '../utils/bbox'
+import { getBoundingBoxByChildren } from '../utils/bbox'
 import { parseFloats } from '../utils/parsing'
 import { computeViewBoxTransform } from '../utils/transform'
 import { NonRenderedNode } from './nonrenderednode'
@@ -8,14 +8,7 @@ import { applyAttributes, parseAttributes } from '../applyparseattributes'
 import { applyClipPath, getClipPathNode } from '../utils/applyclippath'
 
 export class Symbol extends NonRenderedNode {
-  async apply(context: Context): Promise<void> {
-    const bBox = this.getBoundingBox(context)
-    context.pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], context.pdf.unitMatrix)
-    await this.renderChildren(context)
-    context.pdf.endFormObject(this.element.getAttribute('id'))
-  }
-
-  private async renderChildren(parentContext: Context): Promise<void> {
+  async apply(parentContext: Context): Promise<void> {
     if (!this.isVisible(parentContext.attributeState.visibility !== 'hidden')) {
       return
     }
@@ -44,7 +37,7 @@ export class Symbol extends NonRenderedNode {
   }
 
   getBoundingBoxCore(context: Context): number[] {
-    return addLineWidth(getBoundingBoxByChildren(context, this), this)
+    return getBoundingBoxByChildren(context, this)
   }
   isVisible(parentVisible: boolean): boolean {
     return svgNodeAndChildrenVisible(this, parentVisible)

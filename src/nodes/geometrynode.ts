@@ -5,7 +5,6 @@ import { iriReference } from '../utils/constants'
 import { addVectors, getAngle, getDirectionVector, normalize } from '../utils/geometry'
 import { getAttribute, nodeIsChildOf } from '../utils/node'
 import { GraphicsNode } from './graphicsnode'
-import { addLineWidth } from '../utils/bbox'
 import { SvgNode } from './svgnode'
 import { Rect } from '../utils/geometry'
 
@@ -107,7 +106,7 @@ export abstract class GeometryNode extends GraphicsNode {
         maxY = Math.max(maxY, y)
       }
     }
-    return addLineWidth([minX, minY, maxX - minX, maxY - minY], this)
+    return [minX, minY, maxX - minX, maxY - minY]
   }
 
   protected getMarkers(path: Path): MarkerList {
