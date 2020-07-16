@@ -1,5 +1,5 @@
 import { Context } from './context/context'
-import { getAttribute, nodeIs } from './utils/node'
+import { getAttribute, nodeIs, refIsSymbol, nodeIsChildOf } from './utils/node'
 import { toPixels } from './utils/misc'
 import { RGBColor } from './utils/rgbcolor'
 import { parseFloats } from './utils/parsing'
@@ -150,8 +150,30 @@ export function applyAttributes(
   }
   strokeOpacity *= childContext.attributeState.opacity
 
-  const hasFillOpacity = fillOpacity < 1.0
-  const hasStrokeOpacity = strokeOpacity < 1.0
+  let hasFillOpacity = fillOpacity < 1.0
+  let hasStrokeOpacity = strokeOpacity < 1.0
+
+  // This is a workaround for symbols that are used multiple times with different
+  // fill/stroke attributes. All paths within symbols are both filled and stroked
+  // and we set the fill/stroke to transparent if the use element has
+  // fill/stroke="none".
+  if (nodeIs(node, 'use') && refIsSymbol(node, childContext)) {
+    hasFillOpacity || ((hasFillOpacity = !childContext.attributeState.fill) && (fillOpacity = 0.0))
+    hasStrokeOpacity ||
+      ((hasStrokeOpacity = !childContext.attributeState.stroke) && (strokeOpacity = 0.0))
+  } else if (nodeIsChildOf(node, 'symbol') || nodeIs(node, 'symbol')) {
+    hasFillOpacity =
+      hasFillOpacity ||
+      (childContext.attributeState.fill !== parentContext.attributeState.fill &&
+        ((!childContext.attributeState.fill && !(fillOpacity = 0.0)) ||
+          (!!childContext.attributeState.fill && !parentContext.attributeState.fill)))
+    hasStrokeOpacity =
+      hasStrokeOpacity ||
+      (childContext.attributeState.stroke !== parentContext.attributeState.stroke &&
+        ((!childContext.attributeState.stroke && !(strokeOpacity = 0.0)) ||
+          (!!childContext.attributeState.stroke && !parentContext.attributeState.stroke)))
+  }
+
   if (hasFillOpacity || hasStrokeOpacity) {
     const gState: GState = {}
     hasFillOpacity && (gState['opacity'] = fillOpacity)

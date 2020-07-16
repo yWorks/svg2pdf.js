@@ -1,9 +1,8 @@
-import { SvgNode } from './svgnode'
+import { applyAttributes, parseAttributes } from '../applyparseattributes'
 import { Context } from '../context/context'
-import { parseAttributes, applyAttributes } from '../applyparseattributes'
 import { getAttribute } from '../utils/node'
-import { iriReference } from '../utils/constants'
-import { ClipPath } from './clippath'
+import { SvgNode } from './svgnode'
+import { applyClipPath, getClipPathNode } from '../utils/applyclippath'
 
 export abstract class RenderedNode extends SvgNode {
   async render(parentContext: Context): Promise<void> {
@@ -23,10 +22,10 @@ export abstract class RenderedNode extends SvgNode {
       this.element.hasAttribute('clip-path') && getAttribute(this.element, 'clip-path') !== 'none'
 
     if (hasClipPath) {
-      const clipNode = this.getClipPathNode(context)
+      const clipNode = getClipPathNode(this, context)
       if (clipNode && clipNode.isVisible(true)) {
         context.pdf.saveGraphicsState()
-        await this.clip(context, clipNode)
+        await applyClipPath(this, clipNode, context)
       } else {
         return
       }
@@ -47,29 +46,4 @@ export abstract class RenderedNode extends SvgNode {
   }
 
   protected abstract async renderCore(context: Context): Promise<void>
-
-  private getClipPathNode(context: Context): ClipPath | undefined {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
-    const clipPathId = iriReference.exec(getAttribute(this.element, 'clip-path'))[1]
-    const clipNode = context.refsHandler.get(clipPathId)
-    return (clipNode as ClipPath) || undefined
-  }
-
-  private async clip(outerContext: Context, clipPathNode: ClipPath): Promise<void> {
-    const clipContext = outerContext.clone()
-    if (
-      clipPathNode.element.hasAttribute('clipPathUnits') &&
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-      // @ts-ignore
-      clipPathNode.element.getAttribute('clipPathUnits').toLowerCase() === 'objectboundingbox'
-    ) {
-      const bBox = this.getBoundingBox(outerContext)
-      clipContext.transform = outerContext.pdf.matrixMult(
-        outerContext.pdf.Matrix(bBox[2], 0, 0, bBox[3], bBox[0], bBox[1]),
-        outerContext.transform
-      )
-    }
-    await clipPathNode.apply(clipContext)
-  }
 }

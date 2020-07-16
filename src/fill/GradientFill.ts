@@ -15,12 +15,13 @@ export class GradientFill implements Fill {
   }
 
   async getFillData(forNode: GraphicsNode, context: Context): Promise<FillData | undefined> {
-    await context.refsHandler.getRendered(
-      this.key,
-      new Context(context.pdf, {
-        refsHandler: context.refsHandler,
-        textMeasure: context.textMeasure
-      })
+    await context.refsHandler.getRendered(this.key, node =>
+      (node as Gradient).apply(
+        new Context(context.pdf, {
+          refsHandler: context.refsHandler,
+          textMeasure: context.textMeasure
+        })
+      )
     )
 
     // matrix to convert between gradient space and user space

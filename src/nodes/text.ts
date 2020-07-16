@@ -1,6 +1,6 @@
 import { Context } from '../context/context'
 import { TextChunk } from '../textchunk'
-import { addLineWidth, defaultBoundingBox } from '../utils/bbox'
+import { defaultBoundingBox } from '../utils/bbox'
 import { mapAlignmentBaseline, toPixels } from '../utils/misc'
 import { getAttribute, nodeIs, svgNodeAndChildrenVisible } from '../utils/node'
 import {
@@ -144,7 +144,7 @@ export class TextNode extends GraphicsNode {
   }
 
   protected getBoundingBoxCore(context: Context): Rect {
-    return addLineWidth(defaultBoundingBox(this.element), this.element)
+    return defaultBoundingBox(this.element)
   }
 
   protected computeNodeTransformCore(context: Context): Matrix {

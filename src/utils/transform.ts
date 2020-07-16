@@ -30,7 +30,7 @@ export function computeViewBoxTransform(
     align = alignAndMeetOrSlice[0]
     meetOrSlice = alignAndMeetOrSlice[1] || 'meet'
   } else {
-    align = 'xMidYMid'
+    align = 'xMidyMid'
     meetOrSlice = 'meet'
   }
 

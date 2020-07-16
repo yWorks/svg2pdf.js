@@ -17,15 +17,16 @@ export class PatternFill implements Fill {
   }
 
   async getFillData(forNode: GraphicsNode, context: Context): Promise<FillData | undefined> {
-    await context.refsHandler.getRendered(
-      this.key,
-      new Context(context.pdf, {
-        refsHandler: context.refsHandler,
-        textMeasure: context.textMeasure
-      })
+    await context.refsHandler.getRendered(this.key, node =>
+      (node as Pattern).apply(
+        new Context(context.pdf, {
+          refsHandler: context.refsHandler,
+          textMeasure: context.textMeasure
+        })
+      )
     )
 
-    const patternOrGradient: PatternData = {
+    const patternData: PatternData = {
       key: this.key,
       boundingBox: undefined,
       xStep: 0,
@@ -37,42 +38,38 @@ export class PatternFill implements Fill {
     let patternUnitsMatrix = context.pdf.unitMatrix
     if (
       !this.pattern.element.hasAttribute('patternUnits') ||
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-      // @ts-ignore
-      this.pattern.element.getAttribute('patternUnits').toLowerCase() === 'objectboundingbox'
+      this.pattern.element.getAttribute('patternUnits')!.toLowerCase() === 'objectboundingbox'
     ) {
       bBox = forNode.getBoundingBox(context)
       patternUnitsMatrix = context.pdf.Matrix(1, 0, 0, 1, bBox[0], bBox[1])
 
-      // TODO: slightly inaccurate (rounding errors? line width bBoxes?)
       const fillBBox = this.pattern.getBoundingBox(context)
-      const x = fillBBox[0] * bBox[0]
-      const y = fillBBox[1] * bBox[1]
-      const width = fillBBox[2] * bBox[2]
-      const height = fillBBox[3] * bBox[3]
-      patternOrGradient.boundingBox = [x, y, x + width, y + height]
-      patternOrGradient.xStep = width
-      patternOrGradient.yStep = height
+      const x = fillBBox[0] * bBox[0] || 0
+      const y = fillBBox[1] * bBox[1] || 0
+      const width = fillBBox[2] * bBox[2] || 0
+      const height = fillBBox[3] * bBox[3] || 0
+      patternData.boundingBox = [x, y, x + width, y + height]
+      patternData.xStep = width
+      patternData.yStep = height
     }
 
     let patternContentUnitsMatrix = context.pdf.unitMatrix
     if (
       this.pattern.element.hasAttribute('patternContentUnits') &&
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-      // @ts-ignore
-      this.pattern.element.getAttribute('patternContentUnits').toLowerCase() === 'objectboundingbox'
+      this.pattern.element.getAttribute('patternContentUnits')!.toLowerCase() ===
+        'objectboundingbox'
     ) {
       bBox || (bBox = forNode.getBoundingBox(context))
       patternContentUnitsMatrix = context.pdf.Matrix(bBox[2], 0, 0, bBox[3], 0, 0)
 
-      const fillBBox = patternOrGradient.boundingBox || this.pattern.getBoundingBox(context)
-      const x = fillBBox[0] / bBox[0]
-      const y = fillBBox[1] / bBox[1]
-      const width = fillBBox[2] / bBox[2]
-      const height = fillBBox[3] / bBox[3]
-      patternOrGradient.boundingBox = [x, y, x + width, y + height]
-      patternOrGradient.xStep = width
-      patternOrGradient.yStep = height
+      const fillBBox = patternData.boundingBox || this.pattern.getBoundingBox(context)
+      const x = fillBBox[0] / bBox[0] || 0
+      const y = fillBBox[1] / bBox[1] || 0
+      const width = fillBBox[2] / bBox[2] || 0
+      const height = fillBBox[3] / bBox[3] || 0
+      patternData.boundingBox = [x, y, x + width, y + height]
+      patternData.xStep = width
+      patternData.yStep = height
     }
 
     let patternTransformMatrix = context.pdf.unitMatrix
@@ -84,13 +81,13 @@ export class PatternFill implements Fill {
     }
 
     let matrix = patternContentUnitsMatrix
-    matrix = context.pdf.matrixMult(matrix, patternUnitsMatrix)
+    matrix = context.pdf.matrixMult(matrix, patternUnitsMatrix) // translate by
     matrix = context.pdf.matrixMult(matrix, patternTransformMatrix)
     matrix = context.pdf.matrixMult(matrix, context.transform)
 
-    patternOrGradient.matrix = matrix
+    patternData.matrix = matrix
 
-    return patternOrGradient
+    return patternData
   }
 }
 

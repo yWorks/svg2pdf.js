@@ -1,7 +1,33 @@
 import { SvgNode } from '../nodes/svgnode'
+import { Context } from '../context/context'
 
 export function nodeIs(node: HTMLElement, tagsString: string): boolean {
-  return tagsString.split(',').indexOf(node.tagName.toLowerCase()) >= 0
+  return tagsString.split(',').indexOf((node.nodeName || node.tagName).toLowerCase()) >= 0
+}
+
+export function nodeIsChildOf(node: HTMLElement, tagString: string) {
+  const root = (node as any).ownerSVGElement
+  if (!root) {
+    return false
+  }
+  for (let tmp: any = node.parentNode; tmp !== root; tmp = tmp.parentNode) {
+    if (nodeIs(tmp, tagString)) {
+      return true
+    }
+  }
+  return false
+}
+
+export function refIsSymbol(node: HTMLElement, context: Context) {
+  const id = node.getAttribute('href') || node.getAttribute('xlink:href')
+  if (!id) {
+    return false
+  }
+  const refNode = context.refsHandler.get(id.substring(1))
+  if (!refNode) {
+    return false
+  }
+  return nodeIs(refNode.element, 'symbol')
 }
 
 export function forEachChild(node: HTMLElement, fn: (n: number, e: HTMLElement) => void): void {

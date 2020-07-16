@@ -1,6 +1,6 @@
 import { SvgNode } from './svgnode'
 import { Context } from '../context/context'
-import { defaultBoundingBox, addLineWidth } from '../utils/bbox'
+import { defaultBoundingBox } from '../utils/bbox'
 import { ReferencesHandler } from '../context/referenceshandler'
 import { parse } from '../parse'
 import { getAttribute, svgNodeIsVisible } from '../utils/node'
@@ -90,7 +90,7 @@ export class ImageNode extends GraphicsNode {
   }
 
   protected getBoundingBoxCore(context: Context): Rect {
-    return addLineWidth(defaultBoundingBox(this.element), this.element)
+    return defaultBoundingBox(this.element)
   }
 
   computeNodeTransformCore(context: Context): Matrix {

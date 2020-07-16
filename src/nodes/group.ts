@@ -6,10 +6,6 @@ import { Rect } from '../utils/geometry'
 import { Matrix } from 'jspdf'
 
 export class Group extends ContainerNode {
-  protected getBoundingBoxCore(context: Context): Rect {
-    return getBoundingBoxByChildren(context, this)
-  }
-
   isVisible(parentVisible: boolean): boolean {
     return svgNodeAndChildrenVisible(this, parentVisible)
   }

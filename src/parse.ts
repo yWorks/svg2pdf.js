@@ -19,6 +19,7 @@ import { Svg } from './nodes/svg'
 import { Group } from './nodes/group'
 import cssesc from 'cssesc'
 import { ClipPath } from './nodes/clippath'
+import { Symbol } from './nodes/symbol'
 
 export function parse(node: HTMLElement, idMap?: { [id: string]: SvgNode }): SvgNode {
   let svgnode: SvgNode
@@ -72,6 +73,9 @@ export function parse(node: HTMLElement, idMap?: { [id: string]: SvgNode }): Svg
       break
     case 'svg':
       svgnode = new Svg(node, children)
+      break
+    case 'symbol':
+      svgnode = new Symbol(node, children)
       break
     case 'text':
       svgnode = new TextNode(node, children)
