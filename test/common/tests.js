@@ -36,6 +36,7 @@ window.tests = [
   'pattern-units',
   'patterns',
   'polyline',
+  'rect',
   'references',
   'remote-images',
   'strokes-and-bounding-boxes',
