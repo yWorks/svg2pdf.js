@@ -34,8 +34,8 @@ for (const name of window.tests) {
         pdf.addFont(filename, 'Batang', 'normal')
       }
 
-      await pdf.svg(svgElement)
-      // await svg2pdf(svgElement, pdf, {})
+      await pdf.svg(svgElement, { loadExternalStyleSheets: true })
+      // await svg2pdf(svgElement, pdf, { loadExternalStyleSheets: true })
 
       comparePdf(pdf.output(), `/test/specs/${name}/reference.pdf`, debug)
     })

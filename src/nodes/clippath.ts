@@ -26,6 +26,7 @@ export class ClipPath extends NonRenderedNode {
       await child.render(
         new Context(context.pdf, {
           refsHandler: context.refsHandler,
+          styleSheets: context.styleSheets,
           withinClipPath: true
         })
       )

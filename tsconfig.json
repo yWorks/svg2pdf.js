@@ -13,7 +13,7 @@
   "include": [
     "src/**/*.ts",
     "./node_modules/svgpath/index.d.ts",
-    "./node_modules/css-select/index.d.ts",
+    "./node_modules/specificity/specificity.d.ts",
     "./typings/**/*.ts",
     "types.d.ts"
   ]

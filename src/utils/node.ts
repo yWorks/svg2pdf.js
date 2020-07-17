@@ -2,7 +2,7 @@ import { SvgNode } from '../nodes/svgnode'
 import { Context } from '../context/context'
 import { StyleSheets } from '../context/stylesheets'
 
-export function nodeIs(node: HTMLElement, tagsString: string): boolean {
+export function nodeIs(node: Element, tagsString: string): boolean {
   return tagsString.split(',').indexOf((node.nodeName || node.tagName).toLowerCase()) >= 0
 }
 
@@ -53,8 +53,8 @@ export function getAttribute(
   const attribute = node.style.getPropertyValue(propertyCss)
   if (attribute) {
     return attribute
-  } else if (styleSheets && styleSheets.getRuleFor(node, propertyCss)) {
-    return styleSheets.getRuleFor(node, propertyCss)
+  } else if (styleSheets.getPropertyValue(node, propertyCss)) {
+    return styleSheets.getPropertyValue(node, propertyCss)
   } else if (node.hasAttribute(propertyNode)) {
     return node.getAttribute(propertyNode) || undefined
   } else {

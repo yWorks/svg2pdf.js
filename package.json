@@ -58,9 +58,7 @@
     "cssesc": "^3.0.0",
     "font-family-papandreou": "^0.2.0-patch1",
     "svgpath": "^2.3.0",
-    "css": "^2.2.4",
-    "css-select": "^2.0.2",
-    "css-select-browser-adapter": "^0.1.2"
+    "specificity": "^0.4.1"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^5.0.2",

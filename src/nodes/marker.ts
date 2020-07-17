@@ -13,14 +13,16 @@ export class MarkerNode extends NonRenderedNode {
     const bBox = this.getBoundingBox(parentContext)
     const context = new Context(parentContext.pdf, {
       refsHandler: parentContext.refsHandler,
-      transform: tfMatrix
+      transform: tfMatrix,
+      styleSheets: parentContext.styleSheets
     })
 
     context.pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], tfMatrix)
     for (const child of this.children) {
       await child.render(
         new Context(context.pdf, {
-          refsHandler: context.refsHandler
+          refsHandler: context.refsHandler,
+          styleSheets: context.styleSheets
         })
       )
     }
@@ -68,7 +70,7 @@ export class MarkerNode extends NonRenderedNode {
     }
     return nodeTransform
   }
-  isVisible(parentVisible: boolean, context:Context): boolean {
+  isVisible(parentVisible: boolean, context: Context): boolean {
     return svgNodeAndChildrenVisible(this, parentVisible, context)
   }
 }

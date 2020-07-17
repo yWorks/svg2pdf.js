@@ -1,14 +1,87 @@
-<?xml-stylesheet href="/base/tests/style-sheets/red.css" type="text/css"?>
+<?xml-stylesheet href="/base/test/specs/style-sheets/xml-stylesheet.css" type="text/css"?>
+<?xml-stylesheet href="xml-stylesheet.css" type="text/css"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="500" height="500">
-    <link xmlns="http://www.w3.org/1999/xhtml" rel="stylesheet" href="/base/tests/style-sheets/green.css" type="text/css" />
-    <style>
-        <![CDATA[
-        .blue {
-            fill: blue;
-        }
-        ]]>
-    </style>
-    <circle cx="100" cy="100" r="75" class="blue" />
-    <circle cx="200" cy="200" r="75" class="red" />
-    <circle cx="300" cy="300" r="75" class="green" />
+  <style>
+    .style-tag-before-link-wins { fill: green }
+    .style-tag-after-link-wins { fill: red }
+  </style>
+  <link xmlns="http://www.w3.org/1999/xhtml" rel="stylesheet" href="/base/test/specs/style-sheets/link-stylesheet.css"
+        type="text/css"/>
+  <link xmlns="http://www.w3.org/1999/xhtml" rel="stylesheet" href="link-stylesheet.css"
+        type="text/css"/>
+  <style>
+    .style-tag-after-link-wins { fill: green }
+  </style>
+  <style>
+    #element-wins circle {
+      fill: green
+    }
+
+    #id-wins #id {
+      fill: green
+    }
+    #id-wins .class {
+      fill: red
+    }
+    #id-wins circle {
+      fill: red
+    }
+
+    #class-wins .class {
+      fill: green
+    }
+    #class-wins circle {
+      fill: red
+    }
+
+    #comma-selectors circle, #comma-selectors #comma-id {
+      fill: green
+    }
+
+    #comma-selectors .comma-class {
+      fill: red
+    }
+
+    .weird-comma-selector a[href~="foo,'bar,baz"], #weird-comma-selector, .another-selector a[href~='foo,bar,"baz'] {
+      fill: green
+    }
+
+    #important-wins circle {
+      fill: green !important;
+    }
+
+    #important-wins #important-id {
+      fill: red
+    }
+
+    #inline-style-wins {
+      fill: red
+    }
+  </style>
+  <circle cx="50" cy="50" r="50" class="xml-wins"/>
+  <circle cx="150" cy="50" r="50" class="style-tag-before-link-wins"/>
+  <circle cx="250" cy="50" r="50" class="link-wins"/>
+  <circle cx="350" cy="50" r="50" class="style-tag-after-link-wins"/>
+
+  <g id="element-wins">
+    <circle cx="50" cy="150" r="50"/>
+  </g>
+  <g id="id-wins">
+    <circle id="id" class="class" cx="150" cy="150" r="50"/>
+  </g>
+  <g id="class-wins">
+    <circle class="class" cx="250" cy="150" r="50"/>
+  </g>
+
+  <g id="comma-selectors">
+    <circle id="comma-id" class="comma-class" cx="50" cy="250" r="50"/>
+  </g>
+  <circle id="weird-comma-selector" cx="150" cy="250" r="50"/>
+
+  <g id="important-wins">
+    <circle id="important-id" cx="50" cy="350" r="50"/>
+  </g>
+
+  <circle id="inline-style-wins" style="fill: green" cx="50" cy="450" r="50"/>
+  <circle fill="green" cx="150" cy="450" r="50"/>
 </svg>

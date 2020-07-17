@@ -86,7 +86,10 @@ export class Use extends GraphicsNode {
     // still within.
     bBox = [bBox[0] - 0.5 * bBox[2], bBox[1] - 0.5 * bBox[3], bBox[2] * 2, bBox[3] * 2]
 
-    const refContext = new Context(context.pdf, { refsHandler: context.refsHandler })
+    const refContext = new Context(context.pdf, {
+      refsHandler: context.refsHandler,
+      styleSheets: context.styleSheets
+    })
 
     context.pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], context.pdf.unitMatrix)
     if (node instanceof Symbol) {

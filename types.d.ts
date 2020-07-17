@@ -21,4 +21,5 @@ interface Svg2PdfOptions {
   scale?: number
   xOffset?: number
   yOffset?: number
+  loadExternalStyleSheets?: boolean
 }

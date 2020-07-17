@@ -66,7 +66,8 @@ export class ImageNode extends GraphicsNode {
       const svgnode = parse(svgElement, idMap)
       await svgnode.render(
         new Context(context.pdf, {
-          refsHandler: new ReferencesHandler(idMap)
+          refsHandler: new ReferencesHandler(idMap),
+          styleSheets: context.styleSheets
         })
       )
       return

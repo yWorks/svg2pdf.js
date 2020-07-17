@@ -19,7 +19,8 @@ export class GradientFill implements Fill {
       (node as Gradient).apply(
         new Context(context.pdf, {
           refsHandler: context.refsHandler,
-          textMeasure: context.textMeasure
+          textMeasure: context.textMeasure,
+          styleSheets: context.styleSheets
         })
       )
     )

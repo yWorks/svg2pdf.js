@@ -23,13 +23,19 @@ export async function svg2pdf(
   pdf: jsPDF,
   options: Svg2PdfOptions = {}
 ): Promise<jsPDF> {
-  //  create context object
-  const context = new Context(pdf)
+  const k = options.scale ?? 1.0,
+    xOffset = options.xOffset ?? 0.0,
+    yOffset = options.yOffset ?? 0.0,
+    extCss = options.loadExternalStyleSheets ?? false
 
-  const k = options.scale || 1.0,
-    xOffset = options.xOffset || 0.0,
-    yOffset = options.yOffset || 0.0,
-    extCss = options.loadExternalStyleSheets || false
+  //  create context object
+  const idMap: { [id: string]: SvgNode } = {}
+  const refsHandler = new ReferencesHandler(idMap)
+
+  const styleSheets = new StyleSheets(element, extCss)
+  await styleSheets.load()
+
+  const context = new Context(pdf, { refsHandler, styleSheets })
 
   pdf.advancedAPI()
   // set offsets and scale everything by k
@@ -44,10 +50,7 @@ export async function svg2pdf(
   // correct for a jsPDF-instance measurement unit that differs from `pt`
   pdf.setFontSize(context.attributeState.fontSize * pdf.internal.scaleFactor)
 
-  const idMap: { [id: string]: SvgNode } = {}
   const node = parse(element, idMap)
-  context.refsHandler = new ReferencesHandler(idMap)
-  context.styleSheets = new StyleSheets(element, extCss)
   await node.render(context)
 
   pdf.restoreGraphicsState()

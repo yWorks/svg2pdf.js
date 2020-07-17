@@ -26,7 +26,7 @@ module.exports = config => {
         served: true
       },
       {
-        pattern: 'test/**/*.+(svg|png|jpg|jpeg|ttf)',
+        pattern: 'test/**/*.+(svg|png|jpg|jpeg|ttf|css)',
         included: false,
         served: true,
         watched: false
