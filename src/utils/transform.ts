@@ -103,7 +103,7 @@ export function parseTransform(
         context.pdf.Matrix(Math.cos(a), Math.sin(a), -Math.sin(a), Math.cos(a), 0, 0),
         resultMatrix
       )
-      if (m[1] && m[2]) {
+      if (m[1] || m[2]) {
         const t1 = context.pdf.Matrix(1, 0, 0, 1, m[1], m[2])
         const t2 = context.pdf.Matrix(1, 0, 0, 1, -m[1], -m[2])
         resultMatrix = context.pdf.matrixMult(t2, context.pdf.matrixMult(resultMatrix, t1))
