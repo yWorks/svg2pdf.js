@@ -4,7 +4,7 @@ import { SvgNode } from '../nodes/svgnode'
 import { Rect } from './geometry'
 
 export function getBoundingBoxByChildren(context: Context, svgnode: SvgNode): number[] {
-  if (getAttribute(svgnode.element, 'display') === 'none') {
+  if (getAttribute(svgnode.element, context.styleSheets, 'display') === 'none') {
     return [0, 0, 0, 0]
   }
   let boundingBox = [0, 0, 0, 0]
@@ -22,28 +22,32 @@ export function getBoundingBoxByChildren(context: Context, svgnode: SvgNode): nu
   return boundingBox
 }
 
-export function defaultBoundingBox(element: HTMLElement): Rect {
+export function defaultBoundingBox(element: HTMLElement, context: Context): Rect {
   const pf: any = parseFloat
   // TODO: check if there are other possible coordinate attributes
   const x1 =
     pf(element.getAttribute('x1')) ||
-    pf(getAttribute(element, 'x')) ||
-    pf(getAttribute(element, 'cx')) - pf(getAttribute(element, 'r')) ||
+    pf(getAttribute(element, context.styleSheets, 'x')) ||
+    pf(getAttribute(element, context.styleSheets, 'cx')) -
+      pf(getAttribute(element, context.styleSheets, 'r')) ||
     0
   const x2 =
     pf(element.getAttribute('x2')) ||
-    x1 + pf(getAttribute(element, 'width')) ||
-    pf(getAttribute(element, 'cx')) + pf(getAttribute(element, 'r')) ||
+    x1 + pf(getAttribute(element, context.styleSheets, 'width')) ||
+    pf(getAttribute(element, context.styleSheets, 'cx')) +
+      pf(getAttribute(element, context.styleSheets, 'r')) ||
     0
   const y1 =
     pf(element.getAttribute('y1')) ||
-    pf(getAttribute(element, 'y')) ||
-    pf(getAttribute(element, 'cy')) - pf(getAttribute(element, 'r')) ||
+    pf(getAttribute(element, context.styleSheets, 'y')) ||
+    pf(getAttribute(element, context.styleSheets, 'cy')) -
+      pf(getAttribute(element, context.styleSheets, 'r')) ||
     0
   const y2 =
     pf(element.getAttribute('y2')) ||
-    y1 + pf(getAttribute(element, 'height')) ||
-    pf(getAttribute(element, 'cy')) + pf(getAttribute(element, 'r')) ||
+    y1 + pf(getAttribute(element, context.styleSheets, 'height')) ||
+    pf(getAttribute(element, context.styleSheets, 'cy')) +
+      pf(getAttribute(element, context.styleSheets, 'r')) ||
     0
   return [
     Math.min(x1, x2),

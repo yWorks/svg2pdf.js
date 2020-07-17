@@ -38,6 +38,7 @@ window.tests = [
   'references',
   'remote-images',
   'strokes-and-bounding-boxes',
+  'style-sheets',
   'symbols',
   'text-fill-stroke',
   'text-placement',

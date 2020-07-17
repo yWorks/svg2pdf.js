@@ -1,6 +1,7 @@
+const commonConfig = require('../../common/karma.common.conf')
 module.exports = config => {
   config.set({
-    ...require('../../common/karma.common.conf'),
+    ...commonConfig,
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '../../..',
@@ -14,22 +15,7 @@ module.exports = config => {
 
       'test/deployment/globals/globals.spec.js',
 
-      {
-        pattern: 'test/specs/**/spec.svg',
-        included: false,
-        served: true
-      },
-      {
-        pattern: 'test/**/*+(svg|png|jpg|jpeg|ttf)',
-        included: false,
-        served: true
-      },
-      {
-        pattern: 'test/specs/**/reference.pdf',
-        included: false,
-        watched: false,
-        served: true
-      }
+      ...commonConfig.files
     ]
   })
 }

@@ -11,16 +11,22 @@ export class Rect extends GeometryNode {
   }
 
   protected getPath(context: Context): Path | null {
-    const w = parseFloat(getAttribute(this.element, 'width') || '0')
-    const h = parseFloat(getAttribute(this.element, 'height') || '0')
+    const w = parseFloat(getAttribute(this.element, context.styleSheets, 'width') || '0')
+    const h = parseFloat(getAttribute(this.element, context.styleSheets, 'height') || '0')
     if (!isFinite(w) || w <= 0 || !isFinite(h) || h <= 0) {
       return null
     }
     const MyArc = (4 / 3) * (Math.SQRT2 - 1),
-      rx = Math.min(parseFloat(getAttribute(this.element, 'rx') || '0'), w * 0.5),
-      ry = Math.min(parseFloat(getAttribute(this.element, 'ry') || '0'), h * 0.5)
-    let x = parseFloat(getAttribute(this.element, 'x') || '0'),
-      y = parseFloat(getAttribute(this.element, 'y') || '0')
+      rx = Math.min(
+        parseFloat(getAttribute(this.element, context.styleSheets, 'rx') || '0'),
+        w * 0.5
+      ),
+      ry = Math.min(
+        parseFloat(getAttribute(this.element, context.styleSheets, 'ry') || '0'),
+        h * 0.5
+      )
+    let x = parseFloat(getAttribute(this.element, context.styleSheets, 'x') || '0'),
+      y = parseFloat(getAttribute(this.element, context.styleSheets, 'y') || '0')
 
     return new Path()
       .moveTo((x += rx), y)
@@ -39,7 +45,7 @@ export class Rect extends GeometryNode {
     return context.pdf.unitMatrix
   }
 
-  isVisible(parentVisible: boolean): boolean {
-    return svgNodeIsVisible(this, parentVisible)
+  isVisible(parentVisible: boolean, context: Context): boolean {
+    return svgNodeIsVisible(this, parentVisible, context)
   }
 }

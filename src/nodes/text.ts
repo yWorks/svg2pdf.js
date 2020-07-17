@@ -35,7 +35,7 @@ export class TextNode extends GraphicsNode {
     const tSpanCount = this.element.childElementCount
     if (tSpanCount === 0) {
       const trimmedText = transformXmlSpace(this.element.textContent || '', context.attributeState)
-      const transformedText = transformText(this.element, trimmedText)
+      const transformedText = transformText(this.element, trimmedText, context)
       xOffset = context.textMeasure.getTextOffset(transformedText, context.attributeState)
 
       if (visibility === 'visible') {
@@ -90,7 +90,8 @@ export class TextNode extends GraphicsNode {
             lastPositions = currentTextSegment.put(context)
             currentTextSegment = new TextChunk(
               this,
-              getAttribute(tSpan, 'text-anchor') || context.attributeState.textAnchor,
+              getAttribute(tSpan, context.styleSheets, 'text-anchor') ||
+                context.attributeState.textAnchor,
               x,
               lastPositions[1]
             )
@@ -103,7 +104,8 @@ export class TextNode extends GraphicsNode {
             lastPositions = currentTextSegment.put(context)
             currentTextSegment = new TextChunk(
               this,
-              getAttribute(tSpan, 'text-anchor') || context.attributeState.textAnchor,
+              getAttribute(tSpan, context.styleSheets, 'text-anchor') ||
+                context.attributeState.textAnchor,
               lastPositions[0],
               y
             )
@@ -129,7 +131,7 @@ export class TextNode extends GraphicsNode {
           trimmedText = consolidateSpaces(trimmedText)
         }
 
-        const transformedText = transformText(this.element, trimmedText)
+        const transformedText = transformText(this.element, trimmedText, context)
         currentTextSegment.add(textNode, transformedText)
       }
 
@@ -139,12 +141,12 @@ export class TextNode extends GraphicsNode {
     context.pdf.restoreGraphicsState()
   }
 
-  isVisible(parentVisible: boolean): boolean {
-    return svgNodeAndChildrenVisible(this, parentVisible)
+  isVisible(parentVisible: boolean, context: Context): boolean {
+    return svgNodeAndChildrenVisible(this, parentVisible, context)
   }
 
   protected getBoundingBoxCore(context: Context): Rect {
-    return defaultBoundingBox(this.element)
+    return defaultBoundingBox(this.element, context)
   }
 
   protected computeNodeTransformCore(context: Context): Matrix {

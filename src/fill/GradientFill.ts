@@ -19,7 +19,8 @@ export class GradientFill implements Fill {
       (node as Gradient).apply(
         new Context(context.pdf, {
           refsHandler: context.refsHandler,
-          textMeasure: context.textMeasure
+          textMeasure: context.textMeasure,
+          styleSheets: context.styleSheets
         })
       )
     )
@@ -42,7 +43,7 @@ export class GradientFill implements Fill {
 
     // matrix that is applied to the gradient before any other transformations
     const gradientTransform = parseTransform(
-      getAttribute(this.gradient.element, 'gradientTransform', 'transform'),
+      getAttribute(this.gradient.element, context.styleSheets, 'gradientTransform', 'transform'),
       context
     )
 

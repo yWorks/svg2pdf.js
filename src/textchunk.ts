@@ -60,14 +60,14 @@ export class TextChunk {
         textNodeContext = context.clone()
         parseAttributes(textNodeContext, this.textNode, textNode)
 
-        const tSpanStrokeColor = getAttribute(textNode, 'stroke')
+        const tSpanStrokeColor = getAttribute(textNode, context.styleSheets, 'stroke')
         if (tSpanStrokeColor) {
           strokeRGB = new RGBColor(tSpanStrokeColor)
           if (strokeRGB.ok) {
             textNodeContext.attributeState.stroke = new ColorFill(strokeRGB)
           }
         }
-        const strokeWidth = getAttribute(textNode, 'stroke-width')
+        const strokeWidth = getAttribute(textNode, context.styleSheets, 'stroke-width')
         if (strokeWidth !== void 0) {
           textNodeContext.attributeState.strokeWidth = parseFloat(strokeWidth)
         }
@@ -115,7 +115,8 @@ export class TextChunk {
 
       if (textNode.nodeName !== '#text') {
         const tSpanVisibility =
-          getAttribute(textNode, 'visibility') || context.attributeState.visibility
+          getAttribute(textNode, context.styleSheets, 'visibility') ||
+          context.attributeState.visibility
         if (tSpanVisibility === 'hidden') {
           continue
         }

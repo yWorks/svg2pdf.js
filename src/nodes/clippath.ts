@@ -6,7 +6,7 @@ import { Rect } from '../utils/geometry'
 
 export class ClipPath extends NonRenderedNode {
   async apply(context: Context): Promise<void> {
-    if (!this.isVisible(true)) {
+    if (!this.isVisible(true, context)) {
       return
     }
 
@@ -26,6 +26,7 @@ export class ClipPath extends NonRenderedNode {
       await child.render(
         new Context(context.pdf, {
           refsHandler: context.refsHandler,
+          styleSheets: context.styleSheets,
           withinClipPath: true
         })
       )
@@ -41,7 +42,7 @@ export class ClipPath extends NonRenderedNode {
     return getBoundingBoxByChildren(context, this)
   }
 
-  isVisible(parentVisible: boolean): boolean {
-    return svgNodeAndChildrenVisible(this, parentVisible)
+  isVisible(parentVisible: boolean, context: Context): boolean {
+    return svgNodeAndChildrenVisible(this, parentVisible, context)
   }
 }

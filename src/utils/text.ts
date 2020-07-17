@@ -1,6 +1,7 @@
 import { AttributeState } from '../context/attributestate'
 import { getAttribute } from './node'
 import { TextOptionsLight } from 'jspdf'
+import { Context } from '../context/context'
 
 // capture type...
 let tol: TextOptionsLight
@@ -43,8 +44,8 @@ export function consolidateSpaces(str: string): string {
 }
 
 // applies text transformations to a text node
-export function transformText(node: HTMLElement, text: string): string {
-  const textTransform = getAttribute(node, 'text-transform')
+export function transformText(node: HTMLElement, text: string, context: Context): string {
+  const textTransform = getAttribute(node, context.styleSheets, 'text-transform')
   switch (textTransform) {
     case 'uppercase':
       return text.toUpperCase()

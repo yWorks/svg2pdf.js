@@ -5,7 +5,7 @@ import { iriReference } from './constants'
 import { getAttribute } from './node'
 
 export function getClipPathNode(targetNode: SvgNode, context: Context) {
-  const clipPathAttr = getAttribute(targetNode.element, 'clip-path')
+  const clipPathAttr = getAttribute(targetNode.element, context.styleSheets, 'clip-path')
   if (!clipPathAttr) {
     return undefined
   }

@@ -1,0 +1,15 @@
+.style-tag-wins {
+  fill: red;
+}
+.link-wins {
+  fill: red;
+}
+.xml-wins {
+  fill: green;
+}
+.style-tag-after-link-wins {
+  fill: red;
+}
+.style-tag-before-link-wins {
+  fill: red;
+}

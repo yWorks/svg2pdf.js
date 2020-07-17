@@ -15,13 +15,12 @@ export class PathNode extends GeometryNode {
   protected computeNodeTransformCore(context: Context): Matrix {
     return context.pdf.unitMatrix
   }
-
-  isVisible(parentVisible: boolean): boolean {
-    return svgNodeIsVisible(this, parentVisible)
+  isVisible(parentVisible: boolean, context: Context): boolean {
+    return svgNodeIsVisible(this, parentVisible, context)
   }
 
   protected getPath(context: Context): Path | null {
-    const svgPath = new SvgPath(getAttribute(this.element, 'd') || '')
+    const svgPath = new SvgPath(getAttribute(this.element, context.styleSheets, 'd') || '')
       .unshort()
       .unarc()
       .abs()

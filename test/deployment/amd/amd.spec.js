@@ -21,7 +21,8 @@ describe('Modules should be loaded by AMD', () => {
 })
 
 for (const name of window.tests) {
-  describe(name, () => {
+  describe(name, function() {
+    this.timeout(5000)
     const svgText = window.loadSvg(`/base/test/specs/${name}/spec.svg`)
     const parser = new DOMParser()
     const svgElement = parser.parseFromString(svgText, 'image/svg+xml').firstElementChild
@@ -40,9 +41,9 @@ for (const name of window.tests) {
             pdf.addFont(filename, 'Batang', 'normal')
           }
 
-          // await svg2pdf(svgElement, pdf, {})
+          // await svg2pdf(svgElement, pdf, { loadExternalStyleSheets: true })
           pdf
-            .svg(svgElement)
+            .svg(svgElement, { loadExternalStyleSheets: true })
             .then(pdf => {
               comparePdf(pdf.output(), `/test/specs/${name}/reference.pdf`, debug)
             })

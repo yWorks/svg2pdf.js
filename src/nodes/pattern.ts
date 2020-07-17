@@ -27,7 +27,8 @@ export class Pattern extends NonRenderedNode {
       await child.render(
         new Context(context.pdf, {
           attributeState: context.attributeState,
-          refsHandler: context.refsHandler
+          refsHandler: context.refsHandler,
+          styleSheets: context.styleSheets
         })
       )
     }
@@ -35,14 +36,14 @@ export class Pattern extends NonRenderedNode {
   }
 
   protected getBoundingBoxCore(context: Context): Rect {
-    return defaultBoundingBox(this.element)
+    return defaultBoundingBox(this.element, context)
   }
 
   protected computeNodeTransformCore(context: Context): Matrix {
     return context.pdf.unitMatrix
   }
 
-  isVisible(parentVisible: boolean): boolean {
-    return svgNodeAndChildrenVisible(this, parentVisible)
+  isVisible(parentVisible: boolean, context: Context): boolean {
+    return svgNodeAndChildrenVisible(this, parentVisible, context)
   }
 }

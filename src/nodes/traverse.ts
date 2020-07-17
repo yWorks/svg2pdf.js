@@ -43,8 +43,8 @@ export abstract class Traverse extends GeometryNode {
     return path
   }
 
-  isVisible(parentVisible: boolean): boolean {
-    return svgNodeIsVisible(this, parentVisible)
+  isVisible(parentVisible: boolean, context:Context): boolean {
+    return svgNodeIsVisible(this, parentVisible, context)
   }
 
   protected computeNodeTransformCore(context: Context): Matrix {

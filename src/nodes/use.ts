@@ -29,8 +29,8 @@ export class Use extends GraphicsNode {
       nodeIs(refNode.element, 'symbol,svg') && refNode.element.hasAttribute('viewBox')
 
     // scale and position it right
-    let x = pf(getAttribute(this.element, 'x') || '0')
-    let y = pf(getAttribute(this.element, 'y') || '0')
+    let x = pf(getAttribute(this.element, context.styleSheets, 'x') || '0')
+    let y = pf(getAttribute(this.element, context.styleSheets, 'y') || '0')
 
     //  calculate the transformation matrix
     let width: number | undefined = undefined
@@ -42,14 +42,18 @@ export class Use extends GraphicsNode {
 
       // in theory, the default value for width/height is 100%, but we currently don't support this
       width = pf(
-        getAttribute(this.element, 'width') || getAttribute(refNode.element, 'width') || '0'
+        getAttribute(this.element, context.styleSheets, 'width') ||
+          getAttribute(refNode.element, context.styleSheets, 'width') ||
+          '0'
       )
       height = pf(
-        getAttribute(this.element, 'height') || getAttribute(refNode.element, 'height') || '0'
+        getAttribute(this.element, context.styleSheets, 'height') ||
+          getAttribute(refNode.element, context.styleSheets, 'height') ||
+          '0'
       )
       //  accumulate x/y to calculate the viewBox transform
-      x += pf(getAttribute(refNode.element, 'x') || '0')
-      y += pf(getAttribute(refNode.element, 'y') || '0')
+      x += pf(getAttribute(refNode.element, context.styleSheets, 'x') || '0')
+      y += pf(getAttribute(refNode.element, context.styleSheets, 'y') || '0')
 
       const viewBox = parseFloats(refNode.element.getAttribute('viewBox')!)
       t = computeViewBoxTransform(refNode.element, viewBox, x, y, width, height, context)
@@ -61,7 +65,10 @@ export class Use extends GraphicsNode {
     context.pdf.setCurrentTransformationMatrix(context.transform)
 
     //  apply the bbox (i.e. clip) if needed
-    if (refNodeOpensViewport && getAttribute(refNode.element, 'overflow') !== 'visible') {
+    if (
+      refNodeOpensViewport &&
+      getAttribute(refNode.element, context.styleSheets, 'overflow') !== 'visible'
+    ) {
       context.pdf.rect(x, y, width!, height!)
       context.pdf.clip().discardPath()
     }
@@ -79,7 +86,10 @@ export class Use extends GraphicsNode {
     // still within.
     bBox = [bBox[0] - 0.5 * bBox[2], bBox[1] - 0.5 * bBox[3], bBox[2] * 2, bBox[3] * 2]
 
-    const refContext = new Context(context.pdf, { refsHandler: context.refsHandler })
+    const refContext = new Context(context.pdf, {
+      refsHandler: context.refsHandler,
+      styleSheets: context.styleSheets
+    })
 
     context.pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], context.pdf.unitMatrix)
     if (node instanceof Symbol) {
@@ -91,11 +101,11 @@ export class Use extends GraphicsNode {
   }
 
   protected getBoundingBoxCore(context: Context): number[] {
-    return defaultBoundingBox(this.element)
+    return defaultBoundingBox(this.element, context)
   }
 
-  isVisible(parentVisible: boolean): boolean {
-    return svgNodeIsVisible(this, parentVisible)
+  isVisible(parentVisible: boolean, context: Context): boolean {
+    return svgNodeIsVisible(this, parentVisible, context)
   }
 
   protected computeNodeTransformCore(context: Context): Matrix {

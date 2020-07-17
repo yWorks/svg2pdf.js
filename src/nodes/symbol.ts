@@ -9,7 +9,7 @@ import { applyClipPath, getClipPathNode } from '../utils/applyclippath'
 
 export class Symbol extends NonRenderedNode {
   async apply(parentContext: Context): Promise<void> {
-    if (!this.isVisible(parentContext.attributeState.visibility !== 'hidden')) {
+    if (!this.isVisible(parentContext.attributeState.visibility !== 'hidden', parentContext)) {
       return
     }
 
@@ -19,11 +19,12 @@ export class Symbol extends NonRenderedNode {
     parseAttributes(context, this)
 
     const hasClipPath =
-      this.element.hasAttribute('clip-path') && getAttribute(this.element, 'clip-path') !== 'none'
+      this.element.hasAttribute('clip-path') &&
+      getAttribute(this.element, context.styleSheets, 'clip-path') !== 'none'
 
     if (hasClipPath) {
       const clipNode = getClipPathNode(this, context)
-      if (clipNode && clipNode.isVisible(true)) {
+      if (clipNode && clipNode.isVisible(true, context)) {
         await applyClipPath(this, clipNode, context)
       } else {
         return
@@ -39,12 +40,12 @@ export class Symbol extends NonRenderedNode {
   getBoundingBoxCore(context: Context): number[] {
     return getBoundingBoxByChildren(context, this)
   }
-  isVisible(parentVisible: boolean): boolean {
-    return svgNodeAndChildrenVisible(this, parentVisible)
+  isVisible(parentVisible: boolean, context: Context): boolean {
+    return svgNodeAndChildrenVisible(this, parentVisible, context)
   }
   computeNodeTransformCore(context: Context) {
-    const x = parseFloat(getAttribute(this.element, 'x') || '0')
-    const y = parseFloat(getAttribute(this.element, 'y') || '0')
+    const x = parseFloat(getAttribute(this.element, context.styleSheets, 'x') || '0')
+    const y = parseFloat(getAttribute(this.element, context.styleSheets, 'y') || '0')
     // TODO: implement refX/refY - this is still to do because common browsers don't seem to support the feature yet
     // x += parseFloat(this.element.getAttribute("refX")) || 0; ???
     // y += parseFloat(this.element.getAttribute("refY")) || 0; ???
@@ -53,13 +54,13 @@ export class Symbol extends NonRenderedNode {
     if (viewBox) {
       const box = parseFloats(viewBox)
       const width = parseFloat(
-        getAttribute(this.element, 'width') ||
-          getAttribute((this.element as any).ownerSVGElement, 'width') ||
+        getAttribute(this.element, context.styleSheets, 'width') ||
+          getAttribute((this.element as any).ownerSVGElement, context.styleSheets, 'width') ||
           viewBox[2]
       )
       const height = parseFloat(
-        getAttribute(this.element, 'height') ||
-          getAttribute((this.element as any).ownerSVGElement, 'height') ||
+        getAttribute(this.element, context.styleSheets, 'height') ||
+          getAttribute((this.element as any).ownerSVGElement, context.styleSheets, 'height') ||
           viewBox[3]
       )
       return computeViewBoxTransform(this.element, box, x, y, width, height, context)

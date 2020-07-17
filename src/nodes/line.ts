@@ -31,8 +31,8 @@ export class Line extends GeometryNode {
     return context.pdf.unitMatrix
   }
 
-  isVisible(parentVisible: boolean): boolean {
-    return svgNodeIsVisible(this, parentVisible)
+  isVisible(parentVisible: boolean, context:Context): boolean {
+    return svgNodeIsVisible(this, parentVisible, context)
   }
 
   protected async fillOrStroke(context: Context): Promise<void> {

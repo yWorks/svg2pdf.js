@@ -6,36 +6,38 @@ import { SvgNode } from './svgnode'
 import { Matrix } from 'jspdf'
 
 export abstract class EllipseBase extends GeometryNode {
-  abstract get rx(): number
-  abstract get ry(): number
+  abstract getRx(context: Context): number
+  abstract getRy(context: Context): number
 
   protected constructor(element: HTMLElement, children: SvgNode[]) {
     super(false, element, children)
   }
 
   protected getPath(context: Context): Path | null {
-    if (!isFinite(this.rx) || this.rx <= 0 || !isFinite(this.ry) || this.ry <= 0) {
+    const rx = this.getRx(context)
+    const ry = this.getRy(context)
+    if (!isFinite(rx) || ry <= 0 || !isFinite(ry) || ry <= 0) {
       return null
     }
 
-    const x = parseFloat(getAttribute(this.element, 'cx') || '0'),
-      y = parseFloat(getAttribute(this.element, 'cy') || '0')
+    const x = parseFloat(getAttribute(this.element, context.styleSheets, 'cx') || '0'),
+      y = parseFloat(getAttribute(this.element, context.styleSheets, 'cy') || '0')
 
-    const lx = (4 / 3) * (Math.SQRT2 - 1) * this.rx,
-      ly = (4 / 3) * (Math.SQRT2 - 1) * this.ry
+    const lx = (4 / 3) * (Math.SQRT2 - 1) * rx,
+      ly = (4 / 3) * (Math.SQRT2 - 1) * ry
     return new Path()
-      .moveTo(x + this.rx, y)
-      .curveTo(x + this.rx, y - ly, x + lx, y - this.ry, x, y - this.ry)
-      .curveTo(x - lx, y - this.ry, x - this.rx, y - ly, x - this.rx, y)
-      .curveTo(x - this.rx, y + ly, x - lx, y + this.ry, x, y + this.ry)
-      .curveTo(x + lx, y + this.ry, x + this.rx, y + ly, x + this.rx, y)
+      .moveTo(x + rx, y)
+      .curveTo(x + rx, y - ly, x + lx, y - ry, x, y - ry)
+      .curveTo(x - lx, y - ry, x - rx, y - ly, x - rx, y)
+      .curveTo(x - rx, y + ly, x - lx, y + ry, x, y + ry)
+      .curveTo(x + lx, y + ry, x + rx, y + ly, x + rx, y)
   }
 
   protected computeNodeTransformCore(context: Context): Matrix {
     return context.pdf.unitMatrix
   }
 
-  isVisible(parentVisible: boolean): boolean {
-    return svgNodeIsVisible(this, parentVisible)
+  isVisible(parentVisible: boolean, context: Context): boolean {
+    return svgNodeIsVisible(this, parentVisible, context)
   }
 }

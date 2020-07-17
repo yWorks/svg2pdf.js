@@ -32,12 +32,12 @@ export abstract class Gradient extends NonRenderedNode {
 
     this.children.forEach(stop => {
       if (stop.element.tagName.toLowerCase() === 'stop') {
-        const color = new RGBColor(getAttribute(stop.element, 'stop-color'))
+        const color = new RGBColor(getAttribute(stop.element, context.styleSheets, 'stop-color'))
         colors.push({
           offset: Gradient.parseGradientOffset(stop.element.getAttribute('offset') || '0'),
           color: [color.r, color.g, color.b]
         })
-        const opacity = getAttribute(stop.element, 'stop-opacity')
+        const opacity = getAttribute(stop.element, context.styleSheets, 'stop-opacity')
         if (opacity && opacity !== '1') {
           opacitySum += parseFloat(opacity)
           hasOpacity = true
@@ -56,13 +56,13 @@ export abstract class Gradient extends NonRenderedNode {
   abstract getCoordinates(): number[]
 
   protected getBoundingBoxCore(context: Context): Rect {
-    return defaultBoundingBox(this.element)
+    return defaultBoundingBox(this.element, context)
   }
   protected computeNodeTransformCore(context: Context): Matrix {
     return context.pdf.unitMatrix
   }
-  isVisible(parentVisible: boolean): boolean {
-    return svgNodeAndChildrenVisible(this, parentVisible)
+  isVisible(parentVisible: boolean, context: Context): boolean {
+    return svgNodeAndChildrenVisible(this, parentVisible, context)
   }
 
   /**

@@ -12,38 +12,38 @@ import { GState } from 'jspdf'
 
 export function parseAttributes(context: Context, svgNode: SvgNode, node?: HTMLElement): void {
   const domNode = node || svgNode.element
-  const visibility = getAttribute(domNode, 'visibility')
+  const visibility = getAttribute(domNode, context.styleSheets, 'visibility')
   if (visibility) {
     context.attributeState.visibility = visibility
   }
   // fill mode
-  const fill = getAttribute(domNode, 'fill')
+  const fill = getAttribute(domNode, context.styleSheets, 'fill')
   if (fill) {
     context.attributeState.fill = parseFill(fill, context)
   }
 
   // opacity is realized via a pdf graphics state
-  const fillOpacity = getAttribute(domNode, 'fill-opacity')
+  const fillOpacity = getAttribute(domNode, context.styleSheets, 'fill-opacity')
   if (fillOpacity) {
     context.attributeState.fillOpacity = parseFloat(fillOpacity)
   }
-  const strokeOpacity = getAttribute(domNode, 'stroke-opacity')
+  const strokeOpacity = getAttribute(domNode, context.styleSheets, 'stroke-opacity')
   if (strokeOpacity) {
     context.attributeState.strokeOpacity = parseFloat(strokeOpacity)
   }
-  const opacity = getAttribute(domNode, 'opacity')
+  const opacity = getAttribute(domNode, context.styleSheets, 'opacity')
   if (opacity) {
     context.attributeState.opacity = parseFloat(opacity)
   }
 
   // stroke mode
-  let strokeWidth: any = getAttribute(domNode, 'stroke-width')
+  let strokeWidth: any = getAttribute(domNode, context.styleSheets, 'stroke-width')
   if (strokeWidth !== void 0 && strokeWidth !== '') {
     strokeWidth = Math.abs(parseFloat(strokeWidth))
     context.attributeState.strokeWidth = strokeWidth
   }
 
-  const stroke = getAttribute(domNode, 'stroke')
+  const stroke = getAttribute(domNode, context.styleSheets, 'stroke')
   if (stroke) {
     if (stroke === 'none') {
       context.attributeState.stroke = null
@@ -56,22 +56,24 @@ export function parseAttributes(context: Context, svgNode: SvgNode, node?: HTMLE
     }
   }
 
-  const lineCap = getAttribute(domNode, 'stroke-linecap')
+  const lineCap = getAttribute(domNode, context.styleSheets, 'stroke-linecap')
   if (lineCap) {
     context.attributeState.strokeLinecap = lineCap
   }
-  const lineJoin = getAttribute(domNode, 'stroke-linejoin')
+  const lineJoin = getAttribute(domNode, context.styleSheets, 'stroke-linejoin')
   if (lineJoin) {
     context.attributeState.strokeLinejoin = lineJoin
   }
-  let dashArray: any = getAttribute(domNode, 'stroke-dasharray')
+  let dashArray: any = getAttribute(domNode, context.styleSheets, 'stroke-dasharray')
   if (dashArray) {
     dashArray = parseFloats(dashArray)
-    const dashOffset = parseInt(getAttribute(domNode, 'stroke-dashoffset') || '0')
+    const dashOffset = parseInt(
+      getAttribute(domNode, context.styleSheets, 'stroke-dashoffset') || '0'
+    )
     context.attributeState.strokeDasharray = dashArray
     context.attributeState.strokeDashoffset = dashOffset
   }
-  const miterLimit = getAttribute(domNode, 'stroke-miterlimit')
+  const miterLimit = getAttribute(domNode, context.styleSheets, 'stroke-miterlimit')
   if (miterLimit !== void 0 && miterLimit !== '') {
     context.attributeState.strokeMiterlimit = parseFloat(miterLimit)
   }
@@ -81,17 +83,17 @@ export function parseAttributes(context: Context, svgNode: SvgNode, node?: HTMLE
     context.attributeState.xmlSpace = xmlSpace
   }
 
-  const fontWeight = getAttribute(domNode, 'font-weight')
+  const fontWeight = getAttribute(domNode, context.styleSheets, 'font-weight')
   if (fontWeight) {
     context.attributeState.fontWeight = fontWeight
   }
 
-  const fontStyle = getAttribute(domNode, 'font-style')
+  const fontStyle = getAttribute(domNode, context.styleSheets, 'font-style')
   if (fontStyle) {
     context.attributeState.fontStyle = fontStyle
   }
 
-  const fontFamily = getAttribute(domNode, 'font-family')
+  const fontFamily = getAttribute(domNode, context.styleSheets, 'font-family')
   if (fontFamily) {
     const fontFamilies = FontFamily.parse(fontFamily)
     context.attributeState.fontFamily = findFirstAvailableFontFamily(
@@ -101,14 +103,15 @@ export function parseAttributes(context: Context, svgNode: SvgNode, node?: HTMLE
     )
   }
 
-  const fontSize = getAttribute(domNode, 'font-size')
+  const fontSize = getAttribute(domNode, context.styleSheets, 'font-size')
   if (fontSize) {
     const pdfFontSize = context.pdf.getFontSize()
     context.attributeState.fontSize = toPixels(fontSize, pdfFontSize)
   }
 
   const alignmentBaseline =
-    getAttribute(domNode, 'vertical-align') || getAttribute(domNode, 'alignment-baseline')
+    getAttribute(domNode, context.styleSheets, 'vertical-align') ||
+    getAttribute(domNode, context.styleSheets, 'alignment-baseline')
   if (alignmentBaseline) {
     const matchArr = alignmentBaseline.match(
       /(baseline|text-bottom|alphabetic|ideographic|middle|central|mathematical|text-top|bottom|center|top|hanging)/
@@ -118,7 +121,7 @@ export function parseAttributes(context: Context, svgNode: SvgNode, node?: HTMLE
     }
   }
 
-  const textAnchor = getAttribute(domNode, 'text-anchor')
+  const textAnchor = getAttribute(domNode, context.styleSheets, 'text-anchor')
   if (textAnchor) {
     context.attributeState.textAnchor = textAnchor
   }

@@ -6,8 +6,8 @@ import { Rect } from '../utils/geometry'
 import { Matrix } from 'jspdf'
 
 export class Group extends ContainerNode {
-  isVisible(parentVisible: boolean): boolean {
-    return svgNodeAndChildrenVisible(this, parentVisible)
+  isVisible(parentVisible: boolean, context: Context): boolean {
+    return svgNodeAndChildrenVisible(this, parentVisible, context)
   }
 
   protected computeNodeTransformCore(context: Context): Matrix {

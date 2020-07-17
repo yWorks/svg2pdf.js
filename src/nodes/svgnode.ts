@@ -15,10 +15,10 @@ export abstract class SvgNode {
 
   abstract render(parentContext: Context): Promise<void>
 
-  abstract isVisible(parentHidden: boolean): boolean
+  abstract isVisible(parentHidden: boolean, context: Context): boolean
 
   getBoundingBox(context: Context): number[] {
-    if (getAttribute(this.element, 'display') === 'none') {
+    if (getAttribute(this.element, context.styleSheets, 'display') === 'none') {
       return [0, 0, 0, 0]
     }
     return this.getBoundingBoxCore(context)
@@ -28,7 +28,7 @@ export abstract class SvgNode {
 
   computeNodeTransform(context: Context): Matrix {
     const nodeTransform = this.computeNodeTransformCore(context)
-    const transformString = getAttribute(this.element, 'transform')
+    const transformString = getAttribute(this.element, context.styleSheets, 'transform')
     if (!transformString) return nodeTransform
     else return context.pdf.matrixMult(nodeTransform, parseTransform(transformString, context))
   }

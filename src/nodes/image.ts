@@ -31,10 +31,10 @@ export class ImageNode extends GraphicsNode {
     }
 
     context.pdf.setCurrentTransformationMatrix(context.transform)
-    const width = parseFloat(getAttribute(this.element, 'width') || '0'),
-      height = parseFloat(getAttribute(this.element, 'height') || '0'),
-      x = parseFloat(getAttribute(this.element, 'x') || '0'),
-      y = parseFloat(getAttribute(this.element, 'y') || '0')
+    const width = parseFloat(getAttribute(this.element, context.styleSheets, 'width') || '0'),
+      height = parseFloat(getAttribute(this.element, context.styleSheets, 'height') || '0'),
+      x = parseFloat(getAttribute(this.element, context.styleSheets, 'x') || '0'),
+      y = parseFloat(getAttribute(this.element, context.styleSheets, 'y') || '0')
 
     if (!isFinite(width) || width <= 0 || !isFinite(height) || height <= 0) {
       return
@@ -66,7 +66,8 @@ export class ImageNode extends GraphicsNode {
       const svgnode = parse(svgElement, idMap)
       await svgnode.render(
         new Context(context.pdf, {
-          refsHandler: new ReferencesHandler(idMap)
+          refsHandler: new ReferencesHandler(idMap),
+          styleSheets: context.styleSheets
         })
       )
       return
@@ -90,15 +91,15 @@ export class ImageNode extends GraphicsNode {
   }
 
   protected getBoundingBoxCore(context: Context): Rect {
-    return defaultBoundingBox(this.element)
+    return defaultBoundingBox(this.element, context)
   }
 
   computeNodeTransformCore(context: Context): Matrix {
     return context.pdf.unitMatrix
   }
 
-  isVisible(parentVisible: boolean): boolean {
-    return svgNodeIsVisible(this, parentVisible)
+  isVisible(parentVisible: boolean, context: Context): boolean {
+    return svgNodeIsVisible(this, parentVisible, context)
   }
 
   static async fetchImageData(imageUrl: string): Promise<{ data: string; format: string }> {

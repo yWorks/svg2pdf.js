@@ -2,6 +2,25 @@ const browsersEnv = process.env.BROWSERS
 const browsers = browsersEnv ? browsersEnv.split('.') : ['ChromeHeadless']
 
 module.exports = {
+  files: [
+    {
+      pattern: 'test/specs/**/spec.svg',
+      included: false,
+      served: true
+    },
+    {
+      pattern: 'test/**/*+(svg|png|jpg|jpeg|ttf|css)',
+      included: false,
+      served: true
+    },
+    {
+      pattern: 'test/specs/**/reference.pdf',
+      included: false,
+      watched: false,
+      served: true
+    }
+  ],
+
   // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
   frameworks: ['mocha', 'chai'],
 

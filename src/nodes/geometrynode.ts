@@ -41,7 +41,7 @@ export abstract class GeometryNode extends GraphicsNode {
   }
 
   private async drawMarkers(context: Context, path: Path): Promise<void> {
-    const markers = this.getMarkers(path)
+    const markers = this.getMarkers(path, context)
     await markers.draw(context.clone({ transform: context.pdf.unitMatrix }))
   }
 
@@ -52,7 +52,8 @@ export abstract class GeometryNode extends GraphicsNode {
     const fill = context.attributeState.fill
     const stroke = context.attributeState.stroke && context.attributeState.strokeWidth !== 0
     const fillData = fill ? await fill.getFillData(this, context) : undefined
-    const isNodeFillRuleEvenOdd = getAttribute(this.element, 'fill-rule') === 'evenodd'
+    const isNodeFillRuleEvenOdd =
+      getAttribute(this.element, context.styleSheets, 'fill-rule') === 'evenodd'
 
     // This is a workaround for symbols that are used multiple times with different
     // fill/stroke attributes. All paths within symbols are both filled and stroked
@@ -109,10 +110,22 @@ export abstract class GeometryNode extends GraphicsNode {
     return [minX, minY, maxX - minX, maxY - minY]
   }
 
-  protected getMarkers(path: Path): MarkerList {
-    let markerStart: string | undefined = getAttribute(this.element, 'marker-start')
-    let markerMid: string | undefined = getAttribute(this.element, 'marker-mid')
-    let markerEnd: string | undefined = getAttribute(this.element, 'marker-end')
+  protected getMarkers(path: Path, context: Context): MarkerList {
+    let markerStart: string | undefined = getAttribute(
+      this.element,
+      context.styleSheets,
+      'marker-start'
+    )
+    let markerMid: string | undefined = getAttribute(
+      this.element,
+      context.styleSheets,
+      'marker-mid'
+    )
+    let markerEnd: string | undefined = getAttribute(
+      this.element,
+      context.styleSheets,
+      'marker-end'
+    )
 
     const markers = new MarkerList()
     if (markerStart || markerMid || markerEnd) {

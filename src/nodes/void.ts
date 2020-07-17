@@ -14,7 +14,7 @@ export class VoidNode extends SvgNode {
   protected computeNodeTransformCore(context: Context): Matrix {
     return context.pdf.unitMatrix
   }
-  isVisible(parentVisible: boolean): boolean {
-    return svgNodeIsVisible(this, parentVisible)
+  isVisible(parentVisible: boolean, context:Context): boolean {
+    return svgNodeIsVisible(this, parentVisible, context)
   }
 }

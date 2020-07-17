@@ -1,19 +1,25 @@
 import { SvgNode } from './svgnode'
 import { getAttribute } from '../utils/node'
+import { Context } from '../context/context'
 import { EllipseBase } from './ellipsebase'
 
 export class Circle extends EllipseBase {
-  private readonly r: number
+  private r: number | undefined
 
-  get rx(): number {
-    return this.r
+  private getR(context: Context) {
+    return (
+      this.r ?? (this.r = parseFloat(getAttribute(this.element, context.styleSheets, 'r') || '0'))
+    )
   }
-  get ry(): number {
-    return this.r
+
+  getRx(context: Context): number {
+    return this.getR(context)
+  }
+  getRy(context: Context): number {
+    return this.getR(context)
   }
 
   constructor(node: HTMLElement, children: SvgNode[]) {
     super(node, children)
-    this.r = parseFloat(getAttribute(this.element, 'r') || '0')
   }
 }

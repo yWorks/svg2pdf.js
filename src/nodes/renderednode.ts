@@ -6,7 +6,7 @@ import { applyClipPath, getClipPathNode } from '../utils/applyclippath'
 
 export abstract class RenderedNode extends SvgNode {
   async render(parentContext: Context): Promise<void> {
-    if (!this.isVisible(parentContext.attributeState.visibility !== 'hidden')) {
+    if (!this.isVisible(parentContext.attributeState.visibility !== 'hidden', parentContext)) {
       return
     }
 
@@ -19,11 +19,12 @@ export abstract class RenderedNode extends SvgNode {
     parseAttributes(context, this)
 
     const hasClipPath =
-      this.element.hasAttribute('clip-path') && getAttribute(this.element, 'clip-path') !== 'none'
+      this.element.hasAttribute('clip-path') &&
+      getAttribute(this.element, context.styleSheets, 'clip-path') !== 'none'
 
     if (hasClipPath) {
       const clipNode = getClipPathNode(this, context)
-      if (clipNode && clipNode.isVisible(true)) {
+      if (clipNode && clipNode.isVisible(true, context)) {
         context.pdf.saveGraphicsState()
         await applyClipPath(this, clipNode, context)
       } else {

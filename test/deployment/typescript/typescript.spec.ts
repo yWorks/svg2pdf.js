@@ -17,6 +17,7 @@ const debug = false
 
 for (const name of window.tests) {
   describe(name, function() {
+    this.timeout(5000)
     const svgText = window.loadSvg(`/base/test/specs/${name}/spec.svg`)
     const parser = new DOMParser()
     const svgElement = parser.parseFromString(svgText, 'image/svg+xml')
@@ -34,8 +35,8 @@ for (const name of window.tests) {
         pdf.addFont(filename, 'Batang', 'normal')
       }
 
-      await pdf.svg(svgElement)
-      // await svg2pdf(svgElement, pdf, {})
+      await pdf.svg(svgElement, { loadExternalStyleSheets: true })
+      // await svg2pdf(svgElement, pdf, { loadExternalStyleSheets: true })
 
       comparePdf(pdf.output(), `/test/specs/${name}/reference.pdf`, debug)
     })

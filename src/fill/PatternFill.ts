@@ -21,7 +21,8 @@ export class PatternFill implements Fill {
       (node as Pattern).apply(
         new Context(context.pdf, {
           refsHandler: context.refsHandler,
-          textMeasure: context.textMeasure
+          textMeasure: context.textMeasure,
+          styleSheets: context.styleSheets
         })
       )
     )
@@ -73,11 +74,14 @@ export class PatternFill implements Fill {
     }
 
     let patternTransformMatrix = context.pdf.unitMatrix
-    if (this.pattern.element.hasAttribute('patternTransform')) {
-      patternTransformMatrix = parseTransform(
-        getAttribute(this.pattern.element, 'patternTransform', 'transform'),
-        context
-      )
+    const patternTransform = getAttribute(
+      this.pattern.element,
+      context.styleSheets,
+      'patternTransform',
+      'transform'
+    )
+    if (patternTransform) {
+      patternTransformMatrix = parseTransform(patternTransform, context)
     }
 
     let matrix = patternContentUnitsMatrix
