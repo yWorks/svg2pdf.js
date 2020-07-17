@@ -1,0 +1,5 @@
+<!-- rgba colors as attributes are not yet fully standardized but most browsers support them -->
+<svg id="svgElement" width="320" height="500" xmlns="http://www.w3.org/2000/svg">
+  <rect x="20" y="0" width="100" height="100" fill="rgba(0,0,0,0.3)" stroke="rgba(0,0,0,0.9)" stroke-width="10"/>
+  <rect x="20" y="120" width="100" height="100" fill="rgba(0,0,0,0.9)" stroke="rgba(0,0,0,0.2)" stroke-width="10"/>
+</svg>

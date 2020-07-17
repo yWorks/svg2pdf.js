@@ -2,7 +2,7 @@ import { Context } from './context/context'
 import { getAttribute, nodeIs, refIsSymbol, nodeIsChildOf } from './utils/node'
 import { toPixels } from './utils/misc'
 import { RGBColor } from './utils/rgbcolor'
-import { parseFloats } from './utils/parsing'
+import { parseColor, parseFloats } from './utils/parsing'
 import FontFamily from 'font-family-papandreou'
 import { SvgNode } from './nodes/svgnode'
 import { findFirstAvailableFontFamily, fontAliases } from './utils/fonts'
@@ -49,7 +49,7 @@ export function parseAttributes(context: Context, svgNode: SvgNode, node?: HTMLE
       context.attributeState.stroke = null
     } else {
       // gradients, patterns not supported for strokes ...
-      const strokeRGB = new RGBColor(stroke)
+      const strokeRGB = parseColor(stroke)
       if (strokeRGB.ok) {
         context.attributeState.stroke = new ColorFill(strokeRGB)
       }

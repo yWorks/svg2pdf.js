@@ -19,6 +19,7 @@ window.tests = [
   'empty-elements',
   'fill-and-stroke-inheritance',
   'fill-and-stroke-opacity',
+  'fill-and-stroke-rgba',
   'fill-rule',
   'font-family-attribute',
   'font-style',
