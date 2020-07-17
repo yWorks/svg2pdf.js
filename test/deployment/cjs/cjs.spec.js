@@ -5,6 +5,7 @@ const debug = false
 
 for (const name of window.tests) {
   describe(name, function() {
+    this.timeout(5000)
     const svgText = window.loadSvg(`/base/test/specs/${name}/spec.svg`)
     const parser = new DOMParser()
     const svgElement = parser.parseFromString(svgText, 'image/svg+xml').firstElementChild

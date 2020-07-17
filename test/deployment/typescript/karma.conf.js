@@ -1,6 +1,7 @@
+const commonConfig = require('../../common/karma.common.conf')
 module.exports = config => {
   config.set({
-    ...require('../../common/karma.common.conf'),
+    ...commonConfig,
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '../../..',
@@ -34,22 +35,7 @@ module.exports = config => {
         watched: true
       },
 
-      {
-        pattern: 'test/specs/**/spec.svg',
-        included: false,
-        served: true
-      },
-      {
-        pattern: 'test/**/*+(svg|png|jpg|jpeg|ttf)',
-        included: false,
-        served: true
-      },
-      {
-        pattern: 'test/specs/**/reference.pdf',
-        included: false,
-        watched: false,
-        served: true
-      }
+      ...commonConfig.files
     ],
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
