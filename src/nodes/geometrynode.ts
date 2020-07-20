@@ -3,7 +3,7 @@ import { Marker, MarkerList } from '../markerlist'
 import { Close, CurveTo, LineTo, MoveTo, Path } from '../utils/path'
 import { iriReference } from '../utils/constants'
 import { addVectors, getAngle, getDirectionVector, normalize } from '../utils/geometry'
-import { getAttribute, nodeIsChildOf } from '../utils/node'
+import { getAttribute } from '../utils/node'
 import { GraphicsNode } from './graphicsnode'
 import { SvgNode } from './svgnode'
 import { Rect } from '../utils/geometry'
@@ -59,7 +59,7 @@ export abstract class GeometryNode extends GraphicsNode {
     // fill/stroke attributes. All paths within symbols are both filled and stroked
     // and we set the fill/stroke to transparent if the use element has
     // fill/stroke="none".
-    if ((fill && stroke) || nodeIsChildOf(this.element, 'symbol')) {
+    if ((fill && stroke) || context.withinUse) {
       if (isNodeFillRuleEvenOdd) {
         context.pdf.fillStrokeEvenOdd(fillData)
       } else {

@@ -1,0 +1,188 @@
+<svg id="svgElement" width="500" height="500" xmlns="http://www.w3.org/2000/svg">
+  <path style="fill:none;stroke:black;stroke-width:1"
+        d="M0 0 l0 500 M50 0 l0 500 M100 0 l0 500 M150 0 l0 500 M200 0 l0 500 M250 0 l0 500 M300 0 l0 500 M350 0 l0 500 M400 0 l0 500 M450 0 l0 500 M500 0 l0 500
+    M0 0 l500 0 M0 50 l500 0 M0 100 l500 0 M0 150 l500 0 M0 200 l500 0 M0 250 l500 0 M0 300 l500 0 M0 350 l500 0 M0 400 l500 0 M 0 450 l500 0 M0 500 l500 0 Z"/>
+  M550 0 l0 500 M600 0 l0 500
+  <path style="fill:none;stroke:black;stroke-width:3"
+        d="M0 100 l500 0 M0 200 l500 0 M0 300 l500 0 M0 400 l500 0 M200 0 l0 500 M300 0 l0 500 Z"/>
+
+  <defs>
+    <svg id="myDot">
+      <circle cx="50" cy="50" r="50"/>
+    </svg>
+    <svg id="myDotVB" y="10" height="100" width="200" viewBox="-50 0 80 50">
+      <circle cx="50" cy="50" r="50"/>
+    </svg>
+    <svg id="myDot-overflow" width="100" height="100" overflow="visible" viewBox="-5 0 80 50">
+      <circle cx="50" cy="50" r="50"/>
+    </svg>
+
+
+    <svg id="myDot0" width="50" height="50" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="50"/>
+    </svg>
+    <svg id="myDotFFo" width="50" height="50" viewBox="0 0 100 100" fill-opacity="0.5">
+      <circle cx="50" cy="50" r="50"/>
+    </svg>
+    <svg id="myDotS" width="50" height="50" viewBox="0 0 100 100" fill="none" stroke="red" stroke-width="2">
+      <circle cx="50" cy="50" r="50"/>
+    </svg>
+    <svg id="myDotSSo" width="50" height="50" viewBox="0 0 100 100" fill="none" stroke="red" stroke-width="2"
+         stroke-opacity="0.5">
+      <circle cx="50" cy="50" r="50"/>
+    </svg>
+    <svg id="myDotFSFoSo" width="50" height="50" viewBox="0 0 100 100" stroke="red" stroke-width="2" fill-opacity="0.5"
+         stroke-opacity="0.5">
+      <circle cx="50" cy="50" r="50"/>
+    </svg>
+    <svg id="myDotFS" width="50" height="50" viewBox="0 0 100 100" stroke="red" stroke-width="2">
+      <circle cx="50" cy="50" r="50"/>
+    </svg>
+    <svg id="myDot-" width="50" height="50" viewBox="0 0 100 100" fill="none">
+      <circle cx="50" cy="50" r="50"/>
+    </svg>
+
+    <svg id="myDot0N" width="50" height="50" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="50"/>
+    </svg>
+    <svg id="myDotFFoN" width="50" height="50" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="50" fill-opacity="0.5"/>
+    </svg>
+    <svg id="myDotSN" width="50" height="50" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="50" fill="none" stroke="red" stroke-width="2"/>
+    </svg>
+    <svg id="myDotSSoN" width="50" height="50" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="50" fill="none" stroke="red" stroke-width="2" stroke-opacity="0.5"/>
+    </svg>
+    <svg id="myDotFSFoSoN" width="50" height="50" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="50" stroke="red" stroke-width="2" fill-opacity="0.5" stroke-opacity="0.5"/>
+    </svg>
+    <svg id="myDotFSN" width="50" height="50" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="50" stroke="red" stroke-width="2"/>
+    </svg>
+    <svg id="myDot-N" width="50" height="50" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="50" fill="none"/>
+    </svg>
+
+
+    <svg id="nested1" stroke="purple" stroke-width="2px">
+      <g fill="none" stroke="none">
+        <circle cx="25" cy="25" r="25"/>
+        <circle fill="red" stroke-width="2px" stroke="purple" cx="75" cy="25" r="25"/>
+      </g>
+      <g fill="red" stroke="purple" stroke-width="2px">
+        <circle cx="25" cy="75" r="25"/>
+        <circle fill="none" cx="75" cy="75" r="25"/>
+      </g>
+    </svg>
+
+    <svg id="nested2" fill="none">
+      <g fill="none" stroke="none">
+        <circle cx="25" cy="25" r="25"/>
+        <circle fill="red" stroke-width="2px" stroke="purple" cx="75" cy="25" r="25"/>
+      </g>
+      <g fill="red" stroke="purple" stroke-width="2px">
+        <circle cx="25" cy="75" r="25"/>
+        <circle fill="none" cx="75" cy="75" r="25"/>
+      </g>
+    </svg>
+
+    <clipPath id="clip" clipPathUnits="objectBoundingBox">
+      <rect x="0.3" y="0.1" width="0.4" height="0.8"/>
+    </clipPath>
+
+    <svg id="withClipPath" clip-path="url(#clip)">
+      <circle cx="50" cy="50" r="50"/>
+    </svg>
+
+    <svg id="thickStroke" stroke="red" stroke-width="25" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="50"/>
+    </svg>
+
+    <svg id="opacity" viewBox="0 0 100 100">
+      <circle opacity="0.9" stroke-width="5" fill="red" cx="50" cy="50" r="50"/>
+    </svg>
+
+  </defs>
+
+  <use href="#myDot" x="200"/>
+
+  <g fill="blue">
+    <use href="#myDot" x="200" y="100"/>
+  </g>
+
+  <use href="#myDot" x="200" y="200" fill="red"/>
+
+  <use href="#myDot" x="200" y="300" fill="none" stroke="red" stroke-width="3"/>
+
+  <use href="#myDot" x="200" y="400" style="fill:green"/>
+
+
+  <use href="#myDotVB" y="-10"/>
+
+  <use href="#myDotVB" y="90" width="100" height="100" fill="pink"/>
+
+  <path style="fill:none;stroke:red;stroke-width:4" d="M0 200 L0 300 L100 300 L100 200 L0 200 Z"/>
+  <use href="#myDot-overflow" y="200"/>
+
+  <use href="#myDotVB" y="390" width="40" fill="orange" transform="rotate(-17 620 380) translate(0 714) scale(1 -1)"/>
+  <g transform="rotate(-17 620 380) translate(0 764) scale(1 -1)" fill="orange" stroke="black" stroke-width="10">
+    <use href="#myDotVB" y="390" width="40"/>
+  </g>
+
+
+  <use href="#myDot0" x="300"/>
+  <use href="#myDot0" x="350" fill-opacity="0.5"/>
+  <use href="#myDot0" x="300" y="50" fill="none" stroke="red" stroke-width="2"/>
+  <use href="#myDot0" x="350" y="50" fill="none" stroke="red" stroke-width="2" stroke-opacity="0.5"/>
+  <use href="#myDot0" x="400" stroke="red" stroke-width="2" fill-opacity="0.5" stroke-opacity="0.5"/>
+  <use href="#myDot0" x="400" y="50" stroke="red" stroke-width="2"/>
+  <use href="#myDot0" x="450" fill="none"/>
+
+  <g>
+    <use href="#myDot0" x="300" y="100"/>
+  </g>
+  <g fill-opacity="0.5">
+    <use href="#myDot0" x="350" y="100"/>
+  </g>
+  <g fill="none" stroke="red" stroke-width="2">
+    <use href="#myDot0" x="300" y="150"/>
+  </g>
+  <g fill="none" stroke="red" stroke-width="2" stroke-opacity="0.5">
+    <use href="#myDot0" x="350" y="150"/>
+  </g>
+  <g stroke="red" stroke-width="2" fill-opacity="0.5" stroke-opacity="0.5">
+    <use href="#myDot0" x="400" y="100"/>
+  </g>
+  <g stroke="red" stroke-width="2">
+    <use href="#myDot0" x="400" y="150"/>
+  </g>
+  <g fill="none">
+    <use href="#myDot0" x="450" y="100"/>
+  </g>
+
+  <use href="#myDot0" x="300" y="200"/>
+  <use href="#myDotFFo" x="350" y="200"/>
+  <use href="#myDotS" x="300" y="250"/>
+  <use href="#myDotSSo" x="350" y="250"/>
+  <use href="#myDotFSFoSo" x="400" y="200"/>
+  <use href="#myDotFS" x="400" y="250"/>
+  <use href="#myDot-" x="450" y="200"/>
+
+  <use href="#myDot0N" x="300" y="300"/>
+  <use href="#myDotFFoN" x="350" y="300"/>
+  <use href="#myDotSN" x="300" y="350"/>
+  <use href="#myDotSSoN" x="350" y="350"/>
+  <use href="#myDotFSFoSoN" x="400" y="300"/>
+  <use href="#myDotFSN" x="400" y="350"/>
+  <use href="#myDot-N" x="450" y="300"/>
+
+  <use href="#nested1" x="300" y="400"/>
+  <use href="#nested2" x="400" y="400"/>
+
+  <use href="#withClipPath" x="50" y="400"/>
+
+  <use href="#thickStroke" x="150" y="400" width="50" height="50"/>
+
+  <use href="#opacity" x="150" y="450" width="50" height="50"/>
+</svg>

@@ -1,7 +1,6 @@
 import { Context } from './context/context'
-import { getAttribute, nodeIs, refIsSymbol, nodeIsChildOf } from './utils/node'
+import { getAttribute, nodeIs } from './utils/node'
 import { toPixels } from './utils/misc'
-import { RGBColor } from './utils/rgbcolor'
 import { parseColor, parseFloats } from './utils/parsing'
 import FontFamily from 'font-family-papandreou'
 import { SvgNode } from './nodes/svgnode'
@@ -136,22 +135,22 @@ export function applyAttributes(
     strokeOpacity = 1.0
 
   fillOpacity *= childContext.attributeState.fillOpacity
+  fillOpacity *= childContext.attributeState.opacity
   if (
     childContext.attributeState.fill instanceof ColorFill &&
-    typeof childContext.attributeState.fill.color.a === 'number'
+    typeof childContext.attributeState.fill.color.a !== 'undefined'
   ) {
     fillOpacity *= childContext.attributeState.fill.color.a
   }
-  fillOpacity *= childContext.attributeState.opacity
 
   strokeOpacity *= childContext.attributeState.strokeOpacity
+  strokeOpacity *= childContext.attributeState.opacity
   if (
     childContext.attributeState.stroke instanceof ColorFill &&
-    typeof childContext.attributeState.stroke.color.a === 'number'
+    typeof childContext.attributeState.stroke.color.a !== 'undefined'
   ) {
     strokeOpacity *= childContext.attributeState.stroke.color.a
   }
-  strokeOpacity *= childContext.attributeState.opacity
 
   let hasFillOpacity = fillOpacity < 1.0
   let hasStrokeOpacity = strokeOpacity < 1.0
@@ -160,21 +159,24 @@ export function applyAttributes(
   // fill/stroke attributes. All paths within symbols are both filled and stroked
   // and we set the fill/stroke to transparent if the use element has
   // fill/stroke="none".
-  if (nodeIs(node, 'use') && refIsSymbol(node, childContext)) {
-    hasFillOpacity || ((hasFillOpacity = !childContext.attributeState.fill) && (fillOpacity = 0.0))
-    hasStrokeOpacity ||
-      ((hasStrokeOpacity = !childContext.attributeState.stroke) && (strokeOpacity = 0.0))
-  } else if (nodeIsChildOf(node, 'symbol') || nodeIs(node, 'symbol')) {
-    hasFillOpacity =
-      hasFillOpacity ||
-      (childContext.attributeState.fill !== parentContext.attributeState.fill &&
-        ((!childContext.attributeState.fill && !(fillOpacity = 0.0)) ||
-          (!!childContext.attributeState.fill && !parentContext.attributeState.fill)))
-    hasStrokeOpacity =
-      hasStrokeOpacity ||
-      (childContext.attributeState.stroke !== parentContext.attributeState.stroke &&
-        ((!childContext.attributeState.stroke && !(strokeOpacity = 0.0)) ||
-          (!!childContext.attributeState.stroke && !parentContext.attributeState.stroke)))
+  if (nodeIs(node, 'use')) {
+    hasFillOpacity = true
+    hasStrokeOpacity = true
+    fillOpacity *= childContext.attributeState.fill ? 1 : 0
+    strokeOpacity *= childContext.attributeState.stroke ? 1 : 0
+  } else if (childContext.withinUse) {
+    if (childContext.attributeState.fill !== parentContext.attributeState.fill) {
+      hasFillOpacity = true
+      fillOpacity *= childContext.attributeState.fill ? 1 : 0
+    } else if (hasFillOpacity && !childContext.attributeState.fill) {
+      fillOpacity = 0
+    }
+    if (childContext.attributeState.stroke !== parentContext.attributeState.stroke) {
+      hasStrokeOpacity = true
+      strokeOpacity *= childContext.attributeState.stroke ? 1 : 0
+    } else if (hasStrokeOpacity && !childContext.attributeState.stroke) {
+      strokeOpacity = 0
+    }
   }
 
   if (hasFillOpacity || hasStrokeOpacity) {
