@@ -9,8 +9,9 @@ export function computeViewBoxTransform(
   eY: number,
   eWidth: number,
   eHeight: number,
-  context: Context
-): any {
+  context: Context,
+  noTranslate: boolean = false
+): Matrix {
   const vbX = viewBox[0]
   const vbY = viewBox[1]
   const vbWidth = viewBox[2]
@@ -30,7 +31,7 @@ export function computeViewBoxTransform(
     align = alignAndMeetOrSlice[0]
     meetOrSlice = alignAndMeetOrSlice[1] || 'meet'
   } else {
-    align = 'xMidyMid'
+    align = 'xMidYMid'
     meetOrSlice = 'meet'
   }
 
@@ -44,6 +45,10 @@ export function computeViewBoxTransform(
     }
   }
 
+  if (noTranslate) {
+    return context.pdf.Matrix(scaleX, 0, 0, scaleY, 0, 0)
+  }
+
   let translateX = eX - vbX * scaleX
   let translateY = eY - vbY * scaleY
 
@@ -53,9 +58,9 @@ export function computeViewBoxTransform(
     translateX += eWidth - vbWidth * scaleX
   }
 
-  if (align.indexOf('yMid') >= 0) {
+  if (align.indexOf('YMid') >= 0) {
     translateY += (eHeight - vbHeight * scaleY) / 2
-  } else if (align.indexOf('yMax') >= 0) {
+  } else if (align.indexOf('YMax') >= 0) {
     translateY += eHeight - vbHeight * scaleY
   }
 
