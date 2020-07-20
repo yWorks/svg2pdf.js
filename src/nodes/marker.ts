@@ -13,7 +13,6 @@ export class MarkerNode extends NonRenderedNode {
     const bBox = this.getBoundingBox(parentContext)
     const context = new Context(parentContext.pdf, {
       refsHandler: parentContext.refsHandler,
-      transform: tfMatrix,
       styleSheets: parentContext.styleSheets
     })
 
@@ -51,7 +50,9 @@ export class MarkerNode extends NonRenderedNode {
     let nodeTransform
     if (viewBox) {
       const bounds = parseFloats(viewBox)
-      bounds[0] = bounds[1] = 0 // for some reason vbX anc vbY seem to be ignored for markers
+      // "Markers are drawn such that their reference point (i.e., attributes ‘refX’ and ‘refY’)
+      // is positioned at the given vertex." - The "translate" part of the viewBox transform is
+      // ignored.
       nodeTransform = computeViewBoxTransform(
         this.element,
         bounds,
@@ -59,7 +60,8 @@ export class MarkerNode extends NonRenderedNode {
         0,
         parseFloat(this.element.getAttribute('markerWidth') || '3'),
         parseFloat(this.element.getAttribute('markerHeight') || '3'),
-        context
+        context,
+        true
       )
       nodeTransform = context.pdf.matrixMult(
         context.pdf.Matrix(1, 0, 0, 1, -refX, -refY),
