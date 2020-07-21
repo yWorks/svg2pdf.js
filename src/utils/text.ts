@@ -44,7 +44,7 @@ export function consolidateSpaces(str: string): string {
 }
 
 // applies text transformations to a text node
-export function transformText(node: HTMLElement, text: string, context: Context): string {
+export function transformText(node: Element, text: string, context: Context): string {
   const textTransform = getAttribute(node, context.styleSheets, 'text-transform')
   switch (textTransform) {
     case 'uppercase':

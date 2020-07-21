@@ -6,7 +6,7 @@ import { SvgNode } from './svgnode'
 import { Matrix } from 'jspdf'
 
 export class Line extends GeometryNode {
-  constructor(node: HTMLElement, children: SvgNode[]) {
+  constructor(node: Element, children: SvgNode[]) {
     super(true, node, children)
   }
 
@@ -31,7 +31,7 @@ export class Line extends GeometryNode {
     return context.pdf.unitMatrix
   }
 
-  isVisible(parentVisible: boolean, context:Context): boolean {
+  isVisible(parentVisible: boolean, context: Context): boolean {
     return svgNodeIsVisible(this, parentVisible, context)
   }
 

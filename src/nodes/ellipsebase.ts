@@ -9,7 +9,7 @@ export abstract class EllipseBase extends GeometryNode {
   abstract getRx(context: Context): number
   abstract getRy(context: Context): number
 
-  protected constructor(element: HTMLElement, children: SvgNode[]) {
+  protected constructor(element: Element, children: SvgNode[]) {
     super(false, element, children)
   }
 

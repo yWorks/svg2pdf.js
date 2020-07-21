@@ -57,7 +57,7 @@ export class TextNode extends GraphicsNode {
       )
 
       for (let i = 0; i < this.element.childNodes.length; i++) {
-        const textNode = this.element.childNodes[i] as HTMLElement
+        const textNode = this.element.childNodes[i] as Element
         if (!textNode.textContent) {
           continue
         }

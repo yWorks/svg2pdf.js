@@ -2,11 +2,11 @@ import { compare as compareSpecificity } from 'specificity'
 import { nodeIs } from '../utils/node'
 
 export class StyleSheets {
-  private rootSvg: HTMLElement
+  private rootSvg: Element
   private readonly loadExternalSheets: boolean
   private readonly styleSheets: CSSStyleSheet[]
 
-  constructor(rootSvg: HTMLElement, loadExtSheets: boolean) {
+  constructor(rootSvg: Element, loadExtSheets: boolean) {
     this.rootSvg = rootSvg
     this.loadExternalSheets = loadExtSheets
     this.styleSheets = []
@@ -159,7 +159,7 @@ export class StyleSheets {
     )
   }
 
-  getPropertyValue(node: HTMLElement, propertyCss: string): string | undefined {
+  getPropertyValue(node: Element, propertyCss: string): string | undefined {
     const matchingRules = []
     for (const sheet of this.styleSheets) {
       for (let i = 0; i < sheet.cssRules.length; i++) {

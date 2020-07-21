@@ -12,7 +12,7 @@ export abstract class GeometryNode extends GraphicsNode {
   private readonly hasMarkers: boolean
   private cachedPath: Path | null = null
 
-  protected constructor(hasMarkers: boolean, element: HTMLElement, children: SvgNode[]) {
+  protected constructor(hasMarkers: boolean, element: Element, children: SvgNode[]) {
     super(element, children)
     this.hasMarkers = hasMarkers
   }

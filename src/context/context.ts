@@ -76,7 +76,7 @@ export interface ContextOptions {
 }
 
 export interface Svg2pdfParameters {
-  element: HTMLElement
+  element: Element
   x?: number
   y?: number
   width?: number

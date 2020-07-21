@@ -2,7 +2,7 @@ import { Gradient } from './gradient'
 import { SvgNode } from './svgnode'
 
 export class RadialGradient extends Gradient {
-  constructor(element: HTMLElement, children: SvgNode[]) {
+  constructor(element: Element, children: SvgNode[]) {
     super('radial', element, children)
   }
 

@@ -8,7 +8,7 @@ import { toCubic } from '../utils/geometry'
 import { Matrix } from 'jspdf'
 
 export class PathNode extends GeometryNode {
-  constructor(node: HTMLElement, children: SvgNode[]) {
+  constructor(node: Element, children: SvgNode[]) {
     super(true, node, children)
   }
 

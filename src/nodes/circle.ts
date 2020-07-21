@@ -19,7 +19,7 @@ export class Circle extends EllipseBase {
     return this.getR(context)
   }
 
-  constructor(node: HTMLElement, children: SvgNode[]) {
+  constructor(node: Element, children: SvgNode[]) {
     super(node, children)
   }
 }

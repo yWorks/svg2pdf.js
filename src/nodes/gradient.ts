@@ -12,7 +12,7 @@ export abstract class Gradient extends NonRenderedNode {
 
   protected constructor(
     pdfGradientType: ShadingPatternType,
-    element: HTMLElement,
+    element: Element,
     children: SvgNode[]
   ) {
     super(element, children)

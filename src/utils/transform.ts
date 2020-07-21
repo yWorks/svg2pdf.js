@@ -3,7 +3,7 @@ import { parseFloats } from './parsing'
 import { Matrix } from 'jspdf'
 
 export function computeViewBoxTransform(
-  node: HTMLElement,
+  node: Element,
   viewBox: number[],
   eX: number,
   eY: number,
