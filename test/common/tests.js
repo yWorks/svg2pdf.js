@@ -41,6 +41,8 @@ window.tests = [
   'remote-images',
   'strokes-and-bounding-boxes',
   'style-sheets',
+  'svg-viewbox',
+  'svg-use',
   'symbols',
   'text-fill-stroke',
   'text-placement',

@@ -25,6 +25,7 @@ export class Context {
   textMeasure: TextMeasure
   transform: Matrix
   withinClipPath: boolean
+  withinUse: boolean
 
   constructor(pdf: jsPDF, values: ContextOptions) {
     this.pdf = pdf
@@ -37,6 +38,7 @@ export class Context {
     this.textMeasure = values.textMeasure ?? new TextMeasure()
     this.transform = values.transform ?? this.pdf.unitMatrix
     this.withinClipPath = values.withinClipPath ?? false
+    this.withinUse = values.withinUse ?? false
   }
 
   clone(values: Partial<ContextOptions> = {}): Context {
@@ -48,7 +50,8 @@ export class Context {
       styleSheets: values.styleSheets ?? this.styleSheets,
       textMeasure: values.textMeasure ?? this.textMeasure,
       transform: values.transform ?? this.transform,
-      withinClipPath: values.withinClipPath ?? this.withinClipPath
+      withinClipPath: values.withinClipPath ?? this.withinClipPath,
+      withinUse: values.withinUse ?? this.withinUse
     })
   }
 }
@@ -60,4 +63,5 @@ export interface ContextOptions {
   textMeasure?: TextMeasure
   transform?: Matrix
   withinClipPath?: boolean
+  withinUse?: boolean
 }

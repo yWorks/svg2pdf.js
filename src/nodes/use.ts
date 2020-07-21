@@ -88,7 +88,8 @@ export class Use extends GraphicsNode {
 
     const refContext = new Context(context.pdf, {
       refsHandler: context.refsHandler,
-      styleSheets: context.styleSheets
+      styleSheets: context.styleSheets,
+      withinUse: true
     })
 
     context.pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], context.pdf.unitMatrix)
