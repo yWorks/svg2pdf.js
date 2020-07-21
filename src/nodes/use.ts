@@ -7,6 +7,7 @@ import { computeViewBoxTransform } from '../utils/transform'
 import { parseFloats } from '../utils/parsing'
 import { SvgNode } from './svgnode'
 import { Symbol } from './symbol'
+import { Viewport } from '../context/viewport'
 
 /**
  * Draws the element referenced by a use node, makes use of pdf's XObjects/FormObjects so nodes are only written once
@@ -22,9 +23,7 @@ export class Use extends GraphicsNode {
 
     // get the size of the referenced form object (to apply the correct scaling)
     const id = url.substring(1)
-    const refNode = await context.refsHandler.getRendered(id, node =>
-      Use.renderReferencedNode(node, context)
-    )
+    const refNode = context.refsHandler.get(id)
     const refNodeOpensViewport =
       nodeIs(refNode.element, 'symbol,svg') && refNode.element.hasAttribute('viewBox')
 
@@ -61,6 +60,15 @@ export class Use extends GraphicsNode {
       t = context.pdf.Matrix(1, 0, 0, 1, x, y)
     }
 
+    const refContext = new Context(context.pdf, {
+      refsHandler: context.refsHandler,
+      styleSheets: context.styleSheets,
+      withinUse: true,
+      viewport: refNodeOpensViewport ? new Viewport(width!, height!) : context.viewport,
+      svg2pdfParameters: context.svg2pdfParameters
+    })
+    await context.refsHandler.getRendered(id, node => Use.renderReferencedNode(node, refContext))
+
     context.pdf.saveGraphicsState()
     context.pdf.setCurrentTransformationMatrix(context.transform)
 
@@ -77,8 +85,8 @@ export class Use extends GraphicsNode {
     context.pdf.restoreGraphicsState()
   }
 
-  private static async renderReferencedNode(node: SvgNode, context: Context): Promise<void> {
-    let bBox = node.getBoundingBox(context)
+  private static async renderReferencedNode(node: SvgNode, refContext: Context): Promise<void> {
+    let bBox = node.getBoundingBox(refContext)
 
     // The content of a PDF form object is implicitly clipped at its /BBox property.
     // SVG, however, applies its clip rect at the <use> attribute, which may modify it.
@@ -86,19 +94,13 @@ export class Use extends GraphicsNode {
     // still within.
     bBox = [bBox[0] - 0.5 * bBox[2], bBox[1] - 0.5 * bBox[3], bBox[2] * 2, bBox[3] * 2]
 
-    const refContext = new Context(context.pdf, {
-      refsHandler: context.refsHandler,
-      styleSheets: context.styleSheets,
-      withinUse: true
-    })
-
-    context.pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], context.pdf.unitMatrix)
+    refContext.pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], refContext.pdf.unitMatrix)
     if (node instanceof Symbol) {
       await node.apply(refContext)
     } else {
       await node.render(refContext)
     }
-    context.pdf.endFormObject(node.element.getAttribute('id'))
+    refContext.pdf.endFormObject(node.element.getAttribute('id'))
   }
 
   protected getBoundingBoxCore(context: Context): number[] {

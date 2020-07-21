@@ -28,7 +28,9 @@ export class Pattern extends NonRenderedNode {
         new Context(context.pdf, {
           attributeState: context.attributeState,
           refsHandler: context.refsHandler,
-          styleSheets: context.styleSheets
+          styleSheets: context.styleSheets,
+          viewport: context.viewport,
+          svg2pdfParameters: context.svg2pdfParameters
         })
       )
     }

@@ -3,6 +3,7 @@ import { AttributeState } from './attributestate'
 import { TextMeasure } from './textmeasure'
 import { StyleSheets } from './stylesheets'
 import { jsPDF, Matrix } from 'jspdf'
+import { Viewport } from './viewport'
 
 /**
  *
@@ -19,7 +20,9 @@ import { jsPDF, Matrix } from 'jspdf'
  */
 export class Context {
   pdf: jsPDF
+  svg2pdfParameters: Svg2pdfParameters
   attributeState: AttributeState
+  viewport: Viewport
   refsHandler: ReferencesHandler
   styleSheets: StyleSheets
   textMeasure: TextMeasure
@@ -29,10 +32,12 @@ export class Context {
 
   constructor(pdf: jsPDF, values: ContextOptions) {
     this.pdf = pdf
+    this.svg2pdfParameters = values.svg2pdfParameters
 
     this.attributeState = values.attributeState
       ? values.attributeState.clone()
       : AttributeState.default()
+    this.viewport = values.viewport
     this.refsHandler = values.refsHandler ?? null
     this.styleSheets = values.styleSheets ?? null
     this.textMeasure = values.textMeasure ?? new TextMeasure()
@@ -43,9 +48,11 @@ export class Context {
 
   clone(values: Partial<ContextOptions> = {}): Context {
     return new Context(this.pdf, {
+      svg2pdfParameters: values.svg2pdfParameters ?? this.svg2pdfParameters,
       attributeState: values.attributeState
         ? values.attributeState.clone()
         : this.attributeState.clone(),
+      viewport: values.viewport ?? this.viewport,
       refsHandler: values.refsHandler ?? this.refsHandler,
       styleSheets: values.styleSheets ?? this.styleSheets,
       textMeasure: values.textMeasure ?? this.textMeasure,
@@ -57,6 +64,8 @@ export class Context {
 }
 
 export interface ContextOptions {
+  svg2pdfParameters: Svg2pdfParameters
+  viewport: Viewport
   attributeState?: AttributeState
   refsHandler: ReferencesHandler
   styleSheets: StyleSheets
@@ -64,4 +73,13 @@ export interface ContextOptions {
   transform?: Matrix
   withinClipPath?: boolean
   withinUse?: boolean
+}
+
+export interface Svg2pdfParameters {
+  element: HTMLElement
+  x?: number
+  y?: number
+  width?: number
+  height?: number
+  loadExternalStyleSheets?: boolean
 }

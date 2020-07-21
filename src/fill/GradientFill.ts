@@ -20,7 +20,9 @@ export class GradientFill implements Fill {
         new Context(context.pdf, {
           refsHandler: context.refsHandler,
           textMeasure: context.textMeasure,
-          styleSheets: context.styleSheets
+          styleSheets: context.styleSheets,
+          viewport: context.viewport,
+          svg2pdfParameters: context.svg2pdfParameters
         })
       )
     )
