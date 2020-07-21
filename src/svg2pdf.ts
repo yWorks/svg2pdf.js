@@ -5,28 +5,16 @@ import { parse } from './parse'
 import { ColorFill } from './fill/ColorFill'
 import { jsPDF } from 'jspdf'
 import { StyleSheets } from './context/stylesheets'
+import { Viewport } from './context/viewport'
 
-/**
- * Renders an svg element to a jsPDF document.
- * For accurate results a DOM document is required (mainly used for text size measurement and image format conversion)
- * @param element The svg element, which will be cloned, so the original stays unchanged.
- * @param pdf The jsPDF object.
- * @param options An object that may contain render options. Currently supported are:
- *                         scale: The global factor by which everything is scaled.
- *                         xOffset, yOffset: Offsets that are added to every coordinate AFTER scaling (They are not
- *                            influenced by the scale attribute).
- */
-
-// the actual svgToPdf function (see above)
 export async function svg2pdf(
   element: HTMLElement,
   pdf: jsPDF,
   options: Svg2PdfOptions = {}
 ): Promise<jsPDF> {
-  const k = options.scale ?? 1.0,
-    xOffset = options.xOffset ?? 0.0,
-    yOffset = options.yOffset ?? 0.0,
-    extCss = options.loadExternalStyleSheets ?? false
+  const x = options.x ?? 0.0
+  const y = options.y ?? 0.0
+  const extCss = options.loadExternalStyleSheets ?? false
 
   //  create context object
   const idMap: { [id: string]: SvgNode } = {}
@@ -35,12 +23,17 @@ export async function svg2pdf(
   const styleSheets = new StyleSheets(element, extCss)
   await styleSheets.load()
 
-  const context = new Context(pdf, { refsHandler, styleSheets })
+  // start with the entire page size as viewport
+  const viewport = new Viewport(pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight())
+
+  const svg2pdfParameters = { ...options, element }
+
+  const context = new Context(pdf, { refsHandler, styleSheets, viewport, svg2pdfParameters })
 
   pdf.advancedAPI()
-  // set offsets and scale everything by k
   pdf.saveGraphicsState()
-  pdf.setCurrentTransformationMatrix(pdf.Matrix(k, 0, 0, k, xOffset, yOffset))
+  // set offsets
+  pdf.setCurrentTransformationMatrix(pdf.Matrix(1, 0, 0, 1, x, y))
 
   // set default values that differ from pdf defaults
   pdf.setLineWidth(context.attributeState.strokeWidth)
@@ -70,8 +63,9 @@ jsPDF.API.svg = function(
 }
 
 export interface Svg2PdfOptions {
-  scale?: number
-  xOffset?: number
-  yOffset?: number
+  x?: number
+  y?: number
+  width?: number
+  height?: number
   loadExternalStyleSheets?: boolean
 }

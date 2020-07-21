@@ -27,7 +27,9 @@ export class ClipPath extends NonRenderedNode {
         new Context(context.pdf, {
           refsHandler: context.refsHandler,
           styleSheets: context.styleSheets,
-          withinClipPath: true
+          viewport: context.viewport,
+          withinClipPath: true,
+          svg2pdfParameters: context.svg2pdfParameters
         })
       )
     }

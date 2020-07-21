@@ -20,7 +20,16 @@ describe('Modules should be loaded by AMD', () => {
   })
 })
 
-for (const name of window.tests) {
+for (const test of window.tests) {
+  let name, jsPDFOptions, svg2pdfOptions
+  if (Array.isArray(test)) {
+    ;[name, jsPDFOptions, svg2pdfOptions] = test
+  } else {
+    name = test
+    jsPDFOptions = undefined
+    svg2pdfOptions = { loadExternalStyleSheets: true }
+  }
+
   describe(name, function() {
     this.timeout(5000)
     const svgText = window.loadSvg(`/base/test/specs/${name}/spec.svg`)
@@ -30,8 +39,8 @@ for (const name of window.tests) {
     it(`testing ${name}`, async () => {
       await new Promise((resolve, reject) => {
         require(['jspdf', 'svg2pdf'], (jspdf, svg2pdf) => {
-          const width = svgElement.width.baseVal.value
-          const height = svgElement.height.baseVal.value
+          const width = jsPDFOptions ? jsPDFOptions[0] : svgElement.width.baseVal.value
+          const height = jsPDFOptions ? jsPDFOptions[1] : svgElement.height.baseVal.value
           const pdf = new jspdf.jsPDF(width > height ? 'l' : 'p', 'pt', [width, height])
 
           if (name === 'custom-fonts') {
@@ -41,9 +50,9 @@ for (const name of window.tests) {
             pdf.addFont(filename, 'Batang', 'normal')
           }
 
-          // await svg2pdf(svgElement, pdf, { loadExternalStyleSheets: true })
+          // await svg2pdf(svgElement, pdf, svg2pdfOptions)
           pdf
-            .svg(svgElement, { loadExternalStyleSheets: true })
+            .svg(svgElement, svg2pdfOptions)
             .then(pdf => {
               comparePdf(pdf.output(), `/test/specs/${name}/reference.pdf`, debug)
             })

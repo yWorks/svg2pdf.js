@@ -11,21 +11,19 @@ export class MarkerNode extends NonRenderedNode {
     // the transformations directly at the node are written to the pdf form object transformation matrix
     const tfMatrix = this.computeNodeTransform(parentContext)
     const bBox = this.getBoundingBox(parentContext)
-    const context = new Context(parentContext.pdf, {
-      refsHandler: parentContext.refsHandler,
-      styleSheets: parentContext.styleSheets
-    })
 
-    context.pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], tfMatrix)
+    parentContext.pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], tfMatrix)
     for (const child of this.children) {
       await child.render(
-        new Context(context.pdf, {
-          refsHandler: context.refsHandler,
-          styleSheets: context.styleSheets
+        new Context(parentContext.pdf, {
+          refsHandler: parentContext.refsHandler,
+          styleSheets: parentContext.styleSheets,
+          viewport: parentContext.viewport,
+          svg2pdfParameters: parentContext.svg2pdfParameters
         })
       )
     }
-    context.pdf.endFormObject(this.element.getAttribute('id'))
+    parentContext.pdf.endFormObject(this.element.getAttribute('id'))
   }
 
   protected getBoundingBoxCore(context: Context): Rect {
