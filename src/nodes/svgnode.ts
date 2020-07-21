@@ -5,10 +5,10 @@ import { Rect } from '../utils/geometry'
 import { Matrix } from 'jspdf'
 
 export abstract class SvgNode {
-  readonly element: HTMLElement
+  readonly element: Element
   readonly children: SvgNode[]
 
-  constructor(element: HTMLElement, children: SvgNode[]) {
+  constructor(element: Element, children: SvgNode[]) {
     this.element = element
     this.children = children
   }

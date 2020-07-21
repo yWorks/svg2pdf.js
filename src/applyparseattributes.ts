@@ -9,7 +9,7 @@ import { parseFill } from './fill/parseFill'
 import { ColorFill } from './fill/ColorFill'
 import { GState } from 'jspdf'
 
-export function parseAttributes(context: Context, svgNode: SvgNode, node?: HTMLElement): void {
+export function parseAttributes(context: Context, svgNode: SvgNode, node?: Element): void {
   const domNode = node || svgNode.element
   const visibility = getAttribute(domNode, context.styleSheets, 'visibility')
   if (visibility) {
@@ -129,7 +129,7 @@ export function parseAttributes(context: Context, svgNode: SvgNode, node?: HTMLE
 export function applyAttributes(
   childContext: Context,
   parentContext: Context,
-  node: HTMLElement
+  node: Element
 ): void {
   let fillOpacity = 1.0,
     strokeOpacity = 1.0

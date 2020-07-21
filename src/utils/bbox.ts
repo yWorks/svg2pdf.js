@@ -22,7 +22,7 @@ export function getBoundingBoxByChildren(context: Context, svgnode: SvgNode): nu
   return boundingBox
 }
 
-export function defaultBoundingBox(element: HTMLElement, context: Context): Rect {
+export function defaultBoundingBox(element: Element, context: Context): Rect {
   const pf: any = parseFloat
   // TODO: check if there are other possible coordinate attributes
   const x1 =

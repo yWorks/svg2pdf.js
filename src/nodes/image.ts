@@ -16,7 +16,7 @@ export class ImageNode extends GraphicsNode {
   private readonly imageLoadingPromise: Promise<{ data: string; format: string }> | null = null
   private readonly imageUrl: string | null
 
-  constructor(element: HTMLElement, children: SvgNode[]) {
+  constructor(element: Element, children: SvgNode[]) {
     super(element, children)
     this.imageUrl = this.element.getAttribute('xlink:href') || this.element.getAttribute('href')
 
@@ -45,8 +45,7 @@ export class ImageNode extends GraphicsNode {
 
     if (format.indexOf('svg') === 0) {
       const parser = new DOMParser()
-      const svgElement = parser.parseFromString(data, 'image/svg+xml')
-        .firstElementChild as HTMLElement
+      const svgElement = parser.parseFromString(data, 'image/svg+xml').firstElementChild as Element
 
       // unless preserveAspectRatio starts with "defer", the preserveAspectRatio attribute of the svg is ignored
       const preserveAspectRatio = this.element.getAttribute('preserveAspectRatio')

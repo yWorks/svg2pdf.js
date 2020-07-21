@@ -8,7 +8,7 @@ import { StyleSheets } from './context/stylesheets'
 import { Viewport } from './context/viewport'
 
 export async function svg2pdf(
-  element: HTMLElement,
+  element: Element,
   pdf: jsPDF,
   options: Svg2PdfOptions = {}
 ): Promise<jsPDF> {
@@ -56,7 +56,7 @@ export async function svg2pdf(
 }
 
 jsPDF.API.svg = function(
-  element: HTMLElement,
+  element: Element,
   options: Svg2PdfOptions = {}
 ): ReturnType<typeof svg2pdf> {
   return svg2pdf(element, this, options)

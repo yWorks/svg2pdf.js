@@ -8,11 +8,7 @@ declare module 'svg2pdf.js' {
    * @param pdf The jsPDF object.
    * @param options An object that may contain render options.
    */
-  export function svg2pdf(
-    element: HTMLElement,
-    pdf: jsPDF,
-    options?: Svg2PdfOptions
-  ): Promise<jsPDF>
+  export function svg2pdf(element: Element, pdf: jsPDF, options?: Svg2PdfOptions): Promise<jsPDF>
 }
 
 declare module 'jspdf' {
@@ -23,10 +19,10 @@ declare module 'jspdf' {
      * @param element The svg element, which will be cloned, so the original stays unchanged.
      * @param options An object that may contain render options.
      */
-    svg(element: HTMLElement, options?: Svg2PdfOptions): Promise<jsPDF>
+    svg(element: Element, options?: Svg2PdfOptions): Promise<jsPDF>
   }
   interface jsPDFAPI {
-    svg(this: jsPDF, element: HTMLElement, options?: Svg2PdfOptions): Promise<jsPDF>
+    svg(this: jsPDF, element: Element, options?: Svg2PdfOptions): Promise<jsPDF>
   }
 }
 

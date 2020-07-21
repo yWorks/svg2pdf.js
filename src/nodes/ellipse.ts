@@ -4,7 +4,7 @@ import { SvgNode } from './svgnode'
 import { Context } from '../context/context'
 
 export class Ellipse extends EllipseBase {
-  constructor(element: HTMLElement, children: SvgNode[]) {
+  constructor(element: Element, children: SvgNode[]) {
     super(element, children)
   }
 

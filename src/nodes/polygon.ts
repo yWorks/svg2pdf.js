@@ -2,7 +2,7 @@ import { Traverse } from './traverse'
 import { SvgNode } from './svgnode'
 
 export class Polygon extends Traverse {
-  constructor(node: HTMLElement, children: SvgNode[]) {
+  constructor(node: Element, children: SvgNode[]) {
     super(true, node, children)
   }
 }

@@ -6,7 +6,7 @@ export function nodeIs(node: Element, tagsString: string): boolean {
   return tagsString.split(',').indexOf((node.nodeName || node.tagName).toLowerCase()) >= 0
 }
 
-export function forEachChild(node: HTMLElement, fn: (n: number, e: HTMLElement) => void): void {
+export function forEachChild(node: Element, fn: (n: number, e: Element) => void): void {
   // copy list of children, as the original might be modified
   const children = []
   for (let i = 0; i < node.childNodes.length; i++) {
@@ -14,18 +14,18 @@ export function forEachChild(node: HTMLElement, fn: (n: number, e: HTMLElement) 
     if (childNode.nodeName.charAt(0) !== '#') children.push(childNode)
   }
   for (let i = 0; i < children.length; i++) {
-    fn(i, children[i] as HTMLElement)
+    fn(i, children[i] as Element)
   }
 }
 
 // returns an attribute of a node, either from the node directly or from css
 export function getAttribute(
-  node: HTMLElement,
+  node: Element,
   styleSheets: StyleSheets,
   propertyNode: string,
   propertyCss = propertyNode
 ): string | undefined {
-  const attribute = node.style.getPropertyValue(propertyCss)
+  const attribute = (node as SVGElement).style.getPropertyValue(propertyCss)
   if (attribute) {
     return attribute
   } else if (styleSheets.getPropertyValue(node, propertyCss)) {

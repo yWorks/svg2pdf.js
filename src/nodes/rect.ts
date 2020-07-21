@@ -6,7 +6,7 @@ import { SvgNode } from './svgnode'
 import { Matrix } from 'jspdf'
 
 export class Rect extends GeometryNode {
-  constructor(element: HTMLElement, children: SvgNode[]) {
+  constructor(element: Element, children: SvgNode[]) {
     super(false, element, children)
   }
 

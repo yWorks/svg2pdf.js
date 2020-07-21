@@ -21,7 +21,7 @@ import cssesc from 'cssesc'
 import { ClipPath } from './nodes/clippath'
 import { Symbol } from './nodes/symbol'
 
-export function parse(node: HTMLElement, idMap?: { [id: string]: SvgNode }): SvgNode {
+export function parse(node: Element, idMap?: { [id: string]: SvgNode }): SvgNode {
   let svgnode: SvgNode
   const children: SvgNode[] = []
 

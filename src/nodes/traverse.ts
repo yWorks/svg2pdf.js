@@ -10,7 +10,7 @@ import { Matrix } from 'jspdf'
 export abstract class Traverse extends GeometryNode {
   private readonly closed: boolean
 
-  protected constructor(closed: boolean, node: HTMLElement, children: SvgNode[]) {
+  protected constructor(closed: boolean, node: Element, children: SvgNode[]) {
     super(true, node, children)
     this.closed = closed
   }
@@ -43,7 +43,7 @@ export abstract class Traverse extends GeometryNode {
     return path
   }
 
-  isVisible(parentVisible: boolean, context:Context): boolean {
+  isVisible(parentVisible: boolean, context: Context): boolean {
     return svgNodeIsVisible(this, parentVisible, context)
   }
 

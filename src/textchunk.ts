@@ -18,7 +18,7 @@ import { ColorFill } from './fill/ColorFill'
 export class TextChunk {
   private readonly textNode: TextNode
   private readonly texts: string[]
-  private readonly textNodes: HTMLElement[]
+  private readonly textNodes: Element[]
   private readonly textAnchor: string
   private readonly originX: number
   private readonly originY: number
@@ -32,7 +32,7 @@ export class TextChunk {
     this.originY = originY
   }
 
-  add(tSpan: HTMLElement, text: string): void {
+  add(tSpan: Element, text: string): void {
     this.texts.push(text)
     this.textNodes.push(tSpan)
   }
