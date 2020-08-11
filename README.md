@@ -8,28 +8,14 @@ A javascript-only SVG to PDF conversion utility that runs in the browser leverag
 
 You can get svg2pf.js via npm:
 
-```
-$ npm install svg2pdf.js --save
-```
-
-Then import via [requirejs](http://requirejs.org/):
-
-```javascript
-require.config({
-  baseUrl: './node_modules' // or './bower_components'
-});
-require([
-  'svg2pdf.js/dist/svg2pdf.min',
-  'jspdf/dist/jspdf.umd.min'
-], function (svg2pdf, jsPDF) {...});
+```sh
+npm install svg2pdf.js jspdf --save
+# or
+yarn add svg2pdf.js jspdf
 ```
 
-or script-tag:
-
-```html
-<script src="[node_modules|bower_components]/jspdf/dist/jspdf.umd.min.js"></script>
-<script src="[node_modules|bower_components]/svg2pdf.js/dist/svg2pdf.min.js"></script>
-```
+Since version 2.x, this repository no longer depends on a forked jsPDF but can be used with original
+[MrRio/jsPDF](https://github.com/MrRio/jsPDF).
 
 If you want to use a development version from the repository, pay attention to the fact that the files in dist may
 reflect the last release version. So a simple package.json dependency link to the branch or revision will fail.
@@ -37,19 +23,18 @@ See [#102](https://github.com/yWorks/svg2pdf.js/issues/102) for details.
 
 ## Usage
 
-```javascript
-const svgElement = document.getElementById('svg')
-const width = 300,
-  height = 200
+```js
+import { jsPDF } from 'jspdf'
+import 'svg2pdf.js'
 
-// create a new jsPDF instance
-const pdf = new jsPDF('l', 'pt', [width, height])
+const doc = new jsPDF()
 
-// render the svg element
-svg2pdf(svgElement, pdf, {
-  xOffset: 0,
-  yOffset: 0,
-  scale: 1
+const element = document.getElementById('svg')
+doc.svg(element, {
+  x,
+  y,
+  width,
+  height
 })
 
 // get the data URI
@@ -59,13 +44,35 @@ const uri = pdf.output('datauristring')
 pdf.save('myPDF.pdf')
 ```
 
-## Concerning custom fonts and non US-ASCII characters
-If you want to use other than really basic fonts and characters you *have to* add them first before calling `svg2pdf`:
-```js
-pdf.addFont('myFont.ttf', 'myFont', 'normal')
+Have a look at the [typings file](https://github.com/yWorks/svg2pdf.js/blob/master/types.d.ts) for
+detailed documentation.
+
+### Other module formats
+
+Importing is also possible via [requirejs](http://requirejs.org/):
+
+```javascript
+require.config({
+  baseUrl: './node_modules'
+});
+require([
+  'svg2pdf.js/dist/svg2pdf.umd.min',
+  'jspdf/dist/jspdf.umd.min'
+], (svg2pdf, jsPDF) => {...});
 ```
 
-Please refer to the [jsPDF readme](https://github.com/yWorks/jsPDF).
+or script-tag:
+
+```html
+<script src="[node_modules|bower_components]/jspdf/dist/jspdf.umd.min.js"></script>
+<script src="[node_modules|bower_components]/svg2pdf.js/dist/svg2pdf.umd.min.js"></script>
+```
+
+## Concerning custom fonts and non US-ASCII characters
+
+If you want to use other than really basic fonts and characters you _have to_ add them first before calling `svg2pdf`:
+
+Please refer to the [jsPDF readme](https://github.com/MrRio/jsPDF).
 
 ## Reporting issues
 
@@ -77,9 +84,6 @@ you to provide us with the following information:
 - A (preferably small) sample SVG that reproduces the issue
 - Other code snippets if necessary
 
-If you are getting an exception "pt.saveGraphicsState is not a function" you are using the wrong fork of jsPDF! Use the
-[yWorks fork](https://github.com/yWorks/jsPDF)!
-
 ## Building
 
 If you want to play with the sources or build the minified js file yourself, check out the repository and use the npm scripts defined in `package.json`:
@@ -90,7 +94,7 @@ npm run build
 
 ### Testing
 
-The `tests` folder contains a set of unit tests. Each unit test has its own folder and contains exactly two files:
+The `test` folder contains a set of unit tests. Each unit test has its own folder and contains exactly two files:
 
 - A `spec.svg` file that contains the svg to test
 - A `reference.pdf` file that is generated automatically and serves as reference for regression testing
@@ -98,23 +102,25 @@ The `tests` folder contains a set of unit tests. Each unit test has its own fold
 You can run the tests using
 
 ```sh
-$ npm run createreferences && npm run test
+npm run createreferences && npm run test-unit
 ```
 
-The tests use the [Karma](https://karma-runner.github.io/2.0/index.html) framework and thus run in a captured browser.
-Have a look at the `karma.conf.js` file for configuration (e.g. which browsers to use).
+The tests use the [Karma](https://karma-runner.github.io/2.0/index.html) framework and run in a captured (headless) browser.
 
 The `createreferences` script starts a server that automatically saves reference PDFs if they don't already exist.
 You can omit this command if you just want to test for regression.
 
-If you're debugging and want to have visual feedback, you should switch the `debug` flag to `true` in `tests/runTests.js`.
+If you're debugging and want to have visual feedback, you should switch the `debug` flag to `true` in `test/unit/all.spec.js`.
 This ensures that a new reference PDF will be created on every run. You might also want to disable some of the tests in
-the `tests` array.
+the `test/common/tests` array.
 
 ## Dependencies
 
-- [jsPDF](https://github.com/yWorks/jsPDF) (yWorks fork version!)
-- [fontello/svgpath](https://github.com/fontello/svgpath)
+- [jsPDF](https://github.com/MrRio/jsPDF)
+- [svgpath](https://github.com/fontello/svgpath)
+- [cssesc](https://github.com/mathiasbynens/cssesc)
+- [font-family-papandreou](https://github.com/hanamura/font-family)
+- [specificity](https://github.com/keeganstreet/specificity)
 
 ## License
 
