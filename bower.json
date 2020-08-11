@@ -1,8 +1,13 @@
 {
   "name": "svg2pdf.js",
   "description": "A javascript-only SVG to PDF conversion utility that runs in the browser leveraging jsPDF",
-  "version": "1.5.0",
-  "main": "dist/svg2pdf.min.js",
+  "version": "2.0.0",
+  "main": [
+    "dist/svg2pdf.umd.js",
+    "dist/svg2pdf.umd.min.js",
+    "dist/svg2pdf.es.js",
+    "dist/svg2pdf.es.min.js"
+  ],
   "authors": [
     {
       "name": "yFiles for HTML Support Team",
@@ -16,6 +21,9 @@
   "moduleType": ["amd", "globals", "node"],
   "ignore": ["**/.*", "node_modules", "bower_components", "test", "tests"],
   "dependencies": {
-    "jspdf": "jspdf#~1.5.3"
+    "cssesc": "^3.0.0",
+    "font-family-papandreou": "^0.2.0-patch1",
+    "svgpath": "^2.3.0",
+    "specificity": "^0.4.1"
   }
 }
