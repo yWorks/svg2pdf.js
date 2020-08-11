@@ -13,6 +13,7 @@
   ],
   "types": "types.d.ts",
   "scripts": {
+    "version": "yarpm run build && git add -A dist",
     "build": "rollup -c rollup.config.js",
     "pretest": "yarpm run build",
     "test": "yarpm run test-unit && yarpm run test-globals && yarpm run test-amd && yarpm run test-cjs && yarpm run test-esm",
