@@ -242,11 +242,12 @@ export function applyAttributes(
     childContext.pdf.setLineMiterLimit(childContext.attributeState.strokeMiterlimit)
   }
 
+  let font: string | undefined
   if (childContext.attributeState.fontFamily !== parentContext.attributeState.fontFamily) {
     if (fontAliases.hasOwnProperty(childContext.attributeState.fontFamily)) {
-      childContext.pdf.setFont(fontAliases[childContext.attributeState.fontFamily])
+      font = fontAliases[childContext.attributeState.fontFamily]
     } else {
-      childContext.pdf.setFont(childContext.attributeState.fontFamily)
+      font = childContext.attributeState.fontFamily
     }
   }
 
@@ -260,23 +261,33 @@ export function applyAttributes(
     childContext.pdf.setTextColor(fillColor.r, fillColor.g, fillColor.b)
   }
 
+  let fontStyle: string | undefined
   if (
     childContext.attributeState.fontWeight !== parentContext.attributeState.fontWeight ||
     childContext.attributeState.fontStyle !== parentContext.attributeState.fontStyle
   ) {
-    let fontType = ''
+    fontStyle = ''
     if (childContext.attributeState.fontWeight === 'bold') {
-      fontType = 'bold'
+      fontStyle = 'bold'
     }
     if (childContext.attributeState.fontStyle === 'italic') {
-      fontType += 'italic'
+      fontStyle += 'italic'
     }
 
-    if (fontType === '') {
-      fontType = 'normal'
+    if (fontStyle === '') {
+      fontStyle = 'normal'
     }
+  }
 
-    childContext.pdf.setFontType(fontType)
+  if (font !== undefined || fontStyle !== undefined) {
+    if (font === undefined) {
+      if (fontAliases.hasOwnProperty(childContext.attributeState.fontFamily)) {
+        font = fontAliases[childContext.attributeState.fontFamily]
+      } else {
+        font = childContext.attributeState.fontFamily
+      }
+    }
+    childContext.pdf.setFont(font, fontStyle)
   }
 
   if (childContext.attributeState.fontSize !== parentContext.attributeState.fontSize) {
