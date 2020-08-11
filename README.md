@@ -30,18 +30,17 @@ import 'svg2pdf.js'
 const doc = new jsPDF()
 
 const element = document.getElementById('svg')
-doc.svg(element, {
-  x,
-  y,
-  width,
-  height
-})
-
-// get the data URI
-const uri = pdf.output('datauristring')
-
-// or simply save the created pdf
-pdf.save('myPDF.pdf')
+doc
+  .svg(element, {
+    x,
+    y,
+    width,
+    height
+  })
+  .then(() => {
+    // save the created pdf
+    doc.save('myPDF.pdf')
+  })
 ```
 
 Have a look at the [typings file](https://github.com/yWorks/svg2pdf.js/blob/master/types.d.ts) for
