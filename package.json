@@ -8,15 +8,11 @@
   "files": [
     "dist/**",
     "types.d.ts",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "types": "types.d.ts",
   "scripts": {
-    "browserify:svgpath": "browserify node_modules/svgpath/index.js -s SvgPath -o src/SvgPath.js",
-    "browserify": "browserify src/svg2pdf.js --debug -p licensify -s svg2pdf -o dist/svg2pdf.js",
-    "webpack": "webpack --mode development",
-    "exorcist:svg2pdf": "browserify src/svg2pdf.js --debug -p licensify -s svg2pdf | exorcist dist/svg2pdf.js.map > dist/svg2pdf.js",
-    "uglify:dist": "uglifyjs -m -c --source-map \"includeSources,content='dist/svg2pdf.js.map',url='svg2pdf.min.js.map' dist/svg2pdf.min.js.map\" --comments /@license/ -o dist/svg2pdf.min.js dist/svg2pdf.js",
     "build": "rollup -c rollup.config.js",
     "pretest": "yarpm run build",
     "test": "yarpm run test-unit && yarpm run test-globals && yarpm run test-amd && yarpm run test-cjs && yarpm run test-esm",
@@ -27,7 +23,6 @@
     "test-esm": "karma start ./test/deployment/esm/karma.conf.js",
     "test-typescript": "karma start ./test/deployment/typescript/karma.conf.js",
     "test:ci": "cross-env SHOW_DIFF=true npm run test",
-    "test:coverage": "yarpm run webpack && karma start --coverage",
     "createreferences": "node test/common/reference-server.js",
     "prettier": "prettier --write {src,tests,typings}/**/*.{ts,js}",
     "lint": "eslint {src,tests,typings}/**/*.{ts,js}"
@@ -52,7 +47,7 @@
   },
   "homepage": "https://github.com/yWorks/svg2pdf.js#readme",
   "peerDependencies": {
-    "jspdf": "HackbrettXXX/jsPDF#prebuilt"
+    "jspdf": "^2.0.0"
   },
   "dependencies": {
     "cssesc": "^3.0.0",
@@ -73,7 +68,7 @@
     "cssesc": "^3.0.0",
     "exorcist": "^1.0.1",
     "font-family-papandreou": "^0.2.0-patch1",
-    "jspdf": "HackbrettXXX/jsPDF#prebuilt",
+    "jspdf": "^2.0.0",
     "karma": "^5.1.0",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^3.1.0",
