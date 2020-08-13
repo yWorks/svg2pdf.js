@@ -17,6 +17,8 @@ Steps to reproduce the behavior:
 2. I get this result
 3. Or see this error
 
+E.g. provide a link to the [online playground](http://raw.githack.com/yWorks/svg2pdf.js/master/).
+
 **Expected behavior**
 I would have expected the PDF to look like so. 
 This is in accordance to the following SVG spec
