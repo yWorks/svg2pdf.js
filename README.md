@@ -4,6 +4,8 @@
 
 A javascript-only SVG to PDF conversion utility that runs in the browser leveraging jsPDF.
 
+Give it a trial: [online playground](http://raw.githack.com/yWorks/svg2pdf.js/master/).
+
 ## Installation
 
 You can get svg2pf.js via npm:
