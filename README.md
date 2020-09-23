@@ -79,9 +79,9 @@ Please refer to the [jsPDF readme](https://github.com/MrRio/jsPDF).
 
 Svg2pdf is by no means perfect. If you find something is not working as expected we are glad to receive an
 [issue report](https://github.com/yWorks/svg2pdf.js/issues) from you. In order to be able to react efficiently we ask
-you to provide us with the [necessary information](https://github.com/yWorks/svg2pdf.js/CONTRIBUTING.md#reporting-bugs).
+you to provide us with the [necessary information](https://github.com/yWorks/svg2pdf.js/blob/master/CONTRIBUTING.md#reporting-bugs).
 
-Please stick to our [Code of Conduct](https://github.com/yWorks/svg2pdf.js/CODE_OF_CONDUCT.md).
+Please stick to our [Code of Conduct](https://github.com/yWorks/svg2pdf.js/blob/master/CODE_OF_CONDUCT.md).
 
 ## Building
 
@@ -104,7 +104,7 @@ You can run the tests using
 npm run createreferences && npm run test-unit
 ```
 
-The tests use the [Karma](https://karma-runner.github.io/2.0/index.html) framework and run in a captured (headless) browser.
+The tests use the [Karma](https://karma-runner.github.io/5.2/index.html) framework and run in a captured (headless) browser.
 
 The `createreferences` script starts a server that automatically saves reference PDFs if they don't already exist.
 You can omit this command if you just want to test for regression.
