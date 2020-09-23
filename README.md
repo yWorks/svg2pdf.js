@@ -79,11 +79,7 @@ Please refer to the [jsPDF readme](https://github.com/MrRio/jsPDF).
 
 Svg2pdf is by no means perfect. If you find something is not working as expected we are glad to receive an
 [issue report](https://github.com/yWorks/svg2pdf.js/issues) from you. In order to be able to react efficiently we ask
-you to provide us with the following information:
-
-- The versions of svg2pdf and jsPDF you are using
-- A (preferably small) sample SVG that reproduces the issue
-- Other code snippets if necessary
+you to provide us with the [necessary information](https://github.com/yWorks/svg2pdf.js/CONTRIBUTING.md#reporting-bugs).
 
 Please stick to our [Code of Conduct](https://github.com/yWorks/svg2pdf.js/CODE_OF_CONDUCT.md).
 
@@ -114,7 +110,7 @@ The `createreferences` script starts a server that automatically saves reference
 You can omit this command if you just want to test for regression.
 
 If you're debugging and want to have visual feedback, you should switch the `debug` flag to `true` in `test/unit/all.spec.js`.
-This ensures that a new reference PDF will be created on every run. You might also want to disable some of the tests in
+This ensures that a new reference PDF will be created on every run. You might also want to disable some tests in
 the `test/common/tests` array.
 
 ## Dependencies
