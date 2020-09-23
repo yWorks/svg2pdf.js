@@ -29,7 +29,7 @@ export class PathNode extends GeometryNode {
 
     let prevX: number
     let prevY: number
-    svgPath.iterate((seg, i) => {
+    svgPath.iterate(seg => {
       const type = seg[0]
       switch (type) {
         case 'M':

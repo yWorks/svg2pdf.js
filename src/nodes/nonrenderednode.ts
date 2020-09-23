@@ -4,9 +4,11 @@ import { Rect } from '../utils/geometry'
 import { Matrix } from 'jspdf'
 
 export abstract class NonRenderedNode extends SvgNode {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   render(parentContext: Context): Promise<void> {
     return Promise.resolve()
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected getBoundingBoxCore(context: Context): Rect {
     return []
   }

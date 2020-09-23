@@ -4,7 +4,7 @@ import { SvgNode } from '../nodes/svgnode'
 import { iriReference } from './constants'
 import { getAttribute } from './node'
 
-export function getClipPathNode(targetNode: SvgNode, context: Context) {
+export function getClipPathNode(targetNode: SvgNode, context: Context): ClipPath | undefined {
   const clipPathAttr = getAttribute(targetNode.element, context.styleSheets, 'clip-path')
   if (!clipPathAttr) {
     return undefined
@@ -18,7 +18,11 @@ export function getClipPathNode(targetNode: SvgNode, context: Context) {
   return (clipNode as ClipPath) || undefined
 }
 
-export async function applyClipPath(targetNode: SvgNode, clipPathNode: ClipPath, context: Context) {
+export async function applyClipPath(
+  targetNode: SvgNode,
+  clipPathNode: ClipPath,
+  context: Context
+): Promise<void> {
   const clipContext = context.clone()
   if (
     clipPathNode.element.hasAttribute('clipPathUnits') &&

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any,@typescript-eslint/explicit-module-boundary-types */
 export class RGBColor {
   public ok: boolean
 
@@ -7,6 +8,7 @@ export class RGBColor {
   public b = 0
 
   private readonly simpleColors: { [key: string]: string } = {}
+  // eslint-disable-next-line @typescript-eslint/ban-types
   private colorDefs: { re: RegExp; example: string[]; process: Function }[] = []
 
   constructor(colorString?: string) {

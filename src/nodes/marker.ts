@@ -26,6 +26,7 @@ export class MarkerNode extends NonRenderedNode {
     parentContext.pdf.endFormObject(this.element.getAttribute('id'))
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected getBoundingBoxCore(context: Context): Rect {
     const viewBox = this.element.getAttribute('viewBox')
     let vb

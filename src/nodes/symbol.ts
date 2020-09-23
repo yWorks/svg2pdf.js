@@ -6,6 +6,7 @@ import { computeViewBoxTransform } from '../utils/transform'
 import { NonRenderedNode } from './nonrenderednode'
 import { applyAttributes, parseAttributes } from '../applyparseattributes'
 import { applyClipPath, getClipPathNode } from '../utils/applyclippath'
+import { Matrix } from 'jspdf'
 
 export class Symbol extends NonRenderedNode {
   async apply(parentContext: Context): Promise<void> {
@@ -43,7 +44,7 @@ export class Symbol extends NonRenderedNode {
   isVisible(parentVisible: boolean, context: Context): boolean {
     return svgNodeAndChildrenVisible(this, parentVisible, context)
   }
-  computeNodeTransformCore(context: Context) {
+  computeNodeTransformCore(context: Context): Matrix {
     const x = parseFloat(getAttribute(this.element, context.styleSheets, 'x') || '0')
     const y = parseFloat(getAttribute(this.element, context.styleSheets, 'y') || '0')
     // TODO: implement refX/refY - this is still to do because common browsers don't seem to support the feature yet
@@ -55,12 +56,20 @@ export class Symbol extends NonRenderedNode {
       const box = parseFloats(viewBox)
       const width = parseFloat(
         getAttribute(this.element, context.styleSheets, 'width') ||
-          getAttribute((this.element as any).ownerSVGElement, context.styleSheets, 'width') ||
+          getAttribute(
+            (this.element as SVGElement).ownerSVGElement!,
+            context.styleSheets,
+            'width'
+          ) ||
           viewBox[2]
       )
       const height = parseFloat(
         getAttribute(this.element, context.styleSheets, 'height') ||
-          getAttribute((this.element as any).ownerSVGElement, context.styleSheets, 'height') ||
+          getAttribute(
+            (this.element as SVGElement).ownerSVGElement!,
+            context.styleSheets,
+            'height'
+          ) ||
           viewBox[3]
       )
       return computeViewBoxTransform(this.element, box, x, y, width, height, context)

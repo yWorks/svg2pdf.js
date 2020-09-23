@@ -14,7 +14,7 @@ export class AttributeState {
   public fontWeight = ''
   public opacity = 1.0
   public stroke: Fill | null = null
-  public strokeDasharray: [] | null = null
+  public strokeDasharray: number[] | null = null
   public strokeDashoffset = 0
   public strokeLinecap = ''
   public strokeLinejoin = ''

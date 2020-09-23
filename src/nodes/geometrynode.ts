@@ -165,7 +165,7 @@ export abstract class GeometryNode extends GraphicsNode {
             hasStartMarker &&
               markers.addMarker(
                 new Marker(
-                  markerStart,
+                  markerStart!,
                   [prev.x, prev.y],
                   // @ts-ignore
                   getAngle(last ? [last.x, last.y] : [prev.x, prev.y], [curr.x1, curr.y1])
@@ -174,7 +174,7 @@ export abstract class GeometryNode extends GraphicsNode {
             hasEndMarker &&
               markers.addMarker(
                 new Marker(
-                  markerEnd,
+                  markerEnd!,
                   [curr.x, curr.y],
                   getAngle([curr.x2, curr.y2], [curr.x, curr.y])
                 )
@@ -184,7 +184,7 @@ export abstract class GeometryNode extends GraphicsNode {
               curAngle =
                 prev instanceof MoveTo ? curAngle : normalize(addVectors(prevAngle, curAngle))
               markers.addMarker(
-                new Marker(markerMid, [prev.x, prev.y], Math.atan2(curAngle[1], curAngle[0]))
+                new Marker(markerMid!, [prev.x, prev.y], Math.atan2(curAngle[1], curAngle[0]))
               )
             }
 
@@ -195,12 +195,12 @@ export abstract class GeometryNode extends GraphicsNode {
               // @ts-ignore
               const angle = last ? getDirectionVector([last.x, last.y], [curr.x, curr.y]) : curAngle
               markers.addMarker(
-                new Marker(markerStart, [prev.x, prev.y], Math.atan2(angle[1], angle[0]))
+                new Marker(markerStart!, [prev.x, prev.y], Math.atan2(angle[1], angle[0]))
               )
             }
             hasEndMarker &&
               markers.addMarker(
-                new Marker(markerEnd, [curr.x, curr.y], Math.atan2(curAngle[1], curAngle[0]))
+                new Marker(markerEnd!, [curr.x, curr.y], Math.atan2(curAngle[1], curAngle[0]))
               )
             if (hasMidMarker) {
               const angle =
@@ -210,7 +210,7 @@ export abstract class GeometryNode extends GraphicsNode {
                   ? curAngle
                   : normalize(addVectors(prevAngle, curAngle))
               markers.addMarker(
-                new Marker(markerMid, [prev.x, prev.y], Math.atan2(angle[1], angle[0]))
+                new Marker(markerMid!, [prev.x, prev.y], Math.atan2(angle[1], angle[0]))
               )
             }
             prevAngle = curAngle
@@ -221,7 +221,7 @@ export abstract class GeometryNode extends GraphicsNode {
               const angle =
                 prev instanceof MoveTo ? curAngle : normalize(addVectors(prevAngle, curAngle))
               markers.addMarker(
-                new Marker(markerMid, [prev.x, prev.y], Math.atan2(angle[1], angle[0]))
+                new Marker(markerMid!, [prev.x, prev.y], Math.atan2(angle[1], angle[0]))
               )
             }
             if (hasEndMarker) {
