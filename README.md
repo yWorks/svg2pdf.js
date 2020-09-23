@@ -85,6 +85,8 @@ you to provide us with the following information:
 - A (preferably small) sample SVG that reproduces the issue
 - Other code snippets if necessary
 
+Please stick to our [Code of Conduct](https://github.com/yWorks/svg2pdf.js/CODE_OF_CONDUCT.md).
+
 ## Building
 
 If you want to play with the sources or build the minified js file yourself, check out the repository and use the npm scripts defined in `package.json`:
