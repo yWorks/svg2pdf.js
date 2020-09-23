@@ -10,6 +10,7 @@ export class ColorFill implements Fill {
     this.color = color
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getFillData(forNode: GraphicsNode, context: Context): Promise<FillData | undefined> {
     return undefined
   }

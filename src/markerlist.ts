@@ -62,9 +62,7 @@ export class Marker {
   anchor: number[]
   angle: number
 
-  constructor(id: string | undefined, anchor: number[], angle: number) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
+  constructor(id: string, anchor: number[], angle: number) {
     this.id = id
     this.anchor = anchor
     this.angle = angle

@@ -10,7 +10,7 @@ export function computeViewBoxTransform(
   eWidth: number,
   eHeight: number,
   context: Context,
-  noTranslate: boolean = false
+  noTranslate = false
 ): Matrix {
   const vbX = viewBox[0]
   const vbY = viewBox[1]
@@ -77,12 +77,12 @@ export function parseTransform(
 ): Matrix {
   if (!transformString || transformString === 'none') return context.pdf.unitMatrix
 
-  const mRegex = /^[\s,]*matrix\(([^\)]+)\)\s*/,
-    tRegex = /^[\s,]*translate\(([^\)]+)\)\s*/,
-    rRegex = /^[\s,]*rotate\(([^\)]+)\)\s*/,
-    sRegex = /^[\s,]*scale\(([^\)]+)\)\s*/,
-    sXRegex = /^[\s,]*skewX\(([^\)]+)\)\s*/,
-    sYRegex = /^[\s,]*skewY\(([^\)]+)\)\s*/
+  const mRegex = /^[\s,]*matrix\(([^)]+)\)\s*/,
+    tRegex = /^[\s,]*translate\(([^)]+)\)\s*/,
+    rRegex = /^[\s,]*rotate\(([^)]+)\)\s*/,
+    sRegex = /^[\s,]*scale\(([^)]+)\)\s*/,
+    sXRegex = /^[\s,]*skewX\(([^)]+)\)\s*/,
+    sYRegex = /^[\s,]*skewY\(([^)]+)\)\s*/
 
   let resultMatrix = context.pdf.unitMatrix
   let m

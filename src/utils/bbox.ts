@@ -23,6 +23,7 @@ export function getBoundingBoxByChildren(context: Context, svgnode: SvgNode): nu
 }
 
 export function defaultBoundingBox(element: Element, context: Context): Rect {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const pf: any = parseFloat
   // TODO: check if there are other possible coordinate attributes
   const x1 =

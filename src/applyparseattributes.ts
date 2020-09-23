@@ -36,10 +36,9 @@ export function parseAttributes(context: Context, svgNode: SvgNode, node?: Eleme
   }
 
   // stroke mode
-  let strokeWidth: any = getAttribute(domNode, context.styleSheets, 'stroke-width')
+  const strokeWidth = getAttribute(domNode, context.styleSheets, 'stroke-width')
   if (strokeWidth !== void 0 && strokeWidth !== '') {
-    strokeWidth = Math.abs(parseFloat(strokeWidth))
-    context.attributeState.strokeWidth = strokeWidth
+    context.attributeState.strokeWidth = Math.abs(parseFloat(strokeWidth))
   }
 
   const stroke = getAttribute(domNode, context.styleSheets, 'stroke')
@@ -63,13 +62,12 @@ export function parseAttributes(context: Context, svgNode: SvgNode, node?: Eleme
   if (lineJoin) {
     context.attributeState.strokeLinejoin = lineJoin
   }
-  let dashArray: any = getAttribute(domNode, context.styleSheets, 'stroke-dasharray')
+  const dashArray = getAttribute(domNode, context.styleSheets, 'stroke-dasharray')
   if (dashArray) {
-    dashArray = parseFloats(dashArray)
     const dashOffset = parseInt(
       getAttribute(domNode, context.styleSheets, 'stroke-dashoffset') || '0'
     )
-    context.attributeState.strokeDasharray = dashArray
+    context.attributeState.strokeDasharray = parseFloats(dashArray)
     context.attributeState.strokeDashoffset = dashOffset
   }
   const miterLimit = getAttribute(domNode, context.styleSheets, 'stroke-miterlimit')
