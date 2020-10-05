@@ -25,8 +25,8 @@
     "test-typescript": "karma start ./test/deployment/typescript/karma.conf.js",
     "test:ci": "cross-env SHOW_DIFF=true npm run test",
     "createreferences": "node test/common/reference-server.js",
-    "prettier": "prettier --write {src,tests,typings}/**/*.{ts,js}",
-    "lint": "eslint {src,tests,typings}/**/*.{ts,js}"
+    "prettier": "prettier --write {playground,src,tests,typings}/**/*.{ts,js}",
+    "lint": "eslint {playground,src,tests,typings}/**/*.{ts,js}"
   },
   "repository": {
     "type": "git",
