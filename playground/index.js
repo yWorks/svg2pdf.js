@@ -1,6 +1,15 @@
 const { jsPDF } = window.jspdf
 const DOMPurify = window.DOMPurify
 
+DOMPurify.addHook('afterSanitizeAttributes', node => {
+  if (
+    (node.hasAttribute('xlink:href') && !node.getAttribute('xlink:href').match(/^#/)) ||
+    (node.hasAttribute('href') && !node.getAttribute('href').match(/^#/))
+  ) {
+    node.remove()
+  }
+})
+
 const defaultSample = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150">
   <text x="20" y="20">Hello, world!</text>
 </svg>`
@@ -25,7 +34,7 @@ window.addEventListener('load', () => {
 editor.on(
   'change',
   debounce(() => {
-    const svgText = DOMPurify.sanitize(doc.getValue())
+    const svgText = DOMPurify.sanitize(doc.getValue(), { ADD_TAGS: ['use'] })
     updateUrl(svgText)
     updateIssueLinks()
     updateSvg(svgText)
