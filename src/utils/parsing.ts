@@ -23,7 +23,7 @@ export function parseColor(colorString: string, context: Context): RGBColor {
     return transparent
   }
 
-  if (colorString === 'currentcolor') {
+  if (colorString.toLowerCase() === 'currentcolor') {
     if (context.attributeState.color) {
       return context.attributeState.color.color
     } else {
