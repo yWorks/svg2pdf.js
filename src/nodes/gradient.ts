@@ -6,9 +6,11 @@ import { Rect } from '../utils/geometry'
 import { RGBColor } from '../utils/rgbcolor'
 import { SvgNode } from './svgnode'
 import { GState, Matrix, ShadingPattern, ShadingPatternType } from 'jspdf'
+import { parseColor } from '../utils/parsing'
 
 export abstract class Gradient extends NonRenderedNode {
   private readonly pdfGradientType: ShadingPatternType
+  private color: RGBColor | null
 
   protected constructor(
     pdfGradientType: ShadingPatternType,
@@ -17,12 +19,17 @@ export abstract class Gradient extends NonRenderedNode {
   ) {
     super(element, children)
     this.pdfGradientType = pdfGradientType
+    this.color = null
   }
 
   async apply(context: Context): Promise<void> {
     const id = this.element.getAttribute('id')
     if (!id) {
       return
+    }
+
+    if (!this.color) {
+      this.color = parseColor(getAttribute(this.element, context.styleSheets, 'color') || '', null)
     }
 
     const colors: StopData[] = []
@@ -32,7 +39,10 @@ export abstract class Gradient extends NonRenderedNode {
 
     this.children.forEach(stop => {
       if (stop.element.tagName.toLowerCase() === 'stop') {
-        const color = new RGBColor(getAttribute(stop.element, context.styleSheets, 'stop-color'))
+        const color = parseColor(
+          getAttribute(stop.element, context.styleSheets, 'stop-color') || '',
+          this.color
+        )
         colors.push({
           offset: Gradient.parseGradientOffset(stop.element.getAttribute('offset') || '0'),
           color: [color.r, color.g, color.b]

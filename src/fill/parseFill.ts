@@ -25,7 +25,7 @@ export function parseFill(fill: string, context: Context): Fill | null {
     }
   } else {
     // plain color
-    const fillColor = parseColor(fill, context)
+    const fillColor = parseColor(fill, context.attributeState.color)
     if (fillColor.ok) {
       return new ColorFill(fillColor)
     } else if (fill === 'none') {

@@ -25,7 +25,7 @@ export class AttributeState {
   public alignmentBaseline = ''
   public textAnchor = ''
   public visibility = ''
-  public color: ColorFill | null = null
+  public color: RGBColor | null = null
 
   clone(): AttributeState {
     const clone = new AttributeState()
@@ -82,7 +82,7 @@ export class AttributeState {
     attributeState.alignmentBaseline = 'baseline'
     attributeState.textAnchor = 'start'
     attributeState.visibility = 'visible'
-    attributeState.color = new ColorFill(new RGBColor('rgb(0, 0, 0)'))
+    attributeState.color = new RGBColor('rgb(0, 0, 0)')
 
     return attributeState
   }

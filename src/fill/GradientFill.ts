@@ -15,7 +15,7 @@ export class GradientFill implements Fill {
   }
 
   async getFillData(forNode: GraphicsNode, context: Context): Promise<FillData | undefined> {
-    await context.refsHandler.getRendered(this.key, node =>
+    await context.refsHandler.getRendered(this.key, null, node =>
       (node as Gradient).apply(
         new Context(context.pdf, {
           refsHandler: context.refsHandler,

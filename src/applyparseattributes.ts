@@ -15,12 +15,12 @@ export function parseAttributes(context: Context, svgNode: SvgNode, node?: Eleme
   // update color first so currentColor becomes available for this node
   const color = getAttribute(domNode, context.styleSheets, 'color')
   if (color) {
-    const fillColor = parseFill(color, context)
-    if (fillColor instanceof ColorFill) {
+    const fillColor = parseColor(color, context.attributeState.color)
+    if (fillColor.ok) {
       context.attributeState.color = fillColor
     } else {
       // invalid color passed, reset to black
-      context.attributeState.color = new ColorFill(new RGBColor('rgb(0, 0, 0)'))
+      context.attributeState.color = new RGBColor('rgb(0,0,0)')
     }
   }
 
@@ -60,7 +60,7 @@ export function parseAttributes(context: Context, svgNode: SvgNode, node?: Eleme
       context.attributeState.stroke = null
     } else {
       // gradients, patterns not supported for strokes ...
-      const strokeRGB = parseColor(stroke, context)
+      const strokeRGB = parseColor(stroke, context.attributeState.color)
       if (strokeRGB.ok) {
         context.attributeState.stroke = new ColorFill(strokeRGB)
       }
