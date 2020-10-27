@@ -28,12 +28,15 @@ export function getAttribute(
   const attribute = (node as SVGElement).style.getPropertyValue(propertyCss)
   if (attribute) {
     return attribute
-  } else if (styleSheets.getPropertyValue(node, propertyCss)) {
-    return styleSheets.getPropertyValue(node, propertyCss)
-  } else if (node.hasAttribute(propertyNode)) {
-    return node.getAttribute(propertyNode) || undefined
   } else {
-    return undefined
+    const propertyValue = styleSheets.getPropertyValue(node, propertyCss)
+    if (propertyValue) {
+      return propertyValue
+    } else if (node.hasAttribute(propertyNode)) {
+      return node.getAttribute(propertyNode) || undefined
+    } else {
+      return undefined
+    }
   }
 }
 
