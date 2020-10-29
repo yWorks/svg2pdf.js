@@ -40,11 +40,11 @@ export abstract class Gradient extends NonRenderedNode {
       this.ancestors = this.ancestors.reverse()
     }
 
-    let currentColor: RGBColor | null = null
+    let contextColor: RGBColor | null = null
     this.ancestors.forEach(a => {
-      const attr = getAttribute(a.element, context.styleSheets, 'color')
-      if (attr) {
-        currentColor = parseColor(attr, null)
+      const colorAttr = getAttribute(a.element, context.styleSheets, 'color')
+      if (colorAttr) {
+        contextColor = parseColor(colorAttr, null)
       }
     })
 
@@ -55,9 +55,10 @@ export abstract class Gradient extends NonRenderedNode {
 
     this.children.forEach(stop => {
       if (stop.element.tagName.toLowerCase() === 'stop') {
+        const colorAttr = getAttribute(stop.element, context.styleSheets, 'color')
         const color = parseColor(
           getAttribute(stop.element, context.styleSheets, 'stop-color') || '',
-          currentColor
+          colorAttr ? parseColor(colorAttr, null) : contextColor
         )
         colors.push({
           offset: Gradient.parseGradientOffset(stop.element.getAttribute('offset') || '0'),
