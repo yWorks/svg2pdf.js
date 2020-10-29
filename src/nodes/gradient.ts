@@ -10,7 +10,7 @@ import { parseColor } from '../utils/parsing'
 
 export abstract class Gradient extends NonRenderedNode {
   private readonly pdfGradientType: ShadingPatternType
-  private color: RGBColor | null
+  private ancestors: SvgNode[] | null
 
   protected constructor(
     pdfGradientType: ShadingPatternType,
@@ -19,7 +19,7 @@ export abstract class Gradient extends NonRenderedNode {
   ) {
     super(element, children)
     this.pdfGradientType = pdfGradientType
-    this.color = null
+    this.ancestors = null
   }
 
   async apply(context: Context): Promise<void> {
@@ -28,9 +28,25 @@ export abstract class Gradient extends NonRenderedNode {
       return
     }
 
-    if (!this.color) {
-      this.color = parseColor(getAttribute(this.element, context.styleSheets, 'color') || '', null)
+    // Only need to calculate the ancestors array once
+    if (!this.ancestors) {
+      this.ancestors = []
+      let ancestor: SvgNode | null = this as SvgNode
+      while (ancestor) {
+        this.ancestors.push(ancestor)
+        ancestor = ancestor.getParent()
+      }
+      // Ensure the top level ancestor comes first in the array
+      this.ancestors = this.ancestors.reverse()
     }
+
+    let currentColor: RGBColor | null = null
+    this.ancestors.forEach(a => {
+      const attr = getAttribute(a.element, context.styleSheets, 'color')
+      if (attr) {
+        currentColor = parseColor(attr, null)
+      }
+    })
 
     const colors: StopData[] = []
     let opacitySum = 0
@@ -41,7 +57,7 @@ export abstract class Gradient extends NonRenderedNode {
       if (stop.element.tagName.toLowerCase() === 'stop') {
         const color = parseColor(
           getAttribute(stop.element, context.styleSheets, 'stop-color') || '',
-          this.color
+          currentColor
         )
         colors.push({
           offset: Gradient.parseGradientOffset(stop.element.getAttribute('offset') || '0'),
