@@ -10,7 +10,7 @@ import { parseColor } from '../utils/parsing'
 
 export abstract class Gradient extends NonRenderedNode {
   private readonly pdfGradientType: ShadingPatternType
-  private ancestors: SvgNode[] | null
+  private contextColor: RGBColor | null | undefined
 
   protected constructor(
     pdfGradientType: ShadingPatternType,
@@ -19,7 +19,7 @@ export abstract class Gradient extends NonRenderedNode {
   ) {
     super(element, children)
     this.pdfGradientType = pdfGradientType
-    this.ancestors = null
+    this.contextColor = undefined
   }
 
   async apply(context: Context): Promise<void> {
@@ -28,25 +28,19 @@ export abstract class Gradient extends NonRenderedNode {
       return
     }
 
-    // Only need to calculate the ancestors array once
-    if (!this.ancestors) {
-      this.ancestors = []
+    // Only need to calculate contextColor once
+    if (this.contextColor === undefined) {
+      this.contextColor = null
       let ancestor: SvgNode | null = this as SvgNode
       while (ancestor) {
-        this.ancestors.push(ancestor)
+        const colorAttr = getAttribute(ancestor.element, context.styleSheets, 'color')
+        if (colorAttr) {
+          this.contextColor = parseColor(colorAttr, null)
+          break
+        }
         ancestor = ancestor.getParent()
       }
-      // Ensure the top level ancestor comes first in the array
-      this.ancestors = this.ancestors.reverse()
     }
-
-    let contextColor: RGBColor | null = null
-    this.ancestors.forEach(a => {
-      const colorAttr = getAttribute(a.element, context.styleSheets, 'color')
-      if (colorAttr) {
-        contextColor = parseColor(colorAttr, null)
-      }
-    })
 
     const colors: StopData[] = []
     let opacitySum = 0
@@ -58,7 +52,7 @@ export abstract class Gradient extends NonRenderedNode {
         const colorAttr = getAttribute(stop.element, context.styleSheets, 'color')
         const color = parseColor(
           getAttribute(stop.element, context.styleSheets, 'stop-color') || '',
-          colorAttr ? parseColor(colorAttr, null) : contextColor
+          colorAttr ? parseColor(colorAttr, null) : (this.contextColor as RGBColor | null)
         )
         colors.push({
           offset: Gradient.parseGradientOffset(stop.element.getAttribute('offset') || '0'),
