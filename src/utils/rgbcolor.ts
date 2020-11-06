@@ -239,6 +239,9 @@ export class RGBColor {
   toRGB() {
     return 'rgb(' + this.r + ', ' + this.g + ', ' + this.b + ')'
   }
+  toRGBA() {
+    return 'rgba(' + this.r + ', ' + this.g + ', ' + this.b + ', ' + (this.a || '1') + ')'
+  }
   toHex() {
     let r = this.r.toString(16)
     let g = this.g.toString(16)

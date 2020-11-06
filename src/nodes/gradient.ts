@@ -6,9 +6,11 @@ import { Rect } from '../utils/geometry'
 import { RGBColor } from '../utils/rgbcolor'
 import { SvgNode } from './svgnode'
 import { GState, Matrix, ShadingPattern, ShadingPatternType } from 'jspdf'
+import { parseColor } from '../utils/parsing'
 
 export abstract class Gradient extends NonRenderedNode {
   private readonly pdfGradientType: ShadingPatternType
+  private contextColor: RGBColor | null | undefined
 
   protected constructor(
     pdfGradientType: ShadingPatternType,
@@ -17,12 +19,27 @@ export abstract class Gradient extends NonRenderedNode {
   ) {
     super(element, children)
     this.pdfGradientType = pdfGradientType
+    this.contextColor = undefined
   }
 
   async apply(context: Context): Promise<void> {
     const id = this.element.getAttribute('id')
     if (!id) {
       return
+    }
+
+    // Only need to calculate contextColor once
+    if (this.contextColor === undefined) {
+      this.contextColor = null
+      let ancestor: SvgNode | null = this as SvgNode
+      while (ancestor) {
+        const colorAttr = getAttribute(ancestor.element, context.styleSheets, 'color')
+        if (colorAttr) {
+          this.contextColor = parseColor(colorAttr, null)
+          break
+        }
+        ancestor = ancestor.getParent()
+      }
     }
 
     const colors: StopData[] = []
@@ -32,7 +49,11 @@ export abstract class Gradient extends NonRenderedNode {
 
     this.children.forEach(stop => {
       if (stop.element.tagName.toLowerCase() === 'stop') {
-        const color = new RGBColor(getAttribute(stop.element, context.styleSheets, 'stop-color'))
+        const colorAttr = getAttribute(stop.element, context.styleSheets, 'color')
+        const color = parseColor(
+          getAttribute(stop.element, context.styleSheets, 'stop-color') || '',
+          colorAttr ? parseColor(colorAttr, null) : (this.contextColor as RGBColor | null)
+        )
         colors.push({
           offset: Gradient.parseGradientOffset(stop.element.getAttribute('offset') || '0'),
           color: [color.r, color.g, color.b]

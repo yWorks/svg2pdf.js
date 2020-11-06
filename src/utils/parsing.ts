@@ -14,12 +14,19 @@ export function parseFloats(str: string): number[] {
   return floats
 }
 
-// extends RGBColor by rgba colors as RGBColor is not capable of it
-export function parseColor(colorString: string): RGBColor {
+/**
+ * extends RGBColor by rgba colors as RGBColor is not capable of it
+ * currentcolor: the color to return if colorString === 'currentcolor'
+ */
+export function parseColor(colorString: string, currentcolor: RGBColor | null): RGBColor {
   if (colorString === 'transparent') {
     const transparent = new RGBColor('rgb(0,0,0)')
     transparent.a = 0
     return transparent
+  }
+
+  if (colorString.toLowerCase() === 'currentcolor') {
+    return currentcolor || new RGBColor('rgb(0,0,0)')
   }
 
   const match = /\s*rgba\(((?:[^,\)]*,){3}[^,\)]*)\)\s*/.exec(colorString)

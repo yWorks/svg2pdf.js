@@ -8,9 +8,22 @@ import { findFirstAvailableFontFamily, fontAliases } from './utils/fonts'
 import { parseFill } from './fill/parseFill'
 import { ColorFill } from './fill/ColorFill'
 import { GState } from 'jspdf'
+import { RGBColor } from './utils/rgbcolor'
 
 export function parseAttributes(context: Context, svgNode: SvgNode, node?: Element): void {
   const domNode = node || svgNode.element
+  // update color first so currentColor becomes available for this node
+  const color = getAttribute(domNode, context.styleSheets, 'color')
+  if (color) {
+    const fillColor = parseColor(color, context.attributeState.color)
+    if (fillColor.ok) {
+      context.attributeState.color = fillColor
+    } else {
+      // invalid color passed, reset to black
+      context.attributeState.color = new RGBColor('rgb(0,0,0)')
+    }
+  }
+
   const visibility = getAttribute(domNode, context.styleSheets, 'visibility')
   if (visibility) {
     context.attributeState.visibility = visibility
@@ -47,7 +60,7 @@ export function parseAttributes(context: Context, svgNode: SvgNode, node?: Eleme
       context.attributeState.stroke = null
     } else {
       // gradients, patterns not supported for strokes ...
-      const strokeRGB = parseColor(stroke)
+      const strokeRGB = parseColor(stroke, context.attributeState.color)
       if (strokeRGB.ok) {
         context.attributeState.stroke = new ColorFill(strokeRGB)
       }

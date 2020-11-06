@@ -1,5 +1,6 @@
 import cssEsc from 'cssesc'
 import { SvgNode } from '../nodes/svgnode'
+import { RGBColor } from '../utils/rgbcolor'
 
 export class ReferencesHandler {
   private readonly renderedElements: { [key: string]: SvgNode }
@@ -12,14 +13,16 @@ export class ReferencesHandler {
 
   public async getRendered(
     id: string,
+    color: RGBColor | null,
     renderCallback: (node: SvgNode) => Promise<void>
   ): Promise<SvgNode> {
-    if (this.renderedElements.hasOwnProperty(id)) {
+    const key = ReferencesHandler.generateKey(id, color)
+    if (this.renderedElements.hasOwnProperty(key)) {
       return this.renderedElements[id]
     }
 
     const svgNode: SvgNode = this.get(id)
-    this.renderedElements[id] = svgNode
+    this.renderedElements[key] = svgNode
 
     await renderCallback(svgNode)
 
@@ -28,5 +31,9 @@ export class ReferencesHandler {
 
   get(id: string): SvgNode {
     return this.idMap[cssEsc(id, { isIdentifier: true })]
+  }
+
+  public static generateKey(id: string, color: RGBColor | null): string {
+    return id + '|' + (color || new RGBColor('rgb(0,0,0)')).toRGBA()
   }
 }

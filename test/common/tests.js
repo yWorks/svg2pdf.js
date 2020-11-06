@@ -59,5 +59,6 @@ window.tests = [
   'url-references-with-quotes',
   'vertical-align',
   'xml-space',
-  'zero-width-strokes'
+  'zero-width-strokes',
+  'current-color'
 ]

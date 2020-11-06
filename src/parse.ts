@@ -93,5 +93,7 @@ export function parse(node: Element, idMap?: { [id: string]: SvgNode }): SvgNode
     idMap[id] = idMap[id] || svgnode
   }
 
+  svgnode.children.forEach(c => c.setParent(svgnode))
+
   return svgnode
 }

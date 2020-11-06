@@ -7,10 +7,20 @@ import { Matrix } from 'jspdf'
 export abstract class SvgNode {
   readonly element: Element
   readonly children: SvgNode[]
+  protected parent: SvgNode | null
 
   constructor(element: Element, children: SvgNode[]) {
     this.element = element
     this.children = children
+    this.parent = null
+  }
+
+  setParent(parent: SvgNode): void {
+    this.parent = parent
+  }
+
+  getParent(): SvgNode | null {
+    return this.parent
   }
 
   abstract render(parentContext: Context): Promise<void>
