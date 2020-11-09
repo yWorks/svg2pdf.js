@@ -21,11 +21,11 @@ export class TextNode extends GraphicsNode {
   protected async renderCore(context: Context): Promise<void> {
     context.pdf.saveGraphicsState()
 
-    // true = like Firefox, false = like Chrome
-    const finalCharSpace = false
-
     let xOffset = 0
     let charSpace = 0
+    // If string starts with (\n\r | \t | ' ') then for charSpace calculations
+    // need to treat the string as if it contains one extra character
+    let lengthAdjustment = 1
 
     const pdfFontSize = context.pdf.getFontSize()
     const textX = toPixels(this.element.getAttribute('x'), pdfFontSize)
@@ -40,7 +40,8 @@ export class TextNode extends GraphicsNode {
     // when there are no tspans draw the text directly
     const tSpanCount = this.element.childElementCount
     if (tSpanCount === 0) {
-      const trimmedText = transformXmlSpace(this.element.textContent || '', context.attributeState)
+      const originalText = this.element.textContent || ''
+      const trimmedText = transformXmlSpace(originalText, context.attributeState)
       const transformedText = transformText(this.element, trimmedText, context)
       xOffset = context.textMeasure.getTextOffset(transformedText, context.attributeState)
 
@@ -49,8 +50,13 @@ export class TextNode extends GraphicsNode {
           transformedText,
           context.attributeState
         )
-        charSpace =
-          (textLength - defaultSize) / (transformedText.length - (finalCharSpace ? 0 : 1)) || 0
+        if (
+          context.attributeState.xmlSpace === 'default' &&
+          originalText.match(/^[(\n\r)|(\t)| ]/)
+        ) {
+          lengthAdjustment = 0
+        }
+        charSpace = (textLength - defaultSize) / (transformedText.length - lengthAdjustment) || 0
       }
 
       if (visibility === 'visible') {
@@ -83,8 +89,10 @@ export class TextNode extends GraphicsNode {
           continue
         }
 
+        const originalText = textNode.textContent
+
         let xmlSpace = context.attributeState.xmlSpace
-        let textContent = textNode.textContent
+        let textContent = originalText
 
         if (textNode.nodeName === '#text') {
         } else if (nodeIs(textNode, 'title')) {
@@ -142,8 +150,11 @@ export class TextNode extends GraphicsNode {
         if (xmlSpace === 'default') {
           if (i === 0) {
             trimmedText = trimLeft(trimmedText)
+            if (originalText.match(/^[(\n\r)|(\t)| ]/)) {
+              lengthAdjustment = 0
+            }
           }
-          if (i === tSpanCount - 1) {
+          if (i === this.element.childNodes.length - 1) {
             trimmedText = trimRight(trimmedText)
           }
 
@@ -171,7 +182,7 @@ export class TextNode extends GraphicsNode {
           })
         })
 
-        charSpace = (textLength - totalDefaultWidth) / (totalLength - (finalCharSpace ? 0 : 1))
+        charSpace = (textLength - totalDefaultWidth) / (totalLength - lengthAdjustment)
 
         textWidths = measures.map(chunkMeasures =>
           chunkMeasures.map(textMeasure => textMeasure.width + textMeasure.length * charSpace)

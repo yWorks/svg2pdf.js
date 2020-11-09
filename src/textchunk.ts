@@ -53,22 +53,15 @@ export class TextChunk {
     for (i = 0; i < this.textNodes.length; i++) {
       textNode = this.textNodes[i]
 
-      let dx = 0
-
       let textNodeContext
       if (textNode.nodeName === '#text') {
         textNodeContext = context
       } else {
         textNodeContext = context.clone()
         parseAttributes(textNodeContext, this.textNode, textNode)
-        const tSpanDx = textNode.getAttribute('dx')
-        if (tSpanDx !== null) {
-          dx += toPixels(tSpanDx, textNodeContext.attributeState.fontSize)
-        }
       }
       measures.push({
-        width:
-          context.textMeasure.measureTextWidth(this.texts[i], textNodeContext.attributeState) + dx,
+        width: context.textMeasure.measureTextWidth(this.texts[i], textNodeContext.attributeState),
         length: this.texts[i].length
       })
     }
