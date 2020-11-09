@@ -20,8 +20,8 @@ export class TextChunk {
   private readonly texts: string[]
   private readonly textNodes: Element[]
   private readonly textAnchor: string
-  private readonly originX: number
-  private readonly originY: number
+  private originX: number
+  private originY: number
 
   constructor(parent: TextNode, textAnchor: string, originX: number, originY: number) {
     this.textNode = parent
@@ -32,12 +32,51 @@ export class TextChunk {
     this.originY = originY
   }
 
+  setX(originX: number): void {
+    this.originX = originX
+  }
+
+  setY(originY: number): void {
+    this.originY = originY
+  }
+
   add(tSpan: Element, text: string): void {
     this.texts.push(text)
     this.textNodes.push(tSpan)
   }
 
-  put(context: Context): Point {
+  measureTexts(context: Context): { width: number; length: number }[] {
+    let i, textNode
+
+    const measures: { width: number; length: number }[] = []
+
+    for (i = 0; i < this.textNodes.length; i++) {
+      textNode = this.textNodes[i]
+
+      let dx = 0
+
+      let textNodeContext
+      if (textNode.nodeName === '#text') {
+        textNodeContext = context
+      } else {
+        textNodeContext = context.clone()
+        parseAttributes(textNodeContext, this.textNode, textNode)
+        const tSpanDx = textNode.getAttribute('dx')
+        if (tSpanDx !== null) {
+          dx += toPixels(tSpanDx, textNodeContext.attributeState.fontSize)
+        }
+      }
+      measures.push({
+        width:
+          context.textMeasure.measureTextWidth(this.texts[i], textNodeContext.attributeState) + dx,
+        length: this.texts[i].length
+      })
+    }
+
+    return measures
+  }
+
+  put(context: Context, charSpace: number, textWidths: number[] | null): Point {
     let i, textNode
 
     let strokeRGB: RGBColor
@@ -89,7 +128,10 @@ export class TextChunk {
       ys[i] = y
 
       currentTextX =
-        x + context.textMeasure.measureTextWidth(this.texts[i], textNodeContext.attributeState)
+        x +
+        (textWidths
+          ? textWidths[i]
+          : context.textMeasure.measureTextWidth(this.texts[i], textNodeContext.attributeState))
 
       currentTextY = y
 
@@ -130,7 +172,8 @@ export class TextChunk {
       context.pdf.text(this.texts[i], xs[i] - textOffset, ys[i], {
         baseline: mapAlignmentBaseline(alignmentBaseline),
         angle: context.transform,
-        renderingMode: textRenderingMode === 'fill' ? void 0 : textRenderingMode
+        renderingMode: textRenderingMode === 'fill' ? void 0 : textRenderingMode,
+        charSpace: charSpace === 0 ? void 0 : charSpace
       })
 
       context.pdf.restoreGraphicsState()

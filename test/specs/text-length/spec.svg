@@ -1,0 +1,25 @@
+<svg width="550" height="600" viewBox="0 0 550 600" xmlns="http://www.w3.org/2000/svg">
+    <rect fill="#FFB6C1" width="250" height="20" y="0" x="20"></rect>
+    <text textLength="250" y="20" x="20" font-family="times">Hello, world!</text>
+
+    <rect fill="#FFB6C1" width="50" height="20" y="40" x="20"></rect>
+    <text textLength="50" y="60" x="20" font-family="times">Hello, world!</text>
+  
+    <rect fill="#FFB6C1" width="10" height="20" y="80" x="20"></rect>
+    <text textLength="10" y="100" x="20" font-family="times">Hello, world!</text>
+  
+    <rect fill="#FFB6C1" width="200" height="20" y="0" x="300"></rect>
+    <text textLength="200" y="20" x="300" font-family="times">Hello, <tspan fill="yellow">world!</tspan></text>
+  
+    <rect fill="#FFB6C1" width="200" height="20" y="40" x="300"></rect>
+    <text textLength="200" y="60" x="300" font-family="times">Hello, <tspan fill="red">wor</tspan><tspan fill="yellow">ld!</tspan></text>
+  
+    <rect fill="#FFB6C1" width="200" height="20" y="80" x="300"></rect>
+    <text textLength="200" y="100" x="300" font-family="times">He<tspan fill="green">llo</tspan>, <tspan fill="red">wor</tspan><tspan fill="yellow">ld!</tspan></text>
+  
+    <rect fill="#FFB6C1" width="400" height="40" y="160" x="20"></rect>
+    <text textLength="400" y="200" x="20" font-family="times">Hello, <tspan fill="yellow" font-size="70">world!</tspan></text>
+
+    <rect fill="#FFB6C1" width="400" height="40" y="240" x="20"></rect>
+    <text textLength="400" y="280" x="20" font-family="times">Hello, <tspan fill="red" font-size="10" dy="-30">wor</tspan><tspan font-family="sans-serif" fill="yellow" font-size="40" dy="20" dx="-40">ld!</tspan></text>
+</svg> 
