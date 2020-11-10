@@ -50,10 +50,7 @@ export class TextNode extends GraphicsNode {
           transformedText,
           context.attributeState
         )
-        if (
-          context.attributeState.xmlSpace === 'default' &&
-          originalText.match(/^[(\n\r)|(\t)| ]/)
-        ) {
+        if (context.attributeState.xmlSpace === 'default' && originalText.match(/^\s/)) {
           lengthAdjustment = 0
         }
         charSpace = (textLength - defaultSize) / (transformedText.length - lengthAdjustment) || 0
@@ -150,7 +147,7 @@ export class TextNode extends GraphicsNode {
         if (xmlSpace === 'default') {
           if (i === 0) {
             trimmedText = trimLeft(trimmedText)
-            if (originalText.match(/^[(\n\r)|(\t)| ]/)) {
+            if (originalText.match(/^\s/)) {
               lengthAdjustment = 0
             }
           }
