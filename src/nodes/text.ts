@@ -60,10 +60,7 @@ export class TextNode extends GraphicsNode {
             firstText = false
           }
           // Consolidate spaces across different children
-          if (
-            trimInfo.prevContext.attributeState.xmlSpace === 'default' &&
-            trimInfo.prevText.match(/\s$/)
-          ) {
+          if (trimInfo.prevText.match(/\s$/)) {
             trimmedText = trimLeft(trimmedText)
           }
         }
@@ -107,10 +104,6 @@ export class TextNode extends GraphicsNode {
 
         const childContext = context.clone()
         parseAttributes(childContext, textNode, tSpan)
-        // xml:space cannot be reset back to 'default' for a child
-        if (context.attributeState.xmlSpace === 'preserve') {
-          childContext.attributeState.xmlSpace = 'preserve'
-        }
 
         this.processTspans(textNode, tSpan, childContext, textChunks, currentTextSegment, trimInfo)
       }
