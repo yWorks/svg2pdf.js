@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" font-family="times">
+  <text font-size="24" y="20">Stroke <tspan stroke-width="0.5" stroke="red">inherited <tspan fill="green">correctly</tspan></tspan></text>
+  <text font-size="24" y="60">Font-size<tspan font-size="16"> inherited<tspan font-size="24"> correctly</tspan></tspan></text>
+  <text font-size="24" y="100">Text <tspan x="100">absolute x offset<tspan> child</tspan> sibling</tspan></text>
+  <text font-size="24" y="140">Text <tspan dx="20">relative x offset<tspan> child</tspan> sibling</tspan></text>
+  <text font-size="24" y="180">Text <tspan y="190">absolute y offset<tspan> child</tspan> sibling</tspan></text>
+  <text font-size="24" y="220">Text <tspan dy="10">relative y offset<tspan> child</tspan> sibling</tspan></text>
+  <text font-size="24" y="260">Preserve <tspan xml:space="preserve">passed  to<tspan>    children   <tspan xml:space="default">    default   </tspan></tspan></tspan>    sibling</text>
+  <text font-size="24" y="300">Default <tspan xml:space="default">passed    to<tspan>    children<tspan xml:space="preserve">    preserve</tspan></tspan></tspan>    sibling</text>
+  <text font-size="24" y="340">Nested titles <tspan><title>Don't render!</title>ignored</tspan></text>
+  <text font-size="24" y="380"><tspan><tspan>lorem i</tspan> <tspan style="font-weight: bold">p <tspan font-style="italic">su <tspan style="font-weight: normal">m </tspan> </tspan> </tspan> </tspan> </text>
+</svg>

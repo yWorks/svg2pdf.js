@@ -10,21 +10,115 @@ import {
   replaceTabsBySpace,
   transformText,
   transformXmlSpace,
-  trimLeft,
-  trimRight
+  trimLeft
 } from '../utils/text'
 import { GraphicsNode } from './graphicsnode'
 import { Rect } from '../utils/geometry'
 import { Matrix } from 'jspdf'
+import { SvgNode } from './svgnode'
+import { parseAttributes } from '../applyparseattributes'
+
+interface TrimInfo {
+  prevText: string
+  prevContext: Context
+}
 
 export class TextNode extends GraphicsNode {
+  private processTSpans(
+    textNode: SvgNode,
+    node: Element,
+    context: Context,
+    textChunks: { type: 'x' | 'y' | ''; chunk: TextChunk }[],
+    currentTextSegment: TextChunk,
+    trimInfo: TrimInfo
+  ): boolean {
+    const pdfFontSize = context.pdf.getFontSize()
+    const xmlSpace = context.attributeState.xmlSpace
+    let firstText = true,
+      initialSpace = false
+
+    for (let i = 0; i < node.childNodes.length; i++) {
+      const childNode = node.childNodes[i] as Element
+      if (!childNode.textContent) {
+        continue
+      }
+
+      const textContent = childNode.textContent
+
+      if (childNode.nodeName === '#text') {
+        let trimmedText = removeNewlines(textContent)
+        trimmedText = replaceTabsBySpace(trimmedText)
+
+        if (xmlSpace === 'default') {
+          trimmedText = consolidateSpaces(trimmedText)
+          // If first text in tspan and starts with a space
+          if (firstText && trimmedText.match(/^\s/)) {
+            initialSpace = true
+          }
+          // No longer the first text if we've found a letter
+          if (trimmedText.match(/[^\s]/)) {
+            firstText = false
+          }
+          // Consolidate spaces across different children
+          if (trimInfo.prevText.match(/\s$/)) {
+            trimmedText = trimLeft(trimmedText)
+          }
+        }
+
+        const transformedText = transformText(node, trimmedText, context)
+        currentTextSegment.add(node, transformedText, context)
+        trimInfo.prevText = textContent
+        trimInfo.prevContext = context
+      } else if (nodeIs(childNode, 'title')) {
+        // ignore <title> elements
+      } else if (nodeIs(childNode, 'tspan')) {
+        const tSpan = childNode
+
+        const tSpanAbsX = tSpan.getAttribute('x')
+        if (tSpanAbsX !== null) {
+          const x = toPixels(tSpanAbsX, pdfFontSize)
+
+          currentTextSegment = new TextChunk(
+            this,
+            getAttribute(tSpan, context.styleSheets, 'text-anchor') ||
+              context.attributeState.textAnchor,
+            x,
+            0
+          )
+          textChunks.push({ type: 'y', chunk: currentTextSegment })
+        }
+
+        const tSpanAbsY = tSpan.getAttribute('y')
+        if (tSpanAbsY !== null) {
+          const y = toPixels(tSpanAbsY, pdfFontSize)
+
+          currentTextSegment = new TextChunk(
+            this,
+            getAttribute(tSpan, context.styleSheets, 'text-anchor') ||
+              context.attributeState.textAnchor,
+            0,
+            y
+          )
+          textChunks.push({ type: 'x', chunk: currentTextSegment })
+        }
+
+        const childContext = context.clone()
+        parseAttributes(childContext, textNode, tSpan)
+
+        this.processTSpans(textNode, tSpan, childContext, textChunks, currentTextSegment, trimInfo)
+      }
+    }
+
+    return initialSpace
+  }
+
   protected async renderCore(context: Context): Promise<void> {
     context.pdf.saveGraphicsState()
 
     let xOffset = 0
     let charSpace = 0
-    // If string starts with (\n\r | \t | ' ') then for charSpace calculations
-    // need to treat the string as if it contains one extra character
+    // If string starts with \s then for charSpace calculations
+    // need to treat it as if it contains one extra character
     let lengthAdjustment = 1
 
     const pdfFontSize = context.pdf.getFontSize()
@@ -40,8 +134,8 @@ export class TextNode extends GraphicsNode {
     // when there are no tspans draw the text directly
     const tSpanCount = this.element.childElementCount
     if (tSpanCount === 0) {
-      const originalText = this.element.textContent || ''
-      const trimmedText = transformXmlSpace(originalText, context.attributeState)
+      const textContent = this.element.textContent || ''
+      const trimmedText = transformXmlSpace(textContent, context.attributeState)
       const transformedText = transformText(this.element, trimmedText, context)
       xOffset = context.textMeasure.getTextOffset(transformedText, context.attributeState)
 
@@ -50,7 +144,7 @@ export class TextNode extends GraphicsNode {
           transformedText,
           context.attributeState
         )
-        if (context.attributeState.xmlSpace === 'default' && originalText.match(/^\s/)) {
+        if (context.attributeState.xmlSpace === 'default' && textContent.match(/^\s/)) {
           lengthAdjustment = 0
         }
         charSpace = (textLength - defaultSize) / (transformedText.length - lengthAdjustment) || 0
@@ -68,11 +162,8 @@ export class TextNode extends GraphicsNode {
       }
     } else {
       // otherwise loop over tspans and position each relative to the previous one
-      // type sets how the chunk uses the position of the previous chunk to define its origin
-      // x/y means it uses the x/y position of the previous to set it's x/y origin repectively
       const textChunks: { type: 'x' | 'y' | ''; chunk: TextChunk }[] = []
-
-      let currentTextSegment = new TextChunk(
+      const currentTextSegment = new TextChunk(
         this,
         context.attributeState.textAnchor,
         textX + dx,
@@ -80,121 +171,50 @@ export class TextNode extends GraphicsNode {
       )
       textChunks.push({ type: '', chunk: currentTextSegment })
 
-      for (let i = 0; i < this.element.childNodes.length; i++) {
-        const textNode = this.element.childNodes[i] as Element
-        if (!textNode.textContent) {
-          continue
+      const initialSpace = this.processTSpans(
+        this,
+        this.element,
+        context,
+        textChunks,
+        currentTextSegment,
+        // Set prevText to ' ' so any spaces on left of <text> are trimmed
+        { prevText: ' ', prevContext: context }
+      )
+
+      lengthAdjustment = initialSpace ? 0 : 1
+
+      // Right trim the chunks (if required)
+      let trimRight = true
+      for (let r = textChunks.length - 1; r >= 0; r--) {
+        if (trimRight) {
+          trimRight = textChunks[r].chunk.rightTrimText()
         }
-
-        const originalText = textNode.textContent
-
-        let xmlSpace = context.attributeState.xmlSpace
-        let textContent = originalText
-
-        if (textNode.nodeName === '#text') {
-        } else if (nodeIs(textNode, 'title')) {
-          continue
-        } else if (nodeIs(textNode, 'tspan')) {
-          const tSpan = textNode
-
-          if (tSpan.childElementCount > 0) {
-            // filter <title> elements...
-            textContent = ''
-            for (let j = 0; j < tSpan.childNodes.length; j++) {
-              if (tSpan.childNodes[j].nodeName === '#text') {
-                textContent += tSpan.childNodes[j].textContent
-              }
-            }
-          }
-
-          const tSpanAbsX = tSpan.getAttribute('x')
-          if (tSpanAbsX !== null) {
-            const x = toPixels(tSpanAbsX, pdfFontSize)
-
-            currentTextSegment = new TextChunk(
-              this,
-              getAttribute(tSpan, context.styleSheets, 'text-anchor') ||
-                context.attributeState.textAnchor,
-              x,
-              0
-            )
-            textChunks.push({ type: 'y', chunk: currentTextSegment })
-          }
-
-          const tSpanAbsY = tSpan.getAttribute('y')
-          if (tSpanAbsY !== null) {
-            const y = toPixels(tSpanAbsY, pdfFontSize)
-
-            currentTextSegment = new TextChunk(
-              this,
-              getAttribute(tSpan, context.styleSheets, 'text-anchor') ||
-                context.attributeState.textAnchor,
-              0,
-              y
-            )
-            textChunks.push({ type: 'x', chunk: currentTextSegment })
-          }
-
-          const tSpanXmlSpace = tSpan.getAttribute('xml:space')
-          if (tSpanXmlSpace) {
-            xmlSpace = tSpanXmlSpace
-          }
-        }
-
-        let trimmedText = removeNewlines(textContent)
-        trimmedText = replaceTabsBySpace(trimmedText)
-
-        if (xmlSpace === 'default') {
-          if (i === 0) {
-            trimmedText = trimLeft(trimmedText)
-            if (originalText.match(/^\s/)) {
-              lengthAdjustment = 0
-            }
-          }
-          if (i === this.element.childNodes.length - 1) {
-            trimmedText = trimRight(trimmedText)
-          }
-
-          trimmedText = consolidateSpaces(trimmedText)
-        }
-
-        const transformedText = transformText(this.element, trimmedText, context)
-        currentTextSegment.add(textNode, transformedText)
       }
-
-      // These arrays are (from inside out) per text per TextChunk
-      const measures: { width: number; length: number }[][] = []
-      let textWidths: number[][] | null = null
 
       if (textLength > 0) {
         // Calculate the total 'default' width of this text element
         let totalDefaultWidth = 0
         let totalLength = 0
         textChunks.forEach(({ chunk }) => {
-          const chunkMeasures = chunk.measureTexts(context)
-          measures.push(chunkMeasures)
-          chunkMeasures.forEach(({ width, length }) => {
+          chunk.measureText(context)
+          chunk.textMeasures.forEach(({ width, length }) => {
             totalDefaultWidth += width
             totalLength += length
           })
         })
 
         charSpace = (textLength - totalDefaultWidth) / (totalLength - lengthAdjustment)
-
-        textWidths = measures.map(chunkMeasures =>
-          chunkMeasures.map(textMeasure => textMeasure.width + textMeasure.length * charSpace)
-        )
       }
 
       // Put the textchunks
       textChunks.reduce(
-        (lastPositions, { type, chunk }, i) => {
+        (lastPositions, { type, chunk }) => {
           if (type === 'x') {
             chunk.setX(lastPositions[0])
           } else if (type === 'y') {
             chunk.setY(lastPositions[1])
           }
-          return chunk.put(context, charSpace, textWidths ? textWidths[i] : null)
+          return chunk.put(context, charSpace)
         },
         [0, 0]
       )

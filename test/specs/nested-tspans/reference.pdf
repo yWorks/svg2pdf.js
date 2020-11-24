@@ -1,0 +1,691 @@
+%PDF-1.3
+%ºß¬à
+3 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/MediaBox [0 0 500. 500.]
+/Contents 4 0 R
+>>
+endobj
+4 0 obj
+<<
+/Length 4040
+>>
+stream
+0.200025 w
+0 G
+q
+1. 0. 0. -1. 0. 500. cm
+q
+1. 0. 0. 1. 0. 0. cm
+1. w
+0. g
+q
+1. 0. 0. 1. 0. 0. cm
+0. 0. 500. 500. re
+W
+n
+q
+q
+q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+1. 0. 0. -1. 0. 20. Tm
+(Stroke ) Tj
+ET
+Q
+q
+0.5 w
+1. 0. 0. RG
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+2 Tr
+1. 0. 0. -1. 68.66015625 20. Tm
+(inherited ) Tj
+ET
+Q
+q
+0. 0.5 0. rg
+0.5 w
+1. 0. 0. RG
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0. 0.502 0. rg
+2 Tr
+1. 0. 0. -1. 159.9609375 20. Tm
+(correctly) Tj
+ET
+Q
+Q
+Q
+q
+q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 0. 60. Tm
+(Font-size) Tj
+ET
+Q
+q
+BT
+/F9 16 Tf
+18.3999999999999986 TL
+0 g
+0 Tr
+1. 0. 0. -1. 89.3203125 60. Tm
+( inherited) Tj
+ET
+Q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 150.1875 60. Tm
+( correctly) Tj
+ET
+Q
+Q
+Q
+q
+q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 0. 100. Tm
+(Text ) Tj
+ET
+Q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 100. 100. Tm
+(absolute x offset) Tj
+ET
+Q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 258.19140625 100. Tm
+( child) Tj
+ET
+Q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 312.1796875 100. Tm
+( sibling) Tj
+ET
+Q
+Q
+Q
+q
+q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 0. 140. Tm
+(Text ) Tj
+ET
+Q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 68.3046875 140. Tm
+(relative x offset) Tj
+ET
+Q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 218.46875 140. Tm
+( child) Tj
+ET
+Q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 272.45703125 140. Tm
+( sibling) Tj
+ET
+Q
+Q
+Q
+q
+q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 0. 180. Tm
+(Text ) Tj
+ET
+Q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 48.3046875 190. Tm
+(absolute y offset) Tj
+ET
+Q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 206.49609375 190. Tm
+( child) Tj
+ET
+Q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 260.484375 190. Tm
+( sibling) Tj
+ET
+Q
+Q
+Q
+q
+q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 0. 220. Tm
+(Text ) Tj
+ET
+Q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 48.3046875 230. Tm
+(relative y offset) Tj
+ET
+Q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 198.46875 230. Tm
+( child) Tj
+ET
+Q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 252.45703125 230. Tm
+( sibling) Tj
+ET
+Q
+Q
+Q
+q
+q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 0. 260. Tm
+(Preserve ) Tj
+ET
+Q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 88.62890625 260. Tm
+(passed  to) Tj
+ET
+Q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 183.28125 260. Tm
+(    children   ) Tj
+ET
+Q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 303.9140625 260. Tm
+(default ) Tj
+ET
+Q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 376.546875 260. Tm
+(sibling) Tj
+ET
+Q
+Q
+Q
+q
+q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 0. 300. Tm
+(Default ) Tj
+ET
+Q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 77.96484375 300. Tm
+(passed to) Tj
+ET
+Q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 166.6171875 300. Tm
+( children) Tj
+ET
+Q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 251.25 300. Tm
+(    preserve) Tj
+ET
+Q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 356.53125 300. Tm
+( sibling) Tj
+ET
+Q
+Q
+Q
+q
+q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 0. 340. Tm
+(Nested titles ) Tj
+ET
+Q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 125.30859375 340. Tm
+(ignored) Tj
+ET
+Q
+Q
+Q
+q
+q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 0. 380. Tm
+(lorem i) Tj
+ET
+Q
+q
+BT
+/F9 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 68.6484375 380. Tm
+( ) Tj
+ET
+Q
+q
+BT
+/F10 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 74.6484375 380. Tm
+(p ) Tj
+ET
+Q
+q
+BT
+/F12 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 93.99609375 380. Tm
+(su ) Tj
+ET
+Q
+q
+BT
+/F11 24 Tf
+27.5999999999999979 TL
+0 g
+0 Tr
+1. 0. 0. -1. 122.68359375 380. Tm
+(m) Tj
+ET
+Q
+q
+Q
+q
+Q
+q
+Q
+q
+Q
+Q
+Q
+Q
+Q
+Q
+Q
+endstream
+endobj
+1 0 obj
+<</Type /Pages
+/Kids [3 0 R ]
+/Count 1
+>>
+endobj
+5 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+6 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+7 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+8 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+9 0 obj
+<<
+/Type /Font
+/BaseFont /Courier
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+10 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+11 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+12 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+13 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Roman
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+14 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+15 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Italic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+16 0 obj
+<<
+/Type /Font
+/BaseFont /Times-BoldItalic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+17 0 obj
+<<
+/Type /Font
+/BaseFont /ZapfDingbats
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+18 0 obj
+<<
+/Type /Font
+/BaseFont /Symbol
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+2 0 obj
+<<
+/ProcSet [/PDF /Text /ImageB /ImageC /ImageI]
+/Font <<
+/F1 5 0 R
+/F2 6 0 R
+/F3 7 0 R
+/F4 8 0 R
+/F5 9 0 R
+/F6 10 0 R
+/F7 11 0 R
+/F8 12 0 R
+/F9 13 0 R
+/F10 14 0 R
+/F11 15 0 R
+/F12 16 0 R
+/F13 17 0 R
+/F14 18 0 R
+>>
+/XObject <<
+>>
+>>
+endobj
+19 0 obj
+<<
+/Producer (jsPDF 1.0.0)
+/CreationDate (D:19871210000000+00'00')
+>>
+endobj
+20 0 obj
+<<
+/Type /Catalog
+/Pages 1 0 R
+/OpenAction [3 0 R /FitH null]
+/PageLayout /OneColumn
+>>
+endobj
+xref
+0 21
+0000000000 65535 f 
+0000004212 00000 n 
+0000006029 00000 n 
+0000000015 00000 n 
+0000000120 00000 n 
+0000004269 00000 n 
+0000004394 00000 n 
+0000004524 00000 n 
+0000004657 00000 n 
+0000004794 00000 n 
+0000004917 00000 n 
+0000005046 00000 n 
+0000005178 00000 n 
+0000005314 00000 n 
+0000005442 00000 n 
+0000005569 00000 n 
+0000005698 00000 n 
+0000005831 00000 n 
+0000005933 00000 n 
+0000006277 00000 n 
+0000006363 00000 n 
+trailer
+<<
+/Size 21
+/Root 20 0 R
+/Info 19 0 R
+/ID [ <00000000000000000000000000000000> <00000000000000000000000000000000> ]
+>>
+startxref
+6467
+%%EOF

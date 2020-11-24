@@ -31,6 +31,7 @@ window.tests = [
   'image-svg-urls',
   'line-default-coordinates',
   'markers',
+  'nested-tspans',
   'opacity-and-rgba',
   'path-arc-support',
   'pattern-units',
