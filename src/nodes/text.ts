@@ -24,7 +24,7 @@ interface TrimInfo {
 }
 
 export class TextNode extends GraphicsNode {
-  private processTspans(
+  private processTSpans(
     textNode: SvgNode,
     node: Element,
     context: Context,
@@ -70,7 +70,7 @@ export class TextNode extends GraphicsNode {
         trimInfo.prevText = textContent
         trimInfo.prevContext = context
       } else if (nodeIs(childNode, 'title')) {
-        continue
+        // ignore <title> elements
       } else if (nodeIs(childNode, 'tspan')) {
         const tSpan = childNode
 
@@ -105,7 +105,7 @@ export class TextNode extends GraphicsNode {
         const childContext = context.clone()
         parseAttributes(childContext, textNode, tSpan)
 
-        this.processTspans(textNode, tSpan, childContext, textChunks, currentTextSegment, trimInfo)
+        this.processTSpans(textNode, tSpan, childContext, textChunks, currentTextSegment, trimInfo)
       }
     }
 
@@ -171,7 +171,7 @@ export class TextNode extends GraphicsNode {
       )
       textChunks.push({ type: '', chunk: currentTextSegment })
 
-      const initialSpace = this.processTspans(
+      const initialSpace = this.processTSpans(
         this,
         this.element,
         context,
