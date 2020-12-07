@@ -108,6 +108,7 @@ function __generator(thisArg, body) {
     }
 }
 
+/* eslint-disable @typescript-eslint/no-explicit-any,@typescript-eslint/explicit-module-boundary-types */
 var RGBColor = /** @class */ (function () {
     function RGBColor(colorString) {
         this.a = undefined;
@@ -115,6 +116,7 @@ var RGBColor = /** @class */ (function () {
         this.g = 0;
         this.b = 0;
         this.simpleColors = {};
+        // eslint-disable-next-line @typescript-eslint/ban-types
         this.colorDefs = [];
         this.ok = false;
         if (!colorString) {
@@ -336,6 +338,9 @@ var RGBColor = /** @class */ (function () {
     RGBColor.prototype.toRGB = function () {
         return 'rgb(' + this.r + ', ' + this.g + ', ' + this.b + ')';
     };
+    RGBColor.prototype.toRGBA = function () {
+        return 'rgba(' + this.r + ', ' + this.g + ', ' + this.b + ', ' + (this.a || '1') + ')';
+    };
     RGBColor.prototype.toHex = function () {
         var r = this.r.toString(16);
         var g = this.g.toString(16);
@@ -394,6 +399,7 @@ var ColorFill = /** @class */ (function () {
     function ColorFill(color) {
         this.color = color;
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ColorFill.prototype.getFillData = function (forNode, context) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
@@ -428,6 +434,7 @@ var AttributeState = /** @class */ (function () {
         this.alignmentBaseline = '';
         this.textAnchor = '';
         this.visibility = '';
+        this.color = null;
     }
     AttributeState.prototype.clone = function () {
         var clone = new AttributeState();
@@ -453,6 +460,7 @@ var AttributeState = /** @class */ (function () {
         clone.textAnchor = this.textAnchor;
         clone.alignmentBaseline = this.alignmentBaseline;
         clone.visibility = this.visibility;
+        clone.color = this.color;
         return clone;
     };
     AttributeState.default = function () {
@@ -479,6 +487,7 @@ var AttributeState = /** @class */ (function () {
         attributeState.alignmentBaseline = 'baseline';
         attributeState.textAnchor = 'start';
         attributeState.visibility = 'visible';
+        attributeState.color = new RGBColor('rgb(0, 0, 0)');
         return attributeState;
     };
     return AttributeState;
@@ -649,17 +658,18 @@ var ReferencesHandler = /** @class */ (function () {
         this.renderedElements = {};
         this.idMap = idMap;
     }
-    ReferencesHandler.prototype.getRendered = function (id, renderCallback) {
+    ReferencesHandler.prototype.getRendered = function (id, color, renderCallback) {
         return __awaiter(this, void 0, void 0, function () {
-            var svgNode;
+            var key, svgNode;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        if (this.renderedElements.hasOwnProperty(id)) {
+                        key = ReferencesHandler.generateKey(id, color);
+                        if (this.renderedElements.hasOwnProperty(key)) {
                             return [2 /*return*/, this.renderedElements[id]];
                         }
                         svgNode = this.get(id);
-                        this.renderedElements[id] = svgNode;
+                        this.renderedElements[key] = svgNode;
                         return [4 /*yield*/, renderCallback(svgNode)];
                     case 1:
                         _a.sent();
@@ -670,6 +680,9 @@ var ReferencesHandler = /** @class */ (function () {
     };
     ReferencesHandler.prototype.get = function (id) {
         return this.idMap[cssEsc(id, { isIdentifier: true })];
+    };
+    ReferencesHandler.generateKey = function (id, color) {
+        return id + '|' + (color || new RGBColor('rgb(0,0,0)')).toRGBA();
     };
     return ReferencesHandler;
 }());
@@ -812,14 +825,17 @@ function getAttribute(node, styleSheets, propertyNode, propertyCss) {
     if (attribute) {
         return attribute;
     }
-    else if (styleSheets.getPropertyValue(node, propertyCss)) {
-        return styleSheets.getPropertyValue(node, propertyCss);
-    }
-    else if (node.hasAttribute(propertyNode)) {
-        return node.getAttribute(propertyNode) || undefined;
-    }
     else {
-        return undefined;
+        var propertyValue = styleSheets.getPropertyValue(node, propertyCss);
+        if (propertyValue) {
+            return propertyValue;
+        }
+        else if (node.hasAttribute(propertyNode)) {
+            return node.getAttribute(propertyNode) || undefined;
+        }
+        else {
+            return undefined;
+        }
     }
 }
 function svgNodeIsVisible(svgNode, parentVisible, context) {
@@ -880,7 +896,9 @@ var MarkerList = /** @class */ (function () {
                         // as the marker is already scaled by the current line width we must not apply the line width twice!
                         context.pdf.saveGraphicsState();
                         context.pdf.setLineWidth(1.0);
-                        return [4 /*yield*/, context.refsHandler.getRendered(marker.id, function (node) { return node.apply(context); })];
+                        return [4 /*yield*/, context.refsHandler.getRendered(marker.id, null, function (node) {
+                                return node.apply(context);
+                            })];
                     case 2:
                         _a.sent();
                         context.pdf.doFormObject(marker.id, tf);
@@ -903,8 +921,6 @@ var MarkerList = /** @class */ (function () {
  */
 var Marker = /** @class */ (function () {
     function Marker(id, anchor, angle) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-        // @ts-ignore
         this.id = id;
         this.anchor = anchor;
         this.angle = angle;
@@ -948,12 +964,18 @@ function parseFloats(str) {
     }
     return floats;
 }
-// extends RGBColor by rgba colors as RGBColor is not capable of it
-function parseColor(colorString) {
+/**
+ * extends RGBColor by rgba colors as RGBColor is not capable of it
+ * currentcolor: the color to return if colorString === 'currentcolor'
+ */
+function parseColor(colorString, currentcolor) {
     if (colorString === 'transparent') {
         var transparent = new RGBColor('rgb(0,0,0)');
         transparent.a = 0;
         return transparent;
+    }
+    if (colorString.toLowerCase() === 'currentcolor') {
+        return currentcolor || new RGBColor('rgb(0,0,0)');
     }
     var match = /\s*rgba\(((?:[^,\)]*,){3}[^,\)]*)\)\s*/.exec(colorString);
     if (match) {
@@ -1029,6 +1051,7 @@ function getBoundingBoxByChildren(context, svgnode) {
     return boundingBox;
 }
 function defaultBoundingBox(element, context) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     var pf = parseFloat;
     // TODO: check if there are other possible coordinate attributes
     var x1 = pf(element.getAttribute('x1')) ||
@@ -1116,7 +1139,7 @@ function computeViewBoxTransform(node, viewBox, eX, eY, eWidth, eHeight, context
 function parseTransform(transformString, context) {
     if (!transformString || transformString === 'none')
         return context.pdf.unitMatrix;
-    var mRegex = /^[\s,]*matrix\(([^\)]+)\)\s*/, tRegex = /^[\s,]*translate\(([^\)]+)\)\s*/, rRegex = /^[\s,]*rotate\(([^\)]+)\)\s*/, sRegex = /^[\s,]*scale\(([^\)]+)\)\s*/, sXRegex = /^[\s,]*skewX\(([^\)]+)\)\s*/, sYRegex = /^[\s,]*skewY\(([^\)]+)\)\s*/;
+    var mRegex = /^[\s,]*matrix\(([^)]+)\)\s*/, tRegex = /^[\s,]*translate\(([^)]+)\)\s*/, rRegex = /^[\s,]*rotate\(([^)]+)\)\s*/, sRegex = /^[\s,]*scale\(([^)]+)\)\s*/, sXRegex = /^[\s,]*skewX\(([^)]+)\)\s*/, sYRegex = /^[\s,]*skewY\(([^)]+)\)\s*/;
     var resultMatrix = context.pdf.unitMatrix;
     var m;
     var tSLength;
@@ -1176,7 +1199,14 @@ var SvgNode = /** @class */ (function () {
     function SvgNode(element, children) {
         this.element = element;
         this.children = children;
+        this.parent = null;
     }
+    SvgNode.prototype.setParent = function (parent) {
+        this.parent = parent;
+    };
+    SvgNode.prototype.getParent = function () {
+        return this.parent;
+    };
     SvgNode.prototype.getBoundingBox = function (context) {
         if (getAttribute(this.element, context.styleSheets, 'display') === 'none') {
             return [0, 0, 0, 0];
@@ -1199,9 +1229,11 @@ var NonRenderedNode = /** @class */ (function (_super) {
     function NonRenderedNode() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     NonRenderedNode.prototype.render = function (parentContext) {
         return Promise.resolve();
     };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     NonRenderedNode.prototype.getBoundingBoxCore = function (context) {
         return [];
     };
@@ -1216,22 +1248,38 @@ var Gradient = /** @class */ (function (_super) {
     function Gradient(pdfGradientType, element, children) {
         var _this = _super.call(this, element, children) || this;
         _this.pdfGradientType = pdfGradientType;
+        _this.contextColor = undefined;
         return _this;
     }
     Gradient.prototype.apply = function (context) {
         return __awaiter(this, void 0, void 0, function () {
-            var id, colors, opacitySum, hasOpacity, gState, pattern;
+            var id, ancestor, colorAttr, colors, opacitySum, hasOpacity, gState, pattern;
+            var _this = this;
             return __generator(this, function (_a) {
                 id = this.element.getAttribute('id');
                 if (!id) {
                     return [2 /*return*/];
+                }
+                // Only need to calculate contextColor once
+                if (this.contextColor === undefined) {
+                    this.contextColor = null;
+                    ancestor = this;
+                    while (ancestor) {
+                        colorAttr = getAttribute(ancestor.element, context.styleSheets, 'color');
+                        if (colorAttr) {
+                            this.contextColor = parseColor(colorAttr, null);
+                            break;
+                        }
+                        ancestor = ancestor.getParent();
+                    }
                 }
                 colors = [];
                 opacitySum = 0;
                 hasOpacity = false;
                 this.children.forEach(function (stop) {
                     if (stop.element.tagName.toLowerCase() === 'stop') {
-                        var color = new RGBColor(getAttribute(stop.element, context.styleSheets, 'stop-color'));
+                        var colorAttr = getAttribute(stop.element, context.styleSheets, 'color');
+                        var color = parseColor(getAttribute(stop.element, context.styleSheets, 'stop-color') || '', colorAttr ? parseColor(colorAttr, null) : _this.contextColor);
                         colors.push({
                             offset: Gradient.parseGradientOffset(stop.element.getAttribute('offset') || '0'),
                             color: [color.r, color.g, color.b]
@@ -1322,7 +1370,7 @@ var GradientFill = /** @class */ (function () {
             var gradientUnitsMatrix, bBox, gradientTransform;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, context.refsHandler.getRendered(this.key, function (node) {
+                    case 0: return [4 /*yield*/, context.refsHandler.getRendered(this.key, null, function (node) {
                             return node.apply(new Context(context.pdf, {
                                 refsHandler: context.refsHandler,
                                 textMeasure: context.textMeasure,
@@ -1338,8 +1386,6 @@ var GradientFill = /** @class */ (function () {
                     case 1:
                         _a.sent();
                         if (!this.gradient.element.hasAttribute('gradientUnits') ||
-                            // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-                            // @ts-ignore
                             this.gradient.element.getAttribute('gradientUnits').toLowerCase() === 'objectboundingbox') {
                             bBox = forNode.getBoundingBox(context);
                             gradientUnitsMatrix = context.pdf.Matrix(bBox[2], 0, 0, bBox[3], bBox[0], bBox[1]);
@@ -1424,7 +1470,7 @@ var PatternFill = /** @class */ (function () {
             var patternData, bBox, patternUnitsMatrix, fillBBox, x, y, width, height, patternContentUnitsMatrix, fillBBox, x, y, width, height, patternTransformMatrix, patternTransform, matrix;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, context.refsHandler.getRendered(this.key, function (node) {
+                    case 0: return [4 /*yield*/, context.refsHandler.getRendered(this.key, null, function (node) {
                             return node.apply(new Context(context.pdf, {
                                 refsHandler: context.refsHandler,
                                 textMeasure: context.textMeasure,
@@ -1507,7 +1553,7 @@ function parseFill(fill, context) {
     }
     else {
         // plain color
-        var fillColor = parseColor(fill);
+        var fillColor = parseColor(fill, context.attributeState.color);
         if (fillColor.ok) {
             return new ColorFill(fillColor);
         }
@@ -1522,6 +1568,18 @@ function parseFill(fill, context) {
 
 function parseAttributes(context, svgNode, node) {
     var domNode = node || svgNode.element;
+    // update color first so currentColor becomes available for this node
+    var color = getAttribute(domNode, context.styleSheets, 'color');
+    if (color) {
+        var fillColor = parseColor(color, context.attributeState.color);
+        if (fillColor.ok) {
+            context.attributeState.color = fillColor;
+        }
+        else {
+            // invalid color passed, reset to black
+            context.attributeState.color = new RGBColor('rgb(0,0,0)');
+        }
+    }
     var visibility = getAttribute(domNode, context.styleSheets, 'visibility');
     if (visibility) {
         context.attributeState.visibility = visibility;
@@ -1547,8 +1605,7 @@ function parseAttributes(context, svgNode, node) {
     // stroke mode
     var strokeWidth = getAttribute(domNode, context.styleSheets, 'stroke-width');
     if (strokeWidth !== void 0 && strokeWidth !== '') {
-        strokeWidth = Math.abs(parseFloat(strokeWidth));
-        context.attributeState.strokeWidth = strokeWidth;
+        context.attributeState.strokeWidth = Math.abs(parseFloat(strokeWidth));
     }
     var stroke = getAttribute(domNode, context.styleSheets, 'stroke');
     if (stroke) {
@@ -1557,7 +1614,7 @@ function parseAttributes(context, svgNode, node) {
         }
         else {
             // gradients, patterns not supported for strokes ...
-            var strokeRGB = parseColor(stroke);
+            var strokeRGB = parseColor(stroke, context.attributeState.color);
             if (strokeRGB.ok) {
                 context.attributeState.stroke = new ColorFill(strokeRGB);
             }
@@ -1573,9 +1630,8 @@ function parseAttributes(context, svgNode, node) {
     }
     var dashArray = getAttribute(domNode, context.styleSheets, 'stroke-dasharray');
     if (dashArray) {
-        dashArray = parseFloats(dashArray);
         var dashOffset = parseInt(getAttribute(domNode, context.styleSheets, 'stroke-dashoffset') || '0');
-        context.attributeState.strokeDasharray = dashArray;
+        context.attributeState.strokeDasharray = parseFloats(dashArray);
         context.attributeState.strokeDashoffset = dashOffset;
     }
     var miterLimit = getAttribute(domNode, context.styleSheets, 'stroke-miterlimit');
@@ -2209,7 +2265,7 @@ var Use = /** @class */ (function (_super) {
     }
     Use.prototype.renderCore = function (context) {
         return __awaiter(this, void 0, void 0, function () {
-            var pf, url, id, refNode, refNodeOpensViewport, x, y, width, height, t, viewBox, refContext;
+            var pf, url, id, refNode, refNodeOpensViewport, x, y, width, height, t, viewBox, refContext, color;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -2251,7 +2307,10 @@ var Use = /** @class */ (function (_super) {
                             viewport: refNodeOpensViewport ? new Viewport(width, height) : context.viewport,
                             svg2pdfParameters: context.svg2pdfParameters
                         });
-                        return [4 /*yield*/, context.refsHandler.getRendered(id, function (node) { return Use.renderReferencedNode(node, refContext); })];
+                        color = context.attributeState.color;
+                        return [4 /*yield*/, context.refsHandler.getRendered(id, color, function (node) {
+                                return Use.renderReferencedNode(node, id, color, refContext);
+                            })];
                     case 1:
                         _a.sent();
                         context.pdf.saveGraphicsState();
@@ -2262,14 +2321,14 @@ var Use = /** @class */ (function (_super) {
                             context.pdf.rect(x, y, width, height);
                             context.pdf.clip().discardPath();
                         }
-                        context.pdf.doFormObject(id, t);
+                        context.pdf.doFormObject(ReferencesHandler.generateKey(id, color), t);
                         context.pdf.restoreGraphicsState();
                         return [2 /*return*/];
                 }
             });
         });
     };
-    Use.renderReferencedNode = function (node, refContext) {
+    Use.renderReferencedNode = function (node, id, color, refContext) {
         return __awaiter(this, void 0, void 0, function () {
             var bBox;
             return __generator(this, function (_a) {
@@ -2281,6 +2340,8 @@ var Use = /** @class */ (function (_super) {
                         // So, make the bBox a lot larger than it needs to be and hope any thick strokes are
                         // still within.
                         bBox = [bBox[0] - 0.5 * bBox[2], bBox[1] - 0.5 * bBox[3], bBox[2] * 2, bBox[3] * 2];
+                        // set the color to use for the referenced node
+                        refContext.attributeState.color = color;
                         refContext.pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], refContext.pdf.unitMatrix);
                         if (!(node instanceof Symbol$1)) return [3 /*break*/, 2];
                         return [4 /*yield*/, node.apply(refContext)];
@@ -2292,7 +2353,7 @@ var Use = /** @class */ (function (_super) {
                         _a.sent();
                         _a.label = 4;
                     case 4:
-                        refContext.pdf.endFormObject(node.element.getAttribute('id'));
+                        refContext.pdf.endFormObject(ReferencesHandler.generateKey(id, color));
                         return [2 /*return*/];
                 }
             });
@@ -2464,56 +2525,74 @@ var TextChunk = /** @class */ (function () {
         this.textNode = parent;
         this.texts = [];
         this.textNodes = [];
+        this.contexts = [];
         this.textAnchor = textAnchor;
         this.originX = originX;
         this.originY = originY;
+        this.textMeasures = [];
     }
-    TextChunk.prototype.add = function (tSpan, text) {
+    TextChunk.prototype.setX = function (originX) {
+        this.originX = originX;
+    };
+    TextChunk.prototype.setY = function (originY) {
+        this.originY = originY;
+    };
+    TextChunk.prototype.add = function (tSpan, text, context) {
         this.texts.push(text);
         this.textNodes.push(tSpan);
+        this.contexts.push(context);
     };
-    TextChunk.prototype.put = function (context) {
-        var i, textNode;
-        var strokeRGB;
-        var xs = [], ys = [], textNodeContexts = [];
+    TextChunk.prototype.rightTrimText = function () {
+        for (var r = this.texts.length - 1; r >= 0; r--) {
+            if (this.contexts[r].attributeState.xmlSpace === 'default') {
+                this.texts[r] = trimRight(this.texts[r]);
+            }
+            // If find a letter, stop right-trimming
+            if (this.texts[r].match(/[^\s]/)) {
+                return false;
+            }
+        }
+        return true;
+    };
+    TextChunk.prototype.measureText = function (context) {
+        for (var i = 0; i < this.texts.length; i++) {
+            this.textMeasures.push({
+                width: context.textMeasure.measureTextWidth(this.texts[i], this.contexts[i].attributeState),
+                length: this.texts[i].length
+            });
+        }
+    };
+    TextChunk.prototype.put = function (context, charSpace) {
+        var i, textNode, textNodeContext, textMeasure;
+        var alreadySeen = [];
+        var xs = [], ys = [];
         var currentTextX = this.originX, currentTextY = this.originY;
         var minX = currentTextX, maxX = currentTextX;
         for (i = 0; i < this.textNodes.length; i++) {
             textNode = this.textNodes[i];
+            textNodeContext = this.contexts[i];
+            textMeasure = this.textMeasures[i] || {
+                width: context.textMeasure.measureTextWidth(this.texts[i], this.contexts[i].attributeState),
+                length: this.texts[i].length
+            };
             var x = currentTextX;
             var y = currentTextY;
-            var textNodeContext = void 0;
-            if (textNode.nodeName === '#text') {
-                textNodeContext = context;
-            }
-            else {
-                textNodeContext = context.clone();
-                parseAttributes(textNodeContext, this.textNode, textNode);
-                var tSpanStrokeColor = getAttribute(textNode, context.styleSheets, 'stroke');
-                if (tSpanStrokeColor) {
-                    strokeRGB = new RGBColor(tSpanStrokeColor);
-                    if (strokeRGB.ok) {
-                        textNodeContext.attributeState.stroke = new ColorFill(strokeRGB);
+            if (textNode.nodeName !== '#text') {
+                if (!alreadySeen.includes(textNode)) {
+                    alreadySeen.push(textNode);
+                    var tSpanDx = textNode.getAttribute('dx');
+                    if (tSpanDx !== null) {
+                        x += toPixels(tSpanDx, textNodeContext.attributeState.fontSize);
+                    }
+                    var tSpanDy = textNode.getAttribute('dy');
+                    if (tSpanDy !== null) {
+                        y += toPixels(tSpanDy, textNodeContext.attributeState.fontSize);
                     }
                 }
-                var strokeWidth = getAttribute(textNode, context.styleSheets, 'stroke-width');
-                if (strokeWidth !== void 0) {
-                    textNodeContext.attributeState.strokeWidth = parseFloat(strokeWidth);
-                }
-                var tSpanDx = textNode.getAttribute('dx');
-                if (tSpanDx !== null) {
-                    x += toPixels(tSpanDx, textNodeContext.attributeState.fontSize);
-                }
-                var tSpanDy = textNode.getAttribute('dy');
-                if (tSpanDy !== null) {
-                    y += toPixels(tSpanDy, textNodeContext.attributeState.fontSize);
-                }
             }
-            textNodeContexts[i] = textNodeContext;
             xs[i] = x;
             ys[i] = y;
-            currentTextX =
-                x + context.textMeasure.measureTextWidth(this.texts[i], textNodeContext.attributeState);
+            currentTextX = x + textMeasure.width + textMeasure.length * charSpace;
             currentTextY = y;
             minX = Math.min(minX, x);
             maxX = Math.max(maxX, currentTextX);
@@ -2532,21 +2611,21 @@ var TextChunk = /** @class */ (function () {
         }
         for (i = 0; i < this.textNodes.length; i++) {
             textNode = this.textNodes[i];
+            textNodeContext = this.contexts[i];
             if (textNode.nodeName !== '#text') {
-                var tSpanVisibility = getAttribute(textNode, context.styleSheets, 'visibility') ||
-                    context.attributeState.visibility;
-                if (tSpanVisibility === 'hidden') {
+                if (textNodeContext.attributeState.visibility === 'hidden') {
                     continue;
                 }
             }
             context.pdf.saveGraphicsState();
-            applyAttributes(textNodeContexts[i], context, textNode);
-            var alignmentBaseline = textNodeContexts[i].attributeState.alignmentBaseline;
-            var textRenderingMode = getTextRenderingMode(textNodeContexts[i].attributeState);
+            applyAttributes(textNodeContext, context, textNode);
+            var alignmentBaseline = textNodeContext.attributeState.alignmentBaseline;
+            var textRenderingMode = getTextRenderingMode(textNodeContext.attributeState);
             context.pdf.text(this.texts[i], xs[i] - textOffset, ys[i], {
                 baseline: mapAlignmentBaseline(alignmentBaseline),
                 angle: context.transform,
-                renderingMode: textRenderingMode === 'fill' ? void 0 : textRenderingMode
+                renderingMode: textRenderingMode === 'fill' ? void 0 : textRenderingMode,
+                charSpace: charSpace === 0 ? void 0 : charSpace
             });
             context.pdf.restoreGraphicsState();
         }
@@ -2560,92 +2639,141 @@ var TextNode = /** @class */ (function (_super) {
     function TextNode() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
+    TextNode.prototype.processTSpans = function (textNode, node, context, textChunks, currentTextSegment, trimInfo) {
+        var pdfFontSize = context.pdf.getFontSize();
+        var xmlSpace = context.attributeState.xmlSpace;
+        var firstText = true, initialSpace = false;
+        for (var i = 0; i < node.childNodes.length; i++) {
+            var childNode = node.childNodes[i];
+            if (!childNode.textContent) {
+                continue;
+            }
+            var textContent = childNode.textContent;
+            if (childNode.nodeName === '#text') {
+                var trimmedText = removeNewlines(textContent);
+                trimmedText = replaceTabsBySpace(trimmedText);
+                if (xmlSpace === 'default') {
+                    trimmedText = consolidateSpaces(trimmedText);
+                    // If first text in tspan and starts with a space
+                    if (firstText && trimmedText.match(/^\s/)) {
+                        initialSpace = true;
+                    }
+                    // No longer the first text if we've found a letter
+                    if (trimmedText.match(/[^\s]/)) {
+                        firstText = false;
+                    }
+                    // Consolidate spaces across different children
+                    if (trimInfo.prevText.match(/\s$/)) {
+                        trimmedText = trimLeft(trimmedText);
+                    }
+                }
+                var transformedText = transformText(node, trimmedText, context);
+                currentTextSegment.add(node, transformedText, context);
+                trimInfo.prevText = textContent;
+                trimInfo.prevContext = context;
+            }
+            else if (nodeIs(childNode, 'title')) ;
+            else if (nodeIs(childNode, 'tspan')) {
+                var tSpan = childNode;
+                var tSpanAbsX = tSpan.getAttribute('x');
+                if (tSpanAbsX !== null) {
+                    var x = toPixels(tSpanAbsX, pdfFontSize);
+                    currentTextSegment = new TextChunk(this, getAttribute(tSpan, context.styleSheets, 'text-anchor') ||
+                        context.attributeState.textAnchor, x, 0);
+                    textChunks.push({ type: 'y', chunk: currentTextSegment });
+                }
+                var tSpanAbsY = tSpan.getAttribute('y');
+                if (tSpanAbsY !== null) {
+                    var y = toPixels(tSpanAbsY, pdfFontSize);
+                    currentTextSegment = new TextChunk(this, getAttribute(tSpan, context.styleSheets, 'text-anchor') ||
+                        context.attributeState.textAnchor, 0, y);
+                    textChunks.push({ type: 'x', chunk: currentTextSegment });
+                }
+                var childContext = context.clone();
+                parseAttributes(childContext, textNode, tSpan);
+                this.processTSpans(textNode, tSpan, childContext, textChunks, currentTextSegment, trimInfo);
+            }
+        }
+        return initialSpace;
+    };
     TextNode.prototype.renderCore = function (context) {
         return __awaiter(this, void 0, void 0, function () {
-            var xOffset, pdfFontSize, textX, textY, dx, dy, visibility, tSpanCount, trimmedText, transformedText, alignmentBaseline, textRenderingMode, currentTextSegment, i, textNode, xmlSpace, textContent, tSpan, j, lastPositions, tSpanAbsX, x, tSpanAbsY, y, tSpanXmlSpace, trimmedText, transformedText;
+            var xOffset, charSpace, lengthAdjustment, pdfFontSize, textX, textY, dx, dy, textLength, visibility, tSpanCount, textContent, trimmedText, transformedText, defaultSize, alignmentBaseline, textRenderingMode, textChunks, currentTextSegment, initialSpace, trimRight, r, totalDefaultWidth_1, totalLength_1;
             return __generator(this, function (_a) {
                 context.pdf.saveGraphicsState();
                 xOffset = 0;
+                charSpace = 0;
+                lengthAdjustment = 1;
                 pdfFontSize = context.pdf.getFontSize();
                 textX = toPixels(this.element.getAttribute('x'), pdfFontSize);
                 textY = toPixels(this.element.getAttribute('y'), pdfFontSize);
                 dx = toPixels(this.element.getAttribute('dx'), pdfFontSize);
                 dy = toPixels(this.element.getAttribute('dy'), pdfFontSize);
+                textLength = parseFloat(this.element.getAttribute('textLength') || '0');
                 visibility = context.attributeState.visibility;
                 tSpanCount = this.element.childElementCount;
                 if (tSpanCount === 0) {
-                    trimmedText = transformXmlSpace(this.element.textContent || '', context.attributeState);
+                    textContent = this.element.textContent || '';
+                    trimmedText = transformXmlSpace(textContent, context.attributeState);
                     transformedText = transformText(this.element, trimmedText, context);
                     xOffset = context.textMeasure.getTextOffset(transformedText, context.attributeState);
+                    if (textLength > 0) {
+                        defaultSize = context.textMeasure.measureTextWidth(transformedText, context.attributeState);
+                        if (context.attributeState.xmlSpace === 'default' && textContent.match(/^\s/)) {
+                            lengthAdjustment = 0;
+                        }
+                        charSpace = (textLength - defaultSize) / (transformedText.length - lengthAdjustment) || 0;
+                    }
                     if (visibility === 'visible') {
                         alignmentBaseline = context.attributeState.alignmentBaseline;
                         textRenderingMode = getTextRenderingMode(context.attributeState);
                         context.pdf.text(transformedText, textX + dx - xOffset, textY + dy, {
                             baseline: mapAlignmentBaseline(alignmentBaseline),
                             angle: context.transform,
-                            renderingMode: textRenderingMode === 'fill' ? void 0 : textRenderingMode
+                            renderingMode: textRenderingMode === 'fill' ? void 0 : textRenderingMode,
+                            charSpace: charSpace === 0 ? void 0 : charSpace
                         });
                     }
                 }
                 else {
+                    textChunks = [];
                     currentTextSegment = new TextChunk(this, context.attributeState.textAnchor, textX + dx, textY + dy);
-                    for (i = 0; i < this.element.childNodes.length; i++) {
-                        textNode = this.element.childNodes[i];
-                        if (!textNode.textContent) {
-                            continue;
+                    textChunks.push({ type: '', chunk: currentTextSegment });
+                    initialSpace = this.processTSpans(this, this.element, context, textChunks, currentTextSegment, 
+                    // Set prevText to ' ' so any spaces on left of <text> are trimmed
+                    { prevText: ' ', prevContext: context });
+                    lengthAdjustment = initialSpace ? 0 : 1;
+                    trimRight = true;
+                    for (r = textChunks.length - 1; r >= 0; r--) {
+                        if (trimRight) {
+                            trimRight = textChunks[r].chunk.rightTrimText();
                         }
-                        xmlSpace = context.attributeState.xmlSpace;
-                        textContent = textNode.textContent;
-                        if (textNode.nodeName === '#text') ;
-                        else if (nodeIs(textNode, 'title')) {
-                            continue;
-                        }
-                        else if (nodeIs(textNode, 'tspan')) {
-                            tSpan = textNode;
-                            if (tSpan.childElementCount > 0) {
-                                // filter <title> elements...
-                                textContent = '';
-                                for (j = 0; j < tSpan.childNodes.length; j++) {
-                                    if (tSpan.childNodes[j].nodeName === '#text') {
-                                        textContent += tSpan.childNodes[j].textContent;
-                                    }
-                                }
-                            }
-                            lastPositions = void 0;
-                            tSpanAbsX = tSpan.getAttribute('x');
-                            if (tSpanAbsX !== null) {
-                                x = toPixels(tSpanAbsX, pdfFontSize);
-                                lastPositions = currentTextSegment.put(context);
-                                currentTextSegment = new TextChunk(this, getAttribute(tSpan, context.styleSheets, 'text-anchor') ||
-                                    context.attributeState.textAnchor, x, lastPositions[1]);
-                            }
-                            tSpanAbsY = tSpan.getAttribute('y');
-                            if (tSpanAbsY !== null) {
-                                y = toPixels(tSpanAbsY, pdfFontSize);
-                                lastPositions = currentTextSegment.put(context);
-                                currentTextSegment = new TextChunk(this, getAttribute(tSpan, context.styleSheets, 'text-anchor') ||
-                                    context.attributeState.textAnchor, lastPositions[0], y);
-                            }
-                            tSpanXmlSpace = tSpan.getAttribute('xml:space');
-                            if (tSpanXmlSpace) {
-                                xmlSpace = tSpanXmlSpace;
-                            }
-                        }
-                        trimmedText = removeNewlines(textContent);
-                        trimmedText = replaceTabsBySpace(trimmedText);
-                        if (xmlSpace === 'default') {
-                            if (i === 0) {
-                                trimmedText = trimLeft(trimmedText);
-                            }
-                            if (i === tSpanCount - 1) {
-                                trimmedText = trimRight(trimmedText);
-                            }
-                            trimmedText = consolidateSpaces(trimmedText);
-                        }
-                        transformedText = transformText(this.element, trimmedText, context);
-                        currentTextSegment.add(textNode, transformedText);
                     }
-                    currentTextSegment.put(context);
+                    if (textLength > 0) {
+                        totalDefaultWidth_1 = 0;
+                        totalLength_1 = 0;
+                        textChunks.forEach(function (_a) {
+                            var chunk = _a.chunk;
+                            chunk.measureText(context);
+                            chunk.textMeasures.forEach(function (_a) {
+                                var width = _a.width, length = _a.length;
+                                totalDefaultWidth_1 += width;
+                                totalLength_1 += length;
+                            });
+                        });
+                        charSpace = (textLength - totalDefaultWidth_1) / (totalLength_1 - lengthAdjustment);
+                    }
+                    // Put the textchunks
+                    textChunks.reduce(function (lastPositions, _a) {
+                        var type = _a.type, chunk = _a.chunk;
+                        if (type === 'x') {
+                            chunk.setX(lastPositions[0]);
+                        }
+                        else if (type === 'y') {
+                            chunk.setY(lastPositions[1]);
+                        }
+                        return chunk.put(context, charSpace);
+                    }, [0, 0]);
                 }
                 context.pdf.restoreGraphicsState();
                 return [2 /*return*/];
@@ -2683,7 +2811,7 @@ var PathNode = /** @class */ (function (_super) {
         var path = new Path();
         var prevX;
         var prevY;
-        svgPath.iterate(function (seg, i) {
+        svgPath.iterate(function (seg) {
             var type = seg[0];
             switch (type) {
                 case 'M':
@@ -2894,11 +3022,11 @@ var Traverse = /** @class */ (function (_super) {
         _this.closed = closed;
         return _this;
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     Traverse.prototype.getPath = function (context) {
         if (!this.element.hasAttribute('points') || this.element.getAttribute('points') === '') {
             return null;
         }
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore
         var points = Traverse.parsePointsString(this.element.getAttribute('points'));
         var path = new Path();
@@ -2946,9 +3074,11 @@ var VoidNode = /** @class */ (function (_super) {
     function VoidNode() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     VoidNode.prototype.render = function (parentContext) {
         return Promise.resolve();
     };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     VoidNode.prototype.getBoundingBoxCore = function (context) {
         return [0, 0, 0, 0];
     };
@@ -2999,6 +3129,7 @@ var MarkerNode = /** @class */ (function (_super) {
             });
         });
     };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     MarkerNode.prototype.getBoundingBoxCore = function (context) {
         var viewBox = this.element.getAttribute('viewBox');
         var vb;
@@ -3417,6 +3548,7 @@ function parse(node, idMap) {
         var id = cssEsc(svgnode.element.id, { isIdentifier: true });
         idMap[id] = idMap[id] || svgnode;
     }
+    svgnode.children.forEach(function (c) { return c.setParent(svgnode); });
     return svgnode;
 }
 
