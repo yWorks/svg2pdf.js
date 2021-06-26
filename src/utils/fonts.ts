@@ -5,6 +5,7 @@
  */
 import { AttributeState } from '../context/attributestate'
 import { Context } from '../context/context'
+import { combineFontStyleAndFontWeight } from './combineFontStyleAndFontWeight'
 
 export type FontFamily = string
 
@@ -27,16 +28,10 @@ export function findFirstAvailableFontFamily(
   fontFamilies: FontFamily[],
   context: Context
 ): FontFamily {
-  let fontType = ''
-  if (attributeState.fontWeight === 'bold') {
-    fontType = 'bold'
-  }
-  if (attributeState.fontStyle === 'italic') {
-    fontType += 'italic'
-  }
-  if (fontType === '') {
-    fontType = 'normal'
-  }
+  const fontType = combineFontStyleAndFontWeight(
+    attributeState.fontStyle,
+    attributeState.fontWeight
+  )
 
   const availableFonts = context.pdf.getFontList()
   let firstAvailable = ''

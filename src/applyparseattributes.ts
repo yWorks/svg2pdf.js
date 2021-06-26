@@ -9,6 +9,7 @@ import { parseFill } from './fill/parseFill'
 import { ColorFill } from './fill/ColorFill'
 import { GState } from 'jspdf'
 import { RGBColor } from './utils/rgbcolor'
+import { combineFontStyleAndFontWeight } from './utils/combineFontStyleAndFontWeight'
 
 export function parseAttributes(context: Context, svgNode: SvgNode, node?: Element): void {
   const domNode = node || svgNode.element
@@ -277,17 +278,10 @@ export function applyAttributes(
     childContext.attributeState.fontWeight !== parentContext.attributeState.fontWeight ||
     childContext.attributeState.fontStyle !== parentContext.attributeState.fontStyle
   ) {
-    fontStyle = ''
-    if (childContext.attributeState.fontWeight === 'bold') {
-      fontStyle = 'bold'
-    }
-    if (childContext.attributeState.fontStyle === 'italic') {
-      fontStyle += 'italic'
-    }
-
-    if (fontStyle === '') {
-      fontStyle = 'normal'
-    }
+    fontStyle = combineFontStyleAndFontWeight(
+      childContext.attributeState.fontStyle,
+      childContext.attributeState.fontWeight
+    )
   }
 
   if (font !== undefined || fontStyle !== undefined) {
