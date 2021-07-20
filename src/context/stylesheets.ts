@@ -71,6 +71,7 @@ export class StyleSheets {
           const cssRule = sheet.cssRules[i]
           if (!(cssRule instanceof CSSStyleRule)) {
             sheet.deleteRule(i)
+            continue
           }
           const cssStyleRule = cssRule as CSSStyleRule
           if (cssStyleRule.selectorText.indexOf(',') >= 0) {
