@@ -4,12 +4,15 @@ import { toPixels } from './utils/misc'
 import { parseColor, parseFloats } from './utils/parsing'
 import FontFamily from 'font-family-papandreou'
 import { SvgNode } from './nodes/svgnode'
-import { findFirstAvailableFontFamily, fontAliases } from './utils/fonts'
+import {
+  combineFontStyleAndFontWeight,
+  findFirstAvailableFontFamily,
+  fontAliases
+} from './utils/fonts'
 import { parseFill } from './fill/parseFill'
 import { ColorFill } from './fill/ColorFill'
 import { GState } from 'jspdf'
 import { RGBColor } from './utils/rgbcolor'
-import { combineFontStyleAndFontWeight } from './utils/combineFontStyleAndFontWeight'
 
 export function parseAttributes(context: Context, svgNode: SvgNode, node?: Element): void {
   const domNode = node || svgNode.element

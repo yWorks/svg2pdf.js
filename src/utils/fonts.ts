@@ -5,7 +5,7 @@
  */
 import { AttributeState } from '../context/attributestate'
 import { Context } from '../context/context'
-import { combineFontStyleAndFontWeight } from './combineFontStyleAndFontWeight'
+import jsPDF from 'jspdf'
 
 export type FontFamily = string
 
@@ -56,4 +56,32 @@ export function findFirstAvailableFontFamily(
   }
 
   return firstAvailable
+}
+
+const isJsPDF24: boolean = (() => {
+  const parts = jsPDF.version.split('.')
+  return parseFloat(parts[0]) >= 3 || parseFloat(parts[1]) >= 4
+})()
+
+export function combineFontStyleAndFontWeight(
+  fontStyle: string,
+  fontWeight: number | string
+): string {
+  if (isJsPDF24) {
+    return fontWeight == 400 || fontWeight === 'normal'
+      ? fontStyle === 'italic'
+        ? 'italic'
+        : 'normal'
+      : (fontWeight == 700 || fontWeight === 'bold') && fontStyle === 'normal'
+      ? 'bold'
+      : (fontWeight == 700 ? 'bold' : fontWeight) + '' + fontStyle
+  } else {
+    return fontWeight == 400
+      ? fontStyle == 'italic'
+        ? 'italic'
+        : 'normal'
+      : fontWeight == 700 && fontStyle !== 'italic'
+      ? 'bold'
+      : fontStyle + '' + fontWeight
+  }
 }
