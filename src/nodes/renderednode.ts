@@ -18,17 +18,20 @@ export abstract class RenderedNode extends SvgNode {
 
     parseAttributes(context, this)
 
-    const hasClipPath =
-      this.element.hasAttribute('clip-path') &&
-      getAttribute(this.element, context.styleSheets, 'clip-path') !== 'none'
+    const clipPathAttribute = getAttribute(this.element, context.styleSheets, 'clip-path')
+    let hasClipPath = clipPathAttribute && clipPathAttribute !== 'none'
 
     if (hasClipPath) {
-      const clipNode = getClipPathNode(this, context)
-      if (clipNode && clipNode.isVisible(true, context)) {
-        context.pdf.saveGraphicsState()
-        await applyClipPath(this, clipNode, context)
+      const clipNode = getClipPathNode(clipPathAttribute!, this, context)
+      if (clipNode) {
+        if (clipNode.isVisible(true, context)) {
+          context.pdf.saveGraphicsState()
+          await applyClipPath(this, clipNode, context)
+        } else {
+          return
+        }
       } else {
-        return
+        hasClipPath = false
       }
     }
 

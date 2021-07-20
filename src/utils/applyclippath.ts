@@ -2,13 +2,12 @@ import { Context } from '../context/context'
 import { ClipPath } from '../nodes/clippath'
 import { SvgNode } from '../nodes/svgnode'
 import { iriReference } from './constants'
-import { getAttribute } from './node'
 
-export function getClipPathNode(targetNode: SvgNode, context: Context): ClipPath | undefined {
-  const clipPathAttr = getAttribute(targetNode.element, context.styleSheets, 'clip-path')
-  if (!clipPathAttr) {
-    return undefined
-  }
+export function getClipPathNode(
+  clipPathAttr: string,
+  targetNode: SvgNode,
+  context: Context
+): ClipPath | undefined {
   const match = iriReference.exec(clipPathAttr)
   if (!match) {
     return undefined

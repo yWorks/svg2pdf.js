@@ -1,6 +1,7 @@
 window.tests = [
   'attribute-style-precedence',
   'clippath',
+  'clippath-empty',
   'clippath-svg',
   'complete-bpmn',
   'complete-computer-network',
