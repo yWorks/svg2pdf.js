@@ -19,16 +19,17 @@ export class Symbol extends NonRenderedNode {
 
     parseAttributes(context, this)
 
-    const hasClipPath =
-      this.element.hasAttribute('clip-path') &&
-      getAttribute(this.element, context.styleSheets, 'clip-path') !== 'none'
+    const clipPathAttribute = getAttribute(this.element, context.styleSheets, 'clip-path')
+    const hasClipPath = clipPathAttribute && clipPathAttribute !== 'none'
 
     if (hasClipPath) {
-      const clipNode = getClipPathNode(this, context)
-      if (clipNode && clipNode.isVisible(true, context)) {
-        await applyClipPath(this, clipNode, context)
-      } else {
-        return
+      const clipNode = getClipPathNode(clipPathAttribute!, this, context)
+      if (clipNode) {
+        if (clipNode.isVisible(true, context)) {
+          await applyClipPath(this, clipNode, context)
+        } else {
+          return
+        }
       }
     }
 
