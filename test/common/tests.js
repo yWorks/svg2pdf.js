@@ -17,6 +17,7 @@ window.tests = [
   'complete-social-network',
   'custom-fonts',
   'display-none-and-visibility-inheritance',
+  'duplicate-ids',
   'empty-elements',
   'fill-and-stroke-inheritance',
   'fill-and-stroke-opacity',
