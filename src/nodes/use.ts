@@ -9,7 +9,6 @@ import { SvgNode } from './svgnode'
 import { Symbol } from './symbol'
 import { Viewport } from '../context/viewport'
 import { RGBColor } from '../utils/rgbcolor'
-import { ReferencesHandler } from '../context/referenceshandler'
 
 /**
  * Draws the element referenced by a use node, makes use of pdf's XObjects/FormObjects so nodes are only written once
@@ -86,7 +85,7 @@ export class Use extends GraphicsNode {
       context.pdf.clip().discardPath()
     }
 
-    context.pdf.doFormObject(ReferencesHandler.generateKey(id, color), t)
+    context.pdf.doFormObject(context.refsHandler.generateKey(id, color), t)
     context.pdf.restoreGraphicsState()
   }
 
@@ -112,7 +111,7 @@ export class Use extends GraphicsNode {
     } else {
       await node.render(refContext)
     }
-    refContext.pdf.endFormObject(ReferencesHandler.generateKey(id, color))
+    refContext.pdf.endFormObject(refContext.refsHandler.generateKey(id, color))
   }
 
   protected getBoundingBoxCore(context: Context): number[] {

@@ -5,10 +5,13 @@ import { RGBColor } from '../utils/rgbcolor'
 export class ReferencesHandler {
   private readonly renderedElements: { [key: string]: SvgNode }
   private readonly idMap: { [id: string]: SvgNode }
+  private readonly idPrefix: string
+  private static instanceCounter = 0
 
   constructor(idMap: { [id: string]: SvgNode }) {
     this.renderedElements = {}
     this.idMap = idMap
+    this.idPrefix = String(ReferencesHandler.instanceCounter++)
   }
 
   public async getRendered(
@@ -16,7 +19,7 @@ export class ReferencesHandler {
     color: RGBColor | null,
     renderCallback: (node: SvgNode) => Promise<void>
   ): Promise<SvgNode> {
-    const key = ReferencesHandler.generateKey(id, color)
+    const key = this.generateKey(id, color)
     if (this.renderedElements.hasOwnProperty(key)) {
       return this.renderedElements[id]
     }
@@ -33,7 +36,7 @@ export class ReferencesHandler {
     return this.idMap[cssEsc(id, { isIdentifier: true })]
   }
 
-  public static generateKey(id: string, color: RGBColor | null): string {
-    return id + '|' + (color || new RGBColor('rgb(0,0,0)')).toRGBA()
+  public generateKey(id: string, color: RGBColor | null): string {
+    return this.idPrefix + '|' + id + '|' + (color || new RGBColor('rgb(0,0,0)')).toRGBA()
   }
 }
