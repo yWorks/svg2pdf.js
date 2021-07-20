@@ -7,10 +7,12 @@ import { RGBColor } from '../utils/rgbcolor'
 import { SvgNode } from './svgnode'
 import { GState, Matrix, ShadingPattern, ShadingPatternType } from 'jspdf'
 import { parseColor } from '../utils/parsing'
+import { StyleSheets } from '../context/stylesheets'
 
 export abstract class Gradient extends NonRenderedNode {
   private readonly pdfGradientType: ShadingPatternType
   private contextColor: RGBColor | null | undefined
+  private stops: StopData[] | undefined
 
   protected constructor(
     pdfGradientType: ShadingPatternType,
@@ -28,41 +30,15 @@ export abstract class Gradient extends NonRenderedNode {
       return
     }
 
-    // Only need to calculate contextColor once
-    if (this.contextColor === undefined) {
-      this.contextColor = null
-      let ancestor: SvgNode | null = this as SvgNode
-      while (ancestor) {
-        const colorAttr = getAttribute(ancestor.element, context.styleSheets, 'color')
-        if (colorAttr) {
-          this.contextColor = parseColor(colorAttr, null)
-          break
-        }
-        ancestor = ancestor.getParent()
-      }
-    }
-
-    const colors: StopData[] = []
+    const colors: StopData[] = this.getStops(context.styleSheets)
     let opacitySum = 0
     let hasOpacity = false
     let gState
 
-    this.children.forEach(stop => {
-      if (stop.element.tagName.toLowerCase() === 'stop') {
-        const colorAttr = getAttribute(stop.element, context.styleSheets, 'color')
-        const color = parseColor(
-          getAttribute(stop.element, context.styleSheets, 'stop-color') || '',
-          colorAttr ? parseColor(colorAttr, null) : (this.contextColor as RGBColor | null)
-        )
-        colors.push({
-          offset: Gradient.parseGradientOffset(stop.element.getAttribute('offset') || '0'),
-          color: [color.r, color.g, color.b]
-        })
-        const opacity = getAttribute(stop.element, context.styleSheets, 'stop-opacity')
-        if (opacity && opacity !== '1') {
-          opacitySum += parseFloat(opacity)
-          hasOpacity = true
-        }
+    colors.forEach(({ opacity }) => {
+      if (opacity && opacity !== 1) {
+        opacitySum += opacity
+        hasOpacity = true
       }
     })
 
@@ -75,6 +51,45 @@ export abstract class Gradient extends NonRenderedNode {
   }
 
   abstract getCoordinates(): number[]
+
+  public getStops(styleSheets: StyleSheets): StopData[] {
+    if (this.stops) {
+      return this.stops
+    }
+
+    // Only need to calculate contextColor once
+    if (this.contextColor === undefined) {
+      this.contextColor = null
+      let ancestor: SvgNode | null = this as SvgNode
+      while (ancestor) {
+        const colorAttr = getAttribute(ancestor.element, styleSheets, 'color')
+        if (colorAttr) {
+          this.contextColor = parseColor(colorAttr, null)
+          break
+        }
+        ancestor = ancestor.getParent()
+      }
+    }
+
+    const stops: StopData[] = []
+    this.children.forEach(stop => {
+      if (stop.element.tagName.toLowerCase() === 'stop') {
+        const colorAttr = getAttribute(stop.element, styleSheets, 'color')
+        const color = parseColor(
+          getAttribute(stop.element, styleSheets, 'stop-color') || '',
+          colorAttr ? parseColor(colorAttr, null) : (this.contextColor as RGBColor | null)
+        )
+        const opacity = parseFloat(getAttribute(stop.element, styleSheets, 'stop-opacity') || '1')
+        stops.push({
+          offset: Gradient.parseGradientOffset(stop.element.getAttribute('offset') || '0'),
+          color: [color.r, color.g, color.b],
+          opacity
+        })
+      }
+    })
+
+    return (this.stops = stops)
+  }
 
   protected getBoundingBoxCore(context: Context): Rect {
     return defaultBoundingBox(this.element, context)
@@ -98,7 +113,8 @@ export abstract class Gradient extends NonRenderedNode {
   }
 }
 
-interface StopData {
+export interface StopData {
   color: number[]
+  opacity: number
   offset: number
 }

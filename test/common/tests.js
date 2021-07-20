@@ -25,6 +25,7 @@ window.tests = [
   'font-style',
   'gradient-default-coordinates',
   'gradient-percent-offset',
+  'gradient-stop-defaults',
   'gradient-units',
   'gradients-and-patterns-mixed',
   'hidden-clippath',
