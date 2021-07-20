@@ -8,6 +8,9 @@
         <marker viewBox="0 0 15 10" refX="2" refY="5" markerWidth="7" markerHeight="7" orient="auto" id="ygc15_0" preserveAspectRatio="xMinYMin">
             <path d="M 0 0 L 15 5 L 0 10 z" fill="#336699"/>
         </marker>
+        <marker id="marker1" refY="2.5" refX="5" markerHeight="5" markerWidth="5" orient="auto">
+            <path stroke-width="0.3333333333333333" d="M0,0 L0,5 L5,2.5 Z" stroke="#3982fc" fill="#fff" />
+        </marker>
     </defs>
     <path d="M 0 0 h 100 v 100 h -100" fill="none" stroke="#000000" marker-start="url(#mid)" marker-end="url(#mid)"
           stroke-width="2" marker-mid="url(#ygc15_0)" transform="translate(20 20)"/>
@@ -31,5 +34,8 @@
     <polyline points="0,0 30,10 40,40 10,30" fill="none" stroke="black" transform="translate(100 320) rotate(25)"
              marker-start="url(#mid)" marker-mid="url(#mid)"/>
 
-  <path d="M 0,0 L 100,0" transform="translate(100, 220) scale(2)" marker-end="url(#ygc15_0)" stroke="black"/>
+    <path d="M 0,0 L 100,0" transform="translate(100, 220) scale(2)" marker-end="url(#ygc15_0)" stroke="black"/>
+
+    <line x1="150" y1="150" x2="250" y2="150" marker-end="url(#marker1)" stroke="#000000" stroke-width="3"/>
+    <line x1="150" y1="170" x2="250" y2="170" marker-end="url(#marker1)" stroke="#000000" stroke-width="3" stroke-dasharray="6,3"/>
 </svg>

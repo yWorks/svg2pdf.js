@@ -5,6 +5,7 @@ import { NonRenderedNode } from './nonrenderednode'
 import { svgNodeAndChildrenVisible } from '../utils/node'
 import { Rect } from '../utils/geometry'
 import { Matrix } from 'jspdf'
+import { applyContext } from '../applyparseattributes'
 
 export class MarkerNode extends NonRenderedNode {
   async apply(parentContext: Context): Promise<void> {
@@ -13,15 +14,23 @@ export class MarkerNode extends NonRenderedNode {
     const bBox = this.getBoundingBox(parentContext)
 
     parentContext.pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], tfMatrix)
+
+    const childContext = new Context(parentContext.pdf, {
+      refsHandler: parentContext.refsHandler,
+      styleSheets: parentContext.styleSheets,
+      viewport: parentContext.viewport,
+      svg2pdfParameters: parentContext.svg2pdfParameters
+    })
+
+    // "Properties do not inherit from the element referencing the 'marker' into the contents of the
+    // marker. However, by using the context-stroke value for the fill or stroke on elements in its
+    // definition, a single marker can be designed to match the style of the element referencing the
+    // marker."
+    // -> we need to reset all attributes
+    applyContext(childContext)
+
     for (const child of this.children) {
-      await child.render(
-        new Context(parentContext.pdf, {
-          refsHandler: parentContext.refsHandler,
-          styleSheets: parentContext.styleSheets,
-          viewport: parentContext.viewport,
-          svg2pdfParameters: parentContext.svg2pdfParameters
-        })
-      )
+      await child.render(childContext)
     }
     parentContext.pdf.endFormObject(this.element.getAttribute('id'))
   }
@@ -36,8 +45,8 @@ export class MarkerNode extends NonRenderedNode {
     return [
       (vb && vb[0]) || 0,
       (vb && vb[1]) || 0,
-      (vb && vb[2]) || parseFloat(this.element.getAttribute('marker-width') || '0'),
-      (vb && vb[3]) || parseFloat(this.element.getAttribute('marker-height') || '0')
+      (vb && vb[2]) || parseFloat(this.element.getAttribute('markerWidth') || '3'),
+      (vb && vb[3]) || parseFloat(this.element.getAttribute('markerHeight') || '3')
     ]
   }
 

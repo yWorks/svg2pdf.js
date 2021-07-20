@@ -44,7 +44,6 @@ export class MarkerList {
 
       // as the marker is already scaled by the current line width we must not apply the line width twice!
       context.pdf.saveGraphicsState()
-      context.pdf.setLineWidth(1.0)
       await context.refsHandler.getRendered(marker.id, null, node =>
         (node as MarkerNode).apply(context)
       )
