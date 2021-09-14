@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2015-2020 yWorks GmbH
+ * Copyright (c) 2015-2021 yWorks GmbH
  * Copyright (c) 2013-2015 by Vitaly Puzrin
  *
  *
@@ -26,7 +26,7 @@
 
 import cssEsc from 'cssesc';
 import FontFamily from 'font-family-papandreou';
-import { GState, ShadingPattern, TilingPattern, jsPDF } from 'jspdf';
+import jsPDF, { GState, ShadingPattern, TilingPattern, jsPDF as jsPDF$1 } from 'jspdf';
 import SvgPath from 'svgpath';
 import { compare } from 'specificity';
 
@@ -657,6 +657,7 @@ var ReferencesHandler = /** @class */ (function () {
     function ReferencesHandler(idMap) {
         this.renderedElements = {};
         this.idMap = idMap;
+        this.idPrefix = String(ReferencesHandler.instanceCounter++);
     }
     ReferencesHandler.prototype.getRendered = function (id, color, renderCallback) {
         return __awaiter(this, void 0, void 0, function () {
@@ -664,7 +665,7 @@ var ReferencesHandler = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        key = ReferencesHandler.generateKey(id, color);
+                        key = this.generateKey(id, color);
                         if (this.renderedElements.hasOwnProperty(key)) {
                             return [2 /*return*/, this.renderedElements[id]];
                         }
@@ -681,9 +682,10 @@ var ReferencesHandler = /** @class */ (function () {
     ReferencesHandler.prototype.get = function (id) {
         return this.idMap[cssEsc(id, { isIdentifier: true })];
     };
-    ReferencesHandler.generateKey = function (id, color) {
-        return id + '|' + (color || new RGBColor('rgb(0,0,0)')).toRGBA();
+    ReferencesHandler.prototype.generateKey = function (id, color) {
+        return this.idPrefix + '|' + id + '|' + (color || new RGBColor('rgb(0,0,0)')).toRGBA();
     };
+    ReferencesHandler.instanceCounter = 0;
     return ReferencesHandler;
 }());
 
@@ -895,7 +897,6 @@ var MarkerList = /** @class */ (function () {
                         tf = context.pdf.matrixMult(tf, context.transform);
                         // as the marker is already scaled by the current line width we must not apply the line width twice!
                         context.pdf.saveGraphicsState();
-                        context.pdf.setLineWidth(1.0);
                         return [4 /*yield*/, context.refsHandler.getRendered(marker.id, null, function (node) {
                                 return node.apply(context);
                             })];
@@ -1001,16 +1002,7 @@ var fontAliases = {
     fantasy: 'times'
 };
 function findFirstAvailableFontFamily(attributeState, fontFamilies, context) {
-    var fontType = '';
-    if (attributeState.fontWeight === 'bold') {
-        fontType = 'bold';
-    }
-    if (attributeState.fontStyle === 'italic') {
-        fontType += 'italic';
-    }
-    if (fontType === '') {
-        fontType = 'normal';
-    }
+    var fontType = combineFontStyleAndFontWeight(attributeState.fontStyle, attributeState.fontWeight);
     var availableFonts = context.pdf.getFontList();
     var firstAvailable = '';
     var fontIsAvailable = fontFamilies.some(function (font) {
@@ -1030,6 +1022,30 @@ function findFirstAvailableFontFamily(attributeState, fontFamilies, context) {
         firstAvailable = 'times';
     }
     return firstAvailable;
+}
+var isJsPDF23 = (function () {
+    var parts = jsPDF.version.split('.');
+    return parseFloat(parts[0]) === 2 && parseFloat(parts[1]) === 3;
+})();
+function combineFontStyleAndFontWeight(fontStyle, fontWeight) {
+    if (isJsPDF23) {
+        return fontWeight == 400
+            ? fontStyle == 'italic'
+                ? 'italic'
+                : 'normal'
+            : fontWeight == 700 && fontStyle !== 'italic'
+                ? 'bold'
+                : fontStyle + '' + fontWeight;
+    }
+    else {
+        return fontWeight == 400 || fontWeight === 'normal'
+            ? fontStyle === 'italic'
+                ? 'italic'
+                : 'normal'
+            : (fontWeight == 700 || fontWeight === 'bold') && fontStyle === 'normal'
+                ? 'bold'
+                : (fontWeight == 700 ? 'bold' : fontWeight) + '' + fontStyle;
+    }
 }
 
 function getBoundingBoxByChildren(context, svgnode) {
@@ -1253,42 +1269,20 @@ var Gradient = /** @class */ (function (_super) {
     }
     Gradient.prototype.apply = function (context) {
         return __awaiter(this, void 0, void 0, function () {
-            var id, ancestor, colorAttr, colors, opacitySum, hasOpacity, gState, pattern;
-            var _this = this;
+            var id, colors, opacitySum, hasOpacity, gState, pattern;
             return __generator(this, function (_a) {
                 id = this.element.getAttribute('id');
                 if (!id) {
                     return [2 /*return*/];
                 }
-                // Only need to calculate contextColor once
-                if (this.contextColor === undefined) {
-                    this.contextColor = null;
-                    ancestor = this;
-                    while (ancestor) {
-                        colorAttr = getAttribute(ancestor.element, context.styleSheets, 'color');
-                        if (colorAttr) {
-                            this.contextColor = parseColor(colorAttr, null);
-                            break;
-                        }
-                        ancestor = ancestor.getParent();
-                    }
-                }
-                colors = [];
+                colors = this.getStops(context.styleSheets);
                 opacitySum = 0;
                 hasOpacity = false;
-                this.children.forEach(function (stop) {
-                    if (stop.element.tagName.toLowerCase() === 'stop') {
-                        var colorAttr = getAttribute(stop.element, context.styleSheets, 'color');
-                        var color = parseColor(getAttribute(stop.element, context.styleSheets, 'stop-color') || '', colorAttr ? parseColor(colorAttr, null) : _this.contextColor);
-                        colors.push({
-                            offset: Gradient.parseGradientOffset(stop.element.getAttribute('offset') || '0'),
-                            color: [color.r, color.g, color.b]
-                        });
-                        var opacity = getAttribute(stop.element, context.styleSheets, 'stop-opacity');
-                        if (opacity && opacity !== '1') {
-                            opacitySum += parseFloat(opacity);
-                            hasOpacity = true;
-                        }
+                colors.forEach(function (_a) {
+                    var opacity = _a.opacity;
+                    if (opacity && opacity !== 1) {
+                        opacitySum += opacity;
+                        hasOpacity = true;
                     }
                 });
                 if (hasOpacity) {
@@ -1299,6 +1293,39 @@ var Gradient = /** @class */ (function (_super) {
                 return [2 /*return*/];
             });
         });
+    };
+    Gradient.prototype.getStops = function (styleSheets) {
+        var _this = this;
+        if (this.stops) {
+            return this.stops;
+        }
+        // Only need to calculate contextColor once
+        if (this.contextColor === undefined) {
+            this.contextColor = null;
+            var ancestor = this;
+            while (ancestor) {
+                var colorAttr = getAttribute(ancestor.element, styleSheets, 'color');
+                if (colorAttr) {
+                    this.contextColor = parseColor(colorAttr, null);
+                    break;
+                }
+                ancestor = ancestor.getParent();
+            }
+        }
+        var stops = [];
+        this.children.forEach(function (stop) {
+            if (stop.element.tagName.toLowerCase() === 'stop') {
+                var colorAttr = getAttribute(stop.element, styleSheets, 'color');
+                var color = parseColor(getAttribute(stop.element, styleSheets, 'stop-color') || '', colorAttr ? parseColor(colorAttr, null) : _this.contextColor);
+                var opacity = parseFloat(getAttribute(stop.element, styleSheets, 'stop-opacity') || '1');
+                stops.push({
+                    offset: Gradient.parseGradientOffset(stop.element.getAttribute('offset') || '0'),
+                    color: [color.r, color.g, color.b],
+                    opacity: opacity
+                });
+            }
+        });
+        return (this.stops = stops);
     };
     Gradient.prototype.getBoundingBoxCore = function (context) {
         return defaultBoundingBox(this.element, context);
@@ -1541,7 +1568,7 @@ function parseFill(fill, context) {
         var fillUrl = url[1];
         var fillNode = context.refsHandler.get(fillUrl);
         if (fillNode && (fillNode instanceof LinearGradient || fillNode instanceof RadialGradient)) {
-            return new GradientFill(fillUrl, fillNode);
+            return getGradientFill(fillUrl, fillNode, context);
         }
         else if (fillNode && fillNode instanceof Pattern) {
             return new PatternFill(fillUrl, fillNode);
@@ -1564,6 +1591,27 @@ function parseFill(fill, context) {
             return null;
         }
     }
+}
+function getGradientFill(fillUrl, gradient, context) {
+    // "It is necessary that at least two stops are defined to have a gradient effect. If no stops are
+    // defined, then painting shall occur as if 'none' were specified as the paint style. If one stop
+    // is defined, then paint with the solid color fill using the color defined for that gradient
+    // stop."
+    var stops = gradient.getStops(context.styleSheets);
+    if (stops.length === 0) {
+        return null;
+    }
+    if (stops.length === 1) {
+        var stopColor = stops[0].color;
+        var rgbColor = new RGBColor();
+        rgbColor.ok = true;
+        rgbColor.r = stopColor[0];
+        rgbColor.g = stopColor[1];
+        rgbColor.b = stopColor[2];
+        rgbColor.a = stops[0].opacity;
+        return new ColorFill(rgbColor);
+    }
+    return new GradientFill(fillUrl, gradient);
 }
 
 function parseAttributes(context, svgNode, node) {
@@ -1770,16 +1818,7 @@ function applyAttributes(childContext, parentContext, node) {
     var fontStyle;
     if (childContext.attributeState.fontWeight !== parentContext.attributeState.fontWeight ||
         childContext.attributeState.fontStyle !== parentContext.attributeState.fontStyle) {
-        fontStyle = '';
-        if (childContext.attributeState.fontWeight === 'bold') {
-            fontStyle = 'bold';
-        }
-        if (childContext.attributeState.fontStyle === 'italic') {
-            fontStyle += 'italic';
-        }
-        if (fontStyle === '') {
-            fontStyle = 'normal';
-        }
+        fontStyle = combineFontStyleAndFontWeight(childContext.attributeState.fontStyle, childContext.attributeState.fontWeight);
     }
     if (font !== undefined || fontStyle !== undefined) {
         if (font === undefined) {
@@ -1797,12 +1836,95 @@ function applyAttributes(childContext, parentContext, node) {
         childContext.pdf.setFontSize(childContext.attributeState.fontSize * childContext.pdf.internal.scaleFactor);
     }
 }
-
-function getClipPathNode(targetNode, context) {
-    var clipPathAttr = getAttribute(targetNode.element, context.styleSheets, 'clip-path');
-    if (!clipPathAttr) {
-        return undefined;
+function applyContext(context) {
+    var attributeState = context.attributeState, pdf = context.pdf;
+    var fillOpacity = 1.0, strokeOpacity = 1.0;
+    fillOpacity *= attributeState.fillOpacity;
+    fillOpacity *= attributeState.opacity;
+    if (attributeState.fill instanceof ColorFill &&
+        typeof attributeState.fill.color.a !== 'undefined') {
+        fillOpacity *= attributeState.fill.color.a;
     }
+    strokeOpacity *= attributeState.strokeOpacity;
+    strokeOpacity *= attributeState.opacity;
+    if (attributeState.stroke instanceof ColorFill &&
+        typeof attributeState.stroke.color.a !== 'undefined') {
+        strokeOpacity *= attributeState.stroke.color.a;
+    }
+    var gState = {};
+    gState['opacity'] = fillOpacity;
+    gState['stroke-opacity'] = strokeOpacity;
+    pdf.setGState(new GState(gState));
+    if (attributeState.fill &&
+        attributeState.fill instanceof ColorFill &&
+        attributeState.fill.color.ok) {
+        // text fill color will be applied through setTextColor()
+        pdf.setFillColor(attributeState.fill.color.r, attributeState.fill.color.g, attributeState.fill.color.b);
+    }
+    else {
+        pdf.setFillColor(0, 0, 0);
+    }
+    pdf.setLineWidth(attributeState.strokeWidth);
+    if (attributeState.stroke instanceof ColorFill) {
+        pdf.setDrawColor(attributeState.stroke.color.r, attributeState.stroke.color.g, attributeState.stroke.color.b);
+    }
+    else {
+        pdf.setDrawColor(0, 0, 0);
+    }
+    pdf.setLineCap(attributeState.strokeLinecap);
+    pdf.setLineJoin(attributeState.strokeLinejoin);
+    if (attributeState.strokeDasharray) {
+        pdf.setLineDashPattern(attributeState.strokeDasharray, attributeState.strokeDashoffset);
+    }
+    else {
+        pdf.setLineDashPattern([], 0);
+    }
+    pdf.setLineMiterLimit(attributeState.strokeMiterlimit);
+    var font;
+    if (fontAliases.hasOwnProperty(attributeState.fontFamily)) {
+        font = fontAliases[attributeState.fontFamily];
+    }
+    else {
+        font = attributeState.fontFamily;
+    }
+    if (attributeState.fill &&
+        attributeState.fill instanceof ColorFill &&
+        attributeState.fill.color.ok) {
+        var fillColor = attributeState.fill.color;
+        pdf.setTextColor(fillColor.r, fillColor.g, fillColor.b);
+    }
+    else {
+        pdf.setTextColor(0, 0, 0);
+    }
+    var fontStyle = '';
+    if (attributeState.fontWeight === 'bold') {
+        fontStyle = 'bold';
+    }
+    if (attributeState.fontStyle === 'italic') {
+        fontStyle += 'italic';
+    }
+    if (fontStyle === '') {
+        fontStyle = 'normal';
+    }
+    if (font !== undefined || fontStyle !== undefined) {
+        if (font === undefined) {
+            if (fontAliases.hasOwnProperty(attributeState.fontFamily)) {
+                font = fontAliases[attributeState.fontFamily];
+            }
+            else {
+                font = attributeState.fontFamily;
+            }
+        }
+        pdf.setFont(font, fontStyle);
+    }
+    else {
+        pdf.setFont('helvetica', fontStyle);
+    }
+    // correct for a jsPDF-instance measurement unit that differs from `pt`
+    pdf.setFontSize(attributeState.fontSize * pdf.internal.scaleFactor);
+}
+
+function getClipPathNode(clipPathAttr, targetNode, context) {
     var match = iriReference.exec(clipPathAttr);
     if (!match) {
         return undefined;
@@ -1839,7 +1961,7 @@ var RenderedNode = /** @class */ (function (_super) {
     }
     RenderedNode.prototype.render = function (parentContext) {
         return __awaiter(this, void 0, void 0, function () {
-            var context, hasClipPath, clipNode;
+            var context, clipPathAttribute, hasClipPath, clipNode;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -1849,24 +1971,29 @@ var RenderedNode = /** @class */ (function (_super) {
                         context = parentContext.clone();
                         context.transform = context.pdf.matrixMult(this.computeNodeTransform(context), parentContext.transform);
                         parseAttributes(context, this);
-                        hasClipPath = this.element.hasAttribute('clip-path') &&
-                            getAttribute(this.element, context.styleSheets, 'clip-path') !== 'none';
-                        if (!hasClipPath) return [3 /*break*/, 3];
-                        clipNode = getClipPathNode(this, context);
-                        if (!(clipNode && clipNode.isVisible(true, context))) return [3 /*break*/, 2];
+                        clipPathAttribute = getAttribute(this.element, context.styleSheets, 'clip-path');
+                        hasClipPath = clipPathAttribute && clipPathAttribute !== 'none';
+                        if (!hasClipPath) return [3 /*break*/, 5];
+                        clipNode = getClipPathNode(clipPathAttribute, this, context);
+                        if (!clipNode) return [3 /*break*/, 4];
+                        if (!clipNode.isVisible(true, context)) return [3 /*break*/, 2];
                         context.pdf.saveGraphicsState();
                         return [4 /*yield*/, applyClipPath(this, clipNode, context)];
                     case 1:
                         _a.sent();
                         return [3 /*break*/, 3];
                     case 2: return [2 /*return*/];
-                    case 3:
+                    case 3: return [3 /*break*/, 5];
+                    case 4:
+                        hasClipPath = false;
+                        _a.label = 5;
+                    case 5:
                         if (!context.withinClipPath) {
                             context.pdf.saveGraphicsState();
                         }
                         applyAttributes(context, parentContext, this.element);
                         return [4 /*yield*/, this.renderCore(context)];
-                    case 4:
+                    case 6:
                         _a.sent();
                         if (!context.withinClipPath) {
                             context.pdf.restoreGraphicsState();
@@ -2177,7 +2304,7 @@ var Symbol$1 = /** @class */ (function (_super) {
     }
     Symbol.prototype.apply = function (parentContext) {
         return __awaiter(this, void 0, void 0, function () {
-            var context, hasClipPath, clipNode, _i, _a, child;
+            var context, clipPathAttribute, hasClipPath, clipNode, _i, _a, child;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -2187,11 +2314,12 @@ var Symbol$1 = /** @class */ (function (_super) {
                         context = parentContext.clone();
                         context.transform = context.pdf.unitMatrix;
                         parseAttributes(context, this);
-                        hasClipPath = this.element.hasAttribute('clip-path') &&
-                            getAttribute(this.element, context.styleSheets, 'clip-path') !== 'none';
+                        clipPathAttribute = getAttribute(this.element, context.styleSheets, 'clip-path');
+                        hasClipPath = clipPathAttribute && clipPathAttribute !== 'none';
                         if (!hasClipPath) return [3 /*break*/, 3];
-                        clipNode = getClipPathNode(this, context);
-                        if (!(clipNode && clipNode.isVisible(true, context))) return [3 /*break*/, 2];
+                        clipNode = getClipPathNode(clipPathAttribute, this, context);
+                        if (!clipNode) return [3 /*break*/, 3];
+                        if (!clipNode.isVisible(true, context)) return [3 /*break*/, 2];
                         return [4 /*yield*/, applyClipPath(this, clipNode, context)];
                     case 1:
                         _b.sent();
@@ -2321,7 +2449,7 @@ var Use = /** @class */ (function (_super) {
                             context.pdf.rect(x, y, width, height);
                             context.pdf.clip().discardPath();
                         }
-                        context.pdf.doFormObject(ReferencesHandler.generateKey(id, color), t);
+                        context.pdf.doFormObject(context.refsHandler.generateKey(id, color), t);
                         context.pdf.restoreGraphicsState();
                         return [2 /*return*/];
                 }
@@ -2353,7 +2481,7 @@ var Use = /** @class */ (function (_super) {
                         _a.sent();
                         _a.label = 4;
                     case 4:
-                        refContext.pdf.endFormObject(ReferencesHandler.generateKey(id, color));
+                        refContext.pdf.endFormObject(refContext.refsHandler.generateKey(id, color));
                         return [2 /*return*/];
                 }
             });
@@ -3098,24 +3226,31 @@ var MarkerNode = /** @class */ (function (_super) {
     }
     MarkerNode.prototype.apply = function (parentContext) {
         return __awaiter(this, void 0, void 0, function () {
-            var tfMatrix, bBox, _i, _a, child;
+            var tfMatrix, bBox, childContext, _i, _a, child;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         tfMatrix = this.computeNodeTransform(parentContext);
                         bBox = this.getBoundingBox(parentContext);
                         parentContext.pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], tfMatrix);
+                        childContext = new Context(parentContext.pdf, {
+                            refsHandler: parentContext.refsHandler,
+                            styleSheets: parentContext.styleSheets,
+                            viewport: parentContext.viewport,
+                            svg2pdfParameters: parentContext.svg2pdfParameters
+                        });
+                        // "Properties do not inherit from the element referencing the 'marker' into the contents of the
+                        // marker. However, by using the context-stroke value for the fill or stroke on elements in its
+                        // definition, a single marker can be designed to match the style of the element referencing the
+                        // marker."
+                        // -> we need to reset all attributes
+                        applyContext(childContext);
                         _i = 0, _a = this.children;
                         _b.label = 1;
                     case 1:
                         if (!(_i < _a.length)) return [3 /*break*/, 4];
                         child = _a[_i];
-                        return [4 /*yield*/, child.render(new Context(parentContext.pdf, {
-                                refsHandler: parentContext.refsHandler,
-                                styleSheets: parentContext.styleSheets,
-                                viewport: parentContext.viewport,
-                                svg2pdfParameters: parentContext.svg2pdfParameters
-                            }))];
+                        return [4 /*yield*/, child.render(childContext)];
                     case 2:
                         _b.sent();
                         _b.label = 3;
@@ -3139,8 +3274,8 @@ var MarkerNode = /** @class */ (function (_super) {
         return [
             (vb && vb[0]) || 0,
             (vb && vb[1]) || 0,
-            (vb && vb[2]) || parseFloat(this.element.getAttribute('marker-width') || '0'),
-            (vb && vb[3]) || parseFloat(this.element.getAttribute('marker-height') || '0')
+            (vb && vb[2]) || parseFloat(this.element.getAttribute('markerWidth') || '3'),
+            (vb && vb[3]) || parseFloat(this.element.getAttribute('markerHeight') || '3')
         ];
     };
     MarkerNode.prototype.computeNodeTransformCore = function (context) {
@@ -3628,6 +3763,7 @@ var StyleSheets = /** @class */ (function () {
                     var cssRule = sheet.cssRules[i];
                     if (!(cssRule instanceof CSSStyleRule)) {
                         sheet.deleteRule(i);
+                        continue;
                     }
                     var cssStyleRule = cssRule;
                     if (cssStyleRule.selectorText.indexOf(',') >= 0) {
@@ -3781,7 +3917,7 @@ function svg2pdf(element, pdf, options) {
         });
     });
 }
-jsPDF.API.svg = function (element, options) {
+jsPDF$1.API.svg = function (element, options) {
     if (options === void 0) { options = {}; }
     return svg2pdf(element, this, options);
 };
