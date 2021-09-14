@@ -150,7 +150,7 @@
             <rect fill="rgba(0,0,0,0.25)" width="250" height="100" transform="translate(2 2)"/>
             <rect fill="#FFFFFF" width="250" height="100"/>
             <use xlink:href="#usericon_male1" transform="scale(0.85) translate(15 10)"/>
-            <g style="font-size:10px; font-family:Roboto; font-weight: 300; fill: #444">
+            <g style="font-size:10px; font-family:Roboto; font-weight: 400; fill: #444">
                 <text transform="translate(100 25)" style="font-size:16px; fill:#336699">Eric Joplin</text>
                 <text transform="translate(100 45)" style="text-transform: uppercase; font-weight: 400">Chief
                     Executive

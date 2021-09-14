@@ -4,7 +4,11 @@ import { toPixels } from './utils/misc'
 import { parseColor, parseFloats } from './utils/parsing'
 import FontFamily from 'font-family-papandreou'
 import { SvgNode } from './nodes/svgnode'
-import { findFirstAvailableFontFamily, fontAliases } from './utils/fonts'
+import {
+  combineFontStyleAndFontWeight,
+  findFirstAvailableFontFamily,
+  fontAliases
+} from './utils/fonts'
 import { parseFill } from './fill/parseFill'
 import { ColorFill } from './fill/ColorFill'
 import { GState } from 'jspdf'
@@ -277,17 +281,10 @@ export function applyAttributes(
     childContext.attributeState.fontWeight !== parentContext.attributeState.fontWeight ||
     childContext.attributeState.fontStyle !== parentContext.attributeState.fontStyle
   ) {
-    fontStyle = ''
-    if (childContext.attributeState.fontWeight === 'bold') {
-      fontStyle = 'bold'
-    }
-    if (childContext.attributeState.fontStyle === 'italic') {
-      fontStyle += 'italic'
-    }
-
-    if (fontStyle === '') {
-      fontStyle = 'normal'
-    }
+    fontStyle = combineFontStyleAndFontWeight(
+      childContext.attributeState.fontStyle,
+      childContext.attributeState.fontWeight
+    )
   }
 
   if (font !== undefined || fontStyle !== undefined) {
