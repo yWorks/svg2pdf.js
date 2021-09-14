@@ -29,7 +29,7 @@ const umd = {
   input: 'src/svg2pdf.ts',
   output: [
     {
-      file: pkg.browser.replace('.min', ''),
+      file: pkg.browser.replace('.es.min.', '.umd.'),
       format: 'umd',
       name: 'svg2pdf',
       exports: 'named',
@@ -37,7 +37,7 @@ const umd = {
       globals
     },
     {
-      file: pkg.browser,
+      file: pkg.browser.replace('.es.', '.umd.'),
       format: 'umd',
       name: 'svg2pdf',
       exports: 'named',
