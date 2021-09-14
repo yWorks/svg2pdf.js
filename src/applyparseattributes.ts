@@ -305,3 +305,117 @@ export function applyAttributes(
     )
   }
 }
+
+export function applyContext(context: Context): void {
+  const { attributeState, pdf } = context
+
+  let fillOpacity = 1.0,
+    strokeOpacity = 1.0
+
+  fillOpacity *= attributeState.fillOpacity
+  fillOpacity *= attributeState.opacity
+  if (
+    attributeState.fill instanceof ColorFill &&
+    typeof attributeState.fill.color.a !== 'undefined'
+  ) {
+    fillOpacity *= attributeState.fill.color.a
+  }
+
+  strokeOpacity *= attributeState.strokeOpacity
+  strokeOpacity *= attributeState.opacity
+  if (
+    attributeState.stroke instanceof ColorFill &&
+    typeof attributeState.stroke.color.a !== 'undefined'
+  ) {
+    strokeOpacity *= attributeState.stroke.color.a
+  }
+
+  const gState: GState = {}
+  gState['opacity'] = fillOpacity
+  gState['stroke-opacity'] = strokeOpacity
+  pdf.setGState(new GState(gState))
+
+  if (
+    attributeState.fill &&
+    attributeState.fill instanceof ColorFill &&
+    attributeState.fill.color.ok
+  ) {
+    // text fill color will be applied through setTextColor()
+    pdf.setFillColor(
+      attributeState.fill.color.r,
+      attributeState.fill.color.g,
+      attributeState.fill.color.b
+    )
+  } else {
+    pdf.setFillColor(0, 0, 0)
+  }
+
+  pdf.setLineWidth(attributeState.strokeWidth)
+
+  if (attributeState.stroke instanceof ColorFill) {
+    pdf.setDrawColor(
+      attributeState.stroke.color.r,
+      attributeState.stroke.color.g,
+      attributeState.stroke.color.b
+    )
+  } else {
+    pdf.setDrawColor(0, 0, 0)
+  }
+
+  pdf.setLineCap(attributeState.strokeLinecap)
+  pdf.setLineJoin(attributeState.strokeLinejoin)
+
+  if (attributeState.strokeDasharray) {
+    pdf.setLineDashPattern(attributeState.strokeDasharray, attributeState.strokeDashoffset)
+  } else {
+    pdf.setLineDashPattern([], 0)
+  }
+
+  pdf.setLineMiterLimit(attributeState.strokeMiterlimit)
+
+  let font: string | undefined
+  if (fontAliases.hasOwnProperty(attributeState.fontFamily)) {
+    font = fontAliases[attributeState.fontFamily]
+  } else {
+    font = attributeState.fontFamily
+  }
+
+  if (
+    attributeState.fill &&
+    attributeState.fill instanceof ColorFill &&
+    attributeState.fill.color.ok
+  ) {
+    const fillColor = attributeState.fill.color
+    pdf.setTextColor(fillColor.r, fillColor.g, fillColor.b)
+  } else {
+    pdf.setTextColor(0, 0, 0)
+  }
+
+  let fontStyle: string | undefined = ''
+  if (attributeState.fontWeight === 'bold') {
+    fontStyle = 'bold'
+  }
+  if (attributeState.fontStyle === 'italic') {
+    fontStyle += 'italic'
+  }
+
+  if (fontStyle === '') {
+    fontStyle = 'normal'
+  }
+
+  if (font !== undefined || fontStyle !== undefined) {
+    if (font === undefined) {
+      if (fontAliases.hasOwnProperty(attributeState.fontFamily)) {
+        font = fontAliases[attributeState.fontFamily]
+      } else {
+        font = attributeState.fontFamily
+      }
+    }
+    pdf.setFont(font, fontStyle)
+  } else {
+    pdf.setFont('helvetica', fontStyle)
+  }
+
+  // correct for a jsPDF-instance measurement unit that differs from `pt`
+  pdf.setFontSize(attributeState.fontSize * pdf.internal.scaleFactor)
+}

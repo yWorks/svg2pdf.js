@@ -1,6 +1,7 @@
 window.tests = [
   'attribute-style-precedence',
   'clippath',
+  'clippath-empty',
   'clippath-svg',
   'complete-bpmn',
   'complete-computer-network',
@@ -16,6 +17,7 @@ window.tests = [
   'complete-social-network',
   'custom-fonts',
   'display-none-and-visibility-inheritance',
+  'duplicate-ids',
   'empty-elements',
   'fill-and-stroke-inheritance',
   'fill-and-stroke-opacity',
@@ -25,6 +27,7 @@ window.tests = [
   'font-style',
   'gradient-default-coordinates',
   'gradient-percent-offset',
+  'gradient-stop-defaults',
   'gradient-units',
   'gradients-and-patterns-mixed',
   'hidden-clippath',
