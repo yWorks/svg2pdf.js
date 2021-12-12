@@ -109,8 +109,8 @@ export class TextChunk {
       xs[i] = x
       ys[i] = y
 
-      currentTextX = x + textMeasure.width + textMeasure.length * charSpace
-
+     // currentTextX = x + textMeasure.width + textMeasure.length * charSpace  // this code is the reason for incorrect positioning  of the nested tSpan on pdf
+      currentTextX = x
       currentTextY = y
 
       minX = Math.min(minX, x)
