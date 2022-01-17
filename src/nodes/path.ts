@@ -30,8 +30,7 @@ export class PathNode extends GeometryNode {
     let prevX: number
     let prevY: number
     svgPath.iterate(seg => {
-      const type = seg[0]
-      switch (type) {
+      switch (seg[0]) {
         case 'M':
           path.moveTo(seg[1], seg[2])
           break
@@ -56,7 +55,7 @@ export class PathNode extends GeometryNode {
           path.close()
           break
       }
-      switch (type) {
+      switch (seg[0]) {
         case 'M':
         case 'L':
           prevX = seg[1]
