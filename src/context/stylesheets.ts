@@ -5,11 +5,12 @@ export class StyleSheets {
   private rootSvg: Element
   private readonly loadExternalSheets: boolean
   private readonly styleSheets: CSSStyleSheet[]
-
+  private cssValueMap: Map<string, string>
   constructor(rootSvg: Element, loadExtSheets: boolean) {
     this.rootSvg = rootSvg
     this.loadExternalSheets = loadExtSheets
     this.styleSheets = []
+    this.cssValueMap = new Map()
   }
 
   public async load(): Promise<void> {
@@ -86,6 +87,27 @@ export class StyleSheets {
         this.styleSheets.push(sheet)
       }
     }
+  }
+
+  getCssValue(selector: string): string | undefined {
+    const value: string = selector
+      .replace(/var\(/g, '')
+      .replace(/\)/g, '')
+      .replace(/^\s+|\s+$/g, '')
+    if (this.cssValueMap.get(value)) {
+      return this.cssValueMap.get(value)
+    }
+    for (const sheet of this.styleSheets) {
+      for (let i = 0; i < sheet.cssRules.length; i++) {
+        const rule = sheet.cssRules[i] as CSSStyleRule
+        const res = rule.style.getPropertyValue(value)
+        if (res) {
+          this.cssValueMap.set(value, res)
+          return res
+        }
+      }
+    }
+    return undefined
   }
 
   private static splitSelectorAtCommas(selectorText: string): string[] {
@@ -184,6 +206,17 @@ export class StyleSheets {
     const mostSpecificRule = matchingRules.reduce((previousValue, currentValue) =>
       compare(previousValue, currentValue) === 1 ? previousValue : currentValue
     )
-    return mostSpecificRule.style.getPropertyValue(propertyCss) || undefined
+    let resValue: string = mostSpecificRule.style.getPropertyValue(propertyCss)
+    const varReg = /var\(.*?\)/gi
+    if (resValue && varReg.test(resValue)) {
+      const cssValueList: RegExpMatchArray = resValue.match(varReg) || []
+      cssValueList.map(cssValue => {
+        const res = this.getCssValue(cssValue)
+        if (res) {
+          resValue = resValue.replace(cssValue, res)
+        }
+      })
+    }
+    return resValue || undefined
   }
 }
