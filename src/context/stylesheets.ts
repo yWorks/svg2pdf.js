@@ -213,7 +213,7 @@ export class StyleSheets {
       cssValueList.map(cssValue => {
         const res = this.getCssValue(cssValue)
         if (res) {
-          resValue = resValue.replace(cssValue, res)
+          resValue = resValue.replace(cssValue, res.replace(/^\s+|\s+$/g, ''))
         }
       })
     }

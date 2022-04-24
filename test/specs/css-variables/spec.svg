@@ -1,0 +1,14 @@
+<svg viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg">
+  <style>.bluePolyline {stroke: var(--color); } .polyLineColors {--color:  blue;}</style>
+  <style>.redPolyline { --colorRed: red; stroke: var(--colorRed);}</style>
+  <style>.greenPolyline { stroke: var(--colorGreen);}</style>
+  <style>.green {--colorGreen:   #009900 }</style>
+  <style>.rgb {--colorRGB: rgb(75,128,0); stroke:var(--colorRGB);}</style>
+  <style>.space {--colorSpace: rgb(75,100,128); stroke:var(  --colorSpace  );}</style>
+  <text class="bluePolyline polyLineColors" y="-20" x="20">In Different Class</text>
+  <text class="redPolyline" y="0" x="20">In Same Class</text>
+  <text class="green greenPolyline" y="20" x="20">Value With Space</text>
+  <text y="40" x="20" class="rgb" >RGB Color</text>
+  <text y="60" x="20" class="space">Var With Space </text>
+
+</svg>

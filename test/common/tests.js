@@ -15,6 +15,7 @@ window.tests = [
   'complete-organization-chart',
   'complete-organization-chart-new',
   'complete-social-network',
+  'css-variables',
   'custom-fonts',
   'display-none-and-visibility-inheritance',
   'duplicate-ids',
