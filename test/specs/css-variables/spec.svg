@@ -1,14 +1,32 @@
 <svg viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg">
-  <style>.bluePolyline {stroke: var(--color); } .polyLineColors {--color:  blue;}</style>
-  <style>.redPolyline { --colorRed: red; stroke: var(--colorRed);}</style>
-  <style>.greenPolyline { stroke: var(--colorGreen);}</style>
-  <style>.green {--colorGreen:   #009900 }</style>
-  <style>.rgb {--colorRGB: rgb(75,128,0); stroke:var(--colorRGB);}</style>
-  <style>.space {--colorSpace: rgb(75,100,128); stroke:var(  --colorSpace  );}</style>
-  <text class="bluePolyline polyLineColors" y="-20" x="20">In Different Class</text>
-  <text class="redPolyline" y="0" x="20">In Same Class</text>
-  <text class="green greenPolyline" y="20" x="20">Value With Space</text>
-  <text y="40" x="20" class="rgb" >RGB Color</text>
-  <text y="60" x="20" class="space">Var With Space </text>
+  <style>.valueUse {stroke: var(--valueDefinition); } .valueDefinition {--valueDefinition:  blue;}</style>
+  <text class="valueUse" y="-40" x="20">Test Get variables globally </text>
 
+  <style>.rgb {--colorRGB: rgb(75,128,0); stroke:var(--colorRGB);}</style>
+  <text y="-20" x="20" class="rgb" >Test RGB Color</text>
+
+  <style>.normal { --colorRed: red; stroke: var(--colorRed);}</style>
+  <text class="normal" y="0" x="20">Test normal use</text>
+
+
+  <style>.TestValue { stroke: var(--colorGreen);}</style>
+  <style>.green {--colorGreen:   #009900 }</style>
+  <text class="green greenPolyline" y="20" x="20">Test Value With Space</text>
+  
+  
+
+  <style>.space {--colorSpace: rgb(75,100,128); stroke:var(  --colorSpace  );}</style>
+  <text y="40" x="20" class="space">Test Var With Space </text>
+
+
+  <style> .spare {stroke:var(--undefined-color,var( --undefined-two, rgb(75,128,0)));}</style>
+  <text y="60" x="20" class="spare">Test Spare variable </text> 
+
+
+  <style> .multiple {--colorR: 0; --colorG: 11; --colorB: 199; stroke:rgb(var(--colorR),var(--colorG),var(--colorB));}</style>
+  <text y="80" x="20" class="multiple">Test Multiple variables </text>
+  
+  <style> .error {--colorGreen:#009900  stroke:var(--colorGreen, var( ()--undefined-two))((, rgb(()75,128,0)));}</style>
+  <text y="100" x="20" class="error">Test error value </text>  
+ 
 </svg>
