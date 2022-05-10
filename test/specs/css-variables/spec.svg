@@ -11,7 +11,7 @@
 
   <style>.TestValue { stroke: var(--colorGreen);}</style>
   <style>.green {--colorGreen:   #009900 }</style>
-  <text class="green greenPolyline" y="20" x="20">Test Value With Space</text>
+  <text class="green" y="20" x="20">Test Value With Space</text>
   
   
 
@@ -20,7 +20,7 @@
 
 
   <style> .spare {stroke:var(--undefined-color,var( --undefined-two, rgb(75,128,0)));}</style>
-  <text y="60" x="20" class="spare">Test Spare variable </text> 
+  <text y="60" x="20" class="spare">Test Value fallback </text> 
 
 
   <style> .multiple {--colorR: 0; --colorG: 11; --colorB: 199; stroke:rgb(var(--colorR),var(--colorG),var(--colorB));}</style>

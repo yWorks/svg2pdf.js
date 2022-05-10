@@ -11,12 +11,10 @@ export class StyleSheets {
   private rootSvg: Element
   private readonly loadExternalSheets: boolean
   private readonly styleSheets: CSSStyleSheet[]
-  private cssVariableList: CssVariable[]
   constructor(rootSvg: Element, loadExtSheets: boolean) {
     this.rootSvg = rootSvg
     this.loadExternalSheets = loadExtSheets
     this.styleSheets = []
-    this.cssVariableList = []
   }
 
   public async load(): Promise<void> {
@@ -93,68 +91,6 @@ export class StyleSheets {
         this.styleSheets.push(sheet)
       }
     }
-  }
-
-  analysisCssVariables(selector: string, untreatedIndex: number): boolean {
-    const cssSelector = selector.slice(untreatedIndex)
-    let bracketsIndex = 0
-    let varStart = 0
-    let varEnd = 0
-    let valueIndex = 0
-    let valueName: string
-    let valueString: string
-    const varReg = /,(?![^(]*\))/
-    if (cssSelector.indexOf('var(') >= 0) {
-      varStart = cssSelector.indexOf('var(')
-      for (let i = varStart + 4; i < cssSelector.length; i++) {
-        //get effective var() form selector
-        if (cssSelector[i] == '(') {
-          bracketsIndex++
-        }
-        if (cssSelector[i] == ')') {
-          if (bracketsIndex == 0) {
-            //This is a effective var()
-            varEnd = i + 1
-            valueString = cssSelector.slice(varStart, varEnd)
-            valueIndex = 0
-            valueName = ''
-            //exclude 'var(' and ')' form cssValueString
-            for (let ch = 0; ch < valueString.length; ch++) {
-              if (valueString[ch] == 'v' && valueString.slice(ch, ch + 4) == 'var(') {
-                valueIndex++
-                ch += 3
-                continue
-              }
-              if (valueString[ch] == ')' && valueIndex > 0) {
-                valueIndex--
-                continue
-              }
-              valueName += valueString[ch]
-            }
-            this.cssVariableList.push({
-              startIndex: varStart + untreatedIndex,
-              endIndex: varEnd + untreatedIndex,
-              originalCss: valueString,
-              valueName: valueName.split(varReg)
-            })
-            return this.analysisCssVariables(selector, untreatedIndex + varEnd)
-          } else {
-            bracketsIndex--
-          }
-        }
-      }
-      //brackets number discord law
-      return false
-    }
-    //processing completed
-    return true
-  }
-  getCssValue(selector: string): string | undefined {
-    const value: string = selector.replace(/^\s+|\s+$/g, '')
-    this.cssVariableList = []
-    if (this.analysisCssVariables(value, 0)) {
-    }
-    return undefined
   }
 
   private static splitSelectorAtCommas(selectorText: string): string[] {
@@ -253,41 +189,62 @@ export class StyleSheets {
     const mostSpecificRule = matchingRules.reduce((previousValue, currentValue) =>
       compare(previousValue, currentValue) === 1 ? previousValue : currentValue
     )
-    const cssValue: string = mostSpecificRule.style.getPropertyValue(propertyCss)
-    const varReg = /var\(.*?\)/gi
-    if (cssValue && varReg.test(cssValue)) {
-      const originalValue = cssValue.replace(/^\s+|\s+$/g, '')
-      let res = originalValue
-      this.cssVariableList = []
-      if (this.analysisCssVariables(originalValue, 0)) {
-        this.cssVariableList.map(CssVariable => {
-          for (let i = 0; i < CssVariable.valueName.length; i++) {
-            const name = CssVariable.valueName[i].replace(/^\s+|\s+$/g, '')
-            if (name.slice(0, 2) == '--') {
-              const css = getComputedStyle(node).getPropertyValue(name)
-              if (css) {
-                res = res.replace(
-                  originalValue.substring(CssVariable.startIndex, CssVariable.endIndex),
-                  css
-                )
-                return
-              }
-            } else {
-              if (name) {
-                res = res.replace(
-                  originalValue.substring(CssVariable.startIndex, CssVariable.endIndex),
-                  name
-                )
-                return
-              }
-            }
-          }
-        })
-        return res
-      } else {
-        return cssValue
+    const getPropertyCssValue = (propertyCss: string): string => {
+      //Screening fallback
+      let propertyValue =
+        propertyCss.indexOf('var(') == -1
+          ? mostSpecificRule.style.getPropertyValue(propertyCss.trim())
+          : propertyCss
+      const cssVariables: {
+        text: string //Varlables text
+        fallback: string // Varlables fallback
+        key: string //Varlables key
+      }[] = []
+      for (
+        let index = propertyValue.indexOf('var('), left = index + 4, bracketsLevels = 0;
+        index < propertyValue.length;
+
+      ) {
+        // not found
+        if (index < 0) {
+          break
+        }
+        if (propertyValue.charAt(index) === ')') bracketsLevels--
+        else if (propertyValue.charAt(index) === '(') bracketsLevels++
+        if (bracketsLevels == 0 && index > left) {
+          const text = propertyValue.substring(left - 4, index + 1)
+          const inner = text.substring(4, text.length - 1)
+          const separator = inner.indexOf(',')
+          const length = inner.length
+          const sp = separator < 0 ? length : separator
+          cssVariables.push({
+            text, //var(--one,var(--two,rgb(1,1,1)))
+            fallback: inner.substring(sp + 1), //var(--two,rgb(1,1,1))
+            key: inner.substring(0, sp).trim() //--one
+          })
+          //Process the next css Varlables
+          index = propertyValue.indexOf('var(', index)
+          left = index + 4
+          continue
+        }
+        index++
       }
+      if (cssVariables.length === 0) {
+        //propertyCss is a  normal cssValue return itself
+        //propertyCss is a cssVariable key return getPropertyValue()
+        return propertyValue || propertyCss.startsWith('--') ? propertyValue : propertyCss
+      }
+      cssVariables.map(v => {
+        const value = getPropertyCssValue(v.key)
+        // Detect the need for fallback
+        propertyValue = propertyValue.replace(
+          v.text,
+          value ? value : getPropertyCssValue(v.fallback)
+        )
+      })
+      return propertyValue
     }
-    return cssValue || undefined
+
+    return getPropertyCssValue(propertyCss) || undefined
   }
 }
