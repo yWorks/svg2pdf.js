@@ -1,12 +1,6 @@
 import { compare as compareSpecificity } from 'specificity'
 import { nodeIs } from '../utils/node'
 
-type CssVariable = {
-  startIndex: number
-  endIndex: number
-  originalCss: string
-  valueName: string[]
-}
 export class StyleSheets {
   private rootSvg: Element
   private readonly loadExternalSheets: boolean
