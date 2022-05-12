@@ -7,7 +7,7 @@
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
-    "lib": ["dom", "es2015"],
+    "lib": ["dom", "es2016"],
     "sourceMap": true
   },
   "include": [
