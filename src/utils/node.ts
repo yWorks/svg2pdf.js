@@ -25,7 +25,7 @@ export function getAttribute(
   propertyNode: string,
   propertyCss = propertyNode
 ): string | undefined {
-  const attribute = (node as SVGElement).style.getPropertyValue(propertyCss)
+  const attribute = (node as SVGElement).style?.getPropertyValue(propertyCss)
   if (attribute) {
     return attribute
   } else {
