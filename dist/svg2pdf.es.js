@@ -1,20 +1,20 @@
 /**
  * The MIT License (MIT)
- *
+ * 
  * Copyright (c) 2015-2021 yWorks GmbH
  * Copyright (c) 2013-2015 by Vitaly Puzrin
- *
- *
+ * 
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -822,8 +822,9 @@ function forEachChild(node, fn) {
 }
 // returns an attribute of a node, either from the node directly or from css
 function getAttribute(node, styleSheets, propertyNode, propertyCss) {
+    var _a;
     if (propertyCss === void 0) { propertyCss = propertyNode; }
-    var attribute = node.style.getPropertyValue(propertyCss);
+    var attribute = (_a = node.style) === null || _a === void 0 ? void 0 : _a.getPropertyValue(propertyCss);
     if (attribute) {
         return attribute;
     }
@@ -2940,8 +2941,7 @@ var PathNode = /** @class */ (function (_super) {
         var prevX;
         var prevY;
         svgPath.iterate(function (seg) {
-            var type = seg[0];
-            switch (type) {
+            switch (seg[0]) {
                 case 'M':
                     path.moveTo(seg[1], seg[2]);
                     break;
@@ -2966,7 +2966,7 @@ var PathNode = /** @class */ (function (_super) {
                     path.close();
                     break;
             }
-            switch (type) {
+            switch (seg[0]) {
                 case 'M':
                 case 'L':
                     prevX = seg[1];
