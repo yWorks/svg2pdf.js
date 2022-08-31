@@ -9,7 +9,7 @@ assignees: ''
 
 **Describe the bug**
 A clear and concise description of what the bug is. 
-What version are you using (exact version of svg2pdf.js and jspdf - the yWorks fork version, of course)?
+What version are you using (exact version of svg2pdf.js and jspdf)?
 
 **To Reproduce**
 Steps to reproduce the behavior:
