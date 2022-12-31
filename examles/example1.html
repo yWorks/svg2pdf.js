@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>svg2pdf - save file as pdf</title>
+  </head>
+  <body>
+    <button id="downloadpdf">Download PDF</button>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.0.0/jspdf.umd.min.js" integrity="sha512-g77bZKU4ktH2I5nNioWzOMcbd3fN/svB0vQM73Uo5GRn/EGfcSJB0DlR1ithxnFsDaa0HmlOwHYiUFeM1P3RRw==" crossorigin="anonymous"></script>
+    <script src="../dist/svg2pdf.umd.min.js"></script>
+
+    <script>
+      const { jsPDF } = window.jspdf
+
+      var svgText = '<svg width="100" height="100"><rect x="0" y="0" width="200" height="100" fill="green"></rect></svg>'
+        
+        function downloadonclick(){
+          
+          let parser = new DOMParser()
+          let svgtextobject = parser.parseFromString(svgText, 'image/svg+xml').documentElement
+          const doc = new jsPDF()
+          doc.svg(svgtextobject, {x:10,y:10,width:420,height:297}).then(() => {
+              // save the created pdf
+              doc.save('drawing.pdf')
+          }) 
+        }
+        var button = document.getElementById('downloadpdf')
+        button.addEventListener('click',downloadonclick)
+    </script>
+  </body>
+</html>
