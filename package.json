@@ -76,7 +76,7 @@
     "karma-firefox-launcher": "^2.1.0",
     "karma-mocha": "^2.0.1",
     "karma-mocha-reporter": "^2.2.5",
-    "karma-webpack": "^4.0.2",
+    "karma-webpack": "^5.0.0",
     "log-utils": "^1.0.0",
     "mocha": "^8.0.1",
     "prettier": "^1.19.1",
@@ -88,7 +88,7 @@
     "rollup-plugin-terser": "^6.1.0",
     "ts-loader": "^8.0.0",
     "typescript": "^3.9.6",
-    "webpack": "^4.43.0",
+    "webpack": "^5.75.0",
     "yarpm": "^0.2.1"
   }
 }
