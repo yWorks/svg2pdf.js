@@ -12,11 +12,11 @@ module.exports = {
       }
     ]
   },
-  node: {
-    fs: 'empty'
-  },
   resolve: {
-    extensions: ['.ts', '.js']
+    extensions: ['.ts', '.js'],
+    fallback: {
+      fs: 'empty'
+    }
   },
   devtool: 'inline-source-map',
   output: {
