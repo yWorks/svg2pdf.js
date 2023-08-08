@@ -169,7 +169,7 @@ export class TextChunk {
     attributeName: 'dx' | 'dy'
   ): string | null {
     let currentElement: Element | null = element
-    while (currentElement && nodeIs(currentElement, 'text,tspan')) {
+    while (currentElement && nodeIs(currentElement, 'tspan')) {
       if (currentElement.hasAttribute(attributeName)) {
         return currentElement.getAttribute(attributeName)
       }
