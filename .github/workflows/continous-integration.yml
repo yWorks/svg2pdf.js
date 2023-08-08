@@ -12,3 +12,7 @@ jobs:
         node-version: '16.x'
     - run: npm install
     - run: npm run test:ci
+    - uses: actions/upload-artifact@v3
+      with:
+        name: references
+        path: test/specs/**/reference.pdf
