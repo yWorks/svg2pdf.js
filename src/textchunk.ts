@@ -4,6 +4,7 @@ import { mapAlignmentBaseline, toPixels } from './utils/misc'
 import { applyAttributes } from './applyparseattributes'
 import { TextNode } from './nodes/text'
 import { Point } from './utils/geometry'
+import { nodeIs } from './utils/node'
 
 /**
  * @param {string} textAnchor
@@ -94,12 +95,12 @@ export class TextChunk {
         if (!alreadySeen.includes(textNode)) {
           alreadySeen.push(textNode)
 
-          const tSpanDx = textNode.getAttribute('dx')
+          const tSpanDx = TextChunk.resolveRelativePositionAttribute(textNode, 'dx')
           if (tSpanDx !== null) {
             x += toPixels(tSpanDx, textNodeContext.attributeState.fontSize)
           }
 
-          const tSpanDy = textNode.getAttribute('dy')
+          const tSpanDy = TextChunk.resolveRelativePositionAttribute(textNode, 'dy')
           if (tSpanDy !== null) {
             y += toPixels(tSpanDy, textNodeContext.attributeState.fontSize)
           }
@@ -156,5 +157,31 @@ export class TextChunk {
     }
 
     return [currentTextX, currentTextY]
+  }
+
+  /**
+   * Resolves a positional attribute (dx, dy) on a given tSpan, possibly
+   * inheriting it from the nearest ancestor. Positional attributes
+   * are only inherited from a parent to its first child.
+   */
+  private static resolveRelativePositionAttribute(
+    element: Element,
+    attributeName: 'dx' | 'dy'
+  ): string | null {
+    let currentElement: Element | null = element
+    while (currentElement && nodeIs(currentElement, 'text,tspan')) {
+      if (currentElement.hasAttribute(attributeName)) {
+        return currentElement.getAttribute(attributeName)
+      }
+
+      if (!(element.parentElement?.firstChild === element)) {
+        // positional attributes are only inherited from a parent to its first child
+        break
+      }
+
+      currentElement = currentElement.parentElement
+    }
+
+    return null
   }
 }
