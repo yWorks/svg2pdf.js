@@ -55,6 +55,8 @@ window.tests = [
   'svg-viewbox',
   'svg-use',
   'symbols',
+  'test-AL-picture',
+  'test-AL-arrows',
   'text-fill-stroke',
   'text-placement',
   'title-element',
