@@ -31,6 +31,7 @@ window.tests = [
   'gradient-units',
   'gradients-and-patterns-mixed',
   'hidden-clippath',
+  'image-data-urls-base64-spaces',
   'image-svg-urls',
   'line-default-coordinates',
   'markers',
