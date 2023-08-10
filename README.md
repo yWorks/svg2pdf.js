@@ -113,6 +113,10 @@ If you're debugging and want to have visual feedback, you should switch the `deb
 This ensures that a new reference PDF will be created on every run. You might also want to disable some tests in
 the `test/common/tests` array.
 
+Some tests might fail on your local machine, because of differences in text measuring. If you're contributing to
+a pull request and need to update the reference files, download the respective artifact from the CI build job on
+GitHub and check it in in a subsequent commit.
+
 ## Dependencies
 
 - [jsPDF](https://github.com/MrRio/jsPDF)

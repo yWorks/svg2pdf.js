@@ -65,6 +65,7 @@ window.tests = [
   'vertical-align',
   'xml-space',
   'zero-width-strokes',
+  'zero-width-strokes-text',
   'current-color',
   'text-length'
 ]

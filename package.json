@@ -23,7 +23,7 @@
     "test-cjs": "karma start ./test/deployment/cjs/karma.conf.js",
     "test-esm": "karma start ./test/deployment/esm/karma.conf.js",
     "test-typescript": "karma start ./test/deployment/typescript/karma.conf.js",
-    "test:ci": "cross-env SHOW_DIFF=true npm run test",
+    "test:ci": "cross-env SHOW_DIFF=true concurrently -k -s command-1 \"npm run createreferences\" \"npm run test\"",
     "createreferences": "node test/common/reference-server.js",
     "prettier": "prettier --write {playground,src,tests,typings}/**/*.{ts,js}",
     "lint": "eslint {playground,src,tests,typings}/**/*.{ts,js}"
@@ -62,6 +62,7 @@
     "@typescript-eslint/parser": "^3.6.1",
     "chai": "^4.2.0",
     "chalk": "^4.1.0",
+    "concurrently": "^8.2.0",
     "eslint": "^7.4.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.4",
