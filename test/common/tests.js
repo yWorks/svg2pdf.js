@@ -36,6 +36,7 @@ window.tests = [
   'line-default-coordinates',
   'markers',
   'nested-tspans',
+  'no-stroke-without-stroke-width',
   'opacity-and-rgba',
   'path-arc-support',
   'pattern-units',
