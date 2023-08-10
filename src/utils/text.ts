@@ -9,11 +9,13 @@ type TextRenderingMode = typeof tol.renderingMode
 
 export function getTextRenderingMode(attributeState: AttributeState): TextRenderingMode {
   let renderingMode: TextRenderingMode = 'invisible'
-  if (attributeState.fill && attributeState.stroke) {
+  const doStroke = attributeState.stroke && attributeState.strokeWidth !== 0
+  const doFill = attributeState.fill
+  if (doFill && doStroke) {
     renderingMode = 'fillThenStroke'
-  } else if (attributeState.fill) {
+  } else if (doFill) {
     renderingMode = 'fill'
-  } else if (attributeState.stroke) {
+  } else if (doStroke) {
     renderingMode = 'stroke'
   }
   return renderingMode
