@@ -12,27 +12,35 @@ export class Pattern extends NonRenderedNode {
       return
     }
 
+    const scaleFactor = context.pdf.internal.scaleFactor
+
     // the transformations directly at the node are written to the pattern transformation matrix
-    const bBox = this.getBoundingBox(context)
+    const x = context.svg2pdfParameters.x ?? 0
+    const y = context.svg2pdfParameters.y ?? 0
+    const [patternX, patternY, width, height] = this.getBoundingBox(context)
+    const startX = (patternX + x) * scaleFactor
+    const startY = (patternY + y) * scaleFactor
+    const endX = startX + width * scaleFactor
+    const endY = startY + height * scaleFactor
     const pattern = new TilingPattern(
-      [bBox[0], bBox[1], bBox[0] + bBox[2], bBox[1] + bBox[3]],
-      bBox[2],
-      bBox[3]
+      [startX, startY, endX, endY],
+      width * scaleFactor,
+      height * scaleFactor
     )
 
     context.pdf.beginTilingPattern(pattern)
     // continue without transformation
 
     for (const child of this.children) {
-      await child.render(
-        new Context(context.pdf, {
-          attributeState: context.attributeState,
-          refsHandler: context.refsHandler,
-          styleSheets: context.styleSheets,
-          viewport: context.viewport,
-          svg2pdfParameters: context.svg2pdfParameters
-        })
-      )
+      const childContext = new Context(context.pdf, {
+        attributeState: context.attributeState,
+        refsHandler: context.refsHandler,
+        styleSheets: context.styleSheets,
+        viewport: context.viewport,
+        svg2pdfParameters: context.svg2pdfParameters,
+        transform: context.pdf.Matrix(scaleFactor, 0, 0, scaleFactor, startX, startY)
+      })
+      await child.render(childContext)
     }
     context.pdf.endTilingPattern(id, pattern)
   }

@@ -22,7 +22,8 @@ for (const test of window.tests) {
     it(`testing ${name}`, async function() {
       const width = jsPDFOptions ? jsPDFOptions[0] : svgElement.width.baseVal.value
       const height = jsPDFOptions ? jsPDFOptions[1] : svgElement.height.baseVal.value
-      const pdf = new jsPDF(width > height ? 'l' : 'p', 'pt', [width, height])
+      const unit = jsPDFOptions ? jsPDFOptions[2] || 'pt' : 'pt'
+      const pdf = new jsPDF(width > height ? 'l' : 'p', unit, [width, height])
 
       if (name === 'custom-fonts') {
         const filename = '/base/test/specs/custom-fonts/Batang.ttf'

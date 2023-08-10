@@ -38,6 +38,8 @@ window.tests = [
   'nested-tspans',
   'opacity-and-rgba',
   'path-arc-support',
+  ['pattern-offset', undefined, { x: 10, y: 10 }],
+  ['pattern-scale', [400, 300, 'mm'], {}],
   'pattern-units',
   'patterns',
   'polyline',
