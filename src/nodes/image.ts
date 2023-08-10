@@ -10,8 +10,7 @@ import { Matrix } from 'jspdf'
 import { Viewport } from '../context/viewport'
 
 // groups: 1: mime-type (+ charset), 2: mime-type (w/o charset), 3: charset, 4: base64?, 5: body
-export const dataUriRegex = /^\s*data:(([^/,;]+\/[^/,;]+)(?:;([^,;=]+=[^,;=]+))?)?(?:;(base64))?,(.*\s*)$/i
-
+export const dataUriRegex = /^\s*data:(([^/,;]+\/[^/,;]+)(?:;([^,;=]+=[^,;=]+))?)?(?:;(base64))?,((?:.|\s)*)$/i
 export class ImageNode extends GraphicsNode {
   private readonly imageLoadingPromise: Promise<{ data: string; format: string }> | null = null
   private readonly imageUrl: string | null
@@ -87,7 +86,7 @@ export class ImageNode extends GraphicsNode {
       } catch (e) {
         typeof console === 'object' &&
           console.warn &&
-          console.warn(`Could not load image ${this.imageUrl}.\n${e}`)
+          console.warn(`Could not load image ${this.imageUrl}. \n${e}`)
       }
     }
   }
@@ -118,7 +117,9 @@ export class ImageNode extends GraphicsNode {
       format = mimeTypeParts[1]
 
       data = match[5]
+
       if (match[4] === 'base64') {
+        data = data.replace(/\s/g, '')
         data = atob(data)
       } else {
         data = decodeURIComponent(data)

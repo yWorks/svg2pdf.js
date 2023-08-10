@@ -32,6 +32,7 @@ window.tests = [
   'gradient-units',
   'gradients-and-patterns-mixed',
   'hidden-clippath',
+  'image-data-urls-base64-spaces',
   'image-svg-urls',
   'line-default-coordinates',
   'markers',
@@ -65,6 +66,7 @@ window.tests = [
   'vertical-align',
   'xml-space',
   'zero-width-strokes',
+  'zero-width-strokes-text',
   'current-color',
   'text-length'
 ]

@@ -1,6 +1,6 @@
 {
   "name": "svg2pdf.js",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "A javascript-only SVG to PDF conversion utility that runs in the browser leveraging jsPDF",
   "main": "dist/svg2pdf.umd.min.js",
   "module": "dist/svg2pdf.es.min.js",
@@ -23,7 +23,7 @@
     "test-cjs": "karma start ./test/deployment/cjs/karma.conf.js",
     "test-esm": "karma start ./test/deployment/esm/karma.conf.js",
     "test-typescript": "karma start ./test/deployment/typescript/karma.conf.js",
-    "test:ci": "cross-env SHOW_DIFF=true npm run test",
+    "test:ci": "cross-env SHOW_DIFF=true concurrently -k -s command-1 \"npm run createreferences\" \"npm run test\"",
     "createreferences": "node test/common/reference-server.js",
     "prettier": "prettier --write {playground,src,tests,typings}/**/*.{ts,js}",
     "lint": "eslint {playground,src,tests,typings}/**/*.{ts,js}"
@@ -62,12 +62,13 @@
     "@typescript-eslint/parser": "^3.6.1",
     "chai": "^4.2.0",
     "chalk": "^4.1.0",
+    "concurrently": "^8.2.0",
     "eslint": "^7.4.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.4",
     "cross-env": "^7.0.2",
     "cssesc": "^3.0.0",
-    "exorcist": "^1.0.1",
+    "exorcist": "^2.0.0",
     "font-family-papandreou": "^0.2.0-patch1",
     "jspdf": "^2.4.0",
     "karma": "^6.3.2",
@@ -76,7 +77,7 @@
     "karma-firefox-launcher": "^2.1.0",
     "karma-mocha": "^2.0.1",
     "karma-mocha-reporter": "^2.2.5",
-    "karma-webpack": "^4.0.2",
+    "karma-webpack": "^5.0.0",
     "log-utils": "^1.0.0",
     "mocha": "^8.0.1",
     "prettier": "^1.19.1",
@@ -88,7 +89,7 @@
     "rollup-plugin-terser": "^6.1.0",
     "ts-loader": "^8.0.0",
     "typescript": "^3.9.6",
-    "webpack": "^4.43.0",
+    "webpack": "^5.88.0",
     "yarpm": "^0.2.1"
   }
 }

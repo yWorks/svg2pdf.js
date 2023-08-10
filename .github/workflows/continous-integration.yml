@@ -1,6 +1,6 @@
 name: Continous Integration for svg2pdf.js
 
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
   test:
@@ -9,6 +9,12 @@ jobs:
     - uses: actions/checkout@master
     - uses: actions/setup-node@v1
       with:
-        node-version: '10.x'
+        node-version: '16.x'
     - run: npm install
     - run: npm run test:ci
+    - name: Archive reference files
+      if: ${{ failure() }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: references
+        path: test/specs/**/reference.pdf
