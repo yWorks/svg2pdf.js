@@ -1,20 +1,20 @@
 /**
  * The MIT License (MIT)
- * 
- * Copyright (c) 2015-2021 yWorks GmbH
+ *
+ * Copyright (c) 2015-2023 yWorks GmbH
  * Copyright (c) 2013-2015 by Vitaly Puzrin
- * 
- * 
+ *
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -493,117 +493,6 @@ var AttributeState = /** @class */ (function () {
     return AttributeState;
 }());
 
-var iriReference = /url\(["']?#([^"']+)["']?\)/;
-var alignmentBaselineMap = {
-    bottom: 'bottom',
-    'text-bottom': 'bottom',
-    top: 'top',
-    'text-top': 'top',
-    hanging: 'hanging',
-    middle: 'middle',
-    central: 'middle',
-    center: 'middle',
-    mathematical: 'middle',
-    ideographic: 'ideographic',
-    alphabetic: 'alphabetic',
-    baseline: 'alphabetic'
-};
-var svgNamespaceURI = 'http://www.w3.org/2000/svg';
-
-var TextMeasure = /** @class */ (function () {
-    function TextMeasure() {
-        this.measureMethods = {};
-    }
-    TextMeasure.prototype.getTextOffset = function (text, attributeState) {
-        var textAnchor = attributeState.textAnchor;
-        if (textAnchor === 'start') {
-            return 0;
-        }
-        var width = this.measureTextWidth(text, attributeState);
-        var xOffset = 0;
-        switch (textAnchor) {
-            case 'end':
-                xOffset = width;
-                break;
-            case 'middle':
-                xOffset = width / 2;
-                break;
-        }
-        return xOffset;
-    };
-    TextMeasure.prototype.measureTextWidth = function (text, attributeState) {
-        if (text.length === 0) {
-            return 0;
-        }
-        var fontFamily = attributeState.fontFamily;
-        var measure = this.getMeasureFunction(fontFamily);
-        return measure.call(this, text, attributeState.fontFamily, attributeState.fontSize + 'px', attributeState.fontStyle, attributeState.fontWeight);
-    };
-    TextMeasure.prototype.getMeasurementTextNode = function () {
-        if (!this.textMeasuringTextElement) {
-            this.textMeasuringTextElement = document.createElementNS(svgNamespaceURI, 'text');
-            var svg = document.createElementNS(svgNamespaceURI, 'svg');
-            svg.appendChild(this.textMeasuringTextElement);
-            svg.style.setProperty('position', 'absolute');
-            svg.style.setProperty('visibility', 'hidden');
-            document.body.appendChild(svg);
-        }
-        return this.textMeasuringTextElement;
-    };
-    TextMeasure.prototype.canvasTextMeasure = function (text, fontFamily, fontSize, fontStyle, fontWeight) {
-        var canvas = document.createElement('canvas');
-        var context = canvas.getContext('2d');
-        if (context != null) {
-            context.font = [fontStyle, fontWeight, fontSize, fontFamily].join(' ');
-            return context.measureText(text).width;
-        }
-        return 0;
-    };
-    TextMeasure.prototype.svgTextMeasure = function (text, fontFamily, fontSize, fontStyle, fontWeight, measurementTextNode) {
-        if (measurementTextNode === void 0) { measurementTextNode = this.getMeasurementTextNode(); }
-        var textNode = measurementTextNode;
-        textNode.setAttribute('font-family', fontFamily);
-        textNode.setAttribute('font-size', fontSize);
-        textNode.setAttribute('font-style', fontStyle);
-        textNode.setAttribute('font-weight', fontWeight);
-        textNode.setAttributeNS('http://www.w3.org/XML/1998/namespace', 'xml:space', 'preserve');
-        textNode.textContent = text;
-        return textNode.getBBox().width;
-    };
-    /**
-     * Canvas text measuring is a lot faster than svg measuring. However, it is inaccurate for some fonts. So test each
-     * font once and decide if canvas is accurate enough.
-     */
-    TextMeasure.prototype.getMeasureFunction = function (fontFamily) {
-        var method = this.measureMethods[fontFamily];
-        if (!method) {
-            var fontSize = '16px';
-            var fontStyle = 'normal';
-            var fontWeight = 'normal';
-            var canvasWidth = this.canvasTextMeasure(TextMeasure.testString, fontFamily, fontSize, fontStyle, fontWeight);
-            var svgWidth = this.svgTextMeasure(TextMeasure.testString, fontFamily, fontSize, fontStyle, fontWeight);
-            method =
-                Math.abs(canvasWidth - svgWidth) < TextMeasure.epsilon
-                    ? this.canvasTextMeasure
-                    : this.svgTextMeasure;
-            this.measureMethods[fontFamily] = method;
-        }
-        return method;
-    };
-    TextMeasure.prototype.cleanupTextMeasuring = function () {
-        if (this.textMeasuringTextElement) {
-            var parentNode = this.textMeasuringTextElement.parentNode;
-            if (parentNode) {
-                document.body.removeChild(parentNode);
-            }
-            this.textMeasuringTextElement = undefined;
-        }
-    };
-    TextMeasure.testString = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789!"$%&/()=?\'\\+*-_.:,;^}][{#~|<>';
-    TextMeasure.epsilon = 0.1;
-    return TextMeasure;
-}());
-
 /**
  *
  * @package
@@ -619,35 +508,35 @@ var TextMeasure = /** @class */ (function () {
  */
 var Context = /** @class */ (function () {
     function Context(pdf, values) {
-        var _a, _b, _c, _d, _e, _f;
+        var _a, _b, _c;
         this.pdf = pdf;
         this.svg2pdfParameters = values.svg2pdfParameters;
         this.attributeState = values.attributeState
             ? values.attributeState.clone()
             : AttributeState.default();
         this.viewport = values.viewport;
-        this.refsHandler = (_a = values.refsHandler) !== null && _a !== void 0 ? _a : null;
-        this.styleSheets = (_b = values.styleSheets) !== null && _b !== void 0 ? _b : null;
-        this.textMeasure = (_c = values.textMeasure) !== null && _c !== void 0 ? _c : new TextMeasure();
-        this.transform = (_d = values.transform) !== null && _d !== void 0 ? _d : this.pdf.unitMatrix;
-        this.withinClipPath = (_e = values.withinClipPath) !== null && _e !== void 0 ? _e : false;
-        this.withinUse = (_f = values.withinUse) !== null && _f !== void 0 ? _f : false;
+        this.refsHandler = values.refsHandler;
+        this.styleSheets = values.styleSheets;
+        this.textMeasure = values.textMeasure;
+        this.transform = (_a = values.transform) !== null && _a !== void 0 ? _a : this.pdf.unitMatrix;
+        this.withinClipPath = (_b = values.withinClipPath) !== null && _b !== void 0 ? _b : false;
+        this.withinUse = (_c = values.withinUse) !== null && _c !== void 0 ? _c : false;
     }
     Context.prototype.clone = function (values) {
-        var _a, _b, _c, _d, _e, _f, _g, _h;
+        var _a, _b, _c, _d;
         if (values === void 0) { values = {}; }
         return new Context(this.pdf, {
-            svg2pdfParameters: (_a = values.svg2pdfParameters) !== null && _a !== void 0 ? _a : this.svg2pdfParameters,
+            svg2pdfParameters: this.svg2pdfParameters,
             attributeState: values.attributeState
                 ? values.attributeState.clone()
                 : this.attributeState.clone(),
-            viewport: (_b = values.viewport) !== null && _b !== void 0 ? _b : this.viewport,
-            refsHandler: (_c = values.refsHandler) !== null && _c !== void 0 ? _c : this.refsHandler,
-            styleSheets: (_d = values.styleSheets) !== null && _d !== void 0 ? _d : this.styleSheets,
-            textMeasure: (_e = values.textMeasure) !== null && _e !== void 0 ? _e : this.textMeasure,
-            transform: (_f = values.transform) !== null && _f !== void 0 ? _f : this.transform,
-            withinClipPath: (_g = values.withinClipPath) !== null && _g !== void 0 ? _g : this.withinClipPath,
-            withinUse: (_h = values.withinUse) !== null && _h !== void 0 ? _h : this.withinUse
+            viewport: (_a = values.viewport) !== null && _a !== void 0 ? _a : this.viewport,
+            refsHandler: this.refsHandler,
+            styleSheets: this.styleSheets,
+            textMeasure: this.textMeasure,
+            transform: (_b = values.transform) !== null && _b !== void 0 ? _b : this.transform,
+            withinClipPath: (_c = values.withinClipPath) !== null && _c !== void 0 ? _c : this.withinClipPath,
+            withinUse: (_d = values.withinUse) !== null && _d !== void 0 ? _d : this.withinUse
         });
     };
     return Context;
@@ -929,6 +818,23 @@ var Marker = /** @class */ (function () {
     }
     return Marker;
 }());
+
+var iriReference = /url\(["']?#([^"']+)["']?\)/;
+var alignmentBaselineMap = {
+    bottom: 'bottom',
+    'text-bottom': 'bottom',
+    top: 'top',
+    'text-top': 'top',
+    hanging: 'hanging',
+    middle: 'middle',
+    central: 'middle',
+    center: 'middle',
+    mathematical: 'middle',
+    ideographic: 'ideographic',
+    alphabetic: 'alphabetic',
+    baseline: 'alphabetic'
+};
+var svgNamespaceURI = 'http://www.w3.org/2000/svg';
 
 /**
  * Convert em, px and bare number attributes to pixel values
@@ -1461,7 +1367,8 @@ var Pattern = /** @class */ (function (_super) {
                                 refsHandler: context.refsHandler,
                                 styleSheets: context.styleSheets,
                                 viewport: context.viewport,
-                                svg2pdfParameters: context.svg2pdfParameters
+                                svg2pdfParameters: context.svg2pdfParameters,
+                                textMeasure: context.textMeasure
                             }))];
                     case 2:
                         _b.sent();
@@ -2434,7 +2341,8 @@ var Use = /** @class */ (function (_super) {
                             styleSheets: context.styleSheets,
                             withinUse: true,
                             viewport: refNodeOpensViewport ? new Viewport(width, height) : context.viewport,
-                            svg2pdfParameters: context.svg2pdfParameters
+                            svg2pdfParameters: context.svg2pdfParameters,
+                            textMeasure: context.textMeasure
                         });
                         color = context.attributeState.color;
                         return [4 /*yield*/, context.refsHandler.getRendered(id, color, function (node) {
@@ -2594,13 +2502,15 @@ var Ellipse = /** @class */ (function (_super) {
 
 function getTextRenderingMode(attributeState) {
     var renderingMode = 'invisible';
-    if (attributeState.fill && attributeState.stroke) {
+    var doStroke = attributeState.stroke && attributeState.strokeWidth !== 0;
+    var doFill = attributeState.fill;
+    if (doFill && doStroke) {
         renderingMode = 'fillThenStroke';
     }
-    else if (attributeState.fill) {
+    else if (doFill) {
         renderingMode = 'fill';
     }
-    else if (attributeState.stroke) {
+    else if (doStroke) {
         renderingMode = 'stroke';
     }
     return renderingMode;
@@ -2709,11 +2619,11 @@ var TextChunk = /** @class */ (function () {
             if (textNode.nodeName !== '#text') {
                 if (!alreadySeen.includes(textNode)) {
                     alreadySeen.push(textNode);
-                    var tSpanDx = textNode.getAttribute('dx');
+                    var tSpanDx = TextChunk.resolveRelativePositionAttribute(textNode, 'dx');
                     if (tSpanDx !== null) {
                         x += toPixels(tSpanDx, textNodeContext.attributeState.fontSize);
                     }
-                    var tSpanDy = textNode.getAttribute('dy');
+                    var tSpanDy = TextChunk.resolveRelativePositionAttribute(textNode, 'dy');
                     if (tSpanDy !== null) {
                         y += toPixels(tSpanDy, textNodeContext.attributeState.fontSize);
                     }
@@ -2759,6 +2669,26 @@ var TextChunk = /** @class */ (function () {
             context.pdf.restoreGraphicsState();
         }
         return [currentTextX, currentTextY];
+    };
+    /**
+     * Resolves a positional attribute (dx, dy) on a given tSpan, possibly
+     * inheriting it from the nearest ancestor. Positional attributes
+     * are only inherited from a parent to its first child.
+     */
+    TextChunk.resolveRelativePositionAttribute = function (element, attributeName) {
+        var _a;
+        var currentElement = element;
+        while (currentElement && nodeIs(currentElement, 'tspan')) {
+            if (currentElement.hasAttribute(attributeName)) {
+                return currentElement.getAttribute(attributeName);
+            }
+            if (!(((_a = element.parentElement) === null || _a === void 0 ? void 0 : _a.firstChild) === element)) {
+                // positional attributes are only inherited from a parent to its first child
+                break;
+            }
+            currentElement = currentElement.parentElement;
+        }
+        return null;
     };
     return TextChunk;
 }());
@@ -2994,7 +2924,7 @@ var PathNode = /** @class */ (function (_super) {
 }(GeometryNode));
 
 // groups: 1: mime-type (+ charset), 2: mime-type (w/o charset), 3: charset, 4: base64?, 5: body
-var dataUriRegex = /^\s*data:(([^/,;]+\/[^/,;]+)(?:;([^,;=]+=[^,;=]+))?)?(?:;(base64))?,(.*\s*)$/i;
+var dataUriRegex = /^\s*data:(([^/,;]+\/[^/,;]+)(?:;([^,;=]+=[^,;=]+))?)?(?:;(base64))?,((?:.|\s)*)$/i;
 var ImageNode = /** @class */ (function (_super) {
     __extends(ImageNode, _super);
     function ImageNode(element, children) {
@@ -3043,7 +2973,8 @@ var ImageNode = /** @class */ (function (_super) {
                                 refsHandler: new ReferencesHandler(idMap),
                                 styleSheets: context.styleSheets,
                                 viewport: new Viewport(width, height),
-                                svg2pdfParameters: context.svg2pdfParameters
+                                svg2pdfParameters: context.svg2pdfParameters,
+                                textMeasure: context.textMeasure
                             }))];
                     case 2:
                         _b.sent();
@@ -3057,7 +2988,7 @@ var ImageNode = /** @class */ (function (_super) {
                         catch (e) {
                             typeof console === 'object' &&
                                 console.warn &&
-                                console.warn("Could not load image " + this.imageUrl + ".\n" + e);
+                                console.warn("Could not load image " + this.imageUrl + ". \n" + e);
                         }
                         _b.label = 4;
                     case 4: return [2 /*return*/];
@@ -3090,6 +3021,7 @@ var ImageNode = /** @class */ (function (_super) {
                         format = mimeTypeParts[1];
                         data = match[5];
                         if (match[4] === 'base64') {
+                            data = data.replace(/\s/g, '');
                             data = atob(data);
                         }
                         else {
@@ -3237,7 +3169,8 @@ var MarkerNode = /** @class */ (function (_super) {
                             refsHandler: parentContext.refsHandler,
                             styleSheets: parentContext.styleSheets,
                             viewport: parentContext.viewport,
-                            svg2pdfParameters: parentContext.svg2pdfParameters
+                            svg2pdfParameters: parentContext.svg2pdfParameters,
+                            textMeasure: parentContext.textMeasure
                         });
                         // "Properties do not inherit from the element referencing the 'marker' into the contents of the
                         // marker. However, by using the context-stroke value for the fill or stroke on elements in its
@@ -3588,7 +3521,8 @@ var ClipPath = /** @class */ (function (_super) {
                                 styleSheets: context.styleSheets,
                                 viewport: context.viewport,
                                 withinClipPath: true,
-                                svg2pdfParameters: context.svg2pdfParameters
+                                svg2pdfParameters: context.svg2pdfParameters,
+                                textMeasure: context.textMeasure
                             }))];
                     case 2:
                         _b.sent();
@@ -3872,11 +3806,105 @@ var StyleSheets = /** @class */ (function () {
     return StyleSheets;
 }());
 
+var TextMeasure = /** @class */ (function () {
+    function TextMeasure() {
+        this.measureMethods = {};
+    }
+    TextMeasure.prototype.getTextOffset = function (text, attributeState) {
+        var textAnchor = attributeState.textAnchor;
+        if (textAnchor === 'start') {
+            return 0;
+        }
+        var width = this.measureTextWidth(text, attributeState);
+        var xOffset = 0;
+        switch (textAnchor) {
+            case 'end':
+                xOffset = width;
+                break;
+            case 'middle':
+                xOffset = width / 2;
+                break;
+        }
+        return xOffset;
+    };
+    TextMeasure.prototype.measureTextWidth = function (text, attributeState) {
+        if (text.length === 0) {
+            return 0;
+        }
+        var fontFamily = attributeState.fontFamily;
+        var measure = this.getMeasureFunction(fontFamily);
+        return measure.call(this, text, attributeState.fontFamily, attributeState.fontSize + 'px', attributeState.fontStyle, attributeState.fontWeight);
+    };
+    TextMeasure.prototype.getMeasurementTextNode = function () {
+        if (!this.textMeasuringTextElement) {
+            this.textMeasuringTextElement = document.createElementNS(svgNamespaceURI, 'text');
+            var svg = document.createElementNS(svgNamespaceURI, 'svg');
+            svg.appendChild(this.textMeasuringTextElement);
+            svg.style.setProperty('position', 'absolute');
+            svg.style.setProperty('visibility', 'hidden');
+            document.body.appendChild(svg);
+        }
+        return this.textMeasuringTextElement;
+    };
+    TextMeasure.prototype.canvasTextMeasure = function (text, fontFamily, fontSize, fontStyle, fontWeight) {
+        var canvas = document.createElement('canvas');
+        var context = canvas.getContext('2d');
+        if (context != null) {
+            context.font = [fontStyle, fontWeight, fontSize, fontFamily].join(' ');
+            return context.measureText(text).width;
+        }
+        return 0;
+    };
+    TextMeasure.prototype.svgTextMeasure = function (text, fontFamily, fontSize, fontStyle, fontWeight, measurementTextNode) {
+        if (measurementTextNode === void 0) { measurementTextNode = this.getMeasurementTextNode(); }
+        var textNode = measurementTextNode;
+        textNode.setAttribute('font-family', fontFamily);
+        textNode.setAttribute('font-size', fontSize);
+        textNode.setAttribute('font-style', fontStyle);
+        textNode.setAttribute('font-weight', fontWeight);
+        textNode.setAttributeNS('http://www.w3.org/XML/1998/namespace', 'xml:space', 'preserve');
+        textNode.textContent = text;
+        return textNode.getBBox().width;
+    };
+    /**
+     * Canvas text measuring is a lot faster than svg measuring. However, it is inaccurate for some fonts. So test each
+     * font once and decide if canvas is accurate enough.
+     */
+    TextMeasure.prototype.getMeasureFunction = function (fontFamily) {
+        var method = this.measureMethods[fontFamily];
+        if (!method) {
+            var fontSize = '16px';
+            var fontStyle = 'normal';
+            var fontWeight = 'normal';
+            var canvasWidth = this.canvasTextMeasure(TextMeasure.testString, fontFamily, fontSize, fontStyle, fontWeight);
+            var svgWidth = this.svgTextMeasure(TextMeasure.testString, fontFamily, fontSize, fontStyle, fontWeight);
+            method =
+                Math.abs(canvasWidth - svgWidth) < TextMeasure.epsilon
+                    ? this.canvasTextMeasure
+                    : this.svgTextMeasure;
+            this.measureMethods[fontFamily] = method;
+        }
+        return method;
+    };
+    TextMeasure.prototype.cleanupTextMeasuring = function () {
+        if (this.textMeasuringTextElement) {
+            var parentNode = this.textMeasuringTextElement.parentNode;
+            if (parentNode) {
+                document.body.removeChild(parentNode);
+            }
+            this.textMeasuringTextElement = undefined;
+        }
+    };
+    TextMeasure.testString = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789!"$%&/()=?\'\\+*-_.:,;^}][{#~|<>';
+    TextMeasure.epsilon = 0.1;
+    return TextMeasure;
+}());
+
 function svg2pdf(element, pdf, options) {
     var _a, _b, _c;
     if (options === void 0) { options = {}; }
     return __awaiter(this, void 0, void 0, function () {
-        var x, y, extCss, idMap, refsHandler, styleSheets, viewport, svg2pdfParameters, context, fill, node;
+        var x, y, extCss, idMap, refsHandler, styleSheets, viewport, svg2pdfParameters, textMeasure, context, fill, node;
         return __generator(this, function (_d) {
             switch (_d.label) {
                 case 0:
@@ -3893,7 +3921,14 @@ function svg2pdf(element, pdf, options) {
                     _d.sent();
                     viewport = new Viewport(pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
                     svg2pdfParameters = __assign(__assign({}, options), { element: element });
-                    context = new Context(pdf, { refsHandler: refsHandler, styleSheets: styleSheets, viewport: viewport, svg2pdfParameters: svg2pdfParameters });
+                    textMeasure = new TextMeasure();
+                    context = new Context(pdf, {
+                        refsHandler: refsHandler,
+                        styleSheets: styleSheets,
+                        viewport: viewport,
+                        svg2pdfParameters: svg2pdfParameters,
+                        textMeasure: textMeasure
+                    });
                     pdf.advancedAPI();
                     pdf.saveGraphicsState();
                     // set offsets
