@@ -6,6 +6,7 @@ import { ColorFill } from './fill/ColorFill'
 import { jsPDF } from 'jspdf'
 import { StyleSheets } from './context/stylesheets'
 import { Viewport } from './context/viewport'
+import { TextMeasure } from './context/textmeasure'
 
 export async function svg2pdf(
   element: Element,
@@ -28,7 +29,15 @@ export async function svg2pdf(
 
   const svg2pdfParameters = { ...options, element }
 
-  const context = new Context(pdf, { refsHandler, styleSheets, viewport, svg2pdfParameters })
+  const textMeasure = new TextMeasure()
+
+  const context = new Context(pdf, {
+    refsHandler,
+    styleSheets,
+    viewport,
+    svg2pdfParameters,
+    textMeasure
+  })
 
   pdf.advancedAPI()
   pdf.saveGraphicsState()

@@ -30,7 +30,8 @@ export class Pattern extends NonRenderedNode {
           refsHandler: context.refsHandler,
           styleSheets: context.styleSheets,
           viewport: context.viewport,
-          svg2pdfParameters: context.svg2pdfParameters
+          svg2pdfParameters: context.svg2pdfParameters,
+          textMeasure: context.textMeasure
         })
       )
     }

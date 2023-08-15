@@ -35,6 +35,10 @@ for (const test of window.tests) {
       // await svg2pdf(svgElement, pdf, svg2pdfOptions)
 
       comparePdf(pdf.output(), `/test/specs/${name}/reference.pdf`, debug)
+
+      if (document.querySelector('svg')) {
+        expect.fail('svg measuring element must not remain in document')
+      }
     })
   })
 }
