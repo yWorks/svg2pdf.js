@@ -38,24 +38,32 @@ export class Context {
       ? values.attributeState.clone()
       : AttributeState.default()
     this.viewport = values.viewport
-    this.refsHandler = values.refsHandler ?? null
-    this.styleSheets = values.styleSheets ?? null
-    this.textMeasure = values.textMeasure ?? new TextMeasure()
+    this.refsHandler = values.refsHandler
+    this.styleSheets = values.styleSheets
+    this.textMeasure = values.textMeasure
     this.transform = values.transform ?? this.pdf.unitMatrix
     this.withinClipPath = values.withinClipPath ?? false
     this.withinUse = values.withinUse ?? false
   }
 
-  clone(values: Partial<ContextOptions> = {}): Context {
+  clone(
+    values: {
+      viewport?: Viewport
+      attributeState?: AttributeState
+      transform?: Matrix
+      withinClipPath?: boolean
+      withinUse?: boolean
+    } = {}
+  ): Context {
     return new Context(this.pdf, {
-      svg2pdfParameters: values.svg2pdfParameters ?? this.svg2pdfParameters,
+      svg2pdfParameters: this.svg2pdfParameters,
       attributeState: values.attributeState
         ? values.attributeState.clone()
         : this.attributeState.clone(),
       viewport: values.viewport ?? this.viewport,
-      refsHandler: values.refsHandler ?? this.refsHandler,
-      styleSheets: values.styleSheets ?? this.styleSheets,
-      textMeasure: values.textMeasure ?? this.textMeasure,
+      refsHandler: this.refsHandler,
+      styleSheets: this.styleSheets,
+      textMeasure: this.textMeasure,
       transform: values.transform ?? this.transform,
       withinClipPath: values.withinClipPath ?? this.withinClipPath,
       withinUse: values.withinUse ?? this.withinUse
