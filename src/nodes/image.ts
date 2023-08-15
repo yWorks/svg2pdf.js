@@ -68,7 +68,8 @@ export class ImageNode extends GraphicsNode {
           refsHandler: new ReferencesHandler(idMap),
           styleSheets: context.styleSheets,
           viewport: new Viewport(width, height),
-          svg2pdfParameters: context.svg2pdfParameters
+          svg2pdfParameters: context.svg2pdfParameters,
+          textMeasure: context.textMeasure
         })
       )
       return
