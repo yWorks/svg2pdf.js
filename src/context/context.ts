@@ -69,7 +69,7 @@ export interface ContextOptions {
   attributeState?: AttributeState
   refsHandler: ReferencesHandler
   styleSheets: StyleSheets
-  textMeasure?: TextMeasure
+  textMeasure: TextMeasure
   transform?: Matrix
   withinClipPath?: boolean
   withinUse?: boolean

@@ -66,7 +66,8 @@ export class Use extends GraphicsNode {
       styleSheets: context.styleSheets,
       withinUse: true,
       viewport: refNodeOpensViewport ? new Viewport(width!, height!) : context.viewport,
-      svg2pdfParameters: context.svg2pdfParameters
+      svg2pdfParameters: context.svg2pdfParameters,
+      textMeasure: context.textMeasure
     })
     const color = context.attributeState.color
     await context.refsHandler.getRendered(id, color, node =>

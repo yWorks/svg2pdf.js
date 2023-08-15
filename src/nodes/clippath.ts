@@ -29,7 +29,8 @@ export class ClipPath extends NonRenderedNode {
           styleSheets: context.styleSheets,
           viewport: context.viewport,
           withinClipPath: true,
-          svg2pdfParameters: context.svg2pdfParameters
+          svg2pdfParameters: context.svg2pdfParameters,
+          textMeasure: context.textMeasure
         })
       )
     }
