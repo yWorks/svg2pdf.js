@@ -55,6 +55,7 @@ window.tests = [
   'style-sheets',
   'svg-viewbox',
   'svg-use',
+  'svg-use-empty',
   'symbols',
   'text-fill-stroke',
   'text-placement',
