@@ -2385,7 +2385,7 @@
         };
         GeometryNode.prototype.getBoundingBoxCore = function (context) {
             var path = this.getCachedPath(context);
-            if (!path) {
+            if (!path || !path.segments.length) {
                 return [0, 0, 0, 0];
             }
             var minX = Number.POSITIVE_INFINITY;
