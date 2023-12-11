@@ -80,7 +80,7 @@ export abstract class GeometryNode extends GraphicsNode {
 
   protected getBoundingBoxCore(context: Context): Rect {
     const path = this.getCachedPath(context)
-    if (!path) {
+    if (!path || !path.segments.length) {
       return [0, 0, 0, 0]
     }
     let minX = Number.POSITIVE_INFINITY
