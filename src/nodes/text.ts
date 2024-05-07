@@ -16,7 +16,7 @@ import { GraphicsNode } from './graphicsnode'
 import { Rect } from '../utils/geometry'
 import { Matrix } from 'jspdf'
 import { SvgNode } from './svgnode'
-import { parseAttributes } from '../applyparseattributes'
+import { parseAttributes, applyContext } from '../applyparseattributes'
 
 interface TrimInfo {
   prevText: string
@@ -153,6 +153,7 @@ export class TextNode extends GraphicsNode {
       if (visibility === 'visible') {
         const alignmentBaseline = context.attributeState.alignmentBaseline
         const textRenderingMode = getTextRenderingMode(context.attributeState)
+        applyContext(context)
         context.pdf.text(transformedText, textX + dx - xOffset, textY + dy, {
           baseline: mapAlignmentBaseline(alignmentBaseline),
           angle: context.transform,
