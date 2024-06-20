@@ -125,7 +125,8 @@ export function parseAttributes(context: Context, svgNode: SvgNode, node?: Eleme
 
   const alignmentBaseline =
     getAttribute(domNode, context.styleSheets, 'vertical-align') ||
-    getAttribute(domNode, context.styleSheets, 'alignment-baseline')
+    getAttribute(domNode, context.styleSheets, 'alignment-baseline') ||
+    getAttribute(domNode, context.styleSheets, 'dominant-baseline')
   if (alignmentBaseline) {
     const matchArr = alignmentBaseline.match(
       /(baseline|text-bottom|alphabetic|ideographic|middle|central|mathematical|text-top|bottom|center|top|hanging)/
