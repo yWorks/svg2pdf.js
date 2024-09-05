@@ -52,8 +52,7 @@ export abstract class GeometryNode extends GraphicsNode {
     const fill = context.attributeState.fill
     const stroke = context.attributeState.stroke && context.attributeState.strokeWidth !== 0
     const fillData = fill ? await fill.getFillData(this, context) : undefined
-    const isNodeFillRuleEvenOdd =
-      getAttribute(this.element, context.styleSheets, 'fill-rule') === 'evenodd'
+    const isNodeFillRuleEvenOdd = context.attributeState.fillRule === 'evenodd'
 
     // This is a workaround for symbols that are used multiple times with different
     // fill/stroke attributes. All paths within symbols are both filled and stroked
