@@ -139,6 +139,11 @@ export function parseAttributes(context: Context, svgNode: SvgNode, node?: Eleme
   if (textAnchor) {
     context.attributeState.textAnchor = textAnchor
   }
+
+  const fillRule = getAttribute(domNode, context.styleSheets, 'fill-rule')
+  if (fillRule) {
+    context.attributeState.fillRule = fillRule
+  }
 }
 
 export function applyAttributes(
