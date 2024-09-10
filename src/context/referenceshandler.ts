@@ -1,6 +1,6 @@
 import cssEsc from 'cssesc'
 import { SvgNode } from '../nodes/svgnode'
-import { RGBColor } from '../utils/rgbcolor'
+import { ContextColors } from './attributestate'
 
 export class ReferencesHandler {
   private readonly renderedElements: { [key: string]: SvgNode }
@@ -16,10 +16,10 @@ export class ReferencesHandler {
 
   public async getRendered(
     id: string,
-    color: RGBColor | null,
+    contextColors: ContextColors | null,
     renderCallback: (node: SvgNode) => Promise<void>
   ): Promise<SvgNode> {
-    const key = this.generateKey(id, color)
+    const key = this.generateKey(id, contextColors)
     if (this.renderedElements.hasOwnProperty(key)) {
       return this.renderedElements[id]
     }
@@ -36,7 +36,14 @@ export class ReferencesHandler {
     return this.idMap[cssEsc(id, { isIdentifier: true })]
   }
 
-  public generateKey(id: string, color: RGBColor | null): string {
-    return this.idPrefix + '|' + id + '|' + (color || new RGBColor('rgb(0,0,0)')).toRGBA()
+  public generateKey(id: string, color: ContextColors | null): string {
+    let colorHash = ''
+    const keys = ['color', 'contextFill', 'contextStroke'] as const
+
+    if (color) {
+      colorHash = keys.map(key => color[key]?.toRGBA() ?? '').join('|')
+    }
+
+    return this.idPrefix + '|' + id + '|' + colorHash
   }
 }

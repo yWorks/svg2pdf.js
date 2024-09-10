@@ -15,5 +15,5 @@ export abstract class NonRenderedNode extends SvgNode {
   protected computeNodeTransformCore(context: Context): Matrix {
     return context.pdf.unitMatrix
   }
-  abstract async apply(context: Context): Promise<void>
+  abstract apply(context: Context): Promise<void>
 }
