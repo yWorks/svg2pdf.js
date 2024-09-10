@@ -29,6 +29,7 @@ export class AttributeState {
   public color: RGBColor | null = null
   public contextFill: RGBColor | null = null
   public contextStroke: RGBColor | null = null
+  public fillRule: string | null = null
 
   clone(): AttributeState {
     const clone = new AttributeState()
@@ -56,6 +57,7 @@ export class AttributeState {
     clone.alignmentBaseline = this.alignmentBaseline
     clone.visibility = this.visibility
     clone.color = this.color
+    clone.fillRule = this.fillRule
 
     clone.contextFill = this.contextFill
     clone.contextStroke = this.contextStroke
@@ -89,6 +91,7 @@ export class AttributeState {
     attributeState.textAnchor = 'start'
     attributeState.visibility = 'visible'
     attributeState.color = new RGBColor('rgb(0, 0, 0)')
+    attributeState.fillRule = 'nonzero'
 
     attributeState.contextFill = null
     attributeState.contextStroke = null

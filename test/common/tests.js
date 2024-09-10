@@ -68,5 +68,6 @@ window.tests = [
   'zero-width-strokes',
   'zero-width-strokes-text',
   'current-color',
-  'text-length'
+  'text-length',
+  'group-fill-rule'
 ]
