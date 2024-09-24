@@ -82,7 +82,7 @@
     "mocha": "^8.0.1",
     "prettier": "^1.19.1",
     "requirejs": "^2.3.6",
-    "rollup": "^2.21.0",
+    "rollup": "^3.29.5",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-license": "^2.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
