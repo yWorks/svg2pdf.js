@@ -49,5 +49,5 @@ export abstract class RenderedNode extends SvgNode {
     }
   }
 
-  protected abstract async renderCore(context: Context): Promise<void>
+  protected abstract renderCore(context: Context): Promise<void>
 }
