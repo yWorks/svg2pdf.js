@@ -1,9 +1,12 @@
 import typescript from '@rollup/plugin-typescript'
-import { terser } from 'rollup-plugin-terser'
-import resolve from 'rollup-plugin-node-resolve'
-import commonjs from 'rollup-plugin-commonjs'
+import terser from '@rollup/plugin-terser'
+import resolve from '@rollup/plugin-node-resolve'
+import commonjs from '@rollup/plugin-commonjs'
 import license from 'rollup-plugin-license'
-import pkg from './package.json'
+import * as fs from 'node:fs'
+import * as path from 'node:path'
+
+const pkg = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, 'package.json'), 'utf8'))
 
 function licenseBanner() {
   return license({
