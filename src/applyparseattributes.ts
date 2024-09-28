@@ -71,11 +71,11 @@ export function parseAttributes(context: Context, svgNode: SvgNode, node?: Eleme
     }
   }
 
-  if (context.attributeState.stroke instanceof ColorFill) {
+  if (stroke && context.attributeState.stroke instanceof ColorFill) {
     context.attributeState.contextStroke = context.attributeState.stroke.color
   }
 
-  if (context.attributeState.fill instanceof ColorFill) {
+  if (fill && context.attributeState.fill instanceof ColorFill) {
     context.attributeState.contextFill = context.attributeState.fill.color
   }
 
