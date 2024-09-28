@@ -5,7 +5,7 @@
  */
 import { AttributeState } from '../context/attributestate'
 import { Context } from '../context/context'
-import jsPDF from 'jspdf'
+import { jsPDF } from 'jspdf'
 
 export type FontFamily = string
 
