@@ -36,12 +36,12 @@ export class ReferencesHandler {
     return this.idMap[cssEsc(id, { isIdentifier: true })]
   }
 
-  public generateKey(id: string, color: ContextColors | null): string {
+  public generateKey(id: string, contextColors: ContextColors | null): string {
     let colorHash = ''
     const keys = ['color', 'contextFill', 'contextStroke'] as const
 
-    if (color) {
-      colorHash = keys.map(key => color[key]?.toRGBA() ?? '').join('|')
+    if (contextColors) {
+      colorHash = keys.map(key => contextColors[key]?.toRGBA() ?? '').join('|')
     }
 
     return this.idPrefix + '|' + id + '|' + colorHash
