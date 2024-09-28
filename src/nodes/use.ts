@@ -8,7 +8,7 @@ import { parseFloats } from '../utils/parsing'
 import { SvgNode } from './svgnode'
 import { Symbol } from './symbol'
 import { Viewport } from '../context/viewport'
-import { RGBColor } from '../utils/rgbcolor'
+import { AttributeState } from '../context/attributestate'
 
 /**
  * Draws the element referenced by a use node, makes use of pdf's XObjects/FormObjects so nodes are only written once
@@ -61,17 +61,19 @@ export class Use extends GraphicsNode {
       t = context.pdf.Matrix(1, 0, 0, 1, x, y)
     }
 
+    const contextColors = AttributeState.getContextColors(context, true)
     const refContext = new Context(context.pdf, {
       refsHandler: context.refsHandler,
       styleSheets: context.styleSheets,
       withinUse: true,
       viewport: refNodeOpensViewport ? new Viewport(width!, height!) : context.viewport,
       svg2pdfParameters: context.svg2pdfParameters,
-      textMeasure: context.textMeasure
+      textMeasure: context.textMeasure,
+      attributeState: Object.assign(AttributeState.default(), contextColors)
     })
-    const color = context.attributeState.color
-    await context.refsHandler.getRendered(id, color, node =>
-      Use.renderReferencedNode(node, id, color, refContext)
+
+    await context.refsHandler.getRendered(id, contextColors, node =>
+      Use.renderReferencedNode(node, id, refContext)
     )
 
     context.pdf.saveGraphicsState()
@@ -86,14 +88,13 @@ export class Use extends GraphicsNode {
       context.pdf.clip().discardPath()
     }
 
-    context.pdf.doFormObject(context.refsHandler.generateKey(id, color), t)
+    context.pdf.doFormObject(context.refsHandler.generateKey(id, contextColors), t)
     context.pdf.restoreGraphicsState()
   }
 
   private static async renderReferencedNode(
     node: SvgNode,
     id: string,
-    color: RGBColor | null,
     refContext: Context
   ): Promise<void> {
     let bBox = node.getBoundingBox(refContext)
@@ -104,15 +105,13 @@ export class Use extends GraphicsNode {
     // still within.
     bBox = [bBox[0] - 0.5 * bBox[2], bBox[1] - 0.5 * bBox[3], bBox[2] * 2, bBox[3] * 2]
 
-    // set the color to use for the referenced node
-    refContext.attributeState.color = color
     refContext.pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], refContext.pdf.unitMatrix)
     if (node instanceof Symbol) {
       await node.apply(refContext)
     } else {
       await node.render(refContext)
     }
-    refContext.pdf.endFormObject(refContext.refsHandler.generateKey(id, color))
+    refContext.pdf.endFormObject(refContext.refsHandler.generateKey(id, refContext.attributeState))
   }
 
   protected getBoundingBoxCore(context: Context): number[] {

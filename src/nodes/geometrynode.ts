@@ -7,6 +7,7 @@ import { getAttribute } from '../utils/node'
 import { GraphicsNode } from './graphicsnode'
 import { SvgNode } from './svgnode'
 import { Rect } from '../utils/geometry'
+import { MarkerNode } from './marker'
 
 export abstract class GeometryNode extends GraphicsNode {
   private readonly hasMarkers: boolean
@@ -167,7 +168,8 @@ export abstract class GeometryNode extends GraphicsNode {
                   markerStart!,
                   [prev.x, prev.y],
                   // @ts-ignore
-                  getAngle(last ? [last.x, last.y] : [prev.x, prev.y], [curr.x1, curr.y1])
+                  getAngle(last ? [last.x, last.y] : [prev.x, prev.y], [curr.x1, curr.y1]),
+                  true
                 )
               )
             hasEndMarker &&
@@ -194,7 +196,7 @@ export abstract class GeometryNode extends GraphicsNode {
               // @ts-ignore
               const angle = last ? getDirectionVector([last.x, last.y], [curr.x, curr.y]) : curAngle
               markers.addMarker(
-                new Marker(markerStart!, [prev.x, prev.y], Math.atan2(angle[1], angle[0]))
+                new Marker(markerStart!, [prev.x, prev.y], Math.atan2(angle[1], angle[0]), true)
               )
             }
             hasEndMarker &&
@@ -242,6 +244,29 @@ export abstract class GeometryNode extends GraphicsNode {
         }
       }
     }
+
+    markers.markers.forEach(marker => {
+      const markerNode = context.refsHandler.get(marker.id) as MarkerNode
+
+      if (!markerNode) return
+
+      const orient: string | undefined = getAttribute(
+        markerNode.element,
+        context.styleSheets,
+        'orient'
+      )
+
+      if (orient == null) return
+
+      if (marker.isStartMarker && orient === 'auto-start-reverse') {
+        marker.angle += Math.PI
+      }
+
+      if (!isNaN(Number(orient))) {
+        marker.angle = (parseFloat(orient) / 180) * Math.PI
+      }
+    })
+
     return markers
   }
 }

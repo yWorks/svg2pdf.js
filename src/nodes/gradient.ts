@@ -77,7 +77,9 @@ export abstract class Gradient extends NonRenderedNode {
         const colorAttr = getAttribute(stop.element, styleSheets, 'color')
         const color = parseColor(
           getAttribute(stop.element, styleSheets, 'stop-color') || '',
-          colorAttr ? parseColor(colorAttr, null) : (this.contextColor as RGBColor | null)
+          colorAttr
+            ? { color: parseColor(colorAttr, null) }
+            : { color: this.contextColor as RGBColor | null }
         )
         const opacity = parseFloat(getAttribute(stop.element, styleSheets, 'stop-opacity') || '1')
         stops.push({

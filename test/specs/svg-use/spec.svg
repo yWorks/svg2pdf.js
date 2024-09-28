@@ -103,6 +103,10 @@
       <circle opacity="0.9" stroke-width="5" fill="red" cx="50" cy="50" r="50"/>
     </svg>
 
+    <svg id="context-paint" viewBox="0 0 100 100">
+      <circle opacity="0.9" stroke-width="5" fill="context-fill" stroke="context-stroke" cx="50" cy="50" r="50"/>
+    </svg>
+
   </defs>
 
   <use href="#myDot" x="200"/>
@@ -185,4 +189,9 @@
   <use href="#thickStroke" x="150" y="400" width="50" height="50"/>
 
   <use href="#opacity" x="150" y="450" width="50" height="50"/>
+
+  <g fill="red" stroke="blue">
+    <use href="#context-paint" x="450" y="50" width="50" height="50"/>
+  </g>
+
 </svg>

@@ -2,6 +2,7 @@
  * parses a comma, sign and/or whitespace separated string of floats and returns
  * the single floats in an array
  */
+import { ContextColors } from '../context/attributestate'
 import { RGBColor } from './rgbcolor'
 
 export function parseFloats(str: string): number[] {
@@ -18,15 +19,23 @@ export function parseFloats(str: string): number[] {
  * extends RGBColor by rgba colors as RGBColor is not capable of it
  * currentcolor: the color to return if colorString === 'currentcolor'
  */
-export function parseColor(colorString: string, currentcolor: RGBColor | null): RGBColor {
+export function parseColor(colorString: string, contextColors: ContextColors | null): RGBColor {
   if (colorString === 'transparent') {
     const transparent = new RGBColor('rgb(0,0,0)')
     transparent.a = 0
     return transparent
   }
 
-  if (colorString.toLowerCase() === 'currentcolor') {
-    return currentcolor || new RGBColor('rgb(0,0,0)')
+  if (contextColors && colorString.toLowerCase() === 'currentcolor') {
+    return contextColors.color || new RGBColor('rgb(0,0,0)')
+  }
+
+  if (contextColors && colorString.toLowerCase() === 'context-stroke') {
+    return contextColors.contextStroke || new RGBColor('rgb(0,0,0)')
+  }
+
+  if (contextColors && colorString.toLowerCase() === 'context-fill') {
+    return contextColors.contextFill || new RGBColor('rgb(0,0,0)')
   }
 
   const match = /\s*rgba\(((?:[^,\)]*,){3}[^,\)]*)\)\s*/.exec(colorString)

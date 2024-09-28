@@ -1,3 +1,4 @@
+import { AttributeState } from './context/attributestate'
 import { Context } from './context/context'
 import { MarkerNode } from './nodes/marker'
 
@@ -44,10 +45,11 @@ export class MarkerList {
 
       // as the marker is already scaled by the current line width we must not apply the line width twice!
       context.pdf.saveGraphicsState()
-      await context.refsHandler.getRendered(marker.id, null, node =>
+      const contextColors = AttributeState.getContextColors(context)
+      await context.refsHandler.getRendered(marker.id, contextColors, node =>
         (node as MarkerNode).apply(context)
       )
-      context.pdf.doFormObject(marker.id, tf)
+      context.pdf.doFormObject(context.refsHandler.generateKey(marker.id, contextColors), tf)
       context.pdf.restoreGraphicsState()
     }
   }
@@ -62,10 +64,12 @@ export class Marker {
   id: string
   anchor: number[]
   angle: number
+  isStartMarker: boolean
 
-  constructor(id: string, anchor: number[], angle: number) {
+  constructor(id: string, anchor: number[], angle: number, isStartMarker = false) {
     this.id = id
     this.anchor = anchor
     this.angle = angle
+    this.isStartMarker = isStartMarker
   }
 }

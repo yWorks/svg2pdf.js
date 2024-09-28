@@ -19,7 +19,7 @@ export function parseAttributes(context: Context, svgNode: SvgNode, node?: Eleme
   // update color first so currentColor becomes available for this node
   const color = getAttribute(domNode, context.styleSheets, 'color')
   if (color) {
-    const fillColor = parseColor(color, context.attributeState.color)
+    const fillColor = parseColor(color, context.attributeState)
     if (fillColor.ok) {
       context.attributeState.color = fillColor
     } else {
@@ -64,11 +64,19 @@ export function parseAttributes(context: Context, svgNode: SvgNode, node?: Eleme
       context.attributeState.stroke = null
     } else {
       // gradients, patterns not supported for strokes ...
-      const strokeRGB = parseColor(stroke, context.attributeState.color)
+      const strokeRGB = parseColor(stroke, context.attributeState)
       if (strokeRGB.ok) {
         context.attributeState.stroke = new ColorFill(strokeRGB)
       }
     }
+  }
+
+  if (stroke && context.attributeState.stroke instanceof ColorFill) {
+    context.attributeState.contextStroke = context.attributeState.stroke.color
+  }
+
+  if (fill && context.attributeState.fill instanceof ColorFill) {
+    context.attributeState.contextFill = context.attributeState.fill.color
   }
 
   const lineCap = getAttribute(domNode, context.styleSheets, 'stroke-linecap')

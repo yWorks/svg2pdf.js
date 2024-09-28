@@ -1,6 +1,7 @@
 import { RGBColor } from '../utils/rgbcolor'
 import { Fill } from '../fill/Fill'
 import { ColorFill } from '../fill/ColorFill'
+import { Context } from './context'
 
 export class AttributeState {
   public xmlSpace = ''
@@ -26,6 +27,8 @@ export class AttributeState {
   public textAnchor = ''
   public visibility = ''
   public color: RGBColor | null = null
+  public contextFill: RGBColor | null = null
+  public contextStroke: RGBColor | null = null
   public fillRule: string | null = null
 
   clone(): AttributeState {
@@ -55,6 +58,9 @@ export class AttributeState {
     clone.visibility = this.visibility
     clone.color = this.color
     clone.fillRule = this.fillRule
+
+    clone.contextFill = this.contextFill
+    clone.contextStroke = this.contextStroke
 
     return clone
   }
@@ -87,6 +93,27 @@ export class AttributeState {
     attributeState.color = new RGBColor('rgb(0, 0, 0)')
     attributeState.fillRule = 'nonzero'
 
+    attributeState.contextFill = null
+    attributeState.contextStroke = null
+
     return attributeState
   }
+
+  static getContextColors(context: Context, includeCurrentColor = false): ContextColors {
+    const colors: ContextColors = {}
+    if (context.attributeState.contextFill) {
+      colors['contextFill'] = context.attributeState.contextFill
+    }
+
+    if (context.attributeState.contextStroke) {
+      colors['contextStroke'] = context.attributeState.contextStroke
+    }
+
+    if (includeCurrentColor && context.attributeState.color) {
+      colors['color'] = context.attributeState.color
+    }
+    return colors
+  }
 }
+
+export type ContextColors = Partial<Pick<AttributeState, 'color' | 'contextFill' | 'contextStroke'>>
