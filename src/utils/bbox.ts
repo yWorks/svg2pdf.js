@@ -7,9 +7,18 @@ export function getBoundingBoxByChildren(context: Context, svgnode: SvgNode): nu
   if (getAttribute(svgnode.element, context.styleSheets, 'display') === 'none') {
     return [0, 0, 0, 0]
   }
-  let boundingBox = [0, 0, 0, 0]
+  let boundingBox : number[] = [];
   svgnode.children.forEach(child => {
     const nodeBox = child.getBoundingBox(context)
+    if ((nodeBox[0] === 0) && (nodeBox[1] === 0) && (nodeBox[2] === 0) && (nodeBox[3] === 0))
+       return;
+    const transform = child.computeNodeTransform(context);
+    // TODO: check and apply rotation matrix if any
+    nodeBox[0] += transform.tx;
+    nodeBox[1] += transform.ty;
+    if (boundingBox.length === 0)
+      boundingBox = nodeBox;
+    else
     boundingBox = [
       Math.min(boundingBox[0], nodeBox[0]),
       Math.min(boundingBox[1], nodeBox[1]),
@@ -19,7 +28,7 @@ export function getBoundingBoxByChildren(context: Context, svgnode: SvgNode): nu
         Math.min(boundingBox[1], nodeBox[1])
     ]
   })
-  return boundingBox
+  return boundingBox.length === 0 ? [0, 0, 0, 0] : boundingBox;
 }
 
 export function defaultBoundingBox(element: Element, context: Context): Rect {
