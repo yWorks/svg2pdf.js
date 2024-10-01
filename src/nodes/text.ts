@@ -24,6 +24,7 @@ interface TrimInfo {
 }
 
 export class TextNode extends GraphicsNode {
+  private boundingBox: number[] = []
   private processTSpans(
     textNode: SvgNode,
     node: Element,
@@ -159,6 +160,7 @@ export class TextNode extends GraphicsNode {
           renderingMode: textRenderingMode === 'fill' ? void 0 : textRenderingMode,
           charSpace: charSpace === 0 ? void 0 : charSpace
         })
+        this.boundingBox = [textX + dx - xOffset, textY + dy + 0.1 * pdfFontSize, context.textMeasure.measureTextWidth(transformedText, context.attributeState), pdfFontSize]
       }
     } else {
       // otherwise loop over tspans and position each relative to the previous one
@@ -228,7 +230,7 @@ export class TextNode extends GraphicsNode {
   }
 
   protected getBoundingBoxCore(context: Context): Rect {
-    return defaultBoundingBox(this.element, context)
+    return this.boundingBox.length > 0 ? this.boundingBox : defaultBoundingBox(this.element, context)
   }
 
   protected computeNodeTransformCore(context: Context): Matrix {
