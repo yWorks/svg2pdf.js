@@ -1,6 +1,6 @@
 import { Context } from '../context/context'
 import { ContainerNode } from './containernode'
-import { svgNodeAndChildrenVisible } from '../utils/node'
+import { svgNodeAndChildrenVisible, getAttribute } from '../utils/node'
 import { Matrix } from 'jspdf'
 
 export class Group extends ContainerNode {
@@ -10,5 +10,20 @@ export class Group extends ContainerNode {
 
   protected computeNodeTransformCore(context: Context): Matrix {
     return context.pdf.unitMatrix
+  }
+}
+
+export class GroupA extends Group {
+  protected async renderCore(context: Context): Promise<void> {
+    await super.renderCore(context)
+
+    const href = getAttribute(this.element, context.styleSheets, 'href')
+    if (href) {
+      const box = this.getBoundingBox(context)
+      const scale = context.pdf.internal.scaleFactor
+      const ph = context.pdf.internal.pageSize.getHeight()
+
+      context.pdf.link(scale*box[0], ph - scale*box[1], scale*box[2], scale*box[3], { url: href });
+    }
   }
 }
