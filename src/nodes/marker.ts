@@ -6,6 +6,7 @@ import { svgNodeAndChildrenVisible } from '../utils/node'
 import { Rect } from '../utils/geometry'
 import { Matrix } from 'jspdf'
 import { applyContext } from '../applyparseattributes'
+import { AttributeState } from '../context/attributestate'
 
 export class MarkerNode extends NonRenderedNode {
   async apply(parentContext: Context): Promise<void> {
@@ -15,12 +16,14 @@ export class MarkerNode extends NonRenderedNode {
 
     parentContext.pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], tfMatrix)
 
+    const contextColors = AttributeState.getContextColors(parentContext)
     const childContext = new Context(parentContext.pdf, {
       refsHandler: parentContext.refsHandler,
       styleSheets: parentContext.styleSheets,
       viewport: parentContext.viewport,
       svg2pdfParameters: parentContext.svg2pdfParameters,
-      textMeasure: parentContext.textMeasure
+      textMeasure: parentContext.textMeasure,
+      attributeState: Object.assign(AttributeState.default(), contextColors)
     })
 
     // "Properties do not inherit from the element referencing the 'marker' into the contents of the
@@ -33,7 +36,9 @@ export class MarkerNode extends NonRenderedNode {
     for (const child of this.children) {
       await child.render(childContext)
     }
-    parentContext.pdf.endFormObject(this.element.getAttribute('id'))
+    parentContext.pdf.endFormObject(
+      childContext.refsHandler.generateKey(this.element.getAttribute('id')!, contextColors)
+    )
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
