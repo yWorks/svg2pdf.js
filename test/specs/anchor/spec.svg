@@ -1,0 +1,34 @@
+<svg width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+  <path d="M40,0 V300 M0,20 H300 M0,70 H300 M0,120 H300 M0,170 H300 M0,220 H300 M0,270 H300" stroke="grey"/>
+
+  <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/dominant-baseline#hanging">
+    <text dominant-baseline="hanging" x="40" y="20" font-size="30">hanging</text>
+  </a>
+
+  <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/dominant-baseline#mathematical">
+    <text dominant-baseline="mathematical" x="40" y="70" font-size="30">mathematical</text>
+  </a>
+
+  <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/dominant-baseline#middle">
+    <text dominant-baseline="middle" x="40" y="120" font-size="30">middle</text>
+  </a>
+
+  <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/dominant-baseline#central">
+    <text dominant-baseline="central" x="40" y="170" font-size="30">central</text>
+  </a>
+
+  <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/dominant-baseline#alphabetic">
+    <text dominant-baseline="alphabetic" x="40" y="220" font-size="30">alphabetic</text>
+  </a>
+
+  <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/dominant-baseline#ideographic">
+    <text dominant-baseline="ideographic" x="40" y="270" font-size="30">ideographic</text>
+  </a>
+
+  <circle cx="40" cy="20" r="3" fill="red"/>
+  <circle cx="40" cy="70" r="3" fill="red"/>
+  <circle cx="40" cy="120" r="3" fill="red"/>
+  <circle cx="40" cy="170" r="3" fill="red"/>
+  <circle cx="40" cy="220" r="3" fill="red"/>
+  <circle cx="40" cy="270" r="3" fill="red"/>
+</svg>

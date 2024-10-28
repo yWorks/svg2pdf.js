@@ -1,4 +1,5 @@
 window.tests = [
+  'anchor',
   'attribute-style-precedence',
   'clippath',
   'clippath-empty',
