@@ -8,6 +8,7 @@ import { GraphicsNode } from './graphicsnode'
 import { Rect } from '../utils/geometry'
 import { Matrix } from 'jspdf'
 import { Viewport } from '../context/viewport'
+import { computeViewBoxTransform } from '../utils/transform'
 
 // groups: 1: mime-type (+ charset), 2: mime-type (w/o charset), 3: charset, 4: base64?, 5: body
 export const dataUriRegex = /^\s*data:(([^/,;]+\/[^/,;]+)(?:;([^,;=]+=[^,;=]+))?)?(?:;(base64))?,((?:.|\s)*)$/i
@@ -76,13 +77,26 @@ export class ImageNode extends GraphicsNode {
     } else {
       const dataUri = `data:image/${format};base64,${btoa(data)}`
       try {
-        context.pdf.addImage(
-          dataUri,
-          '', // will be ignored anyways if imageUrl is a data url
+        const [imgWidth, imgHeight] = await ImageNode.getImageDimensions(dataUri)
+        const viewBox = [0, 0, imgWidth, imgHeight]
+        const transform = computeViewBoxTransform(
+          this.element,
+          viewBox,
           x,
           y,
           width,
-          height
+          height,
+          context
+        )
+        context.pdf.setCurrentTransformationMatrix(transform)
+
+        context.pdf.addImage(
+          dataUri,
+          '', // will be ignored anyways if imageUrl is a data url
+          0,
+          0,
+          imgWidth,
+          imgHeight
         )
       } catch (e) {
         typeof console === 'object' &&
@@ -170,5 +184,16 @@ export class ImageNode extends GraphicsNode {
       default:
         return `image/${format}`
     }
+  }
+
+  static getImageDimensions(src: string): Promise<[number, number]> {
+    return new Promise((resolve, reject) => {
+      const img = new Image()
+      img.onload = () => {
+        resolve([img.width, img.height])
+      }
+      img.onerror = reject
+      img.src = src
+    })
   }
 }
