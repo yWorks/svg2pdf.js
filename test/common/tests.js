@@ -44,6 +44,7 @@ window.tests = [
   'rect',
   'references',
   'remote-images',
+  'rgb-color-percent',
   ['size-options/no-params-no-attrs-no-viewbox', [400, 300], {}],
   ['size-options/no-params-no-attrs-with-viewbox', [400, 300], {}],
   ['size-options/no-params-with-attrs-no-viewbox', [400, 300], {}],
