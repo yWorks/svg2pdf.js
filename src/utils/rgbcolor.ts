@@ -197,6 +197,17 @@ export class RGBColor {
         }
       },
       {
+        re: /^rgb\(([0-9.]+)%,\s*([0-9.]+)%,\s*([0-9.]+)%\)$/,
+        example: ['rgb(50.5%, 25.75%, 75.5%)', 'rgb(100%,0%,0%)'],
+        process: function(bits: any) {
+          return [
+            Math.round(parseFloat(bits[1]) * 2.55),
+            Math.round(parseFloat(bits[2]) * 2.55),
+            Math.round(parseFloat(bits[3]) * 2.55)
+          ]
+        }
+      },
+      {
         re: /^(\w{2})(\w{2})(\w{2})$/,
         example: ['#00ff00', '336699'],
         process: function(bits: any) {
