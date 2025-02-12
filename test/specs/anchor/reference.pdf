@@ -1,0 +1,414 @@
+%PDF-1.3
+%ºß¬à
+3 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/MediaBox [0 0 300. 300.]
+/Annots [
+<</Type /Annot /Subtype /Link /Rect [40. 277. 136.650390625 307.] /Border [0 0 0] /A <</S /URI /URI (https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/dominant-baseline#hanging) >> >>
+<</Type /Annot /Subtype /Link /Rect [40. 227. 201.5869140625 257.] /Border [0 0 0] /A <</S /URI /URI (https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/dominant-baseline#mathematical) >> >>
+<</Type /Annot /Subtype /Link /Rect [40. 177. 123.3203125 207.] /Border [0 0 0] /A <</S /URI /URI (https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/dominant-baseline#middle) >> >>
+<</Type /Annot /Subtype /Link /Rect [40. 127. 121.6064453125 157.] /Border [0 0 0] /A <</S /URI /URI (https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/dominant-baseline#central) >> >>
+<</Type /Annot /Subtype /Link /Rect [40. 77. 163.2666015625 107.] /Border [0 0 0] /A <</S /URI /URI (https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/dominant-baseline#alphabetic) >> >>
+<</Type /Annot /Subtype /Link /Rect [40. 27. 181.6064453125 57.] /Border [0 0 0] /A <</S /URI /URI (https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/dominant-baseline#ideographic) >> >>
+]
+/Contents 4 0 R
+>>
+endobj
+4 0 obj
+<<
+/Length 2513
+>>
+stream
+0.200025 w
+0 G
+q
+1. 0. 0. -1. 0. 300. cm
+q
+1. 0. 0. 1. 0. 0. cm
+1. w
+0. g
+q
+1. 0. 0. 1. 0. 0. cm
+0. 0. 300. 300. re
+W
+n
+q
+q
+0.5 G
+1. 0. 0. 1. 0. 0. cm
+40. 0. m
+40. 300. l
+0. 20. m
+300. 20. l
+0. 70. m
+300. 70. l
+0. 120. m
+300. 120. l
+0. 170. m
+300. 170. l
+0. 220. m
+300. 220. l
+0. 270. m
+300. 270. l
+B
+Q
+q
+q
+q
+BT
+/F9 30 Tf
+34.5 TL
+0 g
+1. 0. 0. -1. 40. 20. Tm
+(hanging) Tj
+ET
+Q
+Q
+Q
+q
+q
+q
+BT
+/F9 30 Tf
+34.5 TL
+0 g
+1. 0. 0. -1. 40. 70. Tm
+(mathematical) Tj
+ET
+Q
+Q
+Q
+q
+q
+q
+BT
+/F9 30 Tf
+34.5 TL
+0 g
+1. 0. 0. -1. 40. 120. Tm
+(middle) Tj
+ET
+Q
+Q
+Q
+q
+q
+q
+BT
+/F9 30 Tf
+34.5 TL
+0 g
+1. 0. 0. -1. 40. 170. Tm
+(central) Tj
+ET
+Q
+Q
+Q
+q
+q
+q
+BT
+/F9 30 Tf
+34.5 TL
+0 g
+1. 0. 0. -1. 40. 220. Tm
+(alphabetic) Tj
+ET
+Q
+Q
+Q
+q
+q
+q
+BT
+/F9 30 Tf
+34.5 TL
+0 g
+1. 0. 0. -1. 40. 270. Tm
+(ideographic) Tj
+ET
+Q
+Q
+Q
+q
+1. 0. 0. rg
+1. 0. 0. 1. 0. 0. cm
+43. 20. m
+43. 18.3431457505076203 41.6568542494923832 17. 40. 17. c
+38.3431457505076168 17. 37. 18.3431457505076203 37. 20. c
+37. 21.6568542494923797 38.3431457505076168 23. 40. 23. c
+41.6568542494923832 23. 43. 21.6568542494923797 43. 20. c
+f
+Q
+q
+1. 0. 0. rg
+1. 0. 0. 1. 0. 0. cm
+43. 70. m
+43. 68.3431457505076168 41.6568542494923832 67. 40. 67. c
+38.3431457505076168 67. 37. 68.3431457505076168 37. 70. c
+37. 71.6568542494923832 38.3431457505076168 73. 40. 73. c
+41.6568542494923832 73. 43. 71.6568542494923832 43. 70. c
+f
+Q
+q
+1. 0. 0. rg
+1. 0. 0. 1. 0. 0. cm
+43. 120. m
+43. 118.3431457505076168 41.6568542494923832 117. 40. 117. c
+38.3431457505076168 117. 37. 118.3431457505076168 37. 120. c
+37. 121.6568542494923832 38.3431457505076168 123. 40. 123. c
+41.6568542494923832 123. 43. 121.6568542494923832 43. 120. c
+f
+Q
+q
+1. 0. 0. rg
+1. 0. 0. 1. 0. 0. cm
+43. 170. m
+43. 168.343145750507631 41.6568542494923832 167. 40. 167. c
+38.3431457505076168 167. 37. 168.343145750507631 37. 170. c
+37. 171.656854249492369 38.3431457505076168 173. 40. 173. c
+41.6568542494923832 173. 43. 171.656854249492369 43. 170. c
+f
+Q
+q
+1. 0. 0. rg
+1. 0. 0. 1. 0. 0. cm
+43. 220. m
+43. 218.343145750507631 41.6568542494923832 217. 40. 217. c
+38.3431457505076168 217. 37. 218.343145750507631 37. 220. c
+37. 221.656854249492369 38.3431457505076168 223. 40. 223. c
+41.6568542494923832 223. 43. 221.656854249492369 43. 220. c
+f
+Q
+q
+1. 0. 0. rg
+1. 0. 0. 1. 0. 0. cm
+43. 270. m
+43. 268.343145750507631 41.6568542494923832 267. 40. 267. c
+38.3431457505076168 267. 37. 268.343145750507631 37. 270. c
+37. 271.656854249492369 38.3431457505076168 273. 40. 273. c
+41.6568542494923832 273. 43. 271.656854249492369 43. 270. c
+f
+Q
+Q
+Q
+Q
+Q
+endstream
+endobj
+1 0 obj
+<</Type /Pages
+/Kids [3 0 R ]
+/Count 1
+>>
+endobj
+5 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+6 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+7 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+8 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+9 0 obj
+<<
+/Type /Font
+/BaseFont /Courier
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+10 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+11 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+12 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+13 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Roman
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+14 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+15 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Italic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+16 0 obj
+<<
+/Type /Font
+/BaseFont /Times-BoldItalic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+17 0 obj
+<<
+/Type /Font
+/BaseFont /ZapfDingbats
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+18 0 obj
+<<
+/Type /Font
+/BaseFont /Symbol
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+2 0 obj
+<<
+/ProcSet [/PDF /Text /ImageB /ImageC /ImageI]
+/Font <<
+/F1 5 0 R
+/F2 6 0 R
+/F3 7 0 R
+/F4 8 0 R
+/F5 9 0 R
+/F6 10 0 R
+/F7 11 0 R
+/F8 12 0 R
+/F9 13 0 R
+/F10 14 0 R
+/F11 15 0 R
+/F12 16 0 R
+/F13 17 0 R
+/F14 18 0 R
+>>
+/XObject <<
+>>
+>>
+endobj
+19 0 obj
+<<
+/Producer (jsPDF 1.0.0)
+/CreationDate (D:19871210000000+00'00')
+>>
+endobj
+20 0 obj
+<<
+/Type /Catalog
+/Pages 1 0 R
+/OpenAction [3 0 R /FitH null]
+/PageLayout /OneColumn
+>>
+endobj
+xref
+0 21
+0000000000 65535 f 
+0000003865 00000 n 
+0000005682 00000 n 
+0000000015 00000 n 
+0000001300 00000 n 
+0000003922 00000 n 
+0000004047 00000 n 
+0000004177 00000 n 
+0000004310 00000 n 
+0000004447 00000 n 
+0000004570 00000 n 
+0000004699 00000 n 
+0000004831 00000 n 
+0000004967 00000 n 
+0000005095 00000 n 
+0000005222 00000 n 
+0000005351 00000 n 
+0000005484 00000 n 
+0000005586 00000 n 
+0000005930 00000 n 
+0000006016 00000 n 
+trailer
+<<
+/Size 21
+/Root 20 0 R
+/Info 19 0 R
+/ID [ <00000000000000000000000000000000> <00000000000000000000000000000000> ]
+>>
+startxref
+6120
+%%EOF
