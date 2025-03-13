@@ -3635,7 +3635,7 @@ var ClipPath = /** @class */ (function (_super) {
     }
     ClipPath.prototype.apply = function (context) {
         return __awaiter(this, void 0, void 0, function () {
-            var clipPathMatrix, _i, _a, child;
+            var clipPathMatrix, clipRule, _i, _a, child;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -3644,6 +3644,11 @@ var ClipPath = /** @class */ (function (_super) {
                         }
                         clipPathMatrix = context.pdf.matrixMult(this.computeNodeTransform(context), context.transform);
                         context.pdf.setCurrentTransformationMatrix(clipPathMatrix);
+                        clipRule = !this.children[0]
+                            ? undefined
+                            : (getAttribute(this.children[0].element, context.styleSheets, 'clip-rule') === 'evenodd'
+                                ? 'evenodd'
+                                : undefined);
                         _i = 0, _a = this.children;
                         _b.label = 1;
                     case 1:
@@ -3664,7 +3669,7 @@ var ClipPath = /** @class */ (function (_super) {
                         _i++;
                         return [3 /*break*/, 1];
                     case 4:
-                        context.pdf.clip().discardPath();
+                        context.pdf.clip(clipRule).discardPath();
                         // as we cannot use restoreGraphicsState() to reset the transform (this would reset the clipping path, as well),
                         // we must append the inverse instead
                         context.pdf.setCurrentTransformationMatrix(clipPathMatrix.inversed());

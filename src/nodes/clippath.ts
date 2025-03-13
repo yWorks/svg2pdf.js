@@ -1,7 +1,7 @@
 import { Context } from '../context/context'
 import { NonRenderedNode } from './nonrenderednode'
 import { getBoundingBoxByChildren } from '../utils/bbox'
-import { svgNodeAndChildrenVisible } from '../utils/node'
+import { getAttribute, svgNodeAndChildrenVisible } from '../utils/node'
 import { Rect } from '../utils/geometry'
 
 export class ClipPath extends NonRenderedNode {
@@ -20,7 +20,15 @@ export class ClipPath extends NonRenderedNode {
       context.transform
     )
 
+
     context.pdf.setCurrentTransformationMatrix(clipPathMatrix)
+
+    // Assuming all children have the same clip-rule. We don't support clip different rule per child yet.
+    const clipRule = !this.children[0]
+      ? undefined
+      : (getAttribute(this.children[0].element, context.styleSheets, 'clip-rule') === 'evenodd'
+          ? 'evenodd'
+          : undefined)
 
     for (const child of this.children) {
       await child.render(
@@ -34,7 +42,7 @@ export class ClipPath extends NonRenderedNode {
         })
       )
     }
-    context.pdf.clip().discardPath()
+    context.pdf.clip(clipRule).discardPath()
 
     // as we cannot use restoreGraphicsState() to reset the transform (this would reset the clipping path, as well),
     // we must append the inverse instead
