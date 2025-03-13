@@ -2,7 +2,8 @@ import { Context } from '../context/context'
 import { NonRenderedNode } from './nonrenderednode'
 import { getBoundingBoxByChildren } from '../utils/bbox'
 import { getAttribute, svgNodeAndChildrenVisible } from '../utils/node'
-import { Rect } from '../utils/geometry'
+import { type Rect } from '../utils/geometry'
+import { type StyleSheets } from '../context/stylesheets'
 
 export class ClipPath extends NonRenderedNode {
   async apply(context: Context): Promise<void> {
@@ -20,15 +21,7 @@ export class ClipPath extends NonRenderedNode {
       context.transform
     )
 
-
     context.pdf.setCurrentTransformationMatrix(clipPathMatrix)
-
-    // Assuming all children have the same clip-rule. We don't support clip different rule per child yet.
-    const clipRule = !this.children[0]
-      ? undefined
-      : (getAttribute(this.children[0].element, context.styleSheets, 'clip-rule') === 'evenodd'
-          ? 'evenodd'
-          : undefined)
 
     for (const child of this.children) {
       await child.render(
@@ -42,6 +35,15 @@ export class ClipPath extends NonRenderedNode {
         })
       )
     }
+
+    // Assuming all children have the same clip-rule. We don't support clip different rule per child yet.
+    const hasClipRuleFromFirstChild = this.children.length > 0 && !!getAttribute(this.children[0].element, context.styleSheets, 'clip-rule')
+
+    // Fallback to use `clip-rule` value from `clip-path` element if cannot retrieve from the first child
+    const clipRule = hasClipRuleFromFirstChild
+    ? this.getClipRuleAttr(this.children[0].element, context.styleSheets)
+    : this.getClipRuleAttr(this.element, context.styleSheets)
+
     context.pdf.clip(clipRule).discardPath()
 
     // as we cannot use restoreGraphicsState() to reset the transform (this would reset the clipping path, as well),
@@ -55,5 +57,9 @@ export class ClipPath extends NonRenderedNode {
 
   isVisible(parentVisible: boolean, context: Context): boolean {
     return svgNodeAndChildrenVisible(this, parentVisible, context)
+  }
+
+  private getClipRuleAttr(element: Element, styleSheets: StyleSheets): 'evenodd' | undefined {
+    return getAttribute(element, styleSheets, 'clip-rule') === 'evenodd' ? 'evenodd' : undefined
   }
 }

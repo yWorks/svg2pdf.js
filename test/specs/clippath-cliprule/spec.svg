@@ -8,4 +8,9 @@
     <polygon clip-rule="nonzero" points="80,80 51,170 128,115 32,115 109,170"/>
   </clipPath>
   <rect x="0" y="0" width="200" height="200" fill="blue" clip-path="url(#clip-nonzero)"/>
+
+  <clipPath id="clip-evenodd-parent" clip-rule="evenodd">
+    <polygon points="180,80 151,170 228,115 132,115 209,170"/>
+  </clipPath>
+  <rect x="120" y="0" width="200" height="200" fill="blue" clip-path="url(#clip-evenodd-parent)"/>
 </svg>
