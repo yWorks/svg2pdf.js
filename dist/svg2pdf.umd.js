@@ -5556,7 +5556,7 @@
         }
         ClipPath.prototype.apply = function (context) {
             return __awaiter(this, void 0, void 0, function () {
-                var clipPathMatrix, _i, _a, child;
+                var clipPathMatrix, _i, _a, child, hasClipRuleFromFirstChild, clipRule;
                 return __generator(this, function (_b) {
                     switch (_b.label) {
                         case 0:
@@ -5585,7 +5585,11 @@
                             _i++;
                             return [3 /*break*/, 1];
                         case 4:
-                            context.pdf.clip().discardPath();
+                            hasClipRuleFromFirstChild = this.children.length > 0 && !!getAttribute(this.children[0].element, context.styleSheets, 'clip-rule');
+                            clipRule = hasClipRuleFromFirstChild
+                                ? this.getClipRuleAttr(this.children[0].element, context.styleSheets)
+                                : this.getClipRuleAttr(this.element, context.styleSheets);
+                            context.pdf.clip(clipRule).discardPath();
                             // as we cannot use restoreGraphicsState() to reset the transform (this would reset the clipping path, as well),
                             // we must append the inverse instead
                             context.pdf.setCurrentTransformationMatrix(clipPathMatrix.inversed());
@@ -5599,6 +5603,9 @@
         };
         ClipPath.prototype.isVisible = function (parentVisible, context) {
             return svgNodeAndChildrenVisible(this, parentVisible, context);
+        };
+        ClipPath.prototype.getClipRuleAttr = function (element, styleSheets) {
+            return getAttribute(element, styleSheets, 'clip-rule') === 'evenodd' ? 'evenodd' : undefined;
         };
         return ClipPath;
     }(NonRenderedNode));
