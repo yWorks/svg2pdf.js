@@ -41,8 +41,8 @@ export class ClipPath extends NonRenderedNode {
 
     // Fallback to use `clip-rule` value from `clip-path` element if cannot retrieve from the first child
     const clipRule = hasClipRuleFromFirstChild
-    ? this.getClipRuleAttr(this.children[0].element, context.styleSheets)
-    : this.getClipRuleAttr(this.element, context.styleSheets)
+      ? this.getClipRuleAttr(this.children[0].element, context.styleSheets)
+      : this.getClipRuleAttr(this.element, context.styleSheets)
 
     context.pdf.clip(clipRule).discardPath()
 
