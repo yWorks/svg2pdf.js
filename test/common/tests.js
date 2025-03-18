@@ -2,6 +2,7 @@ window.tests = [
   'anchor',
   'attribute-style-precedence',
   'clippath',
+  'clippath-cliprule',
   'clippath-empty',
   'clippath-svg',
   'complete-bpmn',
