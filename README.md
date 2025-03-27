@@ -29,7 +29,7 @@ See [#102](https://github.com/yWorks/svg2pdf.js/issues/102) for details.
 import { jsPDF } from 'jspdf'
 import 'svg2pdf.js'
 
-const doc = new jsPDF()
+const doc = new jsPDF(width > height ? 'l' : 'p', 'pt', [width, height])
 
 const element = document.getElementById('svg')
 doc
