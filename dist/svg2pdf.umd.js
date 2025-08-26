@@ -28,11 +28,9 @@
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('jspdf')) :
     typeof define === 'function' && define.amd ? define(['exports', 'jspdf'], factory) :
     (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.svg2pdf = {}, global.jspdf));
-}(this, (function (exports, jsPDF) { 'use strict';
+})(this, (function (exports, jspdf) { 'use strict';
 
-    var jsPDF__default = 'default' in jsPDF ? jsPDF['default'] : jsPDF;
-
-    /*! *****************************************************************************
+    /******************************************************************************
     Copyright (c) Microsoft Corporation.
 
     Permission to use, copy, modify, and/or distribute this software for any
@@ -51,11 +49,13 @@
     var extendStatics = function(d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
 
     function __extends(d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -301,6 +301,17 @@
                     }
                 },
                 {
+                    re: /^rgb\(([0-9.]+)%,\s*([0-9.]+)%,\s*([0-9.]+)%\)$/,
+                    example: ['rgb(50.5%, 25.75%, 75.5%)', 'rgb(100%,0%,0%)'],
+                    process: function (bits) {
+                        return [
+                            Math.round(parseFloat(bits[1]) * 2.55),
+                            Math.round(parseFloat(bits[2]) * 2.55),
+                            Math.round(parseFloat(bits[3]) * 2.55)
+                        ];
+                    }
+                },
+                {
                     re: /^(\w{2})(\w{2})(\w{2})$/,
                     example: ['#00ff00', '336699'],
                     process: function (bits) {
@@ -437,6 +448,9 @@
             this.textAnchor = '';
             this.visibility = '';
             this.color = null;
+            this.contextFill = null;
+            this.contextStroke = null;
+            this.fillRule = null;
         }
         AttributeState.prototype.clone = function () {
             var clone = new AttributeState();
@@ -463,6 +477,9 @@
             clone.alignmentBaseline = this.alignmentBaseline;
             clone.visibility = this.visibility;
             clone.color = this.color;
+            clone.fillRule = this.fillRule;
+            clone.contextFill = this.contextFill;
+            clone.contextStroke = this.contextStroke;
             return clone;
         };
         AttributeState.default = function () {
@@ -490,7 +507,24 @@
             attributeState.textAnchor = 'start';
             attributeState.visibility = 'visible';
             attributeState.color = new RGBColor('rgb(0, 0, 0)');
+            attributeState.fillRule = 'nonzero';
+            attributeState.contextFill = null;
+            attributeState.contextStroke = null;
             return attributeState;
+        };
+        AttributeState.getContextColors = function (context, includeCurrentColor) {
+            if (includeCurrentColor === void 0) { includeCurrentColor = false; }
+            var colors = {};
+            if (context.attributeState.contextFill) {
+                colors['contextFill'] = context.attributeState.contextFill;
+            }
+            if (context.attributeState.contextStroke) {
+                colors['contextStroke'] = context.attributeState.contextStroke;
+            }
+            if (includeCurrentColor && context.attributeState.color) {
+                colors['color'] = context.attributeState.color;
+            }
+            return colors;
         };
         return AttributeState;
     }());
@@ -544,114 +578,130 @@
         return Context;
     }());
 
+    function getDefaultExportFromCjs (x) {
+    	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
+    }
+
     /*! https://mths.be/cssesc v3.0.0 by @mathias */
 
-    var object = {};
-    var hasOwnProperty = object.hasOwnProperty;
-    var merge = function merge(options, defaults) {
-    	if (!options) {
-    		return defaults;
-    	}
-    	var result = {};
-    	for (var key in defaults) {
-    		// `if (defaults.hasOwnProperty(key) { … }` is not needed here, since
-    		// only recognized option names are used.
-    		result[key] = hasOwnProperty.call(options, key) ? options[key] : defaults[key];
-    	}
-    	return result;
-    };
+    var cssesc_1;
+    var hasRequiredCssesc;
 
-    var regexAnySingleEscape = /[ -,\.\/:-@\[-\^`\{-~]/;
-    var regexSingleEscape = /[ -,\.\/:-@\[\]\^`\{-~]/;
-    var regexExcessiveSpaces = /(^|\\+)?(\\[A-F0-9]{1,6})\x20(?![a-fA-F0-9\x20])/g;
+    function requireCssesc () {
+    	if (hasRequiredCssesc) return cssesc_1;
+    	hasRequiredCssesc = 1;
 
-    // https://mathiasbynens.be/notes/css-escapes#css
-    var cssesc = function cssesc(string, options) {
-    	options = merge(options, cssesc.options);
-    	if (options.quotes != 'single' && options.quotes != 'double') {
-    		options.quotes = 'single';
-    	}
-    	var quote = options.quotes == 'double' ? '"' : '\'';
-    	var isIdentifier = options.isIdentifier;
+    	var object = {};
+    	var hasOwnProperty = object.hasOwnProperty;
+    	var merge = function merge(options, defaults) {
+    		if (!options) {
+    			return defaults;
+    		}
+    		var result = {};
+    		for (var key in defaults) {
+    			// `if (defaults.hasOwnProperty(key) { … }` is not needed here, since
+    			// only recognized option names are used.
+    			result[key] = hasOwnProperty.call(options, key) ? options[key] : defaults[key];
+    		}
+    		return result;
+    	};
 
-    	var firstChar = string.charAt(0);
-    	var output = '';
-    	var counter = 0;
-    	var length = string.length;
-    	while (counter < length) {
-    		var character = string.charAt(counter++);
-    		var codePoint = character.charCodeAt();
-    		var value = void 0;
-    		// If it’s not a printable ASCII character…
-    		if (codePoint < 0x20 || codePoint > 0x7E) {
-    			if (codePoint >= 0xD800 && codePoint <= 0xDBFF && counter < length) {
-    				// It’s a high surrogate, and there is a next character.
-    				var extra = string.charCodeAt(counter++);
-    				if ((extra & 0xFC00) == 0xDC00) {
-    					// next character is low surrogate
-    					codePoint = ((codePoint & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000;
-    				} else {
-    					// It’s an unmatched surrogate; only append this code unit, in case
-    					// the next code unit is the high surrogate of a surrogate pair.
-    					counter--;
+    	var regexAnySingleEscape = /[ -,\.\/:-@\[-\^`\{-~]/;
+    	var regexSingleEscape = /[ -,\.\/:-@\[\]\^`\{-~]/;
+    	var regexExcessiveSpaces = /(^|\\+)?(\\[A-F0-9]{1,6})\x20(?![a-fA-F0-9\x20])/g;
+
+    	// https://mathiasbynens.be/notes/css-escapes#css
+    	var cssesc = function cssesc(string, options) {
+    		options = merge(options, cssesc.options);
+    		if (options.quotes != 'single' && options.quotes != 'double') {
+    			options.quotes = 'single';
+    		}
+    		var quote = options.quotes == 'double' ? '"' : '\'';
+    		var isIdentifier = options.isIdentifier;
+
+    		var firstChar = string.charAt(0);
+    		var output = '';
+    		var counter = 0;
+    		var length = string.length;
+    		while (counter < length) {
+    			var character = string.charAt(counter++);
+    			var codePoint = character.charCodeAt();
+    			var value = void 0;
+    			// If it’s not a printable ASCII character…
+    			if (codePoint < 0x20 || codePoint > 0x7E) {
+    				if (codePoint >= 0xD800 && codePoint <= 0xDBFF && counter < length) {
+    					// It’s a high surrogate, and there is a next character.
+    					var extra = string.charCodeAt(counter++);
+    					if ((extra & 0xFC00) == 0xDC00) {
+    						// next character is low surrogate
+    						codePoint = ((codePoint & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000;
+    					} else {
+    						// It’s an unmatched surrogate; only append this code unit, in case
+    						// the next code unit is the high surrogate of a surrogate pair.
+    						counter--;
+    					}
     				}
-    			}
-    			value = '\\' + codePoint.toString(16).toUpperCase() + ' ';
-    		} else {
-    			if (options.escapeEverything) {
-    				if (regexAnySingleEscape.test(character)) {
+    				value = '\\' + codePoint.toString(16).toUpperCase() + ' ';
+    			} else {
+    				if (options.escapeEverything) {
+    					if (regexAnySingleEscape.test(character)) {
+    						value = '\\' + character;
+    					} else {
+    						value = '\\' + codePoint.toString(16).toUpperCase() + ' ';
+    					}
+    				} else if (/[\t\n\f\r\x0B]/.test(character)) {
+    					value = '\\' + codePoint.toString(16).toUpperCase() + ' ';
+    				} else if (character == '\\' || !isIdentifier && (character == '"' && quote == character || character == '\'' && quote == character) || isIdentifier && regexSingleEscape.test(character)) {
     					value = '\\' + character;
     				} else {
-    					value = '\\' + codePoint.toString(16).toUpperCase() + ' ';
+    					value = character;
     				}
-    			} else if (/[\t\n\f\r\x0B]/.test(character)) {
-    				value = '\\' + codePoint.toString(16).toUpperCase() + ' ';
-    			} else if (character == '\\' || !isIdentifier && (character == '"' && quote == character || character == '\'' && quote == character) || isIdentifier && regexSingleEscape.test(character)) {
-    				value = '\\' + character;
-    			} else {
-    				value = character;
+    			}
+    			output += value;
+    		}
+
+    		if (isIdentifier) {
+    			if (/^-[-\d]/.test(output)) {
+    				output = '\\-' + output.slice(1);
+    			} else if (/\d/.test(firstChar)) {
+    				output = '\\3' + firstChar + ' ' + output.slice(1);
     			}
     		}
-    		output += value;
-    	}
 
-    	if (isIdentifier) {
-    		if (/^-[-\d]/.test(output)) {
-    			output = '\\-' + output.slice(1);
-    		} else if (/\d/.test(firstChar)) {
-    			output = '\\3' + firstChar + ' ' + output.slice(1);
+    		// Remove spaces after `\HEX` escapes that are not followed by a hex digit,
+    		// since they’re redundant. Note that this is only possible if the escape
+    		// sequence isn’t preceded by an odd number of backslashes.
+    		output = output.replace(regexExcessiveSpaces, function ($0, $1, $2) {
+    			if ($1 && $1.length % 2) {
+    				// It’s not safe to remove the space, so don’t.
+    				return $0;
+    			}
+    			// Strip the space.
+    			return ($1 || '') + $2;
+    		});
+
+    		if (!isIdentifier && options.wrap) {
+    			return quote + output + quote;
     		}
-    	}
+    		return output;
+    	};
 
-    	// Remove spaces after `\HEX` escapes that are not followed by a hex digit,
-    	// since they’re redundant. Note that this is only possible if the escape
-    	// sequence isn’t preceded by an odd number of backslashes.
-    	output = output.replace(regexExcessiveSpaces, function ($0, $1, $2) {
-    		if ($1 && $1.length % 2) {
-    			// It’s not safe to remove the space, so don’t.
-    			return $0;
-    		}
-    		// Strip the space.
-    		return ($1 || '') + $2;
-    	});
+    	// Expose default options (so they can be overridden globally).
+    	cssesc.options = {
+    		'escapeEverything': false,
+    		'isIdentifier': false,
+    		'quotes': 'single',
+    		'wrap': false
+    	};
 
-    	if (!isIdentifier && options.wrap) {
-    		return quote + output + quote;
-    	}
-    	return output;
-    };
+    	cssesc.version = '3.0.0';
 
-    // Expose default options (so they can be overridden globally).
-    cssesc.options = {
-    	'escapeEverything': false,
-    	'isIdentifier': false,
-    	'quotes': 'single',
-    	'wrap': false
-    };
+    	cssesc_1 = cssesc;
+    	return cssesc_1;
+    }
 
-    cssesc.version = '3.0.0';
-
-    var cssesc_1 = cssesc;
+    var cssescExports = requireCssesc();
+    var cssesc = /*@__PURE__*/getDefaultExportFromCjs(cssescExports);
 
     var ReferencesHandler = /** @class */ (function () {
         function ReferencesHandler(idMap) {
@@ -659,13 +709,13 @@
             this.idMap = idMap;
             this.idPrefix = String(ReferencesHandler.instanceCounter++);
         }
-        ReferencesHandler.prototype.getRendered = function (id, color, renderCallback) {
+        ReferencesHandler.prototype.getRendered = function (id, contextColors, renderCallback) {
             return __awaiter(this, void 0, void 0, function () {
                 var key, svgNode;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            key = this.generateKey(id, color);
+                            key = this.generateKey(id, contextColors);
                             if (this.renderedElements.hasOwnProperty(key)) {
                                 return [2 /*return*/, this.renderedElements[id]];
                             }
@@ -680,10 +730,15 @@
             });
         };
         ReferencesHandler.prototype.get = function (id) {
-            return this.idMap[cssesc_1(id, { isIdentifier: true })];
+            return this.idMap[cssesc(id, { isIdentifier: true })];
         };
-        ReferencesHandler.prototype.generateKey = function (id, color) {
-            return this.idPrefix + '|' + id + '|' + (color || new RGBColor('rgb(0,0,0)')).toRGBA();
+        ReferencesHandler.prototype.generateKey = function (id, contextColors) {
+            var colorHash = '';
+            var keys = ['color', 'contextFill', 'contextStroke'];
+            if (contextColors) {
+                colorHash = keys.map(function (key) { var _a, _b; return (_b = (_a = contextColors[key]) === null || _a === void 0 ? void 0 : _a.toRGBA()) !== null && _b !== void 0 ? _b : ''; }).join('|');
+            }
+            return this.idPrefix + '|' + id + '|' + colorHash;
         };
         ReferencesHandler.instanceCounter = 0;
         return ReferencesHandler;
@@ -878,7 +933,7 @@
         };
         MarkerList.prototype.draw = function (context) {
             return __awaiter(this, void 0, void 0, function () {
-                var i, marker, tf, angle, anchor, cos, sin;
+                var i, marker, tf, angle, anchor, cos, sin, contextColors;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -898,12 +953,13 @@
                             tf = context.pdf.matrixMult(tf, context.transform);
                             // as the marker is already scaled by the current line width we must not apply the line width twice!
                             context.pdf.saveGraphicsState();
-                            return [4 /*yield*/, context.refsHandler.getRendered(marker.id, null, function (node) {
+                            contextColors = AttributeState.getContextColors(context);
+                            return [4 /*yield*/, context.refsHandler.getRendered(marker.id, contextColors, function (node) {
                                     return node.apply(context);
                                 })];
                         case 2:
                             _a.sent();
-                            context.pdf.doFormObject(marker.id, tf);
+                            context.pdf.doFormObject(context.refsHandler.generateKey(marker.id, contextColors), tf);
                             context.pdf.restoreGraphicsState();
                             _a.label = 3;
                         case 3:
@@ -922,10 +978,12 @@
      * @param {number} angle
      */
     var Marker = /** @class */ (function () {
-        function Marker(id, anchor, angle) {
+        function Marker(id, anchor, angle, isStartMarker) {
+            if (isStartMarker === void 0) { isStartMarker = false; }
             this.id = id;
             this.anchor = anchor;
             this.angle = angle;
+            this.isStartMarker = isStartMarker;
         }
         return Marker;
     }());
@@ -970,10 +1028,6 @@
         return alignmentBaselineMap[value] || 'alphabetic';
     }
 
-    /**
-     * parses a comma, sign and/or whitespace separated string of floats and returns
-     * the single floats in an array
-     */
     function parseFloats(str) {
         var floats = [];
         var regex = /[+-]?(?:(?:\d+\.?\d*)|(?:\d*\.?\d+))(?:[eE][+-]?\d+)?/g;
@@ -987,14 +1041,20 @@
      * extends RGBColor by rgba colors as RGBColor is not capable of it
      * currentcolor: the color to return if colorString === 'currentcolor'
      */
-    function parseColor(colorString, currentcolor) {
+    function parseColor(colorString, contextColors) {
         if (colorString === 'transparent') {
             var transparent = new RGBColor('rgb(0,0,0)');
             transparent.a = 0;
             return transparent;
         }
-        if (colorString.toLowerCase() === 'currentcolor') {
-            return currentcolor || new RGBColor('rgb(0,0,0)');
+        if (contextColors && colorString.toLowerCase() === 'currentcolor') {
+            return contextColors.color || new RGBColor('rgb(0,0,0)');
+        }
+        if (contextColors && colorString.toLowerCase() === 'context-stroke') {
+            return contextColors.contextStroke || new RGBColor('rgb(0,0,0)');
+        }
+        if (contextColors && colorString.toLowerCase() === 'context-fill') {
+            return contextColors.contextFill || new RGBColor('rgb(0,0,0)');
         }
         var match = /\s*rgba\(((?:[^,\)]*,){3}[^,\)]*)\)\s*/.exec(colorString);
         if (match) {
@@ -1008,243 +1068,254 @@
         }
     }
 
-    // parse
-    // =====
+    var fontFamilyPapandreou;
+    var hasRequiredFontFamilyPapandreou;
 
-    // states
-    // ------
+    function requireFontFamilyPapandreou () {
+    	if (hasRequiredFontFamilyPapandreou) return fontFamilyPapandreou;
+    	hasRequiredFontFamilyPapandreou = 1;
+    	// parse
+    	// =====
 
-    var PLAIN                = 0;
-    var STRINGS              = 1;
-    var ESCAPING             = 2;
-    var IDENTIFIER           = 3;
-    var SEPARATING           = 4;
-    var SPACEAFTERIDENTIFIER = 5;
+    	// states
+    	// ------
 
-    // patterns
-    // --------
+    	var PLAIN                = 0;
+    	var STRINGS              = 1;
+    	var ESCAPING             = 2;
+    	var IDENTIFIER           = 3;
+    	var SEPARATING           = 4;
+    	var SPACEAFTERIDENTIFIER = 5;
 
-    var identifierPattern = /[a-z0-9_-]/i;
-    var spacePattern      = /[\s\t]/;
+    	// patterns
+    	// --------
 
-    // ---
+    	var identifierPattern = /[a-z0-9_-]/i;
+    	var spacePattern      = /[\s\t]/;
 
-    var parse = function(str) {
+    	// ---
 
-      // vars
-      // ----
+    	var parse = function(str) {
 
-      var starting = true;
-      var state    = PLAIN;
-      var buffer   = '';
-      var i        = 0;
-      var quote;
-      var c;
+    	  // vars
+    	  // ----
 
-      // result
-      // ------
+    	  var starting = true;
+    	  var state    = PLAIN;
+    	  var buffer   = '';
+    	  var i        = 0;
+    	  var quote;
+    	  var c;
 
-      var names  = [];
+    	  // result
+    	  // ------
 
-      // parse
-      // -----
+    	  var names  = [];
 
-      while (true) {
+    	  // parse
+    	  // -----
 
-        c = str[i];
+    	  while (true) {
 
-        if (state === PLAIN) {
+    	    c = str[i];
 
-          if (!c && starting) {
+    	    if (state === PLAIN) {
 
-            break;
+    	      if (!c && starting) {
 
-          } else if (!c && !starting) {
+    	        break;
 
-            throw new Error('Parse error');
+    	      } else if (!c && !starting) {
 
-          } else if (c === '"' || c === "'") {
+    	        throw new Error('Parse error');
 
-            quote = c;
-            state = STRINGS;
-            starting = false;
+    	      } else if (c === '"' || c === "'") {
 
-          } else if (spacePattern.test(c)) ; else if (identifierPattern.test(c)) {
+    	        quote = c;
+    	        state = STRINGS;
+    	        starting = false;
 
-            state = IDENTIFIER;
-            starting = false;
-            i--;
+    	      } else if (spacePattern.test(c)) ; else if (identifierPattern.test(c)) {
 
-          } else {
+    	        state = IDENTIFIER;
+    	        starting = false;
+    	        i--;
 
-            throw new Error('Parse error');
+    	      } else {
 
-          }
+    	        throw new Error('Parse error');
 
-        } else if (state === STRINGS) {
+    	      }
 
-          if (!c) {
+    	    } else if (state === STRINGS) {
 
-            throw new Error('Parse Error');
+    	      if (!c) {
 
-          } else if (c === "\\") {
+    	        throw new Error('Parse Error');
 
-            state = ESCAPING;
+    	      } else if (c === "\\") {
 
-          } else if (c === quote) {
+    	        state = ESCAPING;
 
-            names.push(buffer);
-            buffer = '';
-            state = SEPARATING;
+    	      } else if (c === quote) {
 
-          } else {
+    	        names.push(buffer);
+    	        buffer = '';
+    	        state = SEPARATING;
 
-            buffer += c;
+    	      } else {
 
-          }
+    	        buffer += c;
 
-        } else if (state === ESCAPING) {
+    	      }
 
-          if (c === quote || c === "\\") {
+    	    } else if (state === ESCAPING) {
 
-            buffer += c;
-            state = STRINGS;
+    	      if (c === quote || c === "\\") {
 
-          } else {
+    	        buffer += c;
+    	        state = STRINGS;
 
-            throw new Error('Parse error');
+    	      } else {
 
-          }
+    	        throw new Error('Parse error');
 
-        } else if (state === IDENTIFIER) {
+    	      }
 
-          if (!c) {
+    	    } else if (state === IDENTIFIER) {
 
-            names.push(buffer);
-            break;
+    	      if (!c) {
 
-          } else if (identifierPattern.test(c)) {
+    	        names.push(buffer);
+    	        break;
 
-            buffer += c;
+    	      } else if (identifierPattern.test(c)) {
 
-          } else if (c === ',') {
+    	        buffer += c;
 
-            names.push(buffer);
-            buffer = '';
-            state = PLAIN;
+    	      } else if (c === ',') {
 
-          } else if (spacePattern.test(c)) {
+    	        names.push(buffer);
+    	        buffer = '';
+    	        state = PLAIN;
 
-            state = SPACEAFTERIDENTIFIER;
-          } else {
+    	      } else if (spacePattern.test(c)) {
 
-            throw new Error('Parse error');
+    	        state = SPACEAFTERIDENTIFIER;
+    	      } else {
 
-          }
-        } else if (state === SPACEAFTERIDENTIFIER) {
+    	        throw new Error('Parse error');
 
-          if (!c) {
+    	      }
+    	    } else if (state === SPACEAFTERIDENTIFIER) {
 
-            names.push(buffer);
-            break;
+    	      if (!c) {
 
-          } else if (identifierPattern.test(c)) {
+    	        names.push(buffer);
+    	        break;
 
-            buffer += ' ' + c;
-            state = IDENTIFIER;
+    	      } else if (identifierPattern.test(c)) {
 
-          } else if (c === ',') {
+    	        buffer += ' ' + c;
+    	        state = IDENTIFIER;
 
-            names.push(buffer);
-            buffer = '';
-            state = PLAIN;
+    	      } else if (c === ',') {
 
-          } else if (spacePattern.test(c)) ; else {
+    	        names.push(buffer);
+    	        buffer = '';
+    	        state = PLAIN;
 
-            throw new Error('Parse error');
+    	      } else if (spacePattern.test(c)) ; else {
 
-          }
+    	        throw new Error('Parse error');
 
-        } else if (state === SEPARATING) {
+    	      }
 
-          if (!c) {
+    	    } else if (state === SEPARATING) {
 
-            break;
+    	      if (!c) {
 
-          } else if (c === ',') {
+    	        break;
 
-            state = PLAIN;
+    	      } else if (c === ',') {
 
-          } else if (spacePattern.test(c)) ; else {
+    	        state = PLAIN;
 
-            throw new Error('Parse error');
+    	      } else if (spacePattern.test(c)) ; else {
 
-          }
+    	        throw new Error('Parse error');
 
-        }
+    	      }
 
-        i++;
+    	    }
 
-      }
+    	    i++;
 
-      // result
-      // ------
+    	  }
 
-      return names;
+    	  // result
+    	  // ------
 
-    };
+    	  return names;
 
-    // stringify
-    // =========
+    	};
 
-    // pattern
-    // -------
+    	// stringify
+    	// =========
 
-    var stringsPattern = /[^a-z0-9_-]/i;
+    	// pattern
+    	// -------
 
-    // ---
+    	var stringsPattern = /[^a-z0-9_-]/i;
 
-    var stringify = function(names, options) {
+    	// ---
 
-      // quote
-      // -----
+    	var stringify = function(names, options) {
 
-      var quote = options && options.quote || '"';
-      if (quote !== '"' && quote !== "'") {
-        throw new Error('Quote must be `\'` or `"`');
-      }
-      var quotePattern = new RegExp(quote, 'g');
+    	  // quote
+    	  // -----
 
-      // stringify
-      // ---------
+    	  var quote = options && options.quote || '"';
+    	  if (quote !== '"' && quote !== "'") {
+    	    throw new Error('Quote must be `\'` or `"`');
+    	  }
+    	  var quotePattern = new RegExp(quote, 'g');
 
-      var safeNames = [];
+    	  // stringify
+    	  // ---------
 
-      for (var i = 0; i < names.length; ++i) {
-        var name = names[i];
+    	  var safeNames = [];
 
-        if (stringsPattern.test(name)) {
-          name = name
-            .replace(/\\/g, "\\\\")
-            .replace(quotePattern, "\\" + quote);
-          name = quote + name + quote;
-        }
-        safeNames.push(name);
-      }
+    	  for (var i = 0; i < names.length; ++i) {
+    	    var name = names[i];
 
-      // result
-      // ------
+    	    if (stringsPattern.test(name)) {
+    	      name = name
+    	        .replace(/\\/g, "\\\\")
+    	        .replace(quotePattern, "\\" + quote);
+    	      name = quote + name + quote;
+    	    }
+    	    safeNames.push(name);
+    	  }
 
-      return safeNames.join(', ');
-    };
+    	  // result
+    	  // ------
 
-    // export
-    // ======
+    	  return safeNames.join(', ');
+    	};
 
-    var C__Users_hollaender_Documents_github_svg2pdf_node_modules_fontFamilyPapandreou = {
-      parse:     parse,
-      stringify: stringify,
-    };
+    	// export
+    	// ======
+
+    	fontFamilyPapandreou = {
+    	  parse:     parse,
+    	  stringify: stringify,
+    	};
+    	return fontFamilyPapandreou;
+    }
+
+    var fontFamilyPapandreouExports = requireFontFamilyPapandreou();
+    var FontFamily = /*@__PURE__*/getDefaultExportFromCjs(fontFamilyPapandreouExports);
 
     var fontAliases = {
         'sans-serif': 'helvetica',
@@ -1280,7 +1351,7 @@
         return firstAvailable;
     }
     var isJsPDF23 = (function () {
-        var parts = jsPDF__default.version.split('.');
+        var parts = jspdf.jsPDF.version.split('.');
         return parseFloat(parts[0]) === 2 && parseFloat(parts[1]) === 3;
     })();
     function combineFontStyleAndFontWeight(fontStyle, fontWeight) {
@@ -1308,19 +1379,30 @@
         if (getAttribute(svgnode.element, context.styleSheets, 'display') === 'none') {
             return [0, 0, 0, 0];
         }
-        var boundingBox = [0, 0, 0, 0];
+        var boundingBox = [];
         svgnode.children.forEach(function (child) {
             var nodeBox = child.getBoundingBox(context);
-            boundingBox = [
-                Math.min(boundingBox[0], nodeBox[0]),
-                Math.min(boundingBox[1], nodeBox[1]),
-                Math.max(boundingBox[0] + boundingBox[2], nodeBox[0] + nodeBox[2]) -
+            if ((nodeBox[0] === 0) && (nodeBox[1] === 0) && (nodeBox[2] === 0) && (nodeBox[3] === 0))
+                return;
+            var transform = child.computeNodeTransform(context);
+            // TODO: take into account rotation matrix
+            nodeBox[0] = nodeBox[0] * transform.sx + transform.tx;
+            nodeBox[1] = nodeBox[1] * transform.sy + transform.ty;
+            nodeBox[2] = nodeBox[2] * transform.sx;
+            nodeBox[3] = nodeBox[3] * transform.sy;
+            if (boundingBox.length === 0)
+                boundingBox = nodeBox;
+            else
+                boundingBox = [
                     Math.min(boundingBox[0], nodeBox[0]),
-                Math.max(boundingBox[1] + boundingBox[3], nodeBox[1] + nodeBox[3]) -
-                    Math.min(boundingBox[1], nodeBox[1])
-            ];
+                    Math.min(boundingBox[1], nodeBox[1]),
+                    Math.max(boundingBox[0] + boundingBox[2], nodeBox[0] + nodeBox[2]) -
+                        Math.min(boundingBox[0], nodeBox[0]),
+                    Math.max(boundingBox[1] + boundingBox[3], nodeBox[1] + nodeBox[3]) -
+                        Math.min(boundingBox[1], nodeBox[1])
+                ];
         });
-        return boundingBox;
+        return boundingBox.length === 0 ? [0, 0, 0, 0] : boundingBox;
     }
     function defaultBoundingBox(element, context) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1542,9 +1624,9 @@
                         }
                     });
                     if (hasOpacity) {
-                        gState = new jsPDF.GState({ opacity: opacitySum / colors.length });
+                        gState = new jspdf.GState({ opacity: opacitySum / colors.length });
                     }
-                    pattern = new jsPDF.ShadingPattern(this.pdfGradientType, this.getCoordinates(), colors, gState);
+                    pattern = new jspdf.ShadingPattern(this.pdfGradientType, this.getCoordinates(), colors, gState);
                     context.pdf.addShadingPattern(id, pattern);
                     return [2 /*return*/];
                 });
@@ -1572,7 +1654,9 @@
             this.children.forEach(function (stop) {
                 if (stop.element.tagName.toLowerCase() === 'stop') {
                     var colorAttr = getAttribute(stop.element, styleSheets, 'color');
-                    var color = parseColor(getAttribute(stop.element, styleSheets, 'stop-color') || '', colorAttr ? parseColor(colorAttr, null) : _this.contextColor);
+                    var color = parseColor(getAttribute(stop.element, styleSheets, 'stop-color') || '', colorAttr
+                        ? { color: parseColor(colorAttr, null) }
+                        : { color: _this.contextColor });
                     var opacity = parseFloat(getAttribute(stop.element, styleSheets, 'stop-opacity') || '1');
                     stops.push({
                         offset: Gradient.parseGradientOffset(stop.element.getAttribute('offset') || '0'),
@@ -1704,7 +1788,7 @@
                                 return [2 /*return*/];
                             }
                             bBox = this.getBoundingBox(context);
-                            pattern = new jsPDF.TilingPattern([bBox[0], bBox[1], bBox[0] + bBox[2], bBox[1] + bBox[3]], bBox[2], bBox[3]);
+                            pattern = new jspdf.TilingPattern([bBox[0], bBox[1], bBox[0] + bBox[2], bBox[1] + bBox[3]], bBox[2], bBox[3]);
                             context.pdf.beginTilingPattern(pattern);
                             _i = 0, _a = this.children;
                             _b.label = 1;
@@ -1837,7 +1921,7 @@
         }
         else {
             // plain color
-            var fillColor = parseColor(fill, context.attributeState.color);
+            var fillColor = parseColor(fill, context.attributeState);
             if (fillColor.ok) {
                 return new ColorFill(fillColor);
             }
@@ -1876,7 +1960,7 @@
         // update color first so currentColor becomes available for this node
         var color = getAttribute(domNode, context.styleSheets, 'color');
         if (color) {
-            var fillColor = parseColor(color, context.attributeState.color);
+            var fillColor = parseColor(color, context.attributeState);
             if (fillColor.ok) {
                 context.attributeState.color = fillColor;
             }
@@ -1919,11 +2003,17 @@
             }
             else {
                 // gradients, patterns not supported for strokes ...
-                var strokeRGB = parseColor(stroke, context.attributeState.color);
+                var strokeRGB = parseColor(stroke, context.attributeState);
                 if (strokeRGB.ok) {
                     context.attributeState.stroke = new ColorFill(strokeRGB);
                 }
             }
+        }
+        if (stroke && context.attributeState.stroke instanceof ColorFill) {
+            context.attributeState.contextStroke = context.attributeState.stroke.color;
+        }
+        if (fill && context.attributeState.fill instanceof ColorFill) {
+            context.attributeState.contextFill = context.attributeState.fill.color;
         }
         var lineCap = getAttribute(domNode, context.styleSheets, 'stroke-linecap');
         if (lineCap) {
@@ -1957,7 +2047,7 @@
         }
         var fontFamily = getAttribute(domNode, context.styleSheets, 'font-family');
         if (fontFamily) {
-            var fontFamilies = C__Users_hollaender_Documents_github_svg2pdf_node_modules_fontFamilyPapandreou.parse(fontFamily);
+            var fontFamilies = FontFamily.parse(fontFamily);
             context.attributeState.fontFamily = findFirstAvailableFontFamily(context.attributeState, fontFamilies, context);
         }
         var fontSize = getAttribute(domNode, context.styleSheets, 'font-size');
@@ -1976,6 +2066,10 @@
         var textAnchor = getAttribute(domNode, context.styleSheets, 'text-anchor');
         if (textAnchor) {
             context.attributeState.textAnchor = textAnchor;
+        }
+        var fillRule = getAttribute(domNode, context.styleSheets, 'fill-rule');
+        if (fillRule) {
+            context.attributeState.fillRule = fillRule;
         }
     }
     function applyAttributes(childContext, parentContext, node) {
@@ -2024,7 +2118,7 @@
             var gState = {};
             hasFillOpacity && (gState['opacity'] = fillOpacity);
             hasStrokeOpacity && (gState['stroke-opacity'] = strokeOpacity);
-            childContext.pdf.setGState(new jsPDF.GState(gState));
+            childContext.pdf.setGState(new jspdf.GState(gState));
         }
         if (childContext.attributeState.fill &&
             childContext.attributeState.fill !== parentContext.attributeState.fill &&
@@ -2111,7 +2205,7 @@
         var gState = {};
         gState['opacity'] = fillOpacity;
         gState['stroke-opacity'] = strokeOpacity;
-        pdf.setGState(new jsPDF.GState(gState));
+        pdf.setGState(new jspdf.GState(gState));
         if (attributeState.fill &&
             attributeState.fill instanceof ColorFill &&
             attributeState.fill.color.ok) {
@@ -2351,7 +2445,7 @@
                             _b.label = 3;
                         case 3:
                             fillData = _a;
-                            isNodeFillRuleEvenOdd = getAttribute(this.element, context.styleSheets, 'fill-rule') === 'evenodd';
+                            isNodeFillRuleEvenOdd = context.attributeState.fillRule === 'evenodd';
                             // This is a workaround for symbols that are used multiple times with different
                             // fill/stroke attributes. All paths within symbols are both filled and stroked
                             // and we set the fill/stroke to transparent if the use element has
@@ -2447,7 +2541,7 @@
                             hasStartMarker &&
                                 markers.addMarker(new Marker(markerStart, [prev.x, prev.y], 
                                 // @ts-ignore
-                                getAngle(last_1 ? [last_1.x, last_1.y] : [prev.x, prev.y], [curr.x1, curr.y1])));
+                                getAngle(last_1 ? [last_1.x, last_1.y] : [prev.x, prev.y], [curr.x1, curr.y1]), true));
                             hasEndMarker &&
                                 markers.addMarker(new Marker(markerEnd, [curr.x, curr.y], getAngle([curr.x2, curr.y2], [curr.x, curr.y])));
                             if (hasMidMarker) {
@@ -2463,7 +2557,7 @@
                             if (hasStartMarker) {
                                 // @ts-ignore
                                 var angle = last_1 ? getDirectionVector([last_1.x, last_1.y], [curr.x, curr.y]) : curAngle;
-                                markers.addMarker(new Marker(markerStart, [prev.x, prev.y], Math.atan2(angle[1], angle[0])));
+                                markers.addMarker(new Marker(markerStart, [prev.x, prev.y], Math.atan2(angle[1], angle[0]), true));
                             }
                             hasEndMarker &&
                                 markers.addMarker(new Marker(markerEnd, [curr.x, curr.y], Math.atan2(curAngle[1], curAngle[0])));
@@ -2506,6 +2600,20 @@
                     _loop_1(i);
                 }
             }
+            markers.markers.forEach(function (marker) {
+                var markerNode = context.refsHandler.get(marker.id);
+                if (!markerNode)
+                    return;
+                var orient = getAttribute(markerNode.element, context.styleSheets, 'orient');
+                if (orient == null)
+                    return;
+                if (marker.isStartMarker && orient === 'auto-start-reverse') {
+                    marker.angle += Math.PI;
+                }
+                if (!isNaN(Number(orient))) {
+                    marker.angle = (parseFloat(orient) / 180) * Math.PI;
+                }
+            });
             return markers;
         };
         return GeometryNode;
@@ -2650,7 +2758,7 @@
         }
         Use.prototype.renderCore = function (context) {
             return __awaiter(this, void 0, void 0, function () {
-                var pf, url, id, refNode, refNodeOpensViewport, x, y, width, height, t, viewBox, refContext, color;
+                var pf, url, id, refNode, refNodeOpensViewport, x, y, width, height, t, viewBox, contextColors, refContext;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -2685,17 +2793,18 @@
                             else {
                                 t = context.pdf.Matrix(1, 0, 0, 1, x, y);
                             }
+                            contextColors = AttributeState.getContextColors(context, true);
                             refContext = new Context(context.pdf, {
                                 refsHandler: context.refsHandler,
                                 styleSheets: context.styleSheets,
                                 withinUse: true,
                                 viewport: refNodeOpensViewport ? new Viewport(width, height) : context.viewport,
                                 svg2pdfParameters: context.svg2pdfParameters,
-                                textMeasure: context.textMeasure
+                                textMeasure: context.textMeasure,
+                                attributeState: Object.assign(AttributeState.default(), contextColors)
                             });
-                            color = context.attributeState.color;
-                            return [4 /*yield*/, context.refsHandler.getRendered(id, color, function (node) {
-                                    return Use.renderReferencedNode(node, id, color, refContext);
+                            return [4 /*yield*/, context.refsHandler.getRendered(id, contextColors, function (node) {
+                                    return Use.renderReferencedNode(node, id, refContext);
                                 })];
                         case 1:
                             _a.sent();
@@ -2707,14 +2816,14 @@
                                 context.pdf.rect(x, y, width, height);
                                 context.pdf.clip().discardPath();
                             }
-                            context.pdf.doFormObject(context.refsHandler.generateKey(id, color), t);
+                            context.pdf.doFormObject(context.refsHandler.generateKey(id, contextColors), t);
                             context.pdf.restoreGraphicsState();
                             return [2 /*return*/];
                     }
                 });
             });
         };
-        Use.renderReferencedNode = function (node, id, color, refContext) {
+        Use.renderReferencedNode = function (node, id, refContext) {
             return __awaiter(this, void 0, void 0, function () {
                 var bBox;
                 return __generator(this, function (_a) {
@@ -2726,8 +2835,6 @@
                             // So, make the bBox a lot larger than it needs to be and hope any thick strokes are
                             // still within.
                             bBox = [bBox[0] - 0.5 * bBox[2], bBox[1] - 0.5 * bBox[3], bBox[2] * 2, bBox[3] * 2];
-                            // set the color to use for the referenced node
-                            refContext.attributeState.color = color;
                             refContext.pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], refContext.pdf.unitMatrix);
                             if (!(node instanceof Symbol$1)) return [3 /*break*/, 2];
                             return [4 /*yield*/, node.apply(refContext)];
@@ -2739,7 +2846,7 @@
                             _a.sent();
                             _a.label = 4;
                         case 4:
-                            refContext.pdf.endFormObject(refContext.refsHandler.generateKey(id, color));
+                            refContext.pdf.endFormObject(refContext.refsHandler.generateKey(id, refContext.attributeState));
                             return [2 /*return*/];
                     }
                 });
@@ -3045,7 +3152,9 @@
     var TextNode = /** @class */ (function (_super) {
         __extends(TextNode, _super);
         function TextNode() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.boundingBox = [];
+            return _this;
         }
         TextNode.prototype.processTSpans = function (textNode, node, context, textChunks, currentTextSegment, trimInfo) {
             var pdfFontSize = context.pdf.getFontSize();
@@ -3141,6 +3250,7 @@
                                 renderingMode: textRenderingMode === 'fill' ? void 0 : textRenderingMode,
                                 charSpace: charSpace === 0 ? void 0 : charSpace
                             });
+                            this.boundingBox = [textX + dx - xOffset, textY + dy + 0.1 * pdfFontSize, context.textMeasure.measureTextWidth(transformedText, context.attributeState), pdfFontSize];
                         }
                     }
                     else {
@@ -3192,7 +3302,7 @@
             return svgNodeAndChildrenVisible(this, parentVisible, context);
         };
         TextNode.prototype.getBoundingBoxCore = function (context) {
-            return defaultBoundingBox(this.element, context);
+            return this.boundingBox.length > 0 ? this.boundingBox : defaultBoundingBox(this.element, context);
         };
         TextNode.prototype.computeNodeTransformCore = function (context) {
             return context.pdf.unitMatrix;
@@ -3200,1476 +3310,1552 @@
         return TextNode;
     }(GraphicsNode));
 
-    var paramCounts = { a: 7, c: 6, h: 1, l: 2, m: 2, r: 4, q: 4, s: 4, t: 2, v: 1, z: 0 };
+    var path_parse;
+    var hasRequiredPath_parse;
 
-    var SPECIAL_SPACES = [
-      0x1680, 0x180E, 0x2000, 0x2001, 0x2002, 0x2003, 0x2004, 0x2005, 0x2006,
-      0x2007, 0x2008, 0x2009, 0x200A, 0x202F, 0x205F, 0x3000, 0xFEFF
-    ];
+    function requirePath_parse () {
+    	if (hasRequiredPath_parse) return path_parse;
+    	hasRequiredPath_parse = 1;
 
-    function isSpace(ch) {
-      return (ch === 0x0A) || (ch === 0x0D) || (ch === 0x2028) || (ch === 0x2029) || // Line terminators
-        // White spaces
-        (ch === 0x20) || (ch === 0x09) || (ch === 0x0B) || (ch === 0x0C) || (ch === 0xA0) ||
-        (ch >= 0x1680 && SPECIAL_SPACES.indexOf(ch) >= 0);
+
+    	var paramCounts = { a: 7, c: 6, h: 1, l: 2, m: 2, r: 4, q: 4, s: 4, t: 2, v: 1, z: 0 };
+
+    	var SPECIAL_SPACES = [
+    	  0x1680, 0x180E, 0x2000, 0x2001, 0x2002, 0x2003, 0x2004, 0x2005, 0x2006,
+    	  0x2007, 0x2008, 0x2009, 0x200A, 0x202F, 0x205F, 0x3000, 0xFEFF
+    	];
+
+    	function isSpace(ch) {
+    	  return (ch === 0x0A) || (ch === 0x0D) || (ch === 0x2028) || (ch === 0x2029) || // Line terminators
+    	    // White spaces
+    	    (ch === 0x20) || (ch === 0x09) || (ch === 0x0B) || (ch === 0x0C) || (ch === 0xA0) ||
+    	    (ch >= 0x1680 && SPECIAL_SPACES.indexOf(ch) >= 0);
+    	}
+
+    	function isCommand(code) {
+    	  /*eslint-disable no-bitwise*/
+    	  switch (code | 0x20) {
+    	    case 0x6D/* m */:
+    	    case 0x7A/* z */:
+    	    case 0x6C/* l */:
+    	    case 0x68/* h */:
+    	    case 0x76/* v */:
+    	    case 0x63/* c */:
+    	    case 0x73/* s */:
+    	    case 0x71/* q */:
+    	    case 0x74/* t */:
+    	    case 0x61/* a */:
+    	    case 0x72/* r */:
+    	      return true;
+    	  }
+    	  return false;
+    	}
+
+    	function isArc(code) {
+    	  return (code | 0x20) === 0x61;
+    	}
+
+    	function isDigit(code) {
+    	  return (code >= 48 && code <= 57);   // 0..9
+    	}
+
+    	function isDigitStart(code) {
+    	  return (code >= 48 && code <= 57) || /* 0..9 */
+    	          code === 0x2B || /* + */
+    	          code === 0x2D || /* - */
+    	          code === 0x2E;   /* . */
+    	}
+
+
+    	function State(path) {
+    	  this.index  = 0;
+    	  this.path   = path;
+    	  this.max    = path.length;
+    	  this.result = [];
+    	  this.param  = 0.0;
+    	  this.err    = '';
+    	  this.segmentStart = 0;
+    	  this.data   = [];
+    	}
+
+    	function skipSpaces(state) {
+    	  while (state.index < state.max && isSpace(state.path.charCodeAt(state.index))) {
+    	    state.index++;
+    	  }
+    	}
+
+
+    	function scanFlag(state) {
+    	  var ch = state.path.charCodeAt(state.index);
+
+    	  if (ch === 0x30/* 0 */) {
+    	    state.param = 0;
+    	    state.index++;
+    	    return;
+    	  }
+
+    	  if (ch === 0x31/* 1 */) {
+    	    state.param = 1;
+    	    state.index++;
+    	    return;
+    	  }
+
+    	  state.err = 'SvgPath: arc flag can be 0 or 1 only (at pos ' + state.index + ')';
+    	}
+
+
+    	function scanParam(state) {
+    	  var start = state.index,
+    	      index = start,
+    	      max = state.max,
+    	      zeroFirst = false,
+    	      hasCeiling = false,
+    	      hasDecimal = false,
+    	      hasDot = false,
+    	      ch;
+
+    	  if (index >= max) {
+    	    state.err = 'SvgPath: missed param (at pos ' + index + ')';
+    	    return;
+    	  }
+    	  ch = state.path.charCodeAt(index);
+
+    	  if (ch === 0x2B/* + */ || ch === 0x2D/* - */) {
+    	    index++;
+    	    ch = (index < max) ? state.path.charCodeAt(index) : 0;
+    	  }
+
+    	  // This logic is shamelessly borrowed from Esprima
+    	  // https://github.com/ariya/esprimas
+    	  //
+    	  if (!isDigit(ch) && ch !== 0x2E/* . */) {
+    	    state.err = 'SvgPath: param should start with 0..9 or `.` (at pos ' + index + ')';
+    	    return;
+    	  }
+
+    	  if (ch !== 0x2E/* . */) {
+    	    zeroFirst = (ch === 0x30/* 0 */);
+    	    index++;
+
+    	    ch = (index < max) ? state.path.charCodeAt(index) : 0;
+
+    	    if (zeroFirst && index < max) {
+    	      // decimal number starts with '0' such as '09' is illegal.
+    	      if (ch && isDigit(ch)) {
+    	        state.err = 'SvgPath: numbers started with `0` such as `09` are illegal (at pos ' + start + ')';
+    	        return;
+    	      }
+    	    }
+
+    	    while (index < max && isDigit(state.path.charCodeAt(index))) {
+    	      index++;
+    	      hasCeiling = true;
+    	    }
+    	    ch = (index < max) ? state.path.charCodeAt(index) : 0;
+    	  }
+
+    	  if (ch === 0x2E/* . */) {
+    	    hasDot = true;
+    	    index++;
+    	    while (isDigit(state.path.charCodeAt(index))) {
+    	      index++;
+    	      hasDecimal = true;
+    	    }
+    	    ch = (index < max) ? state.path.charCodeAt(index) : 0;
+    	  }
+
+    	  if (ch === 0x65/* e */ || ch === 0x45/* E */) {
+    	    if (hasDot && !hasCeiling && !hasDecimal) {
+    	      state.err = 'SvgPath: invalid float exponent (at pos ' + index + ')';
+    	      return;
+    	    }
+
+    	    index++;
+
+    	    ch = (index < max) ? state.path.charCodeAt(index) : 0;
+    	    if (ch === 0x2B/* + */ || ch === 0x2D/* - */) {
+    	      index++;
+    	    }
+    	    if (index < max && isDigit(state.path.charCodeAt(index))) {
+    	      while (index < max && isDigit(state.path.charCodeAt(index))) {
+    	        index++;
+    	      }
+    	    } else {
+    	      state.err = 'SvgPath: invalid float exponent (at pos ' + index + ')';
+    	      return;
+    	    }
+    	  }
+
+    	  state.index = index;
+    	  state.param = parseFloat(state.path.slice(start, index)) + 0.0;
+    	}
+
+
+    	function finalizeSegment(state) {
+    	  var cmd, cmdLC;
+
+    	  // Process duplicated commands (without comand name)
+
+    	  // This logic is shamelessly borrowed from Raphael
+    	  // https://github.com/DmitryBaranovskiy/raphael/
+    	  //
+    	  cmd   = state.path[state.segmentStart];
+    	  cmdLC = cmd.toLowerCase();
+
+    	  var params = state.data;
+
+    	  if (cmdLC === 'm' && params.length > 2) {
+    	    state.result.push([ cmd, params[0], params[1] ]);
+    	    params = params.slice(2);
+    	    cmdLC = 'l';
+    	    cmd = (cmd === 'm') ? 'l' : 'L';
+    	  }
+
+    	  if (cmdLC === 'r') {
+    	    state.result.push([ cmd ].concat(params));
+    	  } else {
+
+    	    while (params.length >= paramCounts[cmdLC]) {
+    	      state.result.push([ cmd ].concat(params.splice(0, paramCounts[cmdLC])));
+    	      if (!paramCounts[cmdLC]) {
+    	        break;
+    	      }
+    	    }
+    	  }
+    	}
+
+
+    	function scanSegment(state) {
+    	  var max = state.max,
+    	      cmdCode, is_arc, comma_found, need_params, i;
+
+    	  state.segmentStart = state.index;
+    	  cmdCode = state.path.charCodeAt(state.index);
+    	  is_arc = isArc(cmdCode);
+
+    	  if (!isCommand(cmdCode)) {
+    	    state.err = 'SvgPath: bad command ' + state.path[state.index] + ' (at pos ' + state.index + ')';
+    	    return;
+    	  }
+
+    	  need_params = paramCounts[state.path[state.index].toLowerCase()];
+
+    	  state.index++;
+    	  skipSpaces(state);
+
+    	  state.data = [];
+
+    	  if (!need_params) {
+    	    // Z
+    	    finalizeSegment(state);
+    	    return;
+    	  }
+
+    	  comma_found = false;
+
+    	  for (;;) {
+    	    for (i = need_params; i > 0; i--) {
+    	      if (is_arc && (i === 3 || i === 4)) scanFlag(state);
+    	      else scanParam(state);
+
+    	      if (state.err.length) {
+    	        return;
+    	      }
+    	      state.data.push(state.param);
+
+    	      skipSpaces(state);
+    	      comma_found = false;
+
+    	      if (state.index < max && state.path.charCodeAt(state.index) === 0x2C/* , */) {
+    	        state.index++;
+    	        skipSpaces(state);
+    	        comma_found = true;
+    	      }
+    	    }
+
+    	    // after ',' param is mandatory
+    	    if (comma_found) {
+    	      continue;
+    	    }
+
+    	    if (state.index >= state.max) {
+    	      break;
+    	    }
+
+    	    // Stop on next segment
+    	    if (!isDigitStart(state.path.charCodeAt(state.index))) {
+    	      break;
+    	    }
+    	  }
+
+    	  finalizeSegment(state);
+    	}
+
+
+    	/* Returns array of segments:
+    	 *
+    	 * [
+    	 *   [ command, coord1, coord2, ... ]
+    	 * ]
+    	 */
+    	path_parse = function pathParse(svgPath) {
+    	  var state = new State(svgPath);
+    	  var max = state.max;
+
+    	  skipSpaces(state);
+
+    	  while (state.index < max && !state.err.length) {
+    	    scanSegment(state);
+    	  }
+
+    	  if (state.err.length) {
+    	    state.result = [];
+
+    	  } else if (state.result.length) {
+
+    	    if ('mM'.indexOf(state.result[0][0]) < 0) {
+    	      state.err = 'SvgPath: string should start with `M` or `m`';
+    	      state.result = [];
+    	    } else {
+    	      state.result[0][0] = 'M';
+    	    }
+    	  }
+
+    	  return {
+    	    err: state.err,
+    	    segments: state.result
+    	  };
+    	};
+    	return path_parse;
     }
 
-    function isCommand(code) {
-      /*eslint-disable no-bitwise*/
-      switch (code | 0x20) {
-        case 0x6D/* m */:
-        case 0x7A/* z */:
-        case 0x6C/* l */:
-        case 0x68/* h */:
-        case 0x76/* v */:
-        case 0x63/* c */:
-        case 0x73/* s */:
-        case 0x71/* q */:
-        case 0x74/* t */:
-        case 0x61/* a */:
-        case 0x72/* r */:
-          return true;
-      }
-      return false;
+    var matrix;
+    var hasRequiredMatrix;
+
+    function requireMatrix () {
+    	if (hasRequiredMatrix) return matrix;
+    	hasRequiredMatrix = 1;
+
+    	// combine 2 matrixes
+    	// m1, m2 - [a, b, c, d, e, g]
+    	//
+    	function combine(m1, m2) {
+    	  return [
+    	    m1[0] * m2[0] + m1[2] * m2[1],
+    	    m1[1] * m2[0] + m1[3] * m2[1],
+    	    m1[0] * m2[2] + m1[2] * m2[3],
+    	    m1[1] * m2[2] + m1[3] * m2[3],
+    	    m1[0] * m2[4] + m1[2] * m2[5] + m1[4],
+    	    m1[1] * m2[4] + m1[3] * m2[5] + m1[5]
+    	  ];
+    	}
+
+
+    	function Matrix() {
+    	  if (!(this instanceof Matrix)) { return new Matrix(); }
+    	  this.queue = [];   // list of matrixes to apply
+    	  this.cache = null; // combined matrix cache
+    	}
+
+
+    	Matrix.prototype.matrix = function (m) {
+    	  if (m[0] === 1 && m[1] === 0 && m[2] === 0 && m[3] === 1 && m[4] === 0 && m[5] === 0) {
+    	    return this;
+    	  }
+    	  this.cache = null;
+    	  this.queue.push(m);
+    	  return this;
+    	};
+
+
+    	Matrix.prototype.translate = function (tx, ty) {
+    	  if (tx !== 0 || ty !== 0) {
+    	    this.cache = null;
+    	    this.queue.push([ 1, 0, 0, 1, tx, ty ]);
+    	  }
+    	  return this;
+    	};
+
+
+    	Matrix.prototype.scale = function (sx, sy) {
+    	  if (sx !== 1 || sy !== 1) {
+    	    this.cache = null;
+    	    this.queue.push([ sx, 0, 0, sy, 0, 0 ]);
+    	  }
+    	  return this;
+    	};
+
+
+    	Matrix.prototype.rotate = function (angle, rx, ry) {
+    	  var rad, cos, sin;
+
+    	  if (angle !== 0) {
+    	    this.translate(rx, ry);
+
+    	    rad = angle * Math.PI / 180;
+    	    cos = Math.cos(rad);
+    	    sin = Math.sin(rad);
+
+    	    this.queue.push([ cos, sin, -sin, cos, 0, 0 ]);
+    	    this.cache = null;
+
+    	    this.translate(-rx, -ry);
+    	  }
+    	  return this;
+    	};
+
+
+    	Matrix.prototype.skewX = function (angle) {
+    	  if (angle !== 0) {
+    	    this.cache = null;
+    	    this.queue.push([ 1, 0, Math.tan(angle * Math.PI / 180), 1, 0, 0 ]);
+    	  }
+    	  return this;
+    	};
+
+
+    	Matrix.prototype.skewY = function (angle) {
+    	  if (angle !== 0) {
+    	    this.cache = null;
+    	    this.queue.push([ 1, Math.tan(angle * Math.PI / 180), 0, 1, 0, 0 ]);
+    	  }
+    	  return this;
+    	};
+
+
+    	// Flatten queue
+    	//
+    	Matrix.prototype.toArray = function () {
+    	  if (this.cache) {
+    	    return this.cache;
+    	  }
+
+    	  if (!this.queue.length) {
+    	    this.cache = [ 1, 0, 0, 1, 0, 0 ];
+    	    return this.cache;
+    	  }
+
+    	  this.cache = this.queue[0];
+
+    	  if (this.queue.length === 1) {
+    	    return this.cache;
+    	  }
+
+    	  for (var i = 1; i < this.queue.length; i++) {
+    	    this.cache = combine(this.cache, this.queue[i]);
+    	  }
+
+    	  return this.cache;
+    	};
+
+
+    	// Apply list of matrixes to (x,y) point.
+    	// If `isRelative` set, `translate` component of matrix will be skipped
+    	//
+    	Matrix.prototype.calc = function (x, y, isRelative) {
+    	  var m;
+
+    	  // Don't change point on empty transforms queue
+    	  if (!this.queue.length) { return [ x, y ]; }
+
+    	  // Calculate final matrix, if not exists
+    	  //
+    	  // NB. if you deside to apply transforms to point one-by-one,
+    	  // they should be taken in reverse order
+
+    	  if (!this.cache) {
+    	    this.cache = this.toArray();
+    	  }
+
+    	  m = this.cache;
+
+    	  // Apply matrix to point
+    	  return [
+    	    x * m[0] + y * m[2] + (isRelative ? 0 : m[4]),
+    	    x * m[1] + y * m[3] + (isRelative ? 0 : m[5])
+    	  ];
+    	};
+
+
+    	matrix = Matrix;
+    	return matrix;
     }
 
-    function isArc(code) {
-      return (code | 0x20) === 0x61;
+    var transform_parse;
+    var hasRequiredTransform_parse;
+
+    function requireTransform_parse () {
+    	if (hasRequiredTransform_parse) return transform_parse;
+    	hasRequiredTransform_parse = 1;
+
+
+    	var Matrix = requireMatrix();
+
+    	var operations = {
+    	  matrix: true,
+    	  scale: true,
+    	  rotate: true,
+    	  translate: true,
+    	  skewX: true,
+    	  skewY: true
+    	};
+
+    	var CMD_SPLIT_RE    = /\s*(matrix|translate|scale|rotate|skewX|skewY)\s*\(\s*(.+?)\s*\)[\s,]*/;
+    	var PARAMS_SPLIT_RE = /[\s,]+/;
+
+
+    	transform_parse = function transformParse(transformString) {
+    	  var matrix = new Matrix();
+    	  var cmd, params;
+
+    	  // Split value into ['', 'translate', '10 50', '', 'scale', '2', '', 'rotate',  '-45', '']
+    	  transformString.split(CMD_SPLIT_RE).forEach(function (item) {
+
+    	    // Skip empty elements
+    	    if (!item.length) { return; }
+
+    	    // remember operation
+    	    if (typeof operations[item] !== 'undefined') {
+    	      cmd = item;
+    	      return;
+    	    }
+
+    	    // extract params & att operation to matrix
+    	    params = item.split(PARAMS_SPLIT_RE).map(function (i) {
+    	      return +i || 0;
+    	    });
+
+    	    // If params count is not correct - ignore command
+    	    switch (cmd) {
+    	      case 'matrix':
+    	        if (params.length === 6) {
+    	          matrix.matrix(params);
+    	        }
+    	        return;
+
+    	      case 'scale':
+    	        if (params.length === 1) {
+    	          matrix.scale(params[0], params[0]);
+    	        } else if (params.length === 2) {
+    	          matrix.scale(params[0], params[1]);
+    	        }
+    	        return;
+
+    	      case 'rotate':
+    	        if (params.length === 1) {
+    	          matrix.rotate(params[0], 0, 0);
+    	        } else if (params.length === 3) {
+    	          matrix.rotate(params[0], params[1], params[2]);
+    	        }
+    	        return;
+
+    	      case 'translate':
+    	        if (params.length === 1) {
+    	          matrix.translate(params[0], 0);
+    	        } else if (params.length === 2) {
+    	          matrix.translate(params[0], params[1]);
+    	        }
+    	        return;
+
+    	      case 'skewX':
+    	        if (params.length === 1) {
+    	          matrix.skewX(params[0]);
+    	        }
+    	        return;
+
+    	      case 'skewY':
+    	        if (params.length === 1) {
+    	          matrix.skewY(params[0]);
+    	        }
+    	        return;
+    	    }
+    	  });
+
+    	  return matrix;
+    	};
+    	return transform_parse;
     }
 
-    function isDigit(code) {
-      return (code >= 48 && code <= 57);   // 0..9
+    var a2c;
+    var hasRequiredA2c;
+
+    function requireA2c () {
+    	if (hasRequiredA2c) return a2c;
+    	hasRequiredA2c = 1;
+
+
+    	var TAU = Math.PI * 2;
+
+
+    	/* eslint-disable space-infix-ops */
+
+    	// Calculate an angle between two unit vectors
+    	//
+    	// Since we measure angle between radii of circular arcs,
+    	// we can use simplified math (without length normalization)
+    	//
+    	function unit_vector_angle(ux, uy, vx, vy) {
+    	  var sign = (ux * vy - uy * vx < 0) ? -1 : 1;
+    	  var dot  = ux * vx + uy * vy;
+
+    	  // Add this to work with arbitrary vectors:
+    	  // dot /= Math.sqrt(ux * ux + uy * uy) * Math.sqrt(vx * vx + vy * vy);
+
+    	  // rounding errors, e.g. -1.0000000000000002 can screw up this
+    	  if (dot >  1.0) { dot =  1.0; }
+    	  if (dot < -1.0) { dot = -1.0; }
+
+    	  return sign * Math.acos(dot);
+    	}
+
+
+    	// Convert from endpoint to center parameterization,
+    	// see http://www.w3.org/TR/SVG11/implnote.html#ArcImplementationNotes
+    	//
+    	// Return [cx, cy, theta1, delta_theta]
+    	//
+    	function get_arc_center(x1, y1, x2, y2, fa, fs, rx, ry, sin_phi, cos_phi) {
+    	  // Step 1.
+    	  //
+    	  // Moving an ellipse so origin will be the middlepoint between our two
+    	  // points. After that, rotate it to line up ellipse axes with coordinate
+    	  // axes.
+    	  //
+    	  var x1p =  cos_phi*(x1-x2)/2 + sin_phi*(y1-y2)/2;
+    	  var y1p = -sin_phi*(x1-x2)/2 + cos_phi*(y1-y2)/2;
+
+    	  var rx_sq  =  rx * rx;
+    	  var ry_sq  =  ry * ry;
+    	  var x1p_sq = x1p * x1p;
+    	  var y1p_sq = y1p * y1p;
+
+    	  // Step 2.
+    	  //
+    	  // Compute coordinates of the centre of this ellipse (cx', cy')
+    	  // in the new coordinate system.
+    	  //
+    	  var radicant = (rx_sq * ry_sq) - (rx_sq * y1p_sq) - (ry_sq * x1p_sq);
+
+    	  if (radicant < 0) {
+    	    // due to rounding errors it might be e.g. -1.3877787807814457e-17
+    	    radicant = 0;
+    	  }
+
+    	  radicant /=   (rx_sq * y1p_sq) + (ry_sq * x1p_sq);
+    	  radicant = Math.sqrt(radicant) * (fa === fs ? -1 : 1);
+
+    	  var cxp = radicant *  rx/ry * y1p;
+    	  var cyp = radicant * -ry/rx * x1p;
+
+    	  // Step 3.
+    	  //
+    	  // Transform back to get centre coordinates (cx, cy) in the original
+    	  // coordinate system.
+    	  //
+    	  var cx = cos_phi*cxp - sin_phi*cyp + (x1+x2)/2;
+    	  var cy = sin_phi*cxp + cos_phi*cyp + (y1+y2)/2;
+
+    	  // Step 4.
+    	  //
+    	  // Compute angles (theta1, delta_theta).
+    	  //
+    	  var v1x =  (x1p - cxp) / rx;
+    	  var v1y =  (y1p - cyp) / ry;
+    	  var v2x = (-x1p - cxp) / rx;
+    	  var v2y = (-y1p - cyp) / ry;
+
+    	  var theta1 = unit_vector_angle(1, 0, v1x, v1y);
+    	  var delta_theta = unit_vector_angle(v1x, v1y, v2x, v2y);
+
+    	  if (fs === 0 && delta_theta > 0) {
+    	    delta_theta -= TAU;
+    	  }
+    	  if (fs === 1 && delta_theta < 0) {
+    	    delta_theta += TAU;
+    	  }
+
+    	  return [ cx, cy, theta1, delta_theta ];
+    	}
+
+    	//
+    	// Approximate one unit arc segment with bézier curves,
+    	// see http://math.stackexchange.com/questions/873224
+    	//
+    	function approximate_unit_arc(theta1, delta_theta) {
+    	  var alpha = 4/3 * Math.tan(delta_theta/4);
+
+    	  var x1 = Math.cos(theta1);
+    	  var y1 = Math.sin(theta1);
+    	  var x2 = Math.cos(theta1 + delta_theta);
+    	  var y2 = Math.sin(theta1 + delta_theta);
+
+    	  return [ x1, y1, x1 - y1*alpha, y1 + x1*alpha, x2 + y2*alpha, y2 - x2*alpha, x2, y2 ];
+    	}
+
+    	a2c = function a2c(x1, y1, x2, y2, fa, fs, rx, ry, phi) {
+    	  var sin_phi = Math.sin(phi * TAU / 360);
+    	  var cos_phi = Math.cos(phi * TAU / 360);
+
+    	  // Make sure radii are valid
+    	  //
+    	  var x1p =  cos_phi*(x1-x2)/2 + sin_phi*(y1-y2)/2;
+    	  var y1p = -sin_phi*(x1-x2)/2 + cos_phi*(y1-y2)/2;
+
+    	  if (x1p === 0 && y1p === 0) {
+    	    // we're asked to draw line to itself
+    	    return [];
+    	  }
+
+    	  if (rx === 0 || ry === 0) {
+    	    // one of the radii is zero
+    	    return [];
+    	  }
+
+
+    	  // Compensate out-of-range radii
+    	  //
+    	  rx = Math.abs(rx);
+    	  ry = Math.abs(ry);
+
+    	  var lambda = (x1p * x1p) / (rx * rx) + (y1p * y1p) / (ry * ry);
+    	  if (lambda > 1) {
+    	    rx *= Math.sqrt(lambda);
+    	    ry *= Math.sqrt(lambda);
+    	  }
+
+
+    	  // Get center parameters (cx, cy, theta1, delta_theta)
+    	  //
+    	  var cc = get_arc_center(x1, y1, x2, y2, fa, fs, rx, ry, sin_phi, cos_phi);
+
+    	  var result = [];
+    	  var theta1 = cc[2];
+    	  var delta_theta = cc[3];
+
+    	  // Split an arc to multiple segments, so each segment
+    	  // will be less than τ/4 (= 90°)
+    	  //
+    	  var segments = Math.max(Math.ceil(Math.abs(delta_theta) / (TAU / 4)), 1);
+    	  delta_theta /= segments;
+
+    	  for (var i = 0; i < segments; i++) {
+    	    result.push(approximate_unit_arc(theta1, delta_theta));
+    	    theta1 += delta_theta;
+    	  }
+
+    	  // We have a bezier approximation of a unit circle,
+    	  // now need to transform back to the original ellipse
+    	  //
+    	  return result.map(function (curve) {
+    	    for (var i = 0; i < curve.length; i += 2) {
+    	      var x = curve[i + 0];
+    	      var y = curve[i + 1];
+
+    	      // scale
+    	      x *= rx;
+    	      y *= ry;
+
+    	      // rotate
+    	      var xp = cos_phi*x - sin_phi*y;
+    	      var yp = sin_phi*x + cos_phi*y;
+
+    	      // translate
+    	      curve[i + 0] = xp + cc[0];
+    	      curve[i + 1] = yp + cc[1];
+    	    }
+
+    	    return curve;
+    	  });
+    	};
+    	return a2c;
     }
 
-    function isDigitStart(code) {
-      return (code >= 48 && code <= 57) || /* 0..9 */
-              code === 0x2B || /* + */
-              code === 0x2D || /* - */
-              code === 0x2E;   /* . */
+    var ellipse;
+    var hasRequiredEllipse;
+
+    function requireEllipse () {
+    	if (hasRequiredEllipse) return ellipse;
+    	hasRequiredEllipse = 1;
+
+    	/* eslint-disable space-infix-ops */
+
+    	// The precision used to consider an ellipse as a circle
+    	//
+    	var epsilon = 0.0000000001;
+
+    	// To convert degree in radians
+    	//
+    	var torad = Math.PI / 180;
+
+    	// Class constructor :
+    	//  an ellipse centred at 0 with radii rx,ry and x - axis - angle ax.
+    	//
+    	function Ellipse(rx, ry, ax) {
+    	  if (!(this instanceof Ellipse)) { return new Ellipse(rx, ry, ax); }
+    	  this.rx = rx;
+    	  this.ry = ry;
+    	  this.ax = ax;
+    	}
+
+    	// Apply a linear transform m to the ellipse
+    	// m is an array representing a matrix :
+    	//    -         -
+    	//   | m[0] m[2] |
+    	//   | m[1] m[3] |
+    	//    -         -
+    	//
+    	Ellipse.prototype.transform = function (m) {
+    	  // We consider the current ellipse as image of the unit circle
+    	  // by first scale(rx,ry) and then rotate(ax) ...
+    	  // So we apply ma =  m x rotate(ax) x scale(rx,ry) to the unit circle.
+    	  var c = Math.cos(this.ax * torad), s = Math.sin(this.ax * torad);
+    	  var ma = [
+    	    this.rx * (m[0]*c + m[2]*s),
+    	    this.rx * (m[1]*c + m[3]*s),
+    	    this.ry * (-m[0]*s + m[2]*c),
+    	    this.ry * (-m[1]*s + m[3]*c)
+    	  ];
+
+    	  // ma * transpose(ma) = [ J L ]
+    	  //                      [ L K ]
+    	  // L is calculated later (if the image is not a circle)
+    	  var J = ma[0]*ma[0] + ma[2]*ma[2],
+    	      K = ma[1]*ma[1] + ma[3]*ma[3];
+
+    	  // the discriminant of the characteristic polynomial of ma * transpose(ma)
+    	  var D = ((ma[0]-ma[3])*(ma[0]-ma[3]) + (ma[2]+ma[1])*(ma[2]+ma[1])) *
+    	          ((ma[0]+ma[3])*(ma[0]+ma[3]) + (ma[2]-ma[1])*(ma[2]-ma[1]));
+
+    	  // the "mean eigenvalue"
+    	  var JK = (J + K) / 2;
+
+    	  // check if the image is (almost) a circle
+    	  if (D < epsilon * JK) {
+    	    // if it is
+    	    this.rx = this.ry = Math.sqrt(JK);
+    	    this.ax = 0;
+    	    return this;
+    	  }
+
+    	  // if it is not a circle
+    	  var L = ma[0]*ma[1] + ma[2]*ma[3];
+
+    	  D = Math.sqrt(D);
+
+    	  // {l1,l2} = the two eigen values of ma * transpose(ma)
+    	  var l1 = JK + D/2,
+    	      l2 = JK - D/2;
+    	  // the x - axis - rotation angle is the argument of the l1 - eigenvector
+    	  /*eslint-disable indent*/
+    	  this.ax = (Math.abs(L) < epsilon && Math.abs(l1 - K) < epsilon) ?
+    	    90
+    	  :
+    	    Math.atan(Math.abs(L) > Math.abs(l1 - K) ?
+    	      (l1 - J) / L
+    	    :
+    	      L / (l1 - K)
+    	    ) * 180 / Math.PI;
+    	  /*eslint-enable indent*/
+
+    	  // if ax > 0 => rx = sqrt(l1), ry = sqrt(l2), else exchange axes and ax += 90
+    	  if (this.ax >= 0) {
+    	    // if ax in [0,90]
+    	    this.rx = Math.sqrt(l1);
+    	    this.ry = Math.sqrt(l2);
+    	  } else {
+    	    // if ax in ]-90,0[ => exchange axes
+    	    this.ax += 90;
+    	    this.rx = Math.sqrt(l2);
+    	    this.ry = Math.sqrt(l1);
+    	  }
+
+    	  return this;
+    	};
+
+    	// Check if the ellipse is (almost) degenerate, i.e. rx = 0 or ry = 0
+    	//
+    	Ellipse.prototype.isDegenerate = function () {
+    	  return (this.rx < epsilon * this.ry || this.ry < epsilon * this.rx);
+    	};
+
+    	ellipse = Ellipse;
+    	return ellipse;
     }
 
+    var svgpath$1;
+    var hasRequiredSvgpath$1;
 
-    function State(path) {
-      this.index  = 0;
-      this.path   = path;
-      this.max    = path.length;
-      this.result = [];
-      this.param  = 0.0;
-      this.err    = '';
-      this.segmentStart = 0;
-      this.data   = [];
+    function requireSvgpath$1 () {
+    	if (hasRequiredSvgpath$1) return svgpath$1;
+    	hasRequiredSvgpath$1 = 1;
+
+
+    	var pathParse      = requirePath_parse();
+    	var transformParse = requireTransform_parse();
+    	var matrix         = requireMatrix();
+    	var a2c            = requireA2c();
+    	var ellipse        = requireEllipse();
+
+
+    	// Class constructor
+    	//
+    	function SvgPath(path) {
+    	  if (!(this instanceof SvgPath)) { return new SvgPath(path); }
+
+    	  var pstate = pathParse(path);
+
+    	  // Array of path segments.
+    	  // Each segment is array [command, param1, param2, ...]
+    	  this.segments = pstate.segments;
+
+    	  // Error message on parse error.
+    	  this.err      = pstate.err;
+
+    	  // Transforms stack for lazy evaluation
+    	  this.__stack    = [];
+    	}
+
+    	SvgPath.from = function (src) {
+    	  if (typeof src === 'string') return new SvgPath(src);
+
+    	  if (src instanceof SvgPath) {
+    	    // Create empty object
+    	    var s = new SvgPath('');
+
+    	    // Clone properies
+    	    s.err = src.err;
+    	    s.segments = src.segments.map(function (sgm) { return sgm.slice(); });
+    	    s.__stack = src.__stack.map(function (m) {
+    	      return matrix().matrix(m.toArray());
+    	    });
+
+    	    return s;
+    	  }
+
+    	  throw new Error('SvgPath.from: invalid param type ' + src);
+    	};
+
+
+    	SvgPath.prototype.__matrix = function (m) {
+    	  var self = this, i;
+
+    	  // Quick leave for empty matrix
+    	  if (!m.queue.length) { return; }
+
+    	  this.iterate(function (s, index, x, y) {
+    	    var p, result, name, isRelative;
+
+    	    switch (s[0]) {
+
+    	      // Process 'assymetric' commands separately
+    	      case 'v':
+    	        p      = m.calc(0, s[1], true);
+    	        result = (p[0] === 0) ? [ 'v', p[1] ] : [ 'l', p[0], p[1] ];
+    	        break;
+
+    	      case 'V':
+    	        p      = m.calc(x, s[1], false);
+    	        result = (p[0] === m.calc(x, y, false)[0]) ? [ 'V', p[1] ] : [ 'L', p[0], p[1] ];
+    	        break;
+
+    	      case 'h':
+    	        p      = m.calc(s[1], 0, true);
+    	        result = (p[1] === 0) ? [ 'h', p[0] ] : [ 'l', p[0], p[1] ];
+    	        break;
+
+    	      case 'H':
+    	        p      = m.calc(s[1], y, false);
+    	        result = (p[1] === m.calc(x, y, false)[1]) ? [ 'H', p[0] ] : [ 'L', p[0], p[1] ];
+    	        break;
+
+    	      case 'a':
+    	      case 'A':
+    	        // ARC is: ['A', rx, ry, x-axis-rotation, large-arc-flag, sweep-flag, x, y]
+
+    	        // Drop segment if arc is empty (end point === start point)
+    	        /*if ((s[0] === 'A' && s[6] === x && s[7] === y) ||
+    	            (s[0] === 'a' && s[6] === 0 && s[7] === 0)) {
+    	          return [];
+    	        }*/
+
+    	        // Transform rx, ry and the x-axis-rotation
+    	        var ma = m.toArray();
+    	        var e = ellipse(s[1], s[2], s[3]).transform(ma);
+
+    	        // flip sweep-flag if matrix is not orientation-preserving
+    	        if (ma[0] * ma[3] - ma[1] * ma[2] < 0) {
+    	          s[5] = s[5] ? '0' : '1';
+    	        }
+
+    	        // Transform end point as usual (without translation for relative notation)
+    	        p = m.calc(s[6], s[7], s[0] === 'a');
+
+    	        // Empty arcs can be ignored by renderer, but should not be dropped
+    	        // to avoid collisions with `S A S` and so on. Replace with empty line.
+    	        if ((s[0] === 'A' && s[6] === x && s[7] === y) ||
+    	            (s[0] === 'a' && s[6] === 0 && s[7] === 0)) {
+    	          result = [ s[0] === 'a' ? 'l' : 'L', p[0], p[1] ];
+    	          break;
+    	        }
+
+    	        // if the resulting ellipse is (almost) a segment ...
+    	        if (e.isDegenerate()) {
+    	          // replace the arc by a line
+    	          result = [ s[0] === 'a' ? 'l' : 'L', p[0], p[1] ];
+    	        } else {
+    	          // if it is a real ellipse
+    	          // s[0], s[4] and s[5] are not modified
+    	          result = [ s[0], e.rx, e.ry, e.ax, s[4], s[5], p[0], p[1] ];
+    	        }
+
+    	        break;
+
+    	      case 'm':
+    	        // Edge case. The very first `m` should be processed as absolute, if happens.
+    	        // Make sense for coord shift transforms.
+    	        isRelative = index > 0;
+
+    	        p = m.calc(s[1], s[2], isRelative);
+    	        result = [ 'm', p[0], p[1] ];
+    	        break;
+
+    	      default:
+    	        name       = s[0];
+    	        result     = [ name ];
+    	        isRelative = (name.toLowerCase() === name);
+
+    	        // Apply transformations to the segment
+    	        for (i = 1; i < s.length; i += 2) {
+    	          p = m.calc(s[i], s[i + 1], isRelative);
+    	          result.push(p[0], p[1]);
+    	        }
+    	    }
+
+    	    self.segments[index] = result;
+    	  }, true);
+    	};
+
+
+    	// Apply stacked commands
+    	//
+    	SvgPath.prototype.__evaluateStack = function () {
+    	  var m, i;
+
+    	  if (!this.__stack.length) { return; }
+
+    	  if (this.__stack.length === 1) {
+    	    this.__matrix(this.__stack[0]);
+    	    this.__stack = [];
+    	    return;
+    	  }
+
+    	  m = matrix();
+    	  i = this.__stack.length;
+
+    	  while (--i >= 0) {
+    	    m.matrix(this.__stack[i].toArray());
+    	  }
+
+    	  this.__matrix(m);
+    	  this.__stack = [];
+    	};
+
+
+    	// Convert processed SVG Path back to string
+    	//
+    	SvgPath.prototype.toString = function () {
+    	  var result = '', prevCmd = '', cmdSkipped = false;
+
+    	  this.__evaluateStack();
+
+    	  for (var i = 0, len = this.segments.length; i < len; i++) {
+    	    var segment = this.segments[i];
+    	    var cmd = segment[0];
+
+    	    // Command not repeating => store
+    	    if (cmd !== prevCmd || cmd === 'm' || cmd === 'M') {
+    	      // workaround for FontForge SVG importing bug, keep space between "z m".
+    	      if (cmd === 'm' && prevCmd === 'z') result += ' ';
+    	      result += cmd;
+
+    	      cmdSkipped = false;
+    	    } else {
+    	      cmdSkipped = true;
+    	    }
+
+    	    // Store segment params
+    	    for (var pos = 1; pos < segment.length; pos++) {
+    	      var val = segment[pos];
+    	      // Space can be skipped
+    	      // 1. After command (always)
+    	      // 2. For negative value (with '-' at start)
+    	      if (pos === 1) {
+    	        if (cmdSkipped && val >= 0) result += ' ';
+    	      } else if (val >= 0) result += ' ';
+
+    	      result += val;
+    	    }
+
+    	    prevCmd = cmd;
+    	  }
+
+    	  return result;
+    	};
+
+
+    	// Translate path to (x [, y])
+    	//
+    	SvgPath.prototype.translate = function (x, y) {
+    	  this.__stack.push(matrix().translate(x, y || 0));
+    	  return this;
+    	};
+
+
+    	// Scale path to (sx [, sy])
+    	// sy = sx if not defined
+    	//
+    	SvgPath.prototype.scale = function (sx, sy) {
+    	  this.__stack.push(matrix().scale(sx, (!sy && (sy !== 0)) ? sx : sy));
+    	  return this;
+    	};
+
+
+    	// Rotate path around point (sx [, sy])
+    	// sy = sx if not defined
+    	//
+    	SvgPath.prototype.rotate = function (angle, rx, ry) {
+    	  this.__stack.push(matrix().rotate(angle, rx || 0, ry || 0));
+    	  return this;
+    	};
+
+
+    	// Skew path along the X axis by `degrees` angle
+    	//
+    	SvgPath.prototype.skewX = function (degrees) {
+    	  this.__stack.push(matrix().skewX(degrees));
+    	  return this;
+    	};
+
+
+    	// Skew path along the Y axis by `degrees` angle
+    	//
+    	SvgPath.prototype.skewY = function (degrees) {
+    	  this.__stack.push(matrix().skewY(degrees));
+    	  return this;
+    	};
+
+
+    	// Apply matrix transform (array of 6 elements)
+    	//
+    	SvgPath.prototype.matrix = function (m) {
+    	  this.__stack.push(matrix().matrix(m));
+    	  return this;
+    	};
+
+
+    	// Transform path according to "transform" attr of SVG spec
+    	//
+    	SvgPath.prototype.transform = function (transformString) {
+    	  if (!transformString.trim()) {
+    	    return this;
+    	  }
+    	  this.__stack.push(transformParse(transformString));
+    	  return this;
+    	};
+
+
+    	// Round coords with given decimal precition.
+    	// 0 by default (to integers)
+    	//
+    	SvgPath.prototype.round = function (d) {
+    	  var contourStartDeltaX = 0, contourStartDeltaY = 0, deltaX = 0, deltaY = 0, l;
+
+    	  d = d || 0;
+
+    	  this.__evaluateStack();
+
+    	  this.segments.forEach(function (s) {
+    	    var isRelative = (s[0].toLowerCase() === s[0]);
+
+    	    switch (s[0]) {
+    	      case 'H':
+    	      case 'h':
+    	        if (isRelative) { s[1] += deltaX; }
+    	        deltaX = s[1] - s[1].toFixed(d);
+    	        s[1] = +s[1].toFixed(d);
+    	        return;
+
+    	      case 'V':
+    	      case 'v':
+    	        if (isRelative) { s[1] += deltaY; }
+    	        deltaY = s[1] - s[1].toFixed(d);
+    	        s[1] = +s[1].toFixed(d);
+    	        return;
+
+    	      case 'Z':
+    	      case 'z':
+    	        deltaX = contourStartDeltaX;
+    	        deltaY = contourStartDeltaY;
+    	        return;
+
+    	      case 'M':
+    	      case 'm':
+    	        if (isRelative) {
+    	          s[1] += deltaX;
+    	          s[2] += deltaY;
+    	        }
+
+    	        deltaX = s[1] - s[1].toFixed(d);
+    	        deltaY = s[2] - s[2].toFixed(d);
+
+    	        contourStartDeltaX = deltaX;
+    	        contourStartDeltaY = deltaY;
+
+    	        s[1] = +s[1].toFixed(d);
+    	        s[2] = +s[2].toFixed(d);
+    	        return;
+
+    	      case 'A':
+    	      case 'a':
+    	        // [cmd, rx, ry, x-axis-rotation, large-arc-flag, sweep-flag, x, y]
+    	        if (isRelative) {
+    	          s[6] += deltaX;
+    	          s[7] += deltaY;
+    	        }
+
+    	        deltaX = s[6] - s[6].toFixed(d);
+    	        deltaY = s[7] - s[7].toFixed(d);
+
+    	        s[1] = +s[1].toFixed(d);
+    	        s[2] = +s[2].toFixed(d);
+    	        s[3] = +s[3].toFixed(d + 2); // better precision for rotation
+    	        s[6] = +s[6].toFixed(d);
+    	        s[7] = +s[7].toFixed(d);
+    	        return;
+
+    	      default:
+    	        // a c l q s t
+    	        l = s.length;
+
+    	        if (isRelative) {
+    	          s[l - 2] += deltaX;
+    	          s[l - 1] += deltaY;
+    	        }
+
+    	        deltaX = s[l - 2] - s[l - 2].toFixed(d);
+    	        deltaY = s[l - 1] - s[l - 1].toFixed(d);
+
+    	        s.forEach(function (val, i) {
+    	          if (!i) { return; }
+    	          s[i] = +s[i].toFixed(d);
+    	        });
+    	        return;
+    	    }
+    	  });
+
+    	  return this;
+    	};
+
+
+    	// Apply iterator function to all segments. If function returns result,
+    	// current segment will be replaced to array of returned segments.
+    	// If empty array is returned, current regment will be deleted.
+    	//
+    	SvgPath.prototype.iterate = function (iterator, keepLazyStack) {
+    	  var segments = this.segments,
+    	      replacements = {},
+    	      needReplace = false,
+    	      lastX = 0,
+    	      lastY = 0,
+    	      countourStartX = 0,
+    	      countourStartY = 0;
+    	  var i, j, newSegments;
+
+    	  if (!keepLazyStack) {
+    	    this.__evaluateStack();
+    	  }
+
+    	  segments.forEach(function (s, index) {
+
+    	    var res = iterator(s, index, lastX, lastY);
+
+    	    if (Array.isArray(res)) {
+    	      replacements[index] = res;
+    	      needReplace = true;
+    	    }
+
+    	    var isRelative = (s[0] === s[0].toLowerCase());
+
+    	    // calculate absolute X and Y
+    	    switch (s[0]) {
+    	      case 'm':
+    	      case 'M':
+    	        lastX = s[1] + (isRelative ? lastX : 0);
+    	        lastY = s[2] + (isRelative ? lastY : 0);
+    	        countourStartX = lastX;
+    	        countourStartY = lastY;
+    	        return;
+
+    	      case 'h':
+    	      case 'H':
+    	        lastX = s[1] + (isRelative ? lastX : 0);
+    	        return;
+
+    	      case 'v':
+    	      case 'V':
+    	        lastY = s[1] + (isRelative ? lastY : 0);
+    	        return;
+
+    	      case 'z':
+    	      case 'Z':
+    	        // That make sence for multiple contours
+    	        lastX = countourStartX;
+    	        lastY = countourStartY;
+    	        return;
+
+    	      default:
+    	        lastX = s[s.length - 2] + (isRelative ? lastX : 0);
+    	        lastY = s[s.length - 1] + (isRelative ? lastY : 0);
+    	    }
+    	  });
+
+    	  // Replace segments if iterator return results
+
+    	  if (!needReplace) { return this; }
+
+    	  newSegments = [];
+
+    	  for (i = 0; i < segments.length; i++) {
+    	    if (typeof replacements[i] !== 'undefined') {
+    	      for (j = 0; j < replacements[i].length; j++) {
+    	        newSegments.push(replacements[i][j]);
+    	      }
+    	    } else {
+    	      newSegments.push(segments[i]);
+    	    }
+    	  }
+
+    	  this.segments = newSegments;
+
+    	  return this;
+    	};
+
+
+    	// Converts segments from relative to absolute
+    	//
+    	SvgPath.prototype.abs = function () {
+
+    	  this.iterate(function (s, index, x, y) {
+    	    var name = s[0],
+    	        nameUC = name.toUpperCase(),
+    	        i;
+
+    	    // Skip absolute commands
+    	    if (name === nameUC) { return; }
+
+    	    s[0] = nameUC;
+
+    	    switch (name) {
+    	      case 'v':
+    	        // v has shifted coords parity
+    	        s[1] += y;
+    	        return;
+
+    	      case 'a':
+    	        // ARC is: ['A', rx, ry, x-axis-rotation, large-arc-flag, sweep-flag, x, y]
+    	        // touch x, y only
+    	        s[6] += x;
+    	        s[7] += y;
+    	        return;
+
+    	      default:
+    	        for (i = 1; i < s.length; i++) {
+    	          s[i] += i % 2 ? x : y; // odd values are X, even - Y
+    	        }
+    	    }
+    	  }, true);
+
+    	  return this;
+    	};
+
+
+    	// Converts segments from absolute to relative
+    	//
+    	SvgPath.prototype.rel = function () {
+
+    	  this.iterate(function (s, index, x, y) {
+    	    var name = s[0],
+    	        nameLC = name.toLowerCase(),
+    	        i;
+
+    	    // Skip relative commands
+    	    if (name === nameLC) { return; }
+
+    	    // Don't touch the first M to avoid potential confusions.
+    	    if (index === 0 && name === 'M') { return; }
+
+    	    s[0] = nameLC;
+
+    	    switch (name) {
+    	      case 'V':
+    	        // V has shifted coords parity
+    	        s[1] -= y;
+    	        return;
+
+    	      case 'A':
+    	        // ARC is: ['A', rx, ry, x-axis-rotation, large-arc-flag, sweep-flag, x, y]
+    	        // touch x, y only
+    	        s[6] -= x;
+    	        s[7] -= y;
+    	        return;
+
+    	      default:
+    	        for (i = 1; i < s.length; i++) {
+    	          s[i] -= i % 2 ? x : y; // odd values are X, even - Y
+    	        }
+    	    }
+    	  }, true);
+
+    	  return this;
+    	};
+
+
+    	// Converts arcs to cubic bézier curves
+    	//
+    	SvgPath.prototype.unarc = function () {
+    	  this.iterate(function (s, index, x, y) {
+    	    var new_segments, nextX, nextY, result = [], name = s[0];
+
+    	    // Skip anything except arcs
+    	    if (name !== 'A' && name !== 'a') { return null; }
+
+    	    if (name === 'a') {
+    	      // convert relative arc coordinates to absolute
+    	      nextX = x + s[6];
+    	      nextY = y + s[7];
+    	    } else {
+    	      nextX = s[6];
+    	      nextY = s[7];
+    	    }
+
+    	    new_segments = a2c(x, y, nextX, nextY, s[4], s[5], s[1], s[2], s[3]);
+
+    	    // Degenerated arcs can be ignored by renderer, but should not be dropped
+    	    // to avoid collisions with `S A S` and so on. Replace with empty line.
+    	    if (new_segments.length === 0) {
+    	      return [ [ s[0] === 'a' ? 'l' : 'L', s[6], s[7] ] ];
+    	    }
+
+    	    new_segments.forEach(function (s) {
+    	      result.push([ 'C', s[2], s[3], s[4], s[5], s[6], s[7] ]);
+    	    });
+
+    	    return result;
+    	  });
+
+    	  return this;
+    	};
+
+
+    	// Converts smooth curves (with missed control point) to generic curves
+    	//
+    	SvgPath.prototype.unshort = function () {
+    	  var segments = this.segments;
+    	  var prevControlX, prevControlY, prevSegment;
+    	  var curControlX, curControlY;
+
+    	  // TODO: add lazy evaluation flag when relative commands supported
+
+    	  this.iterate(function (s, idx, x, y) {
+    	    var name = s[0], nameUC = name.toUpperCase(), isRelative;
+
+    	    // First command MUST be M|m, it's safe to skip.
+    	    // Protect from access to [-1] for sure.
+    	    if (!idx) { return; }
+
+    	    if (nameUC === 'T') { // quadratic curve
+    	      isRelative = (name === 't');
+
+    	      prevSegment = segments[idx - 1];
+
+    	      if (prevSegment[0] === 'Q') {
+    	        prevControlX = prevSegment[1] - x;
+    	        prevControlY = prevSegment[2] - y;
+    	      } else if (prevSegment[0] === 'q') {
+    	        prevControlX = prevSegment[1] - prevSegment[3];
+    	        prevControlY = prevSegment[2] - prevSegment[4];
+    	      } else {
+    	        prevControlX = 0;
+    	        prevControlY = 0;
+    	      }
+
+    	      curControlX = -prevControlX;
+    	      curControlY = -prevControlY;
+
+    	      if (!isRelative) {
+    	        curControlX += x;
+    	        curControlY += y;
+    	      }
+
+    	      segments[idx] = [
+    	        isRelative ? 'q' : 'Q',
+    	        curControlX, curControlY,
+    	        s[1], s[2]
+    	      ];
+
+    	    } else if (nameUC === 'S') { // cubic curve
+    	      isRelative = (name === 's');
+
+    	      prevSegment = segments[idx - 1];
+
+    	      if (prevSegment[0] === 'C') {
+    	        prevControlX = prevSegment[3] - x;
+    	        prevControlY = prevSegment[4] - y;
+    	      } else if (prevSegment[0] === 'c') {
+    	        prevControlX = prevSegment[3] - prevSegment[5];
+    	        prevControlY = prevSegment[4] - prevSegment[6];
+    	      } else {
+    	        prevControlX = 0;
+    	        prevControlY = 0;
+    	      }
+
+    	      curControlX = -prevControlX;
+    	      curControlY = -prevControlY;
+
+    	      if (!isRelative) {
+    	        curControlX += x;
+    	        curControlY += y;
+    	      }
+
+    	      segments[idx] = [
+    	        isRelative ? 'c' : 'C',
+    	        curControlX, curControlY,
+    	        s[1], s[2], s[3], s[4]
+    	      ];
+    	    }
+    	  });
+
+    	  return this;
+    	};
+
+
+    	svgpath$1 = SvgPath;
+    	return svgpath$1;
     }
 
-    function skipSpaces(state) {
-      while (state.index < state.max && isSpace(state.path.charCodeAt(state.index))) {
-        state.index++;
-      }
+    var svgpath;
+    var hasRequiredSvgpath;
+
+    function requireSvgpath () {
+    	if (hasRequiredSvgpath) return svgpath;
+    	hasRequiredSvgpath = 1;
+
+    	svgpath = requireSvgpath$1();
+    	return svgpath;
     }
 
-
-    function scanFlag(state) {
-      var ch = state.path.charCodeAt(state.index);
-
-      if (ch === 0x30/* 0 */) {
-        state.param = 0;
-        state.index++;
-        return;
-      }
-
-      if (ch === 0x31/* 1 */) {
-        state.param = 1;
-        state.index++;
-        return;
-      }
-
-      state.err = 'SvgPath: arc flag can be 0 or 1 only (at pos ' + state.index + ')';
-    }
-
-
-    function scanParam(state) {
-      var start = state.index,
-          index = start,
-          max = state.max,
-          zeroFirst = false,
-          hasCeiling = false,
-          hasDecimal = false,
-          hasDot = false,
-          ch;
-
-      if (index >= max) {
-        state.err = 'SvgPath: missed param (at pos ' + index + ')';
-        return;
-      }
-      ch = state.path.charCodeAt(index);
-
-      if (ch === 0x2B/* + */ || ch === 0x2D/* - */) {
-        index++;
-        ch = (index < max) ? state.path.charCodeAt(index) : 0;
-      }
-
-      // This logic is shamelessly borrowed from Esprima
-      // https://github.com/ariya/esprimas
-      //
-      if (!isDigit(ch) && ch !== 0x2E/* . */) {
-        state.err = 'SvgPath: param should start with 0..9 or `.` (at pos ' + index + ')';
-        return;
-      }
-
-      if (ch !== 0x2E/* . */) {
-        zeroFirst = (ch === 0x30/* 0 */);
-        index++;
-
-        ch = (index < max) ? state.path.charCodeAt(index) : 0;
-
-        if (zeroFirst && index < max) {
-          // decimal number starts with '0' such as '09' is illegal.
-          if (ch && isDigit(ch)) {
-            state.err = 'SvgPath: numbers started with `0` such as `09` are illegal (at pos ' + start + ')';
-            return;
-          }
-        }
-
-        while (index < max && isDigit(state.path.charCodeAt(index))) {
-          index++;
-          hasCeiling = true;
-        }
-        ch = (index < max) ? state.path.charCodeAt(index) : 0;
-      }
-
-      if (ch === 0x2E/* . */) {
-        hasDot = true;
-        index++;
-        while (isDigit(state.path.charCodeAt(index))) {
-          index++;
-          hasDecimal = true;
-        }
-        ch = (index < max) ? state.path.charCodeAt(index) : 0;
-      }
-
-      if (ch === 0x65/* e */ || ch === 0x45/* E */) {
-        if (hasDot && !hasCeiling && !hasDecimal) {
-          state.err = 'SvgPath: invalid float exponent (at pos ' + index + ')';
-          return;
-        }
-
-        index++;
-
-        ch = (index < max) ? state.path.charCodeAt(index) : 0;
-        if (ch === 0x2B/* + */ || ch === 0x2D/* - */) {
-          index++;
-        }
-        if (index < max && isDigit(state.path.charCodeAt(index))) {
-          while (index < max && isDigit(state.path.charCodeAt(index))) {
-            index++;
-          }
-        } else {
-          state.err = 'SvgPath: invalid float exponent (at pos ' + index + ')';
-          return;
-        }
-      }
-
-      state.index = index;
-      state.param = parseFloat(state.path.slice(start, index)) + 0.0;
-    }
-
-
-    function finalizeSegment(state) {
-      var cmd, cmdLC;
-
-      // Process duplicated commands (without comand name)
-
-      // This logic is shamelessly borrowed from Raphael
-      // https://github.com/DmitryBaranovskiy/raphael/
-      //
-      cmd   = state.path[state.segmentStart];
-      cmdLC = cmd.toLowerCase();
-
-      var params = state.data;
-
-      if (cmdLC === 'm' && params.length > 2) {
-        state.result.push([ cmd, params[0], params[1] ]);
-        params = params.slice(2);
-        cmdLC = 'l';
-        cmd = (cmd === 'm') ? 'l' : 'L';
-      }
-
-      if (cmdLC === 'r') {
-        state.result.push([ cmd ].concat(params));
-      } else {
-
-        while (params.length >= paramCounts[cmdLC]) {
-          state.result.push([ cmd ].concat(params.splice(0, paramCounts[cmdLC])));
-          if (!paramCounts[cmdLC]) {
-            break;
-          }
-        }
-      }
-    }
-
-
-    function scanSegment(state) {
-      var max = state.max,
-          cmdCode, is_arc, comma_found, need_params, i;
-
-      state.segmentStart = state.index;
-      cmdCode = state.path.charCodeAt(state.index);
-      is_arc = isArc(cmdCode);
-
-      if (!isCommand(cmdCode)) {
-        state.err = 'SvgPath: bad command ' + state.path[state.index] + ' (at pos ' + state.index + ')';
-        return;
-      }
-
-      need_params = paramCounts[state.path[state.index].toLowerCase()];
-
-      state.index++;
-      skipSpaces(state);
-
-      state.data = [];
-
-      if (!need_params) {
-        // Z
-        finalizeSegment(state);
-        return;
-      }
-
-      comma_found = false;
-
-      for (;;) {
-        for (i = need_params; i > 0; i--) {
-          if (is_arc && (i === 3 || i === 4)) scanFlag(state);
-          else scanParam(state);
-
-          if (state.err.length) {
-            return;
-          }
-          state.data.push(state.param);
-
-          skipSpaces(state);
-          comma_found = false;
-
-          if (state.index < max && state.path.charCodeAt(state.index) === 0x2C/* , */) {
-            state.index++;
-            skipSpaces(state);
-            comma_found = true;
-          }
-        }
-
-        // after ',' param is mandatory
-        if (comma_found) {
-          continue;
-        }
-
-        if (state.index >= state.max) {
-          break;
-        }
-
-        // Stop on next segment
-        if (!isDigitStart(state.path.charCodeAt(state.index))) {
-          break;
-        }
-      }
-
-      finalizeSegment(state);
-    }
-
-
-    /* Returns array of segments:
-     *
-     * [
-     *   [ command, coord1, coord2, ... ]
-     * ]
-     */
-    var path_parse = function pathParse(svgPath) {
-      var state = new State(svgPath);
-      var max = state.max;
-
-      skipSpaces(state);
-
-      while (state.index < max && !state.err.length) {
-        scanSegment(state);
-      }
-
-      if (state.err.length) {
-        state.result = [];
-
-      } else if (state.result.length) {
-
-        if ('mM'.indexOf(state.result[0][0]) < 0) {
-          state.err = 'SvgPath: string should start with `M` or `m`';
-          state.result = [];
-        } else {
-          state.result[0][0] = 'M';
-        }
-      }
-
-      return {
-        err: state.err,
-        segments: state.result
-      };
-    };
-
-    // combine 2 matrixes
-    // m1, m2 - [a, b, c, d, e, g]
-    //
-    function combine(m1, m2) {
-      return [
-        m1[0] * m2[0] + m1[2] * m2[1],
-        m1[1] * m2[0] + m1[3] * m2[1],
-        m1[0] * m2[2] + m1[2] * m2[3],
-        m1[1] * m2[2] + m1[3] * m2[3],
-        m1[0] * m2[4] + m1[2] * m2[5] + m1[4],
-        m1[1] * m2[4] + m1[3] * m2[5] + m1[5]
-      ];
-    }
-
-
-    function Matrix() {
-      if (!(this instanceof Matrix)) { return new Matrix(); }
-      this.queue = [];   // list of matrixes to apply
-      this.cache = null; // combined matrix cache
-    }
-
-
-    Matrix.prototype.matrix = function (m) {
-      if (m[0] === 1 && m[1] === 0 && m[2] === 0 && m[3] === 1 && m[4] === 0 && m[5] === 0) {
-        return this;
-      }
-      this.cache = null;
-      this.queue.push(m);
-      return this;
-    };
-
-
-    Matrix.prototype.translate = function (tx, ty) {
-      if (tx !== 0 || ty !== 0) {
-        this.cache = null;
-        this.queue.push([ 1, 0, 0, 1, tx, ty ]);
-      }
-      return this;
-    };
-
-
-    Matrix.prototype.scale = function (sx, sy) {
-      if (sx !== 1 || sy !== 1) {
-        this.cache = null;
-        this.queue.push([ sx, 0, 0, sy, 0, 0 ]);
-      }
-      return this;
-    };
-
-
-    Matrix.prototype.rotate = function (angle, rx, ry) {
-      var rad, cos, sin;
-
-      if (angle !== 0) {
-        this.translate(rx, ry);
-
-        rad = angle * Math.PI / 180;
-        cos = Math.cos(rad);
-        sin = Math.sin(rad);
-
-        this.queue.push([ cos, sin, -sin, cos, 0, 0 ]);
-        this.cache = null;
-
-        this.translate(-rx, -ry);
-      }
-      return this;
-    };
-
-
-    Matrix.prototype.skewX = function (angle) {
-      if (angle !== 0) {
-        this.cache = null;
-        this.queue.push([ 1, 0, Math.tan(angle * Math.PI / 180), 1, 0, 0 ]);
-      }
-      return this;
-    };
-
-
-    Matrix.prototype.skewY = function (angle) {
-      if (angle !== 0) {
-        this.cache = null;
-        this.queue.push([ 1, Math.tan(angle * Math.PI / 180), 0, 1, 0, 0 ]);
-      }
-      return this;
-    };
-
-
-    // Flatten queue
-    //
-    Matrix.prototype.toArray = function () {
-      if (this.cache) {
-        return this.cache;
-      }
-
-      if (!this.queue.length) {
-        this.cache = [ 1, 0, 0, 1, 0, 0 ];
-        return this.cache;
-      }
-
-      this.cache = this.queue[0];
-
-      if (this.queue.length === 1) {
-        return this.cache;
-      }
-
-      for (var i = 1; i < this.queue.length; i++) {
-        this.cache = combine(this.cache, this.queue[i]);
-      }
-
-      return this.cache;
-    };
-
-
-    // Apply list of matrixes to (x,y) point.
-    // If `isRelative` set, `translate` component of matrix will be skipped
-    //
-    Matrix.prototype.calc = function (x, y, isRelative) {
-      var m;
-
-      // Don't change point on empty transforms queue
-      if (!this.queue.length) { return [ x, y ]; }
-
-      // Calculate final matrix, if not exists
-      //
-      // NB. if you deside to apply transforms to point one-by-one,
-      // they should be taken in reverse order
-
-      if (!this.cache) {
-        this.cache = this.toArray();
-      }
-
-      m = this.cache;
-
-      // Apply matrix to point
-      return [
-        x * m[0] + y * m[2] + (isRelative ? 0 : m[4]),
-        x * m[1] + y * m[3] + (isRelative ? 0 : m[5])
-      ];
-    };
-
-
-    var matrix = Matrix;
-
-    var operations = {
-      matrix: true,
-      scale: true,
-      rotate: true,
-      translate: true,
-      skewX: true,
-      skewY: true
-    };
-
-    var CMD_SPLIT_RE    = /\s*(matrix|translate|scale|rotate|skewX|skewY)\s*\(\s*(.+?)\s*\)[\s,]*/;
-    var PARAMS_SPLIT_RE = /[\s,]+/;
-
-
-    var transform_parse = function transformParse(transformString) {
-      var matrix$1 = new matrix();
-      var cmd, params;
-
-      // Split value into ['', 'translate', '10 50', '', 'scale', '2', '', 'rotate',  '-45', '']
-      transformString.split(CMD_SPLIT_RE).forEach(function (item) {
-
-        // Skip empty elements
-        if (!item.length) { return; }
-
-        // remember operation
-        if (typeof operations[item] !== 'undefined') {
-          cmd = item;
-          return;
-        }
-
-        // extract params & att operation to matrix
-        params = item.split(PARAMS_SPLIT_RE).map(function (i) {
-          return +i || 0;
-        });
-
-        // If params count is not correct - ignore command
-        switch (cmd) {
-          case 'matrix':
-            if (params.length === 6) {
-              matrix$1.matrix(params);
-            }
-            return;
-
-          case 'scale':
-            if (params.length === 1) {
-              matrix$1.scale(params[0], params[0]);
-            } else if (params.length === 2) {
-              matrix$1.scale(params[0], params[1]);
-            }
-            return;
-
-          case 'rotate':
-            if (params.length === 1) {
-              matrix$1.rotate(params[0], 0, 0);
-            } else if (params.length === 3) {
-              matrix$1.rotate(params[0], params[1], params[2]);
-            }
-            return;
-
-          case 'translate':
-            if (params.length === 1) {
-              matrix$1.translate(params[0], 0);
-            } else if (params.length === 2) {
-              matrix$1.translate(params[0], params[1]);
-            }
-            return;
-
-          case 'skewX':
-            if (params.length === 1) {
-              matrix$1.skewX(params[0]);
-            }
-            return;
-
-          case 'skewY':
-            if (params.length === 1) {
-              matrix$1.skewY(params[0]);
-            }
-            return;
-        }
-      });
-
-      return matrix$1;
-    };
-
-    // Convert an arc to a sequence of cubic bézier curves
-
-
-    var TAU = Math.PI * 2;
-
-
-    /* eslint-disable space-infix-ops */
-
-    // Calculate an angle between two unit vectors
-    //
-    // Since we measure angle between radii of circular arcs,
-    // we can use simplified math (without length normalization)
-    //
-    function unit_vector_angle(ux, uy, vx, vy) {
-      var sign = (ux * vy - uy * vx < 0) ? -1 : 1;
-      var dot  = ux * vx + uy * vy;
-
-      // Add this to work with arbitrary vectors:
-      // dot /= Math.sqrt(ux * ux + uy * uy) * Math.sqrt(vx * vx + vy * vy);
-
-      // rounding errors, e.g. -1.0000000000000002 can screw up this
-      if (dot >  1.0) { dot =  1.0; }
-      if (dot < -1.0) { dot = -1.0; }
-
-      return sign * Math.acos(dot);
-    }
-
-
-    // Convert from endpoint to center parameterization,
-    // see http://www.w3.org/TR/SVG11/implnote.html#ArcImplementationNotes
-    //
-    // Return [cx, cy, theta1, delta_theta]
-    //
-    function get_arc_center(x1, y1, x2, y2, fa, fs, rx, ry, sin_phi, cos_phi) {
-      // Step 1.
-      //
-      // Moving an ellipse so origin will be the middlepoint between our two
-      // points. After that, rotate it to line up ellipse axes with coordinate
-      // axes.
-      //
-      var x1p =  cos_phi*(x1-x2)/2 + sin_phi*(y1-y2)/2;
-      var y1p = -sin_phi*(x1-x2)/2 + cos_phi*(y1-y2)/2;
-
-      var rx_sq  =  rx * rx;
-      var ry_sq  =  ry * ry;
-      var x1p_sq = x1p * x1p;
-      var y1p_sq = y1p * y1p;
-
-      // Step 2.
-      //
-      // Compute coordinates of the centre of this ellipse (cx', cy')
-      // in the new coordinate system.
-      //
-      var radicant = (rx_sq * ry_sq) - (rx_sq * y1p_sq) - (ry_sq * x1p_sq);
-
-      if (radicant < 0) {
-        // due to rounding errors it might be e.g. -1.3877787807814457e-17
-        radicant = 0;
-      }
-
-      radicant /=   (rx_sq * y1p_sq) + (ry_sq * x1p_sq);
-      radicant = Math.sqrt(radicant) * (fa === fs ? -1 : 1);
-
-      var cxp = radicant *  rx/ry * y1p;
-      var cyp = radicant * -ry/rx * x1p;
-
-      // Step 3.
-      //
-      // Transform back to get centre coordinates (cx, cy) in the original
-      // coordinate system.
-      //
-      var cx = cos_phi*cxp - sin_phi*cyp + (x1+x2)/2;
-      var cy = sin_phi*cxp + cos_phi*cyp + (y1+y2)/2;
-
-      // Step 4.
-      //
-      // Compute angles (theta1, delta_theta).
-      //
-      var v1x =  (x1p - cxp) / rx;
-      var v1y =  (y1p - cyp) / ry;
-      var v2x = (-x1p - cxp) / rx;
-      var v2y = (-y1p - cyp) / ry;
-
-      var theta1 = unit_vector_angle(1, 0, v1x, v1y);
-      var delta_theta = unit_vector_angle(v1x, v1y, v2x, v2y);
-
-      if (fs === 0 && delta_theta > 0) {
-        delta_theta -= TAU;
-      }
-      if (fs === 1 && delta_theta < 0) {
-        delta_theta += TAU;
-      }
-
-      return [ cx, cy, theta1, delta_theta ];
-    }
-
-    //
-    // Approximate one unit arc segment with bézier curves,
-    // see http://math.stackexchange.com/questions/873224
-    //
-    function approximate_unit_arc(theta1, delta_theta) {
-      var alpha = 4/3 * Math.tan(delta_theta/4);
-
-      var x1 = Math.cos(theta1);
-      var y1 = Math.sin(theta1);
-      var x2 = Math.cos(theta1 + delta_theta);
-      var y2 = Math.sin(theta1 + delta_theta);
-
-      return [ x1, y1, x1 - y1*alpha, y1 + x1*alpha, x2 + y2*alpha, y2 - x2*alpha, x2, y2 ];
-    }
-
-    var a2c = function a2c(x1, y1, x2, y2, fa, fs, rx, ry, phi) {
-      var sin_phi = Math.sin(phi * TAU / 360);
-      var cos_phi = Math.cos(phi * TAU / 360);
-
-      // Make sure radii are valid
-      //
-      var x1p =  cos_phi*(x1-x2)/2 + sin_phi*(y1-y2)/2;
-      var y1p = -sin_phi*(x1-x2)/2 + cos_phi*(y1-y2)/2;
-
-      if (x1p === 0 && y1p === 0) {
-        // we're asked to draw line to itself
-        return [];
-      }
-
-      if (rx === 0 || ry === 0) {
-        // one of the radii is zero
-        return [];
-      }
-
-
-      // Compensate out-of-range radii
-      //
-      rx = Math.abs(rx);
-      ry = Math.abs(ry);
-
-      var lambda = (x1p * x1p) / (rx * rx) + (y1p * y1p) / (ry * ry);
-      if (lambda > 1) {
-        rx *= Math.sqrt(lambda);
-        ry *= Math.sqrt(lambda);
-      }
-
-
-      // Get center parameters (cx, cy, theta1, delta_theta)
-      //
-      var cc = get_arc_center(x1, y1, x2, y2, fa, fs, rx, ry, sin_phi, cos_phi);
-
-      var result = [];
-      var theta1 = cc[2];
-      var delta_theta = cc[3];
-
-      // Split an arc to multiple segments, so each segment
-      // will be less than τ/4 (= 90°)
-      //
-      var segments = Math.max(Math.ceil(Math.abs(delta_theta) / (TAU / 4)), 1);
-      delta_theta /= segments;
-
-      for (var i = 0; i < segments; i++) {
-        result.push(approximate_unit_arc(theta1, delta_theta));
-        theta1 += delta_theta;
-      }
-
-      // We have a bezier approximation of a unit circle,
-      // now need to transform back to the original ellipse
-      //
-      return result.map(function (curve) {
-        for (var i = 0; i < curve.length; i += 2) {
-          var x = curve[i + 0];
-          var y = curve[i + 1];
-
-          // scale
-          x *= rx;
-          y *= ry;
-
-          // rotate
-          var xp = cos_phi*x - sin_phi*y;
-          var yp = sin_phi*x + cos_phi*y;
-
-          // translate
-          curve[i + 0] = xp + cc[0];
-          curve[i + 1] = yp + cc[1];
-        }
-
-        return curve;
-      });
-    };
-
-    /* eslint-disable space-infix-ops */
-
-    // The precision used to consider an ellipse as a circle
-    //
-    var epsilon = 0.0000000001;
-
-    // To convert degree in radians
-    //
-    var torad = Math.PI / 180;
-
-    // Class constructor :
-    //  an ellipse centred at 0 with radii rx,ry and x - axis - angle ax.
-    //
-    function Ellipse$1(rx, ry, ax) {
-      if (!(this instanceof Ellipse$1)) { return new Ellipse$1(rx, ry, ax); }
-      this.rx = rx;
-      this.ry = ry;
-      this.ax = ax;
-    }
-
-    // Apply a linear transform m to the ellipse
-    // m is an array representing a matrix :
-    //    -         -
-    //   | m[0] m[2] |
-    //   | m[1] m[3] |
-    //    -         -
-    //
-    Ellipse$1.prototype.transform = function (m) {
-      // We consider the current ellipse as image of the unit circle
-      // by first scale(rx,ry) and then rotate(ax) ...
-      // So we apply ma =  m x rotate(ax) x scale(rx,ry) to the unit circle.
-      var c = Math.cos(this.ax * torad), s = Math.sin(this.ax * torad);
-      var ma = [
-        this.rx * (m[0]*c + m[2]*s),
-        this.rx * (m[1]*c + m[3]*s),
-        this.ry * (-m[0]*s + m[2]*c),
-        this.ry * (-m[1]*s + m[3]*c)
-      ];
-
-      // ma * transpose(ma) = [ J L ]
-      //                      [ L K ]
-      // L is calculated later (if the image is not a circle)
-      var J = ma[0]*ma[0] + ma[2]*ma[2],
-          K = ma[1]*ma[1] + ma[3]*ma[3];
-
-      // the discriminant of the characteristic polynomial of ma * transpose(ma)
-      var D = ((ma[0]-ma[3])*(ma[0]-ma[3]) + (ma[2]+ma[1])*(ma[2]+ma[1])) *
-              ((ma[0]+ma[3])*(ma[0]+ma[3]) + (ma[2]-ma[1])*(ma[2]-ma[1]));
-
-      // the "mean eigenvalue"
-      var JK = (J + K) / 2;
-
-      // check if the image is (almost) a circle
-      if (D < epsilon * JK) {
-        // if it is
-        this.rx = this.ry = Math.sqrt(JK);
-        this.ax = 0;
-        return this;
-      }
-
-      // if it is not a circle
-      var L = ma[0]*ma[1] + ma[2]*ma[3];
-
-      D = Math.sqrt(D);
-
-      // {l1,l2} = the two eigen values of ma * transpose(ma)
-      var l1 = JK + D/2,
-          l2 = JK - D/2;
-      // the x - axis - rotation angle is the argument of the l1 - eigenvector
-      /*eslint-disable indent*/
-      this.ax = (Math.abs(L) < epsilon && Math.abs(l1 - K) < epsilon) ?
-        90
-      :
-        Math.atan(Math.abs(L) > Math.abs(l1 - K) ?
-          (l1 - J) / L
-        :
-          L / (l1 - K)
-        ) * 180 / Math.PI;
-      /*eslint-enable indent*/
-
-      // if ax > 0 => rx = sqrt(l1), ry = sqrt(l2), else exchange axes and ax += 90
-      if (this.ax >= 0) {
-        // if ax in [0,90]
-        this.rx = Math.sqrt(l1);
-        this.ry = Math.sqrt(l2);
-      } else {
-        // if ax in ]-90,0[ => exchange axes
-        this.ax += 90;
-        this.rx = Math.sqrt(l2);
-        this.ry = Math.sqrt(l1);
-      }
-
-      return this;
-    };
-
-    // Check if the ellipse is (almost) degenerate, i.e. rx = 0 or ry = 0
-    //
-    Ellipse$1.prototype.isDegenerate = function () {
-      return (this.rx < epsilon * this.ry || this.ry < epsilon * this.rx);
-    };
-
-    var ellipse = Ellipse$1;
-
-    // Class constructor
-    //
-    function SvgPath(path) {
-      if (!(this instanceof SvgPath)) { return new SvgPath(path); }
-
-      var pstate = path_parse(path);
-
-      // Array of path segments.
-      // Each segment is array [command, param1, param2, ...]
-      this.segments = pstate.segments;
-
-      // Error message on parse error.
-      this.err      = pstate.err;
-
-      // Transforms stack for lazy evaluation
-      this.__stack    = [];
-    }
-
-    SvgPath.from = function (src) {
-      if (typeof src === 'string') return new SvgPath(src);
-
-      if (src instanceof SvgPath) {
-        // Create empty object
-        var s = new SvgPath('');
-
-        // Clone properies
-        s.err = src.err;
-        s.segments = src.segments.map(function (sgm) { return sgm.slice(); });
-        s.__stack = src.__stack.map(function (m) {
-          return matrix().matrix(m.toArray());
-        });
-
-        return s;
-      }
-
-      throw new Error('SvgPath.from: invalid param type ' + src);
-    };
-
-
-    SvgPath.prototype.__matrix = function (m) {
-      var self = this, i;
-
-      // Quick leave for empty matrix
-      if (!m.queue.length) { return; }
-
-      this.iterate(function (s, index, x, y) {
-        var p, result, name, isRelative;
-
-        switch (s[0]) {
-
-          // Process 'assymetric' commands separately
-          case 'v':
-            p      = m.calc(0, s[1], true);
-            result = (p[0] === 0) ? [ 'v', p[1] ] : [ 'l', p[0], p[1] ];
-            break;
-
-          case 'V':
-            p      = m.calc(x, s[1], false);
-            result = (p[0] === m.calc(x, y, false)[0]) ? [ 'V', p[1] ] : [ 'L', p[0], p[1] ];
-            break;
-
-          case 'h':
-            p      = m.calc(s[1], 0, true);
-            result = (p[1] === 0) ? [ 'h', p[0] ] : [ 'l', p[0], p[1] ];
-            break;
-
-          case 'H':
-            p      = m.calc(s[1], y, false);
-            result = (p[1] === m.calc(x, y, false)[1]) ? [ 'H', p[0] ] : [ 'L', p[0], p[1] ];
-            break;
-
-          case 'a':
-          case 'A':
-            // ARC is: ['A', rx, ry, x-axis-rotation, large-arc-flag, sweep-flag, x, y]
-
-            // Drop segment if arc is empty (end point === start point)
-            /*if ((s[0] === 'A' && s[6] === x && s[7] === y) ||
-                (s[0] === 'a' && s[6] === 0 && s[7] === 0)) {
-              return [];
-            }*/
-
-            // Transform rx, ry and the x-axis-rotation
-            var ma = m.toArray();
-            var e = ellipse(s[1], s[2], s[3]).transform(ma);
-
-            // flip sweep-flag if matrix is not orientation-preserving
-            if (ma[0] * ma[3] - ma[1] * ma[2] < 0) {
-              s[5] = s[5] ? '0' : '1';
-            }
-
-            // Transform end point as usual (without translation for relative notation)
-            p = m.calc(s[6], s[7], s[0] === 'a');
-
-            // Empty arcs can be ignored by renderer, but should not be dropped
-            // to avoid collisions with `S A S` and so on. Replace with empty line.
-            if ((s[0] === 'A' && s[6] === x && s[7] === y) ||
-                (s[0] === 'a' && s[6] === 0 && s[7] === 0)) {
-              result = [ s[0] === 'a' ? 'l' : 'L', p[0], p[1] ];
-              break;
-            }
-
-            // if the resulting ellipse is (almost) a segment ...
-            if (e.isDegenerate()) {
-              // replace the arc by a line
-              result = [ s[0] === 'a' ? 'l' : 'L', p[0], p[1] ];
-            } else {
-              // if it is a real ellipse
-              // s[0], s[4] and s[5] are not modified
-              result = [ s[0], e.rx, e.ry, e.ax, s[4], s[5], p[0], p[1] ];
-            }
-
-            break;
-
-          case 'm':
-            // Edge case. The very first `m` should be processed as absolute, if happens.
-            // Make sense for coord shift transforms.
-            isRelative = index > 0;
-
-            p = m.calc(s[1], s[2], isRelative);
-            result = [ 'm', p[0], p[1] ];
-            break;
-
-          default:
-            name       = s[0];
-            result     = [ name ];
-            isRelative = (name.toLowerCase() === name);
-
-            // Apply transformations to the segment
-            for (i = 1; i < s.length; i += 2) {
-              p = m.calc(s[i], s[i + 1], isRelative);
-              result.push(p[0], p[1]);
-            }
-        }
-
-        self.segments[index] = result;
-      }, true);
-    };
-
-
-    // Apply stacked commands
-    //
-    SvgPath.prototype.__evaluateStack = function () {
-      var m, i;
-
-      if (!this.__stack.length) { return; }
-
-      if (this.__stack.length === 1) {
-        this.__matrix(this.__stack[0]);
-        this.__stack = [];
-        return;
-      }
-
-      m = matrix();
-      i = this.__stack.length;
-
-      while (--i >= 0) {
-        m.matrix(this.__stack[i].toArray());
-      }
-
-      this.__matrix(m);
-      this.__stack = [];
-    };
-
-
-    // Convert processed SVG Path back to string
-    //
-    SvgPath.prototype.toString = function () {
-      var result = '', prevCmd = '', cmdSkipped = false;
-
-      this.__evaluateStack();
-
-      for (var i = 0, len = this.segments.length; i < len; i++) {
-        var segment = this.segments[i];
-        var cmd = segment[0];
-
-        // Command not repeating => store
-        if (cmd !== prevCmd || cmd === 'm' || cmd === 'M') {
-          // workaround for FontForge SVG importing bug, keep space between "z m".
-          if (cmd === 'm' && prevCmd === 'z') result += ' ';
-          result += cmd;
-
-          cmdSkipped = false;
-        } else {
-          cmdSkipped = true;
-        }
-
-        // Store segment params
-        for (var pos = 1; pos < segment.length; pos++) {
-          var val = segment[pos];
-          // Space can be skipped
-          // 1. After command (always)
-          // 2. For negative value (with '-' at start)
-          if (pos === 1) {
-            if (cmdSkipped && val >= 0) result += ' ';
-          } else if (val >= 0) result += ' ';
-
-          result += val;
-        }
-
-        prevCmd = cmd;
-      }
-
-      return result;
-    };
-
-
-    // Translate path to (x [, y])
-    //
-    SvgPath.prototype.translate = function (x, y) {
-      this.__stack.push(matrix().translate(x, y || 0));
-      return this;
-    };
-
-
-    // Scale path to (sx [, sy])
-    // sy = sx if not defined
-    //
-    SvgPath.prototype.scale = function (sx, sy) {
-      this.__stack.push(matrix().scale(sx, (!sy && (sy !== 0)) ? sx : sy));
-      return this;
-    };
-
-
-    // Rotate path around point (sx [, sy])
-    // sy = sx if not defined
-    //
-    SvgPath.prototype.rotate = function (angle, rx, ry) {
-      this.__stack.push(matrix().rotate(angle, rx || 0, ry || 0));
-      return this;
-    };
-
-
-    // Skew path along the X axis by `degrees` angle
-    //
-    SvgPath.prototype.skewX = function (degrees) {
-      this.__stack.push(matrix().skewX(degrees));
-      return this;
-    };
-
-
-    // Skew path along the Y axis by `degrees` angle
-    //
-    SvgPath.prototype.skewY = function (degrees) {
-      this.__stack.push(matrix().skewY(degrees));
-      return this;
-    };
-
-
-    // Apply matrix transform (array of 6 elements)
-    //
-    SvgPath.prototype.matrix = function (m) {
-      this.__stack.push(matrix().matrix(m));
-      return this;
-    };
-
-
-    // Transform path according to "transform" attr of SVG spec
-    //
-    SvgPath.prototype.transform = function (transformString) {
-      if (!transformString.trim()) {
-        return this;
-      }
-      this.__stack.push(transform_parse(transformString));
-      return this;
-    };
-
-
-    // Round coords with given decimal precition.
-    // 0 by default (to integers)
-    //
-    SvgPath.prototype.round = function (d) {
-      var contourStartDeltaX = 0, contourStartDeltaY = 0, deltaX = 0, deltaY = 0, l;
-
-      d = d || 0;
-
-      this.__evaluateStack();
-
-      this.segments.forEach(function (s) {
-        var isRelative = (s[0].toLowerCase() === s[0]);
-
-        switch (s[0]) {
-          case 'H':
-          case 'h':
-            if (isRelative) { s[1] += deltaX; }
-            deltaX = s[1] - s[1].toFixed(d);
-            s[1] = +s[1].toFixed(d);
-            return;
-
-          case 'V':
-          case 'v':
-            if (isRelative) { s[1] += deltaY; }
-            deltaY = s[1] - s[1].toFixed(d);
-            s[1] = +s[1].toFixed(d);
-            return;
-
-          case 'Z':
-          case 'z':
-            deltaX = contourStartDeltaX;
-            deltaY = contourStartDeltaY;
-            return;
-
-          case 'M':
-          case 'm':
-            if (isRelative) {
-              s[1] += deltaX;
-              s[2] += deltaY;
-            }
-
-            deltaX = s[1] - s[1].toFixed(d);
-            deltaY = s[2] - s[2].toFixed(d);
-
-            contourStartDeltaX = deltaX;
-            contourStartDeltaY = deltaY;
-
-            s[1] = +s[1].toFixed(d);
-            s[2] = +s[2].toFixed(d);
-            return;
-
-          case 'A':
-          case 'a':
-            // [cmd, rx, ry, x-axis-rotation, large-arc-flag, sweep-flag, x, y]
-            if (isRelative) {
-              s[6] += deltaX;
-              s[7] += deltaY;
-            }
-
-            deltaX = s[6] - s[6].toFixed(d);
-            deltaY = s[7] - s[7].toFixed(d);
-
-            s[1] = +s[1].toFixed(d);
-            s[2] = +s[2].toFixed(d);
-            s[3] = +s[3].toFixed(d + 2); // better precision for rotation
-            s[6] = +s[6].toFixed(d);
-            s[7] = +s[7].toFixed(d);
-            return;
-
-          default:
-            // a c l q s t
-            l = s.length;
-
-            if (isRelative) {
-              s[l - 2] += deltaX;
-              s[l - 1] += deltaY;
-            }
-
-            deltaX = s[l - 2] - s[l - 2].toFixed(d);
-            deltaY = s[l - 1] - s[l - 1].toFixed(d);
-
-            s.forEach(function (val, i) {
-              if (!i) { return; }
-              s[i] = +s[i].toFixed(d);
-            });
-            return;
-        }
-      });
-
-      return this;
-    };
-
-
-    // Apply iterator function to all segments. If function returns result,
-    // current segment will be replaced to array of returned segments.
-    // If empty array is returned, current regment will be deleted.
-    //
-    SvgPath.prototype.iterate = function (iterator, keepLazyStack) {
-      var segments = this.segments,
-          replacements = {},
-          needReplace = false,
-          lastX = 0,
-          lastY = 0,
-          countourStartX = 0,
-          countourStartY = 0;
-      var i, j, newSegments;
-
-      if (!keepLazyStack) {
-        this.__evaluateStack();
-      }
-
-      segments.forEach(function (s, index) {
-
-        var res = iterator(s, index, lastX, lastY);
-
-        if (Array.isArray(res)) {
-          replacements[index] = res;
-          needReplace = true;
-        }
-
-        var isRelative = (s[0] === s[0].toLowerCase());
-
-        // calculate absolute X and Y
-        switch (s[0]) {
-          case 'm':
-          case 'M':
-            lastX = s[1] + (isRelative ? lastX : 0);
-            lastY = s[2] + (isRelative ? lastY : 0);
-            countourStartX = lastX;
-            countourStartY = lastY;
-            return;
-
-          case 'h':
-          case 'H':
-            lastX = s[1] + (isRelative ? lastX : 0);
-            return;
-
-          case 'v':
-          case 'V':
-            lastY = s[1] + (isRelative ? lastY : 0);
-            return;
-
-          case 'z':
-          case 'Z':
-            // That make sence for multiple contours
-            lastX = countourStartX;
-            lastY = countourStartY;
-            return;
-
-          default:
-            lastX = s[s.length - 2] + (isRelative ? lastX : 0);
-            lastY = s[s.length - 1] + (isRelative ? lastY : 0);
-        }
-      });
-
-      // Replace segments if iterator return results
-
-      if (!needReplace) { return this; }
-
-      newSegments = [];
-
-      for (i = 0; i < segments.length; i++) {
-        if (typeof replacements[i] !== 'undefined') {
-          for (j = 0; j < replacements[i].length; j++) {
-            newSegments.push(replacements[i][j]);
-          }
-        } else {
-          newSegments.push(segments[i]);
-        }
-      }
-
-      this.segments = newSegments;
-
-      return this;
-    };
-
-
-    // Converts segments from relative to absolute
-    //
-    SvgPath.prototype.abs = function () {
-
-      this.iterate(function (s, index, x, y) {
-        var name = s[0],
-            nameUC = name.toUpperCase(),
-            i;
-
-        // Skip absolute commands
-        if (name === nameUC) { return; }
-
-        s[0] = nameUC;
-
-        switch (name) {
-          case 'v':
-            // v has shifted coords parity
-            s[1] += y;
-            return;
-
-          case 'a':
-            // ARC is: ['A', rx, ry, x-axis-rotation, large-arc-flag, sweep-flag, x, y]
-            // touch x, y only
-            s[6] += x;
-            s[7] += y;
-            return;
-
-          default:
-            for (i = 1; i < s.length; i++) {
-              s[i] += i % 2 ? x : y; // odd values are X, even - Y
-            }
-        }
-      }, true);
-
-      return this;
-    };
-
-
-    // Converts segments from absolute to relative
-    //
-    SvgPath.prototype.rel = function () {
-
-      this.iterate(function (s, index, x, y) {
-        var name = s[0],
-            nameLC = name.toLowerCase(),
-            i;
-
-        // Skip relative commands
-        if (name === nameLC) { return; }
-
-        // Don't touch the first M to avoid potential confusions.
-        if (index === 0 && name === 'M') { return; }
-
-        s[0] = nameLC;
-
-        switch (name) {
-          case 'V':
-            // V has shifted coords parity
-            s[1] -= y;
-            return;
-
-          case 'A':
-            // ARC is: ['A', rx, ry, x-axis-rotation, large-arc-flag, sweep-flag, x, y]
-            // touch x, y only
-            s[6] -= x;
-            s[7] -= y;
-            return;
-
-          default:
-            for (i = 1; i < s.length; i++) {
-              s[i] -= i % 2 ? x : y; // odd values are X, even - Y
-            }
-        }
-      }, true);
-
-      return this;
-    };
-
-
-    // Converts arcs to cubic bézier curves
-    //
-    SvgPath.prototype.unarc = function () {
-      this.iterate(function (s, index, x, y) {
-        var new_segments, nextX, nextY, result = [], name = s[0];
-
-        // Skip anything except arcs
-        if (name !== 'A' && name !== 'a') { return null; }
-
-        if (name === 'a') {
-          // convert relative arc coordinates to absolute
-          nextX = x + s[6];
-          nextY = y + s[7];
-        } else {
-          nextX = s[6];
-          nextY = s[7];
-        }
-
-        new_segments = a2c(x, y, nextX, nextY, s[4], s[5], s[1], s[2], s[3]);
-
-        // Degenerated arcs can be ignored by renderer, but should not be dropped
-        // to avoid collisions with `S A S` and so on. Replace with empty line.
-        if (new_segments.length === 0) {
-          return [ [ s[0] === 'a' ? 'l' : 'L', s[6], s[7] ] ];
-        }
-
-        new_segments.forEach(function (s) {
-          result.push([ 'C', s[2], s[3], s[4], s[5], s[6], s[7] ]);
-        });
-
-        return result;
-      });
-
-      return this;
-    };
-
-
-    // Converts smooth curves (with missed control point) to generic curves
-    //
-    SvgPath.prototype.unshort = function () {
-      var segments = this.segments;
-      var prevControlX, prevControlY, prevSegment;
-      var curControlX, curControlY;
-
-      // TODO: add lazy evaluation flag when relative commands supported
-
-      this.iterate(function (s, idx, x, y) {
-        var name = s[0], nameUC = name.toUpperCase(), isRelative;
-
-        // First command MUST be M|m, it's safe to skip.
-        // Protect from access to [-1] for sure.
-        if (!idx) { return; }
-
-        if (nameUC === 'T') { // quadratic curve
-          isRelative = (name === 't');
-
-          prevSegment = segments[idx - 1];
-
-          if (prevSegment[0] === 'Q') {
-            prevControlX = prevSegment[1] - x;
-            prevControlY = prevSegment[2] - y;
-          } else if (prevSegment[0] === 'q') {
-            prevControlX = prevSegment[1] - prevSegment[3];
-            prevControlY = prevSegment[2] - prevSegment[4];
-          } else {
-            prevControlX = 0;
-            prevControlY = 0;
-          }
-
-          curControlX = -prevControlX;
-          curControlY = -prevControlY;
-
-          if (!isRelative) {
-            curControlX += x;
-            curControlY += y;
-          }
-
-          segments[idx] = [
-            isRelative ? 'q' : 'Q',
-            curControlX, curControlY,
-            s[1], s[2]
-          ];
-
-        } else if (nameUC === 'S') { // cubic curve
-          isRelative = (name === 's');
-
-          prevSegment = segments[idx - 1];
-
-          if (prevSegment[0] === 'C') {
-            prevControlX = prevSegment[3] - x;
-            prevControlY = prevSegment[4] - y;
-          } else if (prevSegment[0] === 'c') {
-            prevControlX = prevSegment[3] - prevSegment[5];
-            prevControlY = prevSegment[4] - prevSegment[6];
-          } else {
-            prevControlX = 0;
-            prevControlY = 0;
-          }
-
-          curControlX = -prevControlX;
-          curControlY = -prevControlY;
-
-          if (!isRelative) {
-            curControlX += x;
-            curControlY += y;
-          }
-
-          segments[idx] = [
-            isRelative ? 'c' : 'C',
-            curControlX, curControlY,
-            s[1], s[2], s[3], s[4]
-          ];
-        }
-      });
-
-      return this;
-    };
-
-
-    var svgpath = SvgPath;
-
-    var svgpath$1 = svgpath;
+    var svgpathExports = requireSvgpath();
+    var SvgPath = /*@__PURE__*/getDefaultExportFromCjs(svgpathExports);
 
     var PathNode = /** @class */ (function (_super) {
         __extends(PathNode, _super);
@@ -4683,7 +4869,7 @@
             return svgNodeIsVisible(this, parentVisible, context);
         };
         PathNode.prototype.getPath = function (context) {
-            var svgPath = new svgpath$1(getAttribute(this.element, context.styleSheets, 'd') || '')
+            var svgPath = new SvgPath(getAttribute(this.element, context.styleSheets, 'd') || '')
                 .unshort()
                 .unarc()
                 .abs();
@@ -4759,9 +4945,9 @@
         }
         ImageNode.prototype.renderCore = function (context) {
             return __awaiter(this, void 0, void 0, function () {
-                var width, height, x, y, _a, data, format, parser, svgElement, preserveAspectRatio, idMap, svgnode, dataUri;
-                return __generator(this, function (_b) {
-                    switch (_b.label) {
+                var width, height, x, y, _a, data, format, parser, svgElement, preserveAspectRatio, idMap, svgnode, dataUri, _b, imgWidth, imgHeight, viewBox, transform, e_1;
+                return __generator(this, function (_c) {
+                    switch (_c.label) {
                         case 0:
                             if (!this.imageLoadingPromise) {
                                 return [2 /*return*/];
@@ -4773,7 +4959,7 @@
                             }
                             return [4 /*yield*/, this.imageLoadingPromise];
                         case 1:
-                            _a = _b.sent(), data = _a.data, format = _a.format;
+                            _a = _c.sent(), data = _a.data, format = _a.format;
                             if (!(format.indexOf('svg') === 0)) return [3 /*break*/, 3];
                             parser = new DOMParser();
                             svgElement = parser.parseFromString(data, 'image/svg+xml').firstElementChild;
@@ -4788,7 +4974,7 @@
                             svgElement.setAttribute('width', String(width));
                             svgElement.setAttribute('height', String(height));
                             idMap = {};
-                            svgnode = parse$1(svgElement, idMap);
+                            svgnode = parse(svgElement, idMap);
                             return [4 /*yield*/, svgnode.render(new Context(context.pdf, {
                                     refsHandler: new ReferencesHandler(idMap),
                                     styleSheets: context.styleSheets,
@@ -4797,21 +4983,29 @@
                                     textMeasure: context.textMeasure
                                 }))];
                         case 2:
-                            _b.sent();
+                            _c.sent();
                             return [2 /*return*/];
                         case 3:
-                            dataUri = "data:image/" + format + ";base64," + btoa(data);
-                            try {
-                                context.pdf.addImage(dataUri, '', // will be ignored anyways if imageUrl is a data url
-                                x, y, width, height);
-                            }
-                            catch (e) {
-                                typeof console === 'object' &&
-                                    console.warn &&
-                                    console.warn("Could not load image " + this.imageUrl + ". \n" + e);
-                            }
-                            _b.label = 4;
-                        case 4: return [2 /*return*/];
+                            dataUri = "data:image/".concat(format, ";base64,").concat(btoa(data));
+                            _c.label = 4;
+                        case 4:
+                            _c.trys.push([4, 6, , 7]);
+                            return [4 /*yield*/, ImageNode.getImageDimensions(dataUri)];
+                        case 5:
+                            _b = _c.sent(), imgWidth = _b[0], imgHeight = _b[1];
+                            viewBox = [0, 0, imgWidth, imgHeight];
+                            transform = computeViewBoxTransform(this.element, viewBox, x, y, width, height, context);
+                            context.pdf.setCurrentTransformationMatrix(transform);
+                            context.pdf.addImage(dataUri, '', // will be ignored anyways if imageUrl is a data url
+                            0, 0, imgWidth, imgHeight);
+                            return [3 /*break*/, 7];
+                        case 6:
+                            e_1 = _c.sent();
+                            typeof console === 'object' &&
+                                console.warn &&
+                                console.warn("Could not load image ".concat(this.imageUrl, ". \n").concat(e_1));
+                            return [3 /*break*/, 7];
+                        case 7: return [2 /*return*/];
                     }
                 });
             });
@@ -4836,7 +5030,7 @@
                             mimeType = match[2];
                             mimeTypeParts = mimeType.split('/');
                             if (mimeTypeParts[0] !== 'image') {
-                                throw new Error("Unsupported image URL: " + imageUrl);
+                                throw new Error("Unsupported image URL: ".concat(imageUrl));
                             }
                             format = mimeTypeParts[1];
                             data = match[5];
@@ -4868,7 +5062,7 @@
                 xhr.responseType = 'arraybuffer';
                 xhr.onload = function () {
                     if (xhr.status !== 200) {
-                        throw new Error("Error " + xhr.status + ": Failed to load image '" + imageUrl + "'");
+                        throw new Error("Error ".concat(xhr.status, ": Failed to load image '").concat(imageUrl, "'"));
                     }
                     var bytes = new Uint8Array(xhr.response);
                     var data = '';
@@ -4889,8 +5083,18 @@
                 case 'jpeg':
                     return 'image/jpeg';
                 default:
-                    return "image/" + format;
+                    return "image/".concat(format);
             }
+        };
+        ImageNode.getImageDimensions = function (src) {
+            return new Promise(function (resolve, reject) {
+                var img = new Image();
+                img.onload = function () {
+                    resolve([img.width, img.height]);
+                };
+                img.onerror = reject;
+                img.src = src;
+            });
         };
         return ImageNode;
     }(GraphicsNode));
@@ -4978,19 +5182,21 @@
         }
         MarkerNode.prototype.apply = function (parentContext) {
             return __awaiter(this, void 0, void 0, function () {
-                var tfMatrix, bBox, childContext, _i, _a, child;
+                var tfMatrix, bBox, contextColors, childContext, _i, _a, child;
                 return __generator(this, function (_b) {
                     switch (_b.label) {
                         case 0:
                             tfMatrix = this.computeNodeTransform(parentContext);
                             bBox = this.getBoundingBox(parentContext);
                             parentContext.pdf.beginFormObject(bBox[0], bBox[1], bBox[2], bBox[3], tfMatrix);
+                            contextColors = AttributeState.getContextColors(parentContext);
                             childContext = new Context(parentContext.pdf, {
                                 refsHandler: parentContext.refsHandler,
                                 styleSheets: parentContext.styleSheets,
                                 viewport: parentContext.viewport,
                                 svg2pdfParameters: parentContext.svg2pdfParameters,
-                                textMeasure: parentContext.textMeasure
+                                textMeasure: parentContext.textMeasure,
+                                attributeState: Object.assign(AttributeState.default(), contextColors)
                             });
                             // "Properties do not inherit from the element referencing the 'marker' into the contents of the
                             // marker. However, by using the context-stroke value for the fill or stroke on elements in its
@@ -5011,7 +5217,7 @@
                             _i++;
                             return [3 /*break*/, 1];
                         case 4:
-                            parentContext.pdf.endFormObject(this.element.getAttribute('id'));
+                            parentContext.pdf.endFormObject(childContext.refsHandler.generateKey(this.element.getAttribute('id'), contextColors));
                             return [2 /*return*/];
                     }
                 });
@@ -5315,6 +5521,34 @@
         return Group;
     }(ContainerNode));
 
+    var Anchor = /** @class */ (function (_super) {
+        __extends(Anchor, _super);
+        function Anchor() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Anchor.prototype.renderCore = function (context) {
+            return __awaiter(this, void 0, void 0, function () {
+                var href, box, scale, ph;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, _super.prototype.renderCore.call(this, context)];
+                        case 1:
+                            _a.sent();
+                            href = getAttribute(this.element, context.styleSheets, 'href');
+                            if (href) {
+                                box = this.getBoundingBox(context);
+                                scale = context.pdf.internal.scaleFactor;
+                                ph = context.pdf.internal.pageSize.getHeight();
+                                context.pdf.link(scale * (box[0] * context.transform.sx + context.transform.tx), ph - scale * (box[1] * context.transform.sy + context.transform.ty), scale * box[2], scale * box[3], { url: href });
+                            }
+                            return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        return Anchor;
+    }(Group));
+
     var ClipPath = /** @class */ (function (_super) {
         __extends(ClipPath, _super);
         function ClipPath() {
@@ -5322,7 +5556,7 @@
         }
         ClipPath.prototype.apply = function (context) {
             return __awaiter(this, void 0, void 0, function () {
-                var clipPathMatrix, _i, _a, child;
+                var clipPathMatrix, _i, _a, child, hasClipRuleFromFirstChild, clipRule;
                 return __generator(this, function (_b) {
                     switch (_b.label) {
                         case 0:
@@ -5351,7 +5585,11 @@
                             _i++;
                             return [3 /*break*/, 1];
                         case 4:
-                            context.pdf.clip().discardPath();
+                            hasClipRuleFromFirstChild = this.children.length > 0 && !!getAttribute(this.children[0].element, context.styleSheets, 'clip-rule');
+                            clipRule = hasClipRuleFromFirstChild
+                                ? this.getClipRuleAttr(this.children[0].element, context.styleSheets)
+                                : this.getClipRuleAttr(this.element, context.styleSheets);
+                            context.pdf.clip(clipRule).discardPath();
                             // as we cannot use restoreGraphicsState() to reset the transform (this would reset the clipping path, as well),
                             // we must append the inverse instead
                             context.pdf.setCurrentTransformationMatrix(clipPathMatrix.inversed());
@@ -5366,15 +5604,20 @@
         ClipPath.prototype.isVisible = function (parentVisible, context) {
             return svgNodeAndChildrenVisible(this, parentVisible, context);
         };
+        ClipPath.prototype.getClipRuleAttr = function (element, styleSheets) {
+            return getAttribute(element, styleSheets, 'clip-rule') === 'evenodd' ? 'evenodd' : undefined;
+        };
         return ClipPath;
     }(NonRenderedNode));
 
-    function parse$1(node, idMap) {
+    function parse(node, idMap) {
         var svgnode;
         var children = [];
-        forEachChild(node, function (i, n) { return children.push(parse$1(n, idMap)); });
+        forEachChild(node, function (i, n) { return children.push(parse(n, idMap)); });
         switch (node.tagName.toLowerCase()) {
             case 'a':
+                svgnode = new Anchor(node, children);
+                break;
             case 'g':
                 svgnode = new Group(node, children);
                 break;
@@ -5434,7 +5677,7 @@
                 break;
         }
         if (idMap != undefined && svgnode.element.hasAttribute('id')) {
-            var id = cssesc_1(svgnode.element.id, { isIdentifier: true });
+            var id = cssesc(svgnode.element.id, { isIdentifier: true });
             idMap[id] = idMap[id] || svgnode;
         }
         svgnode.children.forEach(function (c) { return c.setParent(svgnode); });
@@ -5782,7 +6025,7 @@
                 xhr.responseType = 'text';
                 xhr.onload = function () {
                     if (xhr.status !== 200) {
-                        reject(new Error("Error " + xhr.status + ": Failed to load '" + url + "'"));
+                        reject(new Error("Error ".concat(xhr.status, ": Failed to load '").concat(url, "'")));
                     }
                     resolve(xhr.responseText);
                 };
@@ -5918,11 +6161,11 @@
         return TextMeasure;
     }());
 
-    function svg2pdf(element, pdf, options) {
-        var _a, _b, _c;
-        if (options === void 0) { options = {}; }
-        return __awaiter(this, void 0, void 0, function () {
+    function svg2pdf(element_1, pdf_1) {
+        return __awaiter(this, arguments, void 0, function (element, pdf, options) {
             var x, y, extCss, idMap, refsHandler, styleSheets, viewport, svg2pdfParameters, textMeasure, context, fill, node;
+            var _a, _b, _c;
+            if (options === void 0) { options = {}; }
             return __generator(this, function (_d) {
                 switch (_d.label) {
                     case 0:
@@ -5958,7 +6201,7 @@
                         pdf.setFont(context.attributeState.fontFamily);
                         // correct for a jsPDF-instance measurement unit that differs from `pt`
                         pdf.setFontSize(context.attributeState.fontSize * pdf.internal.scaleFactor);
-                        node = parse$1(element, idMap);
+                        node = parse(element, idMap);
                         return [4 /*yield*/, node.render(context)];
                     case 2:
                         _d.sent();
@@ -5970,14 +6213,12 @@
             });
         });
     }
-    jsPDF.jsPDF.API.svg = function (element, options) {
+    jspdf.jsPDF.API.svg = function (element, options) {
         if (options === void 0) { options = {}; }
         return svg2pdf(element, this, options);
     };
 
     exports.svg2pdf = svg2pdf;
 
-    Object.defineProperty(exports, '__esModule', { value: true });
-
-})));
+}));
 //# sourceMappingURL=svg2pdf.umd.js.map

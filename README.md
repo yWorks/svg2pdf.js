@@ -29,7 +29,7 @@ See [#102](https://github.com/yWorks/svg2pdf.js/issues/102) for details.
 import { jsPDF } from 'jspdf'
 import 'svg2pdf.js'
 
-const doc = new jsPDF()
+const doc = new jsPDF(width > height ? 'l' : 'p', 'pt', [width, height])
 
 const element = document.getElementById('svg')
 doc
@@ -129,7 +129,7 @@ GitHub and check it in in a subsequent commit.
 
 The MIT License (MIT)
 
-Copyright (c) 2015-2023 yWorks GmbH
+Copyright (c) 2015-2025 yWorks GmbH
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

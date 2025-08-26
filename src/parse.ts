@@ -17,6 +17,7 @@ import { RadialGradient } from './nodes/radialgradient'
 import { Polyline } from './nodes/polyline'
 import { Svg } from './nodes/svg'
 import { Group } from './nodes/group'
+import { Anchor } from './nodes/anchor'
 import cssesc from 'cssesc'
 import { ClipPath } from './nodes/clippath'
 import { Symbol } from './nodes/symbol'
@@ -29,6 +30,8 @@ export function parse(node: Element, idMap?: { [id: string]: SvgNode }): SvgNode
 
   switch (node.tagName.toLowerCase()) {
     case 'a':
+      svgnode = new Anchor(node, children)
+      break
     case 'g':
       svgnode = new Group(node, children)
       break
