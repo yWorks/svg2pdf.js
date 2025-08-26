@@ -33,7 +33,7 @@ export class TextNode extends GraphicsNode {
     trimInfo: TrimInfo
   ): boolean {
     const pdfFontSize = context.pdf.getFontSize()
-    const xmlSpace = context.attributeState.xmlSpace
+    const shouldPreserve = context.attributeState.xmlSpace === 'preserve' || context.attributeState.whiteSpace === 'pre'
     let firstText = true,
       initialSpace = false
 
@@ -49,7 +49,7 @@ export class TextNode extends GraphicsNode {
         let trimmedText = removeNewlines(textContent)
         trimmedText = replaceTabsBySpace(trimmedText)
 
-        if (xmlSpace === 'default') {
+        if (!shouldPreserve) {
           trimmedText = consolidateSpaces(trimmedText)
           // If first text in tspan and starts with a space
           if (firstText && trimmedText.match(/^\s/)) {
@@ -144,7 +144,8 @@ export class TextNode extends GraphicsNode {
           transformedText,
           context.attributeState
         )
-        if (context.attributeState.xmlSpace === 'default' && textContent.match(/^\s/)) {
+        const shouldPreserve = context.attributeState.xmlSpace === 'preserve' || context.attributeState.whiteSpace === 'pre'
+        if (!shouldPreserve && textContent.match(/^\s/)) {
           lengthAdjustment = 0
         }
         charSpace = (textLength - defaultSize) / (transformedText.length - lengthAdjustment) || 0

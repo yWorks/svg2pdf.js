@@ -25,7 +25,10 @@ export function transformXmlSpace(trimmedText: string, attributeState: Attribute
   trimmedText = removeNewlines(trimmedText)
   trimmedText = replaceTabsBySpace(trimmedText)
 
-  if (attributeState.xmlSpace === 'default') {
+  const shouldPreserve =
+    attributeState.xmlSpace === 'preserve' || attributeState.whiteSpace === 'pre'
+
+  if (!shouldPreserve) {
     trimmedText = trimmedText.trim()
     trimmedText = consolidateSpaces(trimmedText)
   }

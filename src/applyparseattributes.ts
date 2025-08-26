@@ -97,6 +97,11 @@ export function parseAttributes(context: Context, svgNode: SvgNode, node?: Eleme
     context.attributeState.xmlSpace = xmlSpace
   }
 
+  const whiteSpace = getAttribute(domNode, context.styleSheets, 'white-space')
+  if (whiteSpace) {
+    context.attributeState.whiteSpace = whiteSpace
+  }
+
   const fontWeight = getAttribute(domNode, context.styleSheets, 'font-weight')
   if (fontWeight) {
     context.attributeState.fontWeight = fontWeight
