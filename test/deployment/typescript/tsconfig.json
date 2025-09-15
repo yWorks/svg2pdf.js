@@ -6,13 +6,7 @@
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
-    "lib": [
-      "dom",
-      "es2015"
-    ]
+    "lib": ["dom", "es2015"]
   },
-  "files": [
-    "typescript.spec.ts",
-    "../../../types.d.ts"
-  ]
+  "files": ["typescript.spec.ts", "../../../types.d.ts"]
 }
