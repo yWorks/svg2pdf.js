@@ -50,7 +50,10 @@ export class TextChunk {
 
   rightTrimText(): boolean {
     for (let r = this.texts.length - 1; r >= 0; r--) {
-      if (this.contexts[r].attributeState.xmlSpace === 'default') {
+      const shouldPreserve =
+        this.contexts[r].attributeState.xmlSpace === 'preserve' ||
+        this.contexts[r].attributeState.whiteSpace === 'pre'
+      if (!shouldPreserve) {
         this.texts[r] = trimRight(this.texts[r])
       }
       // If find a letter, stop right-trimming

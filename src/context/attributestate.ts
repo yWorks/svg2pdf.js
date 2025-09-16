@@ -5,6 +5,7 @@ import { Context } from './context'
 
 export class AttributeState {
   public xmlSpace = ''
+  public whiteSpace = ''
   public fill: Fill | null = null
   public fillOpacity = 1.0
   // public fillRule: string = null
@@ -35,6 +36,7 @@ export class AttributeState {
     const clone = new AttributeState()
 
     clone.xmlSpace = this.xmlSpace
+    clone.whiteSpace = this.whiteSpace
     clone.fill = this.fill
     clone.fillOpacity = this.fillOpacity
     // clone.fillRule = this.fillRule;
@@ -69,6 +71,7 @@ export class AttributeState {
     const attributeState = new AttributeState()
 
     attributeState.xmlSpace = 'default'
+    attributeState.whiteSpace = 'normal'
     attributeState.fill = new ColorFill(new RGBColor('rgb(0, 0, 0)'))
     attributeState.fillOpacity = 1.0
     // attributeState.fillRule = "nonzero";

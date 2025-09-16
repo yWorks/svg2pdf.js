@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="500" font-size="15px">
+  <text x="20" y="20" fill="green">
+        white-space omitted          many spaces
+
+        and newlines
+  </text>
+
+  <text x="20" y="60" fill="red" style="white-space: normal">
+    white-space="normal"          many spaces
+
+    and newlines
+  </text>
+
+  <text x="20" y="100" fill="blue" style="white-space: pre">
+        white-space="pre"          many spaces
+
+        and newlines
+  </text>
+
+  <text x="20" y="140"  fill="green"><tspan>
+        white-space omitted          with tSpans
+
+    and newlines, </tspan><tspan>another tSpan</tspan>
+  </text>
+
+  <text x="20" y="180" fill="red"><tspan style="white-space: normal">
+        white-space="normal"          with tSpans
+
+    and newlines,      </tspan><tspan>another tSpan</tspan>
+  </text>
+
+  <text x="20" y="220" fill="blue"><tspan style="white-space: pre">
+        white-space="pre"          with tSpans
+
+    and newlines,      </tspan><tspan>another tSpan</tspan>
+  </text>
+
+  <text x="20" y="260" fill="orange" style="white-space: pre"><tspan>Correct inheritance: </tspan><tspan>"pre"    inherited</tspan><tspan style="white-space: normal">set    to       "normal"</tspan></text>
+
+  <text x="20" y="300" fill="red" style="white-space: normal">
+    Mixed
+    <tspan>tSpans</tspan>
+    and normal text ("normal")
+  </text>
+
+  <text x="20" y="340" fill="blue" style="white-space: pre">
+    Mixed
+    <tspan>tSpans</tspan>
+    and normal text ("pre")
+  </text>
+
+  <!-- Test combination of xml:space and white-space -->
+  <text x="20" y="380" fill="purple" xml:space="preserve">
+    xml:space="preserve"    with spaces
+  </text>
+
+  <text x="20" y="420" fill="darkgreen" style="white-space: pre">
+    white-space="pre"    with spaces
+  </text>
+
+  <!-- Test CSS white-space overriding xml:space -->
+  <text x="20" y="460" fill="brown" xml:space="default" style="white-space: pre">
+    xml:space="default" + white-space="pre"    preserves spaces
+  </text>
+</svg>
