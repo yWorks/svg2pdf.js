@@ -13,10 +13,10 @@
   ],
   "types": "types.d.ts",
   "scripts": {
-    "version": "yarpm run build && git add -A dist",
+    "version": "npm run build && git add -A dist",
     "build": "rollup -c rollup.config.mjs",
-    "pretest": "yarpm run build",
-    "test": "yarpm run test-unit && yarpm run test-globals && yarpm run test-amd && yarpm run test-cjs && yarpm run test-esm",
+    "pretest": "npm run build",
+    "test": "npm run test-unit && npm run test-globals && npm run test-amd && npm run test-cjs && npm run test-esm",
     "test-unit": "karma start ./test/unit/karma.conf.js",
     "test-globals": "karma start ./test/deployment/globals/karma.conf.js",
     "test-amd": "karma start ./test/deployment/amd/karma.conf.js",
@@ -89,7 +89,6 @@
     "rollup-plugin-license": "^3.5.3",
     "ts-loader": "^8.0.0",
     "typescript": "^5.6.2",
-    "webpack": "^5.88.0",
-    "yarpm": "^1.2.0"
+    "webpack": "^5.88.0"
   }
 }
