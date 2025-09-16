@@ -12,8 +12,6 @@ You can get svg2pf.js via npm:
 
 ```sh
 npm install svg2pdf.js jspdf --save
-# or
-yarn add svg2pdf.js jspdf
 ```
 
 Since version 2.x, this repository no longer depends on a forked jsPDF but can be used with original
