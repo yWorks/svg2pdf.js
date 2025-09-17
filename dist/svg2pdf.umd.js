@@ -426,6 +426,7 @@
     var AttributeState = /** @class */ (function () {
         function AttributeState() {
             this.xmlSpace = '';
+            this.whiteSpace = '';
             this.fill = null;
             this.fillOpacity = 1.0;
             // public fillRule: string = null
@@ -455,6 +456,7 @@
         AttributeState.prototype.clone = function () {
             var clone = new AttributeState();
             clone.xmlSpace = this.xmlSpace;
+            clone.whiteSpace = this.whiteSpace;
             clone.fill = this.fill;
             clone.fillOpacity = this.fillOpacity;
             // clone.fillRule = this.fillRule;
@@ -485,6 +487,7 @@
         AttributeState.default = function () {
             var attributeState = new AttributeState();
             attributeState.xmlSpace = 'default';
+            attributeState.whiteSpace = 'normal';
             attributeState.fill = new ColorFill(new RGBColor('rgb(0, 0, 0)'));
             attributeState.fillOpacity = 1.0;
             // attributeState.fillRule = "nonzero";
@@ -1382,7 +1385,7 @@
         var boundingBox = [];
         svgnode.children.forEach(function (child) {
             var nodeBox = child.getBoundingBox(context);
-            if ((nodeBox[0] === 0) && (nodeBox[1] === 0) && (nodeBox[2] === 0) && (nodeBox[3] === 0))
+            if (nodeBox[0] === 0 && nodeBox[1] === 0 && nodeBox[2] === 0 && nodeBox[3] === 0)
                 return;
             var transform = child.computeNodeTransform(context);
             // TODO: take into account rotation matrix
@@ -2036,6 +2039,10 @@
         var xmlSpace = domNode.getAttribute('xml:space');
         if (xmlSpace) {
             context.attributeState.xmlSpace = xmlSpace;
+        }
+        var whiteSpace = getAttribute(domNode, context.styleSheets, 'white-space');
+        if (whiteSpace) {
+            context.attributeState.whiteSpace = whiteSpace;
         }
         var fontWeight = getAttribute(domNode, context.styleSheets, 'font-weight');
         if (fontWeight) {
@@ -2974,7 +2981,8 @@
     function transformXmlSpace(trimmedText, attributeState) {
         trimmedText = removeNewlines(trimmedText);
         trimmedText = replaceTabsBySpace(trimmedText);
-        if (attributeState.xmlSpace === 'default') {
+        var shouldPreserve = attributeState.xmlSpace === 'preserve' || attributeState.whiteSpace === 'pre';
+        if (!shouldPreserve) {
             trimmedText = trimmedText.trim();
             trimmedText = consolidateSpaces(trimmedText);
         }
@@ -3039,7 +3047,9 @@
         };
         TextChunk.prototype.rightTrimText = function () {
             for (var r = this.texts.length - 1; r >= 0; r--) {
-                if (this.contexts[r].attributeState.xmlSpace === 'default') {
+                var shouldPreserve = this.contexts[r].attributeState.xmlSpace === 'preserve' ||
+                    this.contexts[r].attributeState.whiteSpace === 'pre';
+                if (!shouldPreserve) {
                     this.texts[r] = trimRight(this.texts[r]);
                 }
                 // If find a letter, stop right-trimming
@@ -3158,7 +3168,7 @@
         }
         TextNode.prototype.processTSpans = function (textNode, node, context, textChunks, currentTextSegment, trimInfo) {
             var pdfFontSize = context.pdf.getFontSize();
-            var xmlSpace = context.attributeState.xmlSpace;
+            var shouldPreserve = context.attributeState.xmlSpace === 'preserve' || context.attributeState.whiteSpace === 'pre';
             var firstText = true, initialSpace = false;
             for (var i = 0; i < node.childNodes.length; i++) {
                 var childNode = node.childNodes[i];
@@ -3169,7 +3179,7 @@
                 if (childNode.nodeName === '#text') {
                     var trimmedText = removeNewlines(textContent);
                     trimmedText = replaceTabsBySpace(trimmedText);
-                    if (xmlSpace === 'default') {
+                    if (!shouldPreserve) {
                         trimmedText = consolidateSpaces(trimmedText);
                         // If first text in tspan and starts with a space
                         if (firstText && trimmedText.match(/^\s/)) {
@@ -3215,7 +3225,7 @@
         };
         TextNode.prototype.renderCore = function (context) {
             return __awaiter(this, void 0, void 0, function () {
-                var xOffset, charSpace, lengthAdjustment, pdfFontSize, textX, textY, dx, dy, textLength, visibility, tSpanCount, textContent, trimmedText, transformedText, defaultSize, alignmentBaseline, textRenderingMode, textChunks, currentTextSegment, initialSpace, trimRight, r, totalDefaultWidth_1, totalLength_1;
+                var xOffset, charSpace, lengthAdjustment, pdfFontSize, textX, textY, dx, dy, textLength, visibility, tSpanCount, textContent, trimmedText, transformedText, defaultSize, shouldPreserve, alignmentBaseline, textRenderingMode, textChunks, currentTextSegment, initialSpace, trimRight, r, totalDefaultWidth_1, totalLength_1;
                 return __generator(this, function (_a) {
                     context.pdf.saveGraphicsState();
                     xOffset = 0;
@@ -3236,7 +3246,8 @@
                         xOffset = context.textMeasure.getTextOffset(transformedText, context.attributeState);
                         if (textLength > 0) {
                             defaultSize = context.textMeasure.measureTextWidth(transformedText, context.attributeState);
-                            if (context.attributeState.xmlSpace === 'default' && textContent.match(/^\s/)) {
+                            shouldPreserve = context.attributeState.xmlSpace === 'preserve' || context.attributeState.whiteSpace === 'pre';
+                            if (!shouldPreserve && textContent.match(/^\s/)) {
                                 lengthAdjustment = 0;
                             }
                             charSpace = (textLength - defaultSize) / (transformedText.length - lengthAdjustment) || 0;
@@ -3250,7 +3261,12 @@
                                 renderingMode: textRenderingMode === 'fill' ? void 0 : textRenderingMode,
                                 charSpace: charSpace === 0 ? void 0 : charSpace
                             });
-                            this.boundingBox = [textX + dx - xOffset, textY + dy + 0.1 * pdfFontSize, context.textMeasure.measureTextWidth(transformedText, context.attributeState), pdfFontSize];
+                            this.boundingBox = [
+                                textX + dx - xOffset,
+                                textY + dy + 0.1 * pdfFontSize,
+                                context.textMeasure.measureTextWidth(transformedText, context.attributeState),
+                                pdfFontSize
+                            ];
                         }
                     }
                     else {
@@ -3302,7 +3318,9 @@
             return svgNodeAndChildrenVisible(this, parentVisible, context);
         };
         TextNode.prototype.getBoundingBoxCore = function (context) {
-            return this.boundingBox.length > 0 ? this.boundingBox : defaultBoundingBox(this.element, context);
+            return this.boundingBox.length > 0
+                ? this.boundingBox
+                : defaultBoundingBox(this.element, context);
         };
         TextNode.prototype.computeNodeTransformCore = function (context) {
             return context.pdf.unitMatrix;
