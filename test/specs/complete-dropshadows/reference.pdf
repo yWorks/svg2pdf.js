@@ -858,7 +858,6 @@ endobj
 /Height 32
 /ColorSpace /DeviceRGB
 /BitsPerComponent 8
-/DecodeParms <</Colors 3 /BitsPerComponent 8 /Columns 32>>
 /SMask 37 0 R
 /Length 3072
 >>
@@ -874,7 +873,7 @@ endobj
 /Height 32
 /ColorSpace /DeviceGray
 /BitsPerComponent 8
-/DecodeParms << /Colors 1 /BitsPerComponent 8 /Columns 32>>
+/DecodeParms <</Predictor null /Colors 1 /BitsPerComponent 8 /Columns 32>>
 /Length 1024
 >>
 stream
@@ -889,7 +888,6 @@ endobj
 /Height 32
 /ColorSpace /DeviceRGB
 /BitsPerComponent 8
-/DecodeParms <</Colors 3 /BitsPerComponent 8 /Columns 32>>
 /SMask 39 0 R
 /Length 3072
 >>
@@ -905,7 +903,7 @@ endobj
 /Height 32
 /ColorSpace /DeviceGray
 /BitsPerComponent 8
-/DecodeParms << /Colors 1 /BitsPerComponent 8 /Columns 32>>
+/DecodeParms <</Predictor null /Colors 1 /BitsPerComponent 8 /Columns 32>>
 /Length 1024
 >>
 stream
@@ -920,7 +918,6 @@ endobj
 /Height 32
 /ColorSpace /DeviceRGB
 /BitsPerComponent 8
-/DecodeParms <</Colors 3 /BitsPerComponent 8 /Columns 32>>
 /SMask 41 0 R
 /Length 3072
 >>
@@ -936,7 +933,7 @@ endobj
 /Height 32
 /ColorSpace /DeviceGray
 /BitsPerComponent 8
-/DecodeParms << /Colors 1 /BitsPerComponent 8 /Columns 32>>
+/DecodeParms <</Predictor null /Colors 1 /BitsPerComponent 8 /Columns 32>>
 /Length 1024
 >>
 stream
@@ -951,7 +948,6 @@ endobj
 /Height 32
 /ColorSpace /DeviceRGB
 /BitsPerComponent 8
-/DecodeParms <</Colors 3 /BitsPerComponent 8 /Columns 32>>
 /SMask 43 0 R
 /Length 3072
 >>
@@ -967,7 +963,7 @@ endobj
 /Height 32
 /ColorSpace /DeviceGray
 /BitsPerComponent 8
-/DecodeParms << /Colors 1 /BitsPerComponent 8 /Columns 32>>
+/DecodeParms <</Predictor null /Colors 1 /BitsPerComponent 8 /Columns 32>>
 /Length 1024
 >>
 stream
@@ -982,7 +978,6 @@ endobj
 /Height 32
 /ColorSpace /DeviceRGB
 /BitsPerComponent 8
-/DecodeParms <</Colors 3 /BitsPerComponent 8 /Columns 32>>
 /SMask 45 0 R
 /Length 3072
 >>
@@ -998,7 +993,7 @@ endobj
 /Height 32
 /ColorSpace /DeviceGray
 /BitsPerComponent 8
-/DecodeParms << /Colors 1 /BitsPerComponent 8 /Columns 32>>
+/DecodeParms <</Predictor null /Colors 1 /BitsPerComponent 8 /Columns 32>>
 /Length 1024
 >>
 stream
@@ -1070,7 +1065,7 @@ xref
 0 48
 0000000000 65535 f 
 0000005630 00000 n 
-0000033394 00000 n 
+0000033174 00000 n 
 0000000015 00000 n 
 0000000120 00000 n 
 0000005687 00000 n 
@@ -1105,17 +1100,17 @@ xref
 0000010298 00000 n 
 0000010629 00000 n 
 0000010764 00000 n 
-0000014057 00000 n 
-0000015290 00000 n 
-0000018583 00000 n 
-0000019816 00000 n 
-0000023109 00000 n 
-0000024342 00000 n 
-0000027635 00000 n 
-0000028868 00000 n 
-0000032161 00000 n 
-0000033900 00000 n 
-0000033986 00000 n 
+0000013998 00000 n 
+0000015246 00000 n 
+0000018480 00000 n 
+0000019728 00000 n 
+0000022962 00000 n 
+0000024210 00000 n 
+0000027444 00000 n 
+0000028692 00000 n 
+0000031926 00000 n 
+0000033680 00000 n 
+0000033766 00000 n 
 trailer
 <<
 /Size 48
@@ -1124,5 +1119,5 @@ trailer
 /ID [ <00000000000000000000000000000000> <00000000000000000000000000000000> ]
 >>
 startxref
-34090
+33870
 %%EOF
