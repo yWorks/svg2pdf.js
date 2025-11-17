@@ -41,7 +41,21 @@ export class ImageNode extends GraphicsNode {
       return
     }
 
-    const { data, format } = await this.imageLoadingPromise
+    let data
+    let format
+    try {
+      const res = await this.imageLoadingPromise
+      data = res.data
+      format = res.format
+    } catch (e) {
+      typeof console === 'object' &&
+        console.error &&
+        console.error(`Could not load image ${this.imageUrl}. \n${e}`)
+    }
+
+    if (!data || !format) {
+      return
+    }
 
     if (format.indexOf('svg') === 0) {
       const parser = new DOMParser()
