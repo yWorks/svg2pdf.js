@@ -41,7 +41,26 @@ export class ImageNode extends GraphicsNode {
       return
     }
 
-    const { data, format } = await this.imageLoadingPromise
+    let data
+    let format
+    try {
+      const res = await this.imageLoadingPromise
+      data = res.data
+      format = res.format
+    } catch (e) {
+      const error = e instanceof Error ? e : new Error(String(e))
+      const onImageError = context.svg2pdfParameters?.onImageError
+      if (onImageError && this.imageUrl) {
+        const shouldThrow = onImageError(this.imageUrl, error, this.element)
+        if (shouldThrow === true) {
+          throw error
+        }
+      }
+    }
+
+    if (!data || !format) {
+      return
+    }
 
     if (format.indexOf('svg') === 0) {
       const parser = new DOMParser()
@@ -99,9 +118,18 @@ export class ImageNode extends GraphicsNode {
           imgHeight
         )
       } catch (e) {
-        typeof console === 'object' &&
-          console.warn &&
-          console.warn(`Could not load image ${this.imageUrl}. \n${e}`)
+        const error = e instanceof Error ? e : new Error(String(e))
+        const onImageError = context.svg2pdfParameters?.onImageError
+        if (onImageError && this.imageUrl) {
+          const shouldThrow = onImageError(this.imageUrl, error, this.element)
+          if (shouldThrow === true) {
+            throw error
+          }
+        } else {
+          typeof console === 'object' &&
+            console.warn &&
+            console.warn(`Could not load image ${this.imageUrl}. \n${e}`)
+        }
       }
     }
   }
