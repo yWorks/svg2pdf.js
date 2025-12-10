@@ -5,7 +5,6 @@ export class StyleSheets {
   private rootSvg: Element
   private readonly loadExternalSheets: boolean
   private readonly styleSheets: CSSStyleSheet[]
-
   constructor(rootSvg: Element, loadExtSheets: boolean) {
     this.rootSvg = rootSvg
     this.loadExternalSheets = loadExtSheets
@@ -184,6 +183,62 @@ export class StyleSheets {
     const mostSpecificRule = matchingRules.reduce((previousValue, currentValue) =>
       compare(previousValue, currentValue) === 1 ? previousValue : currentValue
     )
-    return mostSpecificRule.style.getPropertyValue(propertyCss) || undefined
+    const getPropertyCssValue = (propertyCss: string): string => {
+      //Screening fallback
+      let propertyValue =
+        propertyCss.indexOf('var(') == -1
+          ? mostSpecificRule.style.getPropertyValue(propertyCss.trim())
+          : propertyCss
+      const cssVariables: {
+        text: string //Varlables text
+        fallback: string // Varlables fallback
+        key: string //Varlables key
+      }[] = []
+      for (
+        let index = propertyValue.indexOf('var('), left = index + 4, bracketsLevels = 0;
+        index < propertyValue.length;
+
+      ) {
+        // not found
+        if (index < 0) {
+          break
+        }
+        if (propertyValue.charAt(index) === ')') bracketsLevels--
+        else if (propertyValue.charAt(index) === '(') bracketsLevels++
+        if (bracketsLevels == 0 && index > left) {
+          const text = propertyValue.substring(left - 4, index + 1)
+          const inner = text.substring(4, text.length - 1)
+          const separator = inner.indexOf(',')
+          const length = inner.length
+          const sp = separator < 0 ? length : separator
+          cssVariables.push({
+            text, //var(--one,var(--two,rgb(1,1,1)))
+            fallback: inner.substring(sp + 1), //var(--two,rgb(1,1,1))
+            key: inner.substring(0, sp).trim() //--one
+          })
+          //Process the next css Varlables
+          index = propertyValue.indexOf('var(', index)
+          left = index + 4
+          continue
+        }
+        index++
+      }
+      if (cssVariables.length === 0) {
+        //propertyCss is a  normal cssValue return itself
+        //propertyCss is a cssVariable key return getPropertyValue()
+        return propertyValue || propertyCss.startsWith('--') ? propertyValue : propertyCss
+      }
+      cssVariables.map(v => {
+        const value = getPropertyCssValue(v.key)
+        // Detect the need for fallback
+        propertyValue = propertyValue.replace(
+          v.text,
+          value ? value : getPropertyCssValue(v.fallback)
+        )
+      })
+      return propertyValue
+    }
+
+    return getPropertyCssValue(propertyCss) || undefined
   }
 }
