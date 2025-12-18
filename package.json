@@ -48,7 +48,7 @@
   },
   "homepage": "https://github.com/yWorks/svg2pdf.js#readme",
   "peerDependencies": {
-    "jspdf": "^3.0.0 || ^2.0.0"
+    "jspdf": "^4.0.0 || ^3.0.0 || ^2.0.0"
   },
   "dependencies": {
     "cssesc": "^3.0.0",
