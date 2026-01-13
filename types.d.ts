@@ -67,4 +67,18 @@ export interface Svg2pdfOptions {
    * policies are ignored. The default is false.
    */
   loadExternalStyleSheets?: boolean
+
+  /**
+   * Optional callback function that is called when an image fails to load.
+   * If provided, this callback will be invoked with error details instead of
+   * silently ignoring the error. The callback can decide how to handle the error
+   * (e.g., throw an exception, log to a custom logging system, or provide fallback behavior).
+   *
+   * @param imageUrl - The URL of the image that failed to load
+   * @param error - The error object describing what went wrong
+   * @param element - The SVG image element that failed to load
+   * @returns If the callback returns `true`, the error will be re-thrown to interrupt the rendering process.
+   *          If it returns `false`, the error will be silently ignored and the image will be skipped.
+   */
+  onImageError?: (imageUrl: string, error: Error, element: Element) => boolean
 }
