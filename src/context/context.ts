@@ -90,4 +90,5 @@ export interface Svg2pdfParameters {
   width?: number
   height?: number
   loadExternalStyleSheets?: boolean
+  onImageError?: (imageUrl: string, error: Error, element: Element) => boolean
 }
