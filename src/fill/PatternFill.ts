@@ -62,7 +62,7 @@ export class PatternFill implements Fill {
       this.pattern.element.getAttribute('patternContentUnits')!.toLowerCase() ===
         'objectboundingbox'
     ) {
-      bBox || (bBox = forNode.getBoundingBox(context))
+      if (!bBox) bBox = forNode.getBoundingBox(context)
       patternContentUnitsMatrix = context.pdf.Matrix(bBox[2], 0, 0, bBox[3], 0, 0)
 
       const fillBBox = patternData.boundingBox || this.pattern.getBoundingBox(context)

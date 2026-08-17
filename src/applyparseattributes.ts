@@ -214,8 +214,8 @@ export function applyAttributes(
 
   if (hasFillOpacity || hasStrokeOpacity) {
     const gState: GState = {}
-    hasFillOpacity && (gState['opacity'] = fillOpacity)
-    hasStrokeOpacity && (gState['stroke-opacity'] = strokeOpacity)
+    if (hasFillOpacity) gState['opacity'] = fillOpacity
+    if (hasStrokeOpacity) gState['stroke-opacity'] = strokeOpacity
     childContext.pdf.setGState(new GState(gState))
   }
 

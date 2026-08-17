@@ -38,7 +38,7 @@ export function parseColor(colorString: string, contextColors: ContextColors | n
     return contextColors.contextFill || new RGBColor('rgb(0,0,0)')
   }
 
-  const match = /\s*rgba\(((?:[^,\)]*,){3}[^,\)]*)\)\s*/.exec(colorString)
+  const match = /\s*rgba\(((?:[^,)]*,){3}[^,)]*)\)\s*/.exec(colorString)
   if (match) {
     const floats = parseFloats(match[1])
     const color = new RGBColor('rgb(' + floats.slice(0, 3).join(',') + ')')

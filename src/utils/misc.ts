@@ -10,13 +10,13 @@ export function toPixels(value: string | null, pdfFontSize: number): number {
   let match
 
   // em
-  match = value && value.toString().match(/^([\-0-9.]+)em$/)
+  match = value && value.toString().match(/^([-0-9.]+)em$/)
   if (match) {
     return parseFloat(match[1]) * pdfFontSize
   }
 
   // pixels
-  match = value && value.toString().match(/^([\-0-9.]+)(px|)$/)
+  match = value && value.toString().match(/^([-0-9.]+)(px|)$/)
   if (match) {
     return parseFloat(match[1])
   }

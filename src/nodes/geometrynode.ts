@@ -129,9 +129,9 @@ export abstract class GeometryNode extends GraphicsNode {
 
     const markers = new MarkerList()
     if (markerStart || markerMid || markerEnd) {
-      markerEnd && (markerEnd = iri(markerEnd))
-      markerStart && (markerStart = iri(markerStart))
-      markerMid && (markerMid = iri(markerMid))
+      if (markerEnd) markerEnd = iri(markerEnd)
+      if (markerStart) markerStart = iri(markerStart)
+      if (markerMid) markerMid = iri(markerMid)
 
       const list = path.segments
       let prevAngle = [1, 0],
@@ -162,7 +162,7 @@ export abstract class GeometryNode extends GraphicsNode {
         const prev = list[i - 1] || null
         if (prev instanceof MoveTo || prev instanceof LineTo || prev instanceof CurveTo) {
           if (curr instanceof CurveTo) {
-            hasStartMarker &&
+            if (hasStartMarker) {
               markers.addMarker(
                 new Marker(
                   markerStart!,
@@ -172,7 +172,8 @@ export abstract class GeometryNode extends GraphicsNode {
                   true
                 )
               )
-            hasEndMarker &&
+            }
+            if (hasEndMarker) {
               markers.addMarker(
                 new Marker(
                   markerEnd!,
@@ -180,6 +181,7 @@ export abstract class GeometryNode extends GraphicsNode {
                   getAngle([curr.x2, curr.y2], [curr.x, curr.y])
                 )
               )
+            }
             if (hasMidMarker) {
               curAngle = getDirectionVector([prev.x, prev.y], [curr.x1, curr.y1])
               curAngle =
@@ -199,10 +201,11 @@ export abstract class GeometryNode extends GraphicsNode {
                 new Marker(markerStart!, [prev.x, prev.y], Math.atan2(angle[1], angle[0]), true)
               )
             }
-            hasEndMarker &&
+            if (hasEndMarker) {
               markers.addMarker(
                 new Marker(markerEnd!, [curr.x, curr.y], Math.atan2(curAngle[1], curAngle[0]))
               )
+            }
             if (hasMidMarker) {
               const angle =
                 curr instanceof MoveTo

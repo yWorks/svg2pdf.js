@@ -100,9 +100,9 @@ export class ImageNode extends GraphicsNode {
           imgHeight
         )
       } catch (e) {
-        typeof console === 'object' &&
-          console.warn &&
+        if (typeof console === 'object' && console.warn) {
           console.warn(`Could not load image ${this.imageUrl}. \n${e}`)
+        }
       }
     }
   }

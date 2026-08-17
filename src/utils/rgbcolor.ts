@@ -300,7 +300,7 @@ export class RGBColor {
         listItem.appendChild(exampleDiv)
         listItem.appendChild(listItemValue)
         xml.appendChild(listItem)
-      } catch (e) {}
+      } catch {}
     }
     return xml
   }

@@ -55,9 +55,7 @@ function sendReference(filename, data) {
   const req = new XMLHttpRequest()
   req.open('POST', `http://localhost:9090${filename}`, true)
   req.setRequestHeader('Content-Type', pdfMimeType)
-  req.onload = e => {
-    //console.log(e)
-  }
+  req.onload = () => {}
 
   const uint8Array = new Uint8Array(data.length)
   for (let i = 0; i < data.length; i++) {
@@ -91,7 +89,7 @@ window.comparePdf = (actual, filePath, alwaysCreateReferences = false) => {
   } else {
     try {
       reference = loadBinaryResource('/base' + filePath, true)
-    } catch (error) {
+    } catch {
       sendReference(filePath, resetFile(actual))
       reference = actual
     }
