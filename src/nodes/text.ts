@@ -34,7 +34,8 @@ export class TextNode extends GraphicsNode {
     trimInfo: TrimInfo
   ): boolean {
     const pdfFontSize = context.pdf.getFontSize()
-    const shouldPreserve = context.attributeState.xmlSpace === 'preserve' || context.attributeState.whiteSpace === 'pre'
+    const shouldPreserve =
+      context.attributeState.xmlSpace === 'preserve' || context.attributeState.whiteSpace === 'pre'
     let firstText = true,
       initialSpace = false
 
@@ -145,7 +146,9 @@ export class TextNode extends GraphicsNode {
           transformedText,
           context.attributeState
         )
-        const shouldPreserve = context.attributeState.xmlSpace === 'preserve' || context.attributeState.whiteSpace === 'pre'
+        const shouldPreserve =
+          context.attributeState.xmlSpace === 'preserve' ||
+          context.attributeState.whiteSpace === 'pre'
         if (!shouldPreserve && textContent.match(/^\s/)) {
           lengthAdjustment = 0
         }

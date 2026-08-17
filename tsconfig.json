@@ -8,7 +8,8 @@
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
     "lib": ["dom", "es2015"],
-    "sourceMap": true
+    "sourceMap": true,
+    "skipLibCheck": true
   },
   "include": [
     "src/**/*.ts",

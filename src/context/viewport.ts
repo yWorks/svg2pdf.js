@@ -1,3 +1,6 @@
 export class Viewport {
-  constructor(public width: number, public height: number) {}
+  constructor(
+    public width: number,
+    public height: number
+  ) {}
 }

@@ -37,7 +37,9 @@ export class ClipPath extends NonRenderedNode {
     }
 
     // Assuming all children have the same clip-rule. We don't support clip different rule per child yet.
-    const hasClipRuleFromFirstChild = this.children.length > 0 && !!getAttribute(this.children[0].element, context.styleSheets, 'clip-rule')
+    const hasClipRuleFromFirstChild =
+      this.children.length > 0 &&
+      !!getAttribute(this.children[0].element, context.styleSheets, 'clip-rule')
 
     // Fallback to use `clip-rule` value from `clip-path` element if cannot retrieve from the first child
     const clipRule = hasClipRuleFromFirstChild

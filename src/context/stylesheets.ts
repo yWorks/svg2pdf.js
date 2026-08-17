@@ -99,7 +99,7 @@ export class StyleSheets {
     let match
     let lastCommaIndex = -1
     let closingQuotesRegex = closingDoubleQuotesRegex
-    for (let i = 0; i < selectorText.length; ) {
+    for (let i = 0; i < selectorText.length;) {
       switch (state) {
         case 'initial':
           initialRegex.lastIndex = i

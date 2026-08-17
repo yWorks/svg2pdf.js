@@ -208,8 +208,8 @@ export abstract class GeometryNode extends GraphicsNode {
                 curr instanceof MoveTo
                   ? prevAngle
                   : prev instanceof MoveTo
-                  ? curAngle
-                  : normalize(addVectors(prevAngle, curAngle))
+                    ? curAngle
+                    : normalize(addVectors(prevAngle, curAngle))
               markers.addMarker(
                 new Marker(markerMid!, [prev.x, prev.y], Math.atan2(angle[1], angle[0]))
               )

@@ -192,14 +192,14 @@ export class RGBColor {
       {
         re: /^rgb\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})\)$/,
         example: ['rgb(123, 234, 45)', 'rgb(255,234,245)'],
-        process: function(bits: any) {
+        process: function (bits: any) {
           return [parseInt(bits[1]), parseInt(bits[2]), parseInt(bits[3])]
         }
       },
       {
         re: /^rgb\(([0-9.]+)%,\s*([0-9.]+)%,\s*([0-9.]+)%\)$/,
         example: ['rgb(50.5%, 25.75%, 75.5%)', 'rgb(100%,0%,0%)'],
-        process: function(bits: any) {
+        process: function (bits: any) {
           return [
             Math.round(parseFloat(bits[1]) * 2.55),
             Math.round(parseFloat(bits[2]) * 2.55),
@@ -210,14 +210,14 @@ export class RGBColor {
       {
         re: /^(\w{2})(\w{2})(\w{2})$/,
         example: ['#00ff00', '336699'],
-        process: function(bits: any) {
+        process: function (bits: any) {
           return [parseInt(bits[1], 16), parseInt(bits[2], 16), parseInt(bits[3], 16)]
         }
       },
       {
         re: /^(\w{1})(\w{1})(\w{1})$/,
         example: ['#fb0', 'f0f'],
-        process: function(bits: any) {
+        process: function (bits: any) {
           return [
             parseInt(bits[1] + bits[1], 16),
             parseInt(bits[2] + bits[2], 16),

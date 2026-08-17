@@ -43,10 +43,7 @@ export class Svg extends ContainerNode {
       getAttribute(this.element, context.styleSheets, 'overflow') !== 'visible'
     ) {
       // establish a new viewport
-      context.pdf
-        .rect(x, y, width, height)
-        .clip()
-        .discardPath()
+      context.pdf.rect(x, y, width, height).clip().discardPath()
     }
 
     await super.render(

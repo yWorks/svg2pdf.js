@@ -2,19 +2,39 @@
   "name": "svg2pdf.js",
   "version": "2.7.0",
   "description": "A javascript-only SVG to PDF conversion utility that runs in the browser leveraging jsPDF",
-  "main": "dist/svg2pdf.umd.min.js",
-  "module": "dist/svg2pdf.es.min.js",
-  "browser": "dist/svg2pdf.es.min.js",
+  "keywords": [
+    "javascript",
+    "pdf",
+    "svg"
+  ],
+  "homepage": "https://github.com/yWorks/svg2pdf.js#readme",
+  "bugs": {
+    "url": "https://github.com/yWorks/svg2pdf.js/issues"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "yFiles for HTML Support Team",
+    "email": "yfileshtml@yworks.com",
+    "url": "https://www.yworks.com/yfileshtml"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yWorks/svg2pdf.js.git"
+  },
   "files": [
     "dist/**",
     "types.d.ts",
     "README.md",
     "LICENSE"
   ],
+  "main": "dist/svg2pdf.umd.min.js",
+  "module": "dist/svg2pdf.es.min.js",
+  "browser": "dist/svg2pdf.es.min.js",
   "types": "types.d.ts",
   "scripts": {
     "version": "npm run build && git add -A dist",
     "build": "rollup -c rollup.config.mjs",
+    "typecheck": "tsc --noEmit",
     "pretest": "npm run build",
     "test": "npm run test-unit && npm run test-globals && npm run test-amd && npm run test-cjs && npm run test-esm",
     "test-unit": "karma start ./test/unit/karma.conf.js",
@@ -25,30 +45,9 @@
     "test-typescript": "karma start ./test/deployment/typescript/karma.conf.js",
     "test:ci": "cross-env SHOW_DIFF=true concurrently -k -s command-1 \"npm run createreferences\" \"npm run test\"",
     "createreferences": "node test/common/reference-server.js",
-    "prettier": "prettier --write {playground,src,tests,typings}/**/*.{ts,js}",
-    "lint": "eslint {playground,src,tests,typings}/**/*.{ts,js}"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/yWorks/svg2pdf.js.git"
-  },
-  "keywords": [
-    "svg",
-    "pdf",
-    "javascript"
-  ],
-  "author": {
-    "name": "yFiles for HTML Support Team",
-    "email": "yfileshtml@yworks.com",
-    "url": "https://www.yworks.com/yfileshtml"
-  },
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/yWorks/svg2pdf.js/issues"
-  },
-  "homepage": "https://github.com/yWorks/svg2pdf.js#readme",
-  "peerDependencies": {
-    "jspdf": "^4.0.0 || ^3.0.0 || ^2.0.0"
+    "format": "oxfmt --write",
+    "format:check": "oxfmt --check",
+    "lint": "oxlint -f=agent"
   },
   "dependencies": {
     "cssesc": "^3.0.0",
@@ -61,16 +60,11 @@
     "@rollup/plugin-node-resolve": "^15.3.0",
     "@rollup/plugin-terser": "^1.0.0",
     "@rollup/plugin-typescript": "^12.1.0",
-    "@typescript-eslint/eslint-plugin": "^3.6.1",
-    "@typescript-eslint/parser": "^3.6.1",
     "chai": "^4.2.0",
     "chalk": "^4.1.0",
     "concurrently": "^8.2.0",
     "cross-env": "^7.0.2",
     "cssesc": "^3.0.0",
-    "eslint": "^7.4.0",
-    "eslint-config-prettier": "^6.11.0",
-    "eslint-plugin-prettier": "^3.1.4",
     "exorcist": "^2.0.0",
     "font-family-papandreou": "^0.2.0-patch1",
     "jspdf": "^4.0.0",
@@ -83,13 +77,17 @@
     "karma-webpack": "^5.0.0",
     "log-utils": "^1.0.0",
     "mocha": "^11.7.5",
-    "prettier": "^1.19.1",
+    "oxfmt": "^0.63.0",
+    "oxlint": "^1.78.0",
     "requirejs": "^2.3.6",
     "rollup": "^4.22.4",
     "rollup-plugin-license": "^3.5.3",
     "ts-loader": "^8.0.0",
     "typescript": "^5.6.2",
     "webpack": "^5.88.0"
+  },
+  "peerDependencies": {
+    "jspdf": "^4.0.0 || ^3.0.0 || ^2.0.0"
   },
   "overrides": {
     "mocha": {

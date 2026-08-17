@@ -64,7 +64,7 @@ export async function svg2pdf(
   return pdf
 }
 
-jsPDF.API.svg = function(
+jsPDF.API.svg = function (
   element: Element,
   options: Svg2PdfOptions = {}
 ): ReturnType<typeof svg2pdf> {

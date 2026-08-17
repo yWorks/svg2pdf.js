@@ -11,7 +11,8 @@ import { Viewport } from '../context/viewport'
 import { computeViewBoxTransform } from '../utils/transform'
 
 // groups: 1: mime-type (+ charset), 2: mime-type (w/o charset), 3: charset, 4: base64?, 5: body
-export const dataUriRegex = /^\s*data:(([^/,;]+\/[^/,;]+)(?:;([^,;=]+=[^,;=]+))?)?(?:;(base64))?,((?:.|\s)*)$/i
+export const dataUriRegex =
+  /^\s*data:(([^/,;]+\/[^/,;]+)(?:;([^,;=]+=[^,;=]+))?)?(?:;(base64))?,((?:.|\s)*)$/i
 export class ImageNode extends GraphicsNode {
   private readonly imageLoadingPromise: Promise<{ data: string; format: string }> | null = null
   private readonly imageUrl: string | null

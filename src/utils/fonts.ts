@@ -73,15 +73,15 @@ export function combineFontStyleAndFontWeight(
         ? 'italic'
         : 'normal'
       : fontWeight == 700 && fontStyle !== 'italic'
-      ? 'bold'
-      : fontStyle + '' + fontWeight
+        ? 'bold'
+        : fontStyle + '' + fontWeight
   } else {
     return fontWeight == 400 || fontWeight === 'normal'
       ? fontStyle === 'italic'
         ? 'italic'
         : 'normal'
       : (fontWeight == 700 || fontWeight === 'bold') && fontStyle === 'normal'
-      ? 'bold'
-      : (fontWeight == 700 ? 'bold' : fontWeight) + '' + fontStyle
+        ? 'bold'
+        : (fontWeight == 700 ? 'bold' : fontWeight) + '' + fontStyle
   }
 }

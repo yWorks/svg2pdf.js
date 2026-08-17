@@ -14,13 +14,13 @@ for (const test of window.tests) {
     svg2pdfOptions = { loadExternalStyleSheets: true }
   }
 
-  describe(name, function() {
+  describe(name, function () {
     this.timeout(5000)
     const svgText = window.loadSvg(`/base/test/specs/${name}/spec.svg`)
     const parser = new DOMParser()
     const svgElement = parser.parseFromString(svgText, 'image/svg+xml').firstElementChild
 
-    it(`testing ${name}`, async function() {
+    it(`testing ${name}`, async function () {
       const width = jsPDFOptions ? jsPDFOptions[0] : svgElement.width.baseVal.value
       const height = jsPDFOptions ? jsPDFOptions[1] : svgElement.height.baseVal.value
       const pdf = new jsPDF(width > height ? 'l' : 'p', 'pt', [width, height])
