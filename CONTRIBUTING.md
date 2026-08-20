@@ -45,8 +45,8 @@ preparing a pull request please follow these guidelines:
 - Make sure to follow the SVG specification. Svg2pdf currently mostly follows SVG 1.1, but some SVG 2.0 features
   are supported, as well.
 - Make sure all tests are green before committing
-- Stick to the TypeScript style guides used in the project and run `npm run prettier` before committing.
-- Resolve all eslint errors and warnings (`npm run lint`)
+- Stick to the TypeScript style guides used in the project and run `npm run format` before committing.
+- Resolve all linter errors and warnings (`npm run lint`)
 - For the commit message, follow these guidelines:
   - Use the present tense ("Add feature" not "Added feature")
   - Use the imperative mood ("Move cursor to..." not "Moves cursor to...")
