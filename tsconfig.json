@@ -6,8 +6,9 @@
     "target": "es5",
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
-    "moduleResolution": "node",
-    "lib": ["dom", "es2015"],
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "lib": ["dom", "es2017"],
     "sourceMap": true,
     "skipLibCheck": true
   },
@@ -16,6 +17,7 @@
     "./node_modules/svgpath/index.d.ts",
     "./node_modules/specificity/specificity.d.ts",
     "./typings/**/*.ts",
-    "types.d.ts"
+    "types.d.ts",
+    "test/**/*.ts"
   ]
 }

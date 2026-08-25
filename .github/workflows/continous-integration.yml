@@ -9,12 +9,13 @@ jobs:
     - uses: actions/checkout@v5
     - uses: actions/setup-node@v6
       with:
-        node-version: 24
+        node-version: 26
     - run: npm ci
+    - run: npm run playwright:install
     - run: npm run test:ci
     - name: Archive reference files
       if: ${{ failure() }}
       uses: actions/upload-artifact@v6
       with:
         name: references
-        path: test/specs/**/reference.pdf
+        path: test/**/*.pdf
