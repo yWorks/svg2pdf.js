@@ -5,7 +5,9 @@ import { loadSvg } from '../utils/loadSvg'
 
 describe('opacity-and-rgba', () => {
   it('opacity-and-rgba', async () => {
-    const { svgElement, width, height } = await loadSvg('/test/opacity-and-rgba/opacity-and-rgba.svg')
+    const { svgElement, width, height } = await loadSvg(
+      '/test/opacity-and-rgba/opacity-and-rgba.svg'
+    )
     const pdf = new jsPDF(width > height ? 'l' : 'p', 'pt', [width, height])
     await svg2pdf(svgElement, pdf, { loadExternalStyleSheets: true })
     await expect(pdf.output('arraybuffer')).toMatchPdfSnapshot('./opacity-and-rgba.pdf')

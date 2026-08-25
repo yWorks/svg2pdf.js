@@ -5,7 +5,9 @@ import { loadSvg } from '../utils/loadSvg'
 
 describe('font-family-attribute', () => {
   it('font-family-attribute', async () => {
-    const { svgElement, width, height } = await loadSvg('/test/font-family-attribute/font-family-attribute.svg')
+    const { svgElement, width, height } = await loadSvg(
+      '/test/font-family-attribute/font-family-attribute.svg'
+    )
     const pdf = new jsPDF(width > height ? 'l' : 'p', 'pt', [width, height])
     await svg2pdf(svgElement, pdf, { loadExternalStyleSheets: true })
     await expect(pdf.output('arraybuffer')).toMatchPdfSnapshot('./font-family-attribute.pdf')

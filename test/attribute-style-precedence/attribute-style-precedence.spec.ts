@@ -5,7 +5,9 @@ import { loadSvg } from '../utils/loadSvg'
 
 describe('attribute-style-precedence', () => {
   it('attribute-style-precedence', async () => {
-    const { svgElement, width, height } = await loadSvg('/test/attribute-style-precedence/attribute-style-precedence.svg')
+    const { svgElement, width, height } = await loadSvg(
+      '/test/attribute-style-precedence/attribute-style-precedence.svg'
+    )
     const pdf = new jsPDF(width > height ? 'l' : 'p', 'pt', [width, height])
     await svg2pdf(svgElement, pdf, { loadExternalStyleSheets: true })
     await expect(pdf.output('arraybuffer')).toMatchPdfSnapshot('./attribute-style-precedence.pdf')

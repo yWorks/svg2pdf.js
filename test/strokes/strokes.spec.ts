@@ -5,7 +5,9 @@ import { loadSvg } from '../utils/loadSvg'
 
 describe('strokes', () => {
   it('strokes-and-bounding-boxes', async () => {
-    const { svgElement, width, height } = await loadSvg('/test/strokes/strokes-and-bounding-boxes.svg')
+    const { svgElement, width, height } = await loadSvg(
+      '/test/strokes/strokes-and-bounding-boxes.svg'
+    )
     const pdf = new jsPDF(width > height ? 'l' : 'p', 'pt', [width, height])
     await svg2pdf(svgElement, pdf, { loadExternalStyleSheets: true })
     await expect(pdf.output('arraybuffer')).toMatchPdfSnapshot('./strokes-and-bounding-boxes.pdf')

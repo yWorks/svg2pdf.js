@@ -5,7 +5,9 @@ import { loadSvg } from '../utils/loadSvg'
 
 describe('line-default-coordinates', () => {
   it('line-default-coordinates', async () => {
-    const { svgElement, width, height } = await loadSvg('/test/line-default-coordinates/line-default-coordinates.svg')
+    const { svgElement, width, height } = await loadSvg(
+      '/test/line-default-coordinates/line-default-coordinates.svg'
+    )
     const pdf = new jsPDF(width > height ? 'l' : 'p', 'pt', [width, height])
     await svg2pdf(svgElement, pdf, { loadExternalStyleSheets: true })
     await expect(pdf.output('arraybuffer')).toMatchPdfSnapshot('./line-default-coordinates.pdf')

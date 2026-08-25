@@ -12,10 +12,14 @@ describe('images', () => {
   })
 
   it('image-data-urls-base64-spaces', async () => {
-    const { svgElement, width, height } = await loadSvg('/test/images/image-data-urls-base64-spaces.svg')
+    const { svgElement, width, height } = await loadSvg(
+      '/test/images/image-data-urls-base64-spaces.svg'
+    )
     const pdf = new jsPDF(width > height ? 'l' : 'p', 'pt', [width, height])
     await svg2pdf(svgElement, pdf, { loadExternalStyleSheets: true })
-    await expect(pdf.output('arraybuffer')).toMatchPdfSnapshot('./image-data-urls-base64-spaces.pdf')
+    await expect(pdf.output('arraybuffer')).toMatchPdfSnapshot(
+      './image-data-urls-base64-spaces.pdf'
+    )
   })
 
   it('image-svg-urls', async () => {

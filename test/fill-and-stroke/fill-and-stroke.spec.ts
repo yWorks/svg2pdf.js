@@ -5,21 +5,27 @@ import { loadSvg } from '../utils/loadSvg'
 
 describe('fill-and-stroke', () => {
   it('fill-and-stroke-inheritance', async () => {
-    const { svgElement, width, height } = await loadSvg('/test/fill-and-stroke/fill-and-stroke-inheritance.svg')
+    const { svgElement, width, height } = await loadSvg(
+      '/test/fill-and-stroke/fill-and-stroke-inheritance.svg'
+    )
     const pdf = new jsPDF(width > height ? 'l' : 'p', 'pt', [width, height])
     await svg2pdf(svgElement, pdf, { loadExternalStyleSheets: true })
     await expect(pdf.output('arraybuffer')).toMatchPdfSnapshot('./fill-and-stroke-inheritance.pdf')
   })
 
   it('fill-and-stroke-opacity', async () => {
-    const { svgElement, width, height } = await loadSvg('/test/fill-and-stroke/fill-and-stroke-opacity.svg')
+    const { svgElement, width, height } = await loadSvg(
+      '/test/fill-and-stroke/fill-and-stroke-opacity.svg'
+    )
     const pdf = new jsPDF(width > height ? 'l' : 'p', 'pt', [width, height])
     await svg2pdf(svgElement, pdf, { loadExternalStyleSheets: true })
     await expect(pdf.output('arraybuffer')).toMatchPdfSnapshot('./fill-and-stroke-opacity.pdf')
   })
 
   it('fill-and-stroke-rgba', async () => {
-    const { svgElement, width, height } = await loadSvg('/test/fill-and-stroke/fill-and-stroke-rgba.svg')
+    const { svgElement, width, height } = await loadSvg(
+      '/test/fill-and-stroke/fill-and-stroke-rgba.svg'
+    )
     const pdf = new jsPDF(width > height ? 'l' : 'p', 'pt', [width, height])
     await svg2pdf(svgElement, pdf, { loadExternalStyleSheets: true })
     await expect(pdf.output('arraybuffer')).toMatchPdfSnapshot('./fill-and-stroke-rgba.pdf')

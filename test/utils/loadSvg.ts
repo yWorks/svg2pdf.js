@@ -3,7 +3,7 @@ export async function loadSvg(path: string): Promise<{
   width: number
   height: number
 }> {
-  const svgText = await fetch(path).then((r) => r.text())
+  const svgText = await fetch(path).then(r => r.text())
   const parser = new DOMParser()
   const svgElement = parser.parseFromString(svgText, 'image/svg+xml')
     .firstElementChild as SVGSVGElement

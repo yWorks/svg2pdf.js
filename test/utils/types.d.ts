@@ -3,7 +3,9 @@ import 'vitest/internal/browser'
 
 declare module 'vitest/internal/browser' {
   interface BrowserCommands {
-    matchPdfSnapshot(request: import('./browser-command.js').PdfSnapshotRequest): Promise<import('./browser-command.js').PdfSnapshotResult>
+    matchPdfSnapshot(
+      request: import('./browser-command.js').PdfSnapshotRequest
+    ): Promise<import('./browser-command.js').PdfSnapshotResult>
   }
 }
 
