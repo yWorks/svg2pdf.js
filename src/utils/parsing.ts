@@ -7,7 +7,7 @@ import { RGBColor } from './rgbcolor'
 
 export function parseFloats(str: string): number[] {
   const floats = []
-  const regex = /[+-]?(?:(?:\d+\.?\d*)|(?:\d*\.?\d+))(?:[eE][+-]?\d+)?/g
+  const regex = /[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?/g
   let match
   while ((match = regex.exec(str))) {
     floats.push(parseFloat(match[0]))
