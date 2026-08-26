@@ -64,7 +64,14 @@ export interface Svg2pdfOptions {
    * Whether external style sheets referenced by SVG link elements or
    * xml-stylesheets shall be loaded using HTTP requests.
    * Note, that all style sheets that cannot be accessed because of CORS
-   * policies are ignored. The default is false.
+   * policies are ignored. The default is `false`.
    */
   loadExternalStyleSheets?: boolean
+
+  /**
+   * Whether image URLs shall be loaded. `true` loads all image URLs, `false`
+   * loads none, and a regular expression loads only URLs matching
+   * the expression. The default is `true`.
+   */
+  loadImages?: boolean | RegExp
 }

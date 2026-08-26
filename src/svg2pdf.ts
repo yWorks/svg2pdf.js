@@ -52,7 +52,7 @@ export async function svg2pdf(
   // correct for a jsPDF-instance measurement unit that differs from `pt`
   pdf.setFontSize(context.attributeState.fontSize * pdf.internal.scaleFactor)
 
-  const node = parse(element, idMap)
+  const node = parse(element, context, idMap)
   await node.render(context)
 
   pdf.restoreGraphicsState()
@@ -77,4 +77,5 @@ export interface Svg2PdfOptions {
   width?: number
   height?: number
   loadExternalStyleSheets?: boolean
+  loadImages?: boolean | RegExp
 }

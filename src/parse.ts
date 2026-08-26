@@ -21,12 +21,13 @@ import { Anchor } from './nodes/anchor'
 import cssesc from 'cssesc'
 import { ClipPath } from './nodes/clippath'
 import { Symbol } from './nodes/symbol'
+import { Context } from './context/context'
 
-export function parse(node: Element, idMap?: { [id: string]: SvgNode }): SvgNode {
+export function parse(node: Element, context: Context, idMap?: { [id: string]: SvgNode }): SvgNode {
   let svgnode: SvgNode
   const children: SvgNode[] = []
 
-  forEachChild(node, (i, n) => children.push(parse(n, idMap)))
+  forEachChild(node, (i, n) => children.push(parse(n, context, idMap)))
 
   switch (node.tagName.toLowerCase()) {
     case 'a':
@@ -48,7 +49,7 @@ export function parse(node: Element, idMap?: { [id: string]: SvgNode }): SvgNode
       svgnode = new LinearGradient(node, children)
       break
     case 'image':
-      svgnode = new ImageNode(node, children)
+      svgnode = new ImageNode(node, children, context)
       break
     case 'line':
       svgnode = new Line(node, children)

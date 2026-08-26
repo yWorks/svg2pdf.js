@@ -17,14 +17,31 @@ export class ImageNode extends GraphicsNode {
   private readonly imageLoadingPromise: Promise<{ data: string; format: string }> | null = null
   private readonly imageUrl: string | null
 
-  constructor(element: Element, children: SvgNode[]) {
+  constructor(element: Element, children: SvgNode[], context: Context) {
     super(element, children)
     this.imageUrl = this.element.getAttribute('xlink:href') || this.element.getAttribute('href')
 
-    if (this.imageUrl) {
+    if (
+      this.imageUrl &&
+      ImageNode.shouldLoadImage(this.imageUrl, context.svg2pdfParameters.loadImages)
+    ) {
       // start loading the image as early as possible
       this.imageLoadingPromise = ImageNode.fetchImageData(this.imageUrl)
     }
+  }
+
+  private static shouldLoadImage(
+    imageUrl: string,
+    loadImages: boolean | RegExp | undefined
+  ): boolean {
+    if (loadImages === false) {
+      return false
+    }
+    if (loadImages instanceof RegExp) {
+      loadImages.lastIndex = 0
+      return loadImages.test(imageUrl)
+    }
+    return true
   }
 
   protected async renderCore(context: Context): Promise<void> {
@@ -64,16 +81,15 @@ export class ImageNode extends GraphicsNode {
       svgElement.setAttribute('height', String(height))
 
       const idMap: { [id: string]: SvgNode } = {}
-      const svgnode = parse(svgElement, idMap)
-      await svgnode.render(
-        new Context(context.pdf, {
-          refsHandler: new ReferencesHandler(idMap),
-          styleSheets: context.styleSheets,
-          viewport: new Viewport(width, height),
-          svg2pdfParameters: context.svg2pdfParameters,
-          textMeasure: context.textMeasure
-        })
-      )
+      const nestedContext = new Context(context.pdf, {
+        refsHandler: new ReferencesHandler(idMap),
+        styleSheets: context.styleSheets,
+        viewport: new Viewport(width, height),
+        svg2pdfParameters: context.svg2pdfParameters,
+        textMeasure: context.textMeasure
+      })
+      const svgNode = parse(svgElement, nestedContext, idMap)
+      await svgNode.render(nestedContext)
       return
     } else {
       const dataUri = `data:image/${format};base64,${btoa(data)}`
