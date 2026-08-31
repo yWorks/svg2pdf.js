@@ -11,7 +11,7 @@ Try it in the [online playground](http://raw.githack.com/yWorks/svg2pdf.js/maste
 You can install svg2pdf.js via npm:
 
 ```sh
-npm install svg2pdf.js jspdf --save
+npm install svg2pdf.js jspdf
 ```
 
 If you want to use a development version from the repository, note that the files in `dist` may reflect the latest
@@ -28,17 +28,15 @@ import 'svg2pdf.js'
 const doc = new jsPDF(width > height ? 'l' : 'p', 'pt', [width, height])
 
 const element = document.getElementById('svg')
-doc
-  .svg(element, {
-    x,
-    y,
-    width,
-    height
-  })
-  .then(() => {
-    // save the created pdf
-    doc.save('myPDF.pdf')
-  })
+await doc.svg(element, {
+  x,
+  y,
+  width,
+  height
+})
+
+// save the created pdf
+doc.save('myPDF.pdf')
 ```
 
 See the [TypeScript declaration file](https://github.com/yWorks/svg2pdf.js/blob/master/types.d.ts) for detailed
@@ -80,7 +78,7 @@ npm run build
 Run the tests with:
 
 ```sh
-npm run test
+npm test
 ```
 
 Tests are located in the `tests` folder. Most compare generated PDFs with snapshots. To update existing snapshots, run
