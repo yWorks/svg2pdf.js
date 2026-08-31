@@ -14,7 +14,7 @@ export class Anchor extends Group {
 
       context.pdf.link(
         scale * (box[0] * context.transform.sx + context.transform.tx),
-        ph - scale * (box[1] * context.transform.sy + context.transform.ty),
+        ph - scale * ((box[1] + box[3]) * context.transform.sy + context.transform.ty),
         scale * box[2],
         scale * box[3],
         { url: href }

@@ -164,9 +164,10 @@ export class TextNode extends GraphicsNode {
           renderingMode: textRenderingMode === 'fill' ? void 0 : textRenderingMode,
           charSpace: charSpace === 0 ? void 0 : charSpace
         })
+        const textBottom = textY + dy + 0.1 * pdfFontSize
         this.boundingBox = [
           textX + dx - xOffset,
-          textY + dy + 0.1 * pdfFontSize,
+          textBottom - pdfFontSize,
           context.textMeasure.measureTextWidth(transformedText, context.attributeState),
           pdfFontSize
         ]
