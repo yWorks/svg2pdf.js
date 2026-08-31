@@ -3239,7 +3239,7 @@
         };
         TextNode.prototype.renderCore = function (context) {
             return __awaiter(this, void 0, void 0, function () {
-                var xOffset, charSpace, lengthAdjustment, pdfFontSize, textX, textY, dx, dy, textLength, visibility, tSpanCount, textContent, trimmedText, transformedText, defaultSize, shouldPreserve, alignmentBaseline, textRenderingMode, textChunks, currentTextSegment, initialSpace, trimRight, r, totalDefaultWidth_1, totalLength_1;
+                var xOffset, charSpace, lengthAdjustment, pdfFontSize, textX, textY, dx, dy, textLength, visibility, tSpanCount, textContent, trimmedText, transformedText, defaultSize, shouldPreserve, alignmentBaseline, textRenderingMode, textBottom, textChunks, currentTextSegment, initialSpace, trimRight, r, totalDefaultWidth_1, totalLength_1;
                 return __generator(this, function (_a) {
                     context.pdf.saveGraphicsState();
                     xOffset = 0;
@@ -3276,9 +3276,10 @@
                                 renderingMode: textRenderingMode === 'fill' ? void 0 : textRenderingMode,
                                 charSpace: charSpace === 0 ? void 0 : charSpace
                             });
+                            textBottom = textY + dy + 0.1 * pdfFontSize;
                             this.boundingBox = [
                                 textX + dx - xOffset,
-                                textY + dy + 0.1 * pdfFontSize,
+                                textBottom - pdfFontSize,
                                 context.textMeasure.measureTextWidth(transformedText, context.attributeState),
                                 pdfFontSize
                             ];
@@ -5581,7 +5582,7 @@
                                 box = this.getBoundingBox(context);
                                 scale = context.pdf.internal.scaleFactor;
                                 ph = context.pdf.internal.pageSize.getHeight();
-                                context.pdf.link(scale * (box[0] * context.transform.sx + context.transform.tx), ph - scale * (box[1] * context.transform.sy + context.transform.ty), scale * box[2], scale * box[3], { url: href });
+                                context.pdf.link(scale * (box[0] * context.transform.sx + context.transform.tx), ph - scale * ((box[1] + box[3]) * context.transform.sy + context.transform.ty), scale * box[2], scale * box[3], { url: href });
                             }
                             return [2 /*return*/];
                     }
