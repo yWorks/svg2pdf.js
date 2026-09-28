@@ -124,12 +124,15 @@ export function parseAttributes(context: Context, svgNode: SvgNode, node?: Eleme
   if (fontFamily) {
     // font-family-papandreou rejects unquoted names with non-ASCII (and some
     // other) characters. Browsers still honor those attribute values, so fall
-    // back to treating the whole string as a single family name.
+    // back to comma-splitting and trimming the family names.
     let fontFamilies: string[]
     try {
       fontFamilies = FontFamily.parse(fontFamily)
     } catch {
-      fontFamilies = [fontFamily.trim()]
+      fontFamilies = fontFamily
+        .split(',')
+        .map(f => f.trim().replace(/^['"]|['"]$/g, ''))
+        .filter(Boolean)
     }
     context.attributeState.fontFamily = findFirstAvailableFontFamily(
       context.attributeState,
