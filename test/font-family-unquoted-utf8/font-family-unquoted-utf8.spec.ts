@@ -9,9 +9,7 @@ describe('font-family-unquoted-utf8', () => {
       '/test/font-family-unquoted-utf8/font-family-unquoted-utf8.svg'
     )
     const pdf = new jsPDF(width > height ? 'l' : 'p', 'pt', [width, height])
-    await expect(
-      svg2pdf(svgElement, pdf, { loadExternalStyleSheets: true })
-    ).resolves.toBeDefined()
+    await expect(svg2pdf(svgElement, pdf, { loadExternalStyleSheets: true })).resolves.toBeDefined()
     const output = pdf.output('arraybuffer')
     expect(output.byteLength).toBeGreaterThan(0)
   })
