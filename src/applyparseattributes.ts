@@ -92,7 +92,14 @@ export function parseAttributes(context: Context, svgNode: SvgNode, node?: Eleme
     const dashOffset = parseInt(
       getAttribute(domNode, context.styleSheets, 'stroke-dashoffset') || '0'
     )
-    context.attributeState.strokeDasharray = parseFloats(dashArray)
+    const parsedDashArray = parseFloats(dashArray)
+    // PDF forbids dash arrays whose lengths are all zero (undefined rendering /
+    // viewer errors). Treat them as a solid stroke instead of emitting the pattern.
+    // See https://github.com/yWorks/svg2pdf.js/issues/343
+    context.attributeState.strokeDasharray =
+      parsedDashArray.length > 0 && parsedDashArray.every(value => value === 0)
+        ? []
+        : parsedDashArray
     context.attributeState.strokeDashoffset = dashOffset
   }
   const miterLimit = getAttribute(domNode, context.styleSheets, 'stroke-miterlimit')
