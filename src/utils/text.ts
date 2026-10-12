@@ -29,7 +29,7 @@ export function transformXmlSpace(trimmedText: string, attributeState: Attribute
     attributeState.xmlSpace === 'preserve' || attributeState.whiteSpace === 'pre'
 
   if (!shouldPreserve) {
-    trimmedText = trimmedText.trim()
+    trimmedText = trimRight(trimLeft(trimmedText))
     trimmedText = consolidateSpaces(trimmedText)
   }
 
@@ -63,9 +63,9 @@ export function transformText(node: Element, text: string, context: Context): st
 }
 
 export function trimLeft(str: string): string {
-  return str.replace(/^\s+/, '')
+  return str.replace(/^[ \t\r\n]+/, '')
 }
 
 export function trimRight(str: string): string {
-  return str.replace(/\s+$/, '')
+  return str.replace(/[ \t\r\n]+$/, '')
 }
