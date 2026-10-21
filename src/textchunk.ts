@@ -57,7 +57,7 @@ export class TextChunk {
         this.texts[r] = trimRight(this.texts[r])
       }
       // If find a letter, stop right-trimming
-      if (this.texts[r].match(/[^\s]/)) {
+      if (this.texts[r].match(/[^ \t\r\n]/)) {
         return false
       }
     }
