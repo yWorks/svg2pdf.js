@@ -32,7 +32,8 @@ await doc.svg(element, {
   x,
   y,
   width,
-  height
+  height,
+  styleNonce // CSP nonce applied to internally created <style> elements
 })
 
 // save the created pdf
