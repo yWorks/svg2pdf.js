@@ -91,4 +91,5 @@ export interface Svg2pdfParameters {
   height?: number
   loadExternalStyleSheets?: boolean
   loadImages?: boolean | RegExp
+  styleNonce?: string
 }

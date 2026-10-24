@@ -4,11 +4,13 @@ import { nodeIs } from '../utils/node'
 export class StyleSheets {
   private rootSvg: Element
   private readonly loadExternalSheets: boolean
+  private readonly styleNonce?: string
   private readonly styleSheets: CSSStyleSheet[]
 
-  constructor(rootSvg: Element, loadExtSheets: boolean) {
+  constructor(rootSvg: Element, loadExtSheets: boolean, styleNonce?: string) {
     this.rootSvg = rootSvg
     this.loadExternalSheets = loadExtSheets
+    this.styleNonce = styleNonce
     this.styleSheets = []
   }
 
@@ -63,6 +65,9 @@ export class StyleSheets {
     const styleDoc = document.implementation.createHTMLDocument('')
     for (const sheetText of sheetTexts) {
       const style = styleDoc.createElement('style')
+      if (this.styleNonce) {
+        style.nonce = this.styleNonce
+      }
       style.textContent = sheetText
       styleDoc.body.appendChild(style)
       const sheet = style.sheet
