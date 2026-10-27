@@ -74,4 +74,7 @@ export interface Svg2pdfOptions {
    * the expression. The default is `true`.
    */
   loadImages?: boolean | RegExp
+
+  /** CSP nonce applied to style elements created when reparsing style sheets. */
+  styleNonce?: string
 }

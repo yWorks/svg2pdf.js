@@ -21,7 +21,7 @@ export async function svg2pdf(
   const idMap: { [id: string]: SvgNode } = {}
   const refsHandler = new ReferencesHandler(idMap)
 
-  const styleSheets = new StyleSheets(element, extCss)
+  const styleSheets = new StyleSheets(element, extCss, options.styleNonce)
   await styleSheets.load()
 
   // start with the entire page size as viewport
@@ -78,4 +78,5 @@ export interface Svg2PdfOptions {
   height?: number
   loadExternalStyleSheets?: boolean
   loadImages?: boolean | RegExp
+  styleNonce?: string
 }
