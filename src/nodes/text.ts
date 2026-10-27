@@ -54,15 +54,15 @@ export class TextNode extends GraphicsNode {
         if (!shouldPreserve) {
           trimmedText = consolidateSpaces(trimmedText)
           // If first text in tspan and starts with a space
-          if (firstText && trimmedText.match(/^\s/)) {
+          if (firstText && trimmedText.match(/^[ \t\r\n]/)) {
             initialSpace = true
           }
           // No longer the first text if we've found a letter
-          if (trimmedText.match(/[^\s]/)) {
+          if (trimmedText.match(/[^ \t\r\n]/)) {
             firstText = false
           }
           // Consolidate spaces across different children
-          if (trimInfo.prevText.match(/\s$/)) {
+          if (trimInfo.prevText.match(/[ \t\r\n]$/)) {
             trimmedText = trimLeft(trimmedText)
           }
         }
@@ -119,7 +119,7 @@ export class TextNode extends GraphicsNode {
 
     let xOffset = 0
     let charSpace = 0
-    // If string starts with \s then for charSpace calculations
+    // If string starts with XML whitespace then for charSpace calculations
     // need to treat it as if it contains one extra character
     let lengthAdjustment = 1
 
@@ -149,7 +149,7 @@ export class TextNode extends GraphicsNode {
         const shouldPreserve =
           context.attributeState.xmlSpace === 'preserve' ||
           context.attributeState.whiteSpace === 'pre'
-        if (!shouldPreserve && textContent.match(/^\s/)) {
+        if (!shouldPreserve && textContent.match(/^[ \t\r\n]/)) {
           lengthAdjustment = 0
         }
         charSpace = (textLength - defaultSize) / (transformedText.length - lengthAdjustment) || 0
