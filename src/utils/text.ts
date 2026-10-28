@@ -67,5 +67,5 @@ export function trimLeft(str: string): string {
 }
 
 export function trimRight(str: string): string {
-  return str.replace(/[ \t\r\n]+$/, '')
+  return str.replace(/(^|[^ \t\r\n])[ \t\r\n]+$/, '$1')
 }
