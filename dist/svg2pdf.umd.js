@@ -2035,7 +2035,14 @@
         var dashArray = getAttribute(domNode, context.styleSheets, 'stroke-dasharray');
         if (dashArray) {
             var dashOffset = parseInt(getAttribute(domNode, context.styleSheets, 'stroke-dashoffset') || '0');
-            context.attributeState.strokeDasharray = parseFloats(dashArray);
+            var parsedDashArray = parseFloats(dashArray);
+            // PDF forbids dash arrays whose lengths are all zero (undefined rendering /
+            // viewer errors). Treat them as a solid stroke instead of emitting the pattern.
+            // See https://github.com/yWorks/svg2pdf.js/issues/343
+            context.attributeState.strokeDasharray =
+                parsedDashArray.length > 0 && parsedDashArray.every(function (value) { return value === 0; })
+                    ? []
+                    : parsedDashArray;
             context.attributeState.strokeDashoffset = dashOffset;
         }
         var miterLimit = getAttribute(domNode, context.styleSheets, 'stroke-miterlimit');
@@ -2997,7 +3004,7 @@
         trimmedText = replaceTabsBySpace(trimmedText);
         var shouldPreserve = attributeState.xmlSpace === 'preserve' || attributeState.whiteSpace === 'pre';
         if (!shouldPreserve) {
-            trimmedText = trimmedText.trim();
+            trimmedText = trimRight(trimLeft(trimmedText));
             trimmedText = consolidateSpaces(trimmedText);
         }
         return trimmedText;
@@ -3025,10 +3032,10 @@
         }
     }
     function trimLeft(str) {
-        return str.replace(/^\s+/, '');
+        return str.replace(/^[ \t\r\n]+/, '');
     }
     function trimRight(str) {
-        return str.replace(/\s+$/, '');
+        return str.replace(/(^|[^ \t\r\n])[ \t\r\n]+$/, '$1');
     }
 
     /**
@@ -3067,7 +3074,7 @@
                     this.texts[r] = trimRight(this.texts[r]);
                 }
                 // If find a letter, stop right-trimming
-                if (this.texts[r].match(/[^\s]/)) {
+                if (this.texts[r].match(/[^ \t\r\n]/)) {
                     return false;
                 }
             }
@@ -3196,15 +3203,15 @@
                     if (!shouldPreserve) {
                         trimmedText = consolidateSpaces(trimmedText);
                         // If first text in tspan and starts with a space
-                        if (firstText && trimmedText.match(/^\s/)) {
+                        if (firstText && trimmedText.match(/^[ \t\r\n]/)) {
                             initialSpace = true;
                         }
                         // No longer the first text if we've found a letter
-                        if (trimmedText.match(/[^\s]/)) {
+                        if (trimmedText.match(/[^ \t\r\n]/)) {
                             firstText = false;
                         }
                         // Consolidate spaces across different children
-                        if (trimInfo.prevText.match(/\s$/)) {
+                        if (trimInfo.prevText.match(/[ \t\r\n]$/)) {
                             trimmedText = trimLeft(trimmedText);
                         }
                     }
@@ -3262,7 +3269,7 @@
                             defaultSize = context.textMeasure.measureTextWidth(transformedText, context.attributeState);
                             shouldPreserve = context.attributeState.xmlSpace === 'preserve' ||
                                 context.attributeState.whiteSpace === 'pre';
-                            if (!shouldPreserve && textContent.match(/^\s/)) {
+                            if (!shouldPreserve && textContent.match(/^[ \t\r\n]/)) {
                                 lengthAdjustment = 0;
                             }
                             charSpace = (textLength - defaultSize) / (transformedText.length - lengthAdjustment) || 0;
@@ -5927,9 +5934,10 @@
     };
 
     var StyleSheets = /** @class */ (function () {
-        function StyleSheets(rootSvg, loadExtSheets) {
+        function StyleSheets(rootSvg, loadExtSheets, styleNonce) {
             this.rootSvg = rootSvg;
             this.loadExternalSheets = loadExtSheets;
+            this.styleNonce = styleNonce;
             this.styleSheets = [];
         }
         StyleSheets.prototype.load = function () {
@@ -5994,6 +6002,9 @@
             for (var _i = 0, sheetTexts_1 = sheetTexts; _i < sheetTexts_1.length; _i++) {
                 var sheetText = sheetTexts_1[_i];
                 var style = styleDoc.createElement('style');
+                if (this.styleNonce) {
+                    style.nonce = this.styleNonce;
+                }
                 style.textContent = sheetText;
                 styleDoc.body.appendChild(style);
                 var sheet = style.sheet;
@@ -6225,7 +6236,7 @@
                         extCss = (_c = options.loadExternalStyleSheets) !== null && _c !== void 0 ? _c : false;
                         idMap = {};
                         refsHandler = new ReferencesHandler(idMap);
-                        styleSheets = new StyleSheets(element, extCss);
+                        styleSheets = new StyleSheets(element, extCss, options.styleNonce);
                         return [4 /*yield*/, styleSheets.load()
                             // start with the entire page size as viewport
                         ];
