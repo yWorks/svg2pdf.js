@@ -28,15 +28,24 @@
     "LICENSE"
   ],
   "type": "module",
-  "main": "dist/svg2pdf.umd.min.js",
+  "main": "dist/svg2pdf.umd.min.cjs",
   "module": "dist/svg2pdf.es.min.js",
   "browser": "dist/svg2pdf.es.min.js",
   "types": "types.d.ts",
+  "exports": {
+    ".": {
+      "types": "./types.d.ts",
+      "import": "./dist/svg2pdf.es.min.js",
+      "require": "./dist/svg2pdf.umd.min.cjs"
+    },
+    "./dist/*": "./dist/*"
+  },
   "scripts": {
     "version": "npm run build && git add -A dist",
     "build": "rollup -c rollup.config.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:node": "node --test test/node-entry/node-entry.test.mjs",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:update": "vitest run -u",
