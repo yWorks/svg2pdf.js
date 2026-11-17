@@ -47,6 +47,14 @@ const umd = {
       sourcemap: true,
       globals,
       plugins: [terser({})]
+    },
+    {
+      // "type": "module" makes Node treat *.js as ESM, so require() needs a .cjs file
+      file: pkg.browser.replace('.es.min.js', '.umd.min.cjs'),
+      format: 'cjs',
+      exports: 'named',
+      sourcemap: true,
+      plugins: [terser({})]
     }
   ],
   external: umdExternals,
