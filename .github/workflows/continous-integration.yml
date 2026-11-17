@@ -16,6 +16,8 @@ jobs:
     - run: npm ci
     - run: npm run playwright:install
     - run: npm run test:ci
+    - run: npm run build
+    - run: npm run test:node
     - name: Archive reference files
       if: ${{ failure() }}
       uses: actions/upload-artifact@v6
