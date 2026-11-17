@@ -67,3 +67,51 @@ console.log(typeof svg2pdf, typeof jsPDF.API.svg)
   )
   assert.equal(out, 'function function')
 })
+
+for (const [module, moduleResolution] of [
+  ['Node16', 'Node16'],
+  ['NodeNext', 'NodeNext'],
+  ['ESNext', 'Bundler']
+]) {
+  test(`TypeScript consumer: tsc --noEmit (${moduleResolution})`, () => {
+    withConsumer(
+      {
+        'package.json': JSON.stringify({ type: 'module' }),
+        'consumer.ts': `
+import { jsPDF } from 'jspdf'
+import { svg2pdf, type Svg2pdfOptions } from 'svg2pdf.js'
+import 'svg2pdf.js'
+
+const pdf = new jsPDF()
+const element = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+const options: Svg2pdfOptions = { width: 100, loadImages: false }
+const rendered: Promise<jsPDF> = svg2pdf(element, pdf, options)
+const augmented: Promise<jsPDF> = pdf.svg(element, options)
+// @ts-expect-error width must be numeric (also guards against untyped exports)
+svg2pdf(element, pdf, { width: '100' })
+`,
+        'tsconfig.json': JSON.stringify({
+          compilerOptions: {
+            strict: true,
+            noEmit: true,
+            module,
+            moduleResolution,
+            target: 'ES2020',
+            types: []
+          },
+          files: ['consumer.ts']
+        })
+      },
+      dir =>
+        execFileSync(
+          process.execPath,
+          [join(root, 'node_modules/typescript/bin/tsc'), '--noEmit'],
+          {
+            cwd: dir,
+            encoding: 'utf8',
+            stdio: 'pipe'
+          }
+        )
+    )
+  })
+}
