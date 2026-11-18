@@ -16,6 +16,16 @@ function licenseBanner() {
   })
 }
 
+// types.d.ts is an ESM declaration file in a "type": "module" package, so require() consumers get a .d.cts copy
+function copyCjsTypes() {
+  return {
+    name: 'copy-cjs-types',
+    writeBundle() {
+      fs.copyFileSync('types.d.ts', pkg.exports['.'].require.types)
+    }
+  }
+}
+
 const umdExternals = [
   ...Object.keys(pkg.peerDependencies || {}),
   ...Object.keys(pkg.optionalDependencies || {})
@@ -47,6 +57,15 @@ const umd = {
       sourcemap: true,
       globals,
       plugins: [terser({})]
+    },
+    {
+      file: pkg.main,
+      format: 'umd',
+      name: 'svg2pdf',
+      exports: 'named',
+      sourcemap: true,
+      globals,
+      plugins: [terser({}), copyCjsTypes()]
     }
   ],
   external: umdExternals,
