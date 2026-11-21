@@ -16,6 +16,17 @@ function licenseBanner() {
   })
 }
 
+// types.d.ts is an ES module declaration because the package is "type": "module".
+// CommonJS consumers need the same declarations in a .d.cts file.
+function cjsTypes() {
+  return {
+    name: 'cjs-types',
+    writeBundle() {
+      fs.copyFileSync('types.d.ts', 'dist/types.d.cts')
+    }
+  }
+}
+
 const umdExternals = [
   ...Object.keys(pkg.peerDependencies || {}),
   ...Object.keys(pkg.optionalDependencies || {})
@@ -47,10 +58,26 @@ const umd = {
       sourcemap: true,
       globals,
       plugins: [terser({})]
+    },
+    {
+      // CommonJS copy of the minified UMD build for `require` (the package is "type": "module")
+      file: pkg.main,
+      format: 'umd',
+      name: 'svg2pdf',
+      exports: 'named',
+      sourcemap: true,
+      globals,
+      plugins: [terser({})]
     }
   ],
   external: umdExternals,
-  plugins: [typescript(), commonjs({ extensions: ['.js', '.ts'] }), resolve(), licenseBanner()]
+  plugins: [
+    typescript(),
+    commonjs({ extensions: ['.js', '.ts'] }),
+    resolve(),
+    licenseBanner(),
+    cjsTypes()
+  ]
 }
 
 const es = {
